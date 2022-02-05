@@ -1,4 +1,5 @@
 //using GeneticSharp.Domain;
+using Stateless;
 
 namespace AlgoritmoEvolutivo
 {

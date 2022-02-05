@@ -16,10 +16,25 @@ namespace Visualizador
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            var result = MessageBox.Show((AlgoritmoEvolutivo.MainClass.Test()).ToString(), "Smth",
-                                 MessageBoxButtons.YesNo,
-                                 MessageBoxIcon.Question);
+
+            AlgoritmoEvolutivo.TestFSM testFSM = new AlgoritmoEvolutivo.TestFSM();
+            
+            var result = MessageBox.Show("State: " + testFSM.GetState().ToString() + "\nKill?", "TestFSM",
+                     MessageBoxButtons.YesNo,
+                     MessageBoxIcon.Question);
+
+            if (result == System.Windows.Forms.DialogResult.Yes)
+            {
+                testFSM.Fire(AlgoritmoEvolutivo.Trigger.Die);
+            }
+
+            result = MessageBox.Show("State: " + testFSM.GetState().ToString(), "TestFSM",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+
             Application.Run(new Form1());
+
+
         }
     }
 }
