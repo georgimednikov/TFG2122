@@ -16,6 +16,9 @@ namespace Visualizador
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            var result = MessageBox.Show((AlgoritmoEvolutivo.MainClass.Test()).ToString(), "Smth",
+                                 MessageBoxButtons.YesNo,
+                                 MessageBoxIcon.Question);
             Application.Run(new Form1());
         }
     }

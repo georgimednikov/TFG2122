@@ -1,8 +1,18 @@
+//using GeneticSharp.Domain;
 
-static class MainClass
+namespace AlgoritmoEvolutivo
 {
-    static void Main(string[] args)
+    public static class MainClass
     {
-        while (true) ;
+        static void Main(string[] args)
+        {
+            while (true) ;
+        }
+
+        public static int Test()
+        {
+            GeneticSharp.Domain.Chromosomes.IntegerChromosome chromosome = new GeneticSharp.Domain.Chromosomes.IntegerChromosome(0, 1);
+            return chromosome.Length;
+        }
     }
 }
