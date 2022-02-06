@@ -13,21 +13,40 @@ namespace EvolutionSimulation.src
     public class CreatureChromosome : BinaryChromosomeBase
     {
         /// <summary>
-        /// The amount of possible values for each gene
+        /// Number of bits of the Choromose
         /// </summary>
-        static int[] geneSize;
+        static private int bitLength;
+
+        BitArray[] bitChromosome;
+
+        /// <summary>
+        /// Start(inclusive) and end(exclusive) of the genes in the Choromosome
+        /// </summary>
+        static private Vector2[] geneRanges;
+
         /// <summary>
         /// Sets the genes' ranges of a creature's chromosome
         /// </summary>
-        public static void SetGeneSize(params int[] genes)
+        public static void SetGeneRange(params int[] genes)
         {
-            geneSize = genes;
+            geneRanges = new Vector2[genes.Length];
+           
+            bitLength = 0;
+            int geneStart = 0;
+            for (int i = 0; i < genes.Length; ++i)
+            {
+                geneRanges[i].X = geneStart;
+                geneRanges[i].Y = geneStart + genes[i];
+                geneStart += genes[i];
+            }
+            bitLength = geneStart; //Because count starts at 0
         }
 
-        public CreatureChromosome() : base(geneSize.Length) //Number of genes, not bits
+        public CreatureChromosome() : base(geneRanges.Length) //Number of genes, not bits
         {
+            bitChromosome = new BitArray[geneRanges.Length];
             CreateGenes();
-
+            int a = 0;
         }
 
         /// <summary>
@@ -35,8 +54,11 @@ namespace EvolutionSimulation.src
         /// </summary>
         public override Gene GenerateGene(int geneIndex)
         {
-            int size = geneSize[geneIndex];
-            var value = RandomizationProvider.Current.GetInt(0, size);
+            Vector2 gene = geneRanges[geneIndex];
+            int size = (int)gene.Y - (int)gene.X; //Number of bit in gene
+            var value = RandomizationProvider.Current.GetInt(0, (int)Math.Pow(2, size));
+            BitArray bits = new BitArray(new int[] { value });
+            bitChromosome[geneIndex] = bits;
             return new Gene(value);
         }
 
@@ -48,13 +70,13 @@ namespace EvolutionSimulation.src
             return new CreatureChromosome();
         }
 
-        public int GetGeneBit(int geneIndex, int bitIndex)
-        {
-            int size = geneSize[geneIndex];
-            int value = (int)GetGene(geneIndex).Value;
-            BitArray bits = new BitArray(new int[] { value });
-            return bits[bitIndex] ? 1 : 0;
-        }
+        //public int GetGeneBit(int geneIndex, int bitIndex)
+        //{
+        //    int size = geneSize[geneIndex];
+        //    int value = (int)GetGene(geneIndex).Value;
+        //    BitArray bits = new BitArray(new int[] { value });
+        //    return bits[bitIndex] ? 1 : 0;
+        //}
 
         /// <summary>
         /// Get the numeric value of the desired attribute
@@ -75,7 +97,7 @@ namespace EvolutionSimulation.src
 
         private int GetFeature(int feature)
         {
-            if (feature >= geneSize.Length || feature < 0)
+            if (feature >= geneRanges.Length || feature < 0)
                 return -1;
             return (int)GetGene(feature).Value;
         }

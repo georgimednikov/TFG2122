@@ -12,10 +12,10 @@ namespace EvolutionSimulation
         public static int Test()
         {
             //GeneticSharp.Domain.Chromosomes.IntegerChromosome chromosome = new GeneticSharp.Domain.Chromosomes.IntegerChromosome(0, 1);
-            src.CreatureChromosome.SetGeneSize(10, 10, 10);
+            src.CreatureChromosome.SetGeneRange(5, 5, 5);
             src.CreatureChromosome chromosome = new src.CreatureChromosome();
             chromosome.GetAttribute(src.CreatureAttribute.Strength);
-            chromosome.GetFeature((int)src.CreatureAttribute.Knowledge);
+            chromosome.GetAttribute(src.CreatureAttribute.Knowledge);
             return chromosome.Length;
         }
     }
