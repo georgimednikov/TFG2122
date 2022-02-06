@@ -7,7 +7,9 @@ namespace AlgoritmoEvolutivo
     {
         static void Main(string[] args)
         {
-            while (true) ;
+            Simulation s = new Simulation();
+            s.Init();
+            s.Run();
         }
 
         public static int Test()

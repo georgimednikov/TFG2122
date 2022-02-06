@@ -6,29 +6,18 @@ using System.Threading.Tasks;
 
 namespace AlgoritmoEvolutivo
 {
+    /// <summary>
+    /// Clase que simula la evolucion
+    /// </summary>
     public class Simulation
     {
+
         public void Init()
         {
-
-        }
-
-        public T AddEntity<T>() where T : IEntity, new()
-        {
-            T ent = new T();
-            entities.Add(ent);
-            world.AddEntity(ent);
-            return ent;
-        }
-
-        //public IEntity GetEntity()
-        //{
-
-        //}
-
-        public void Delete(IEntity entity)
-        {
-            delete.Add(entity);
+            world = new World();
+            world.Init(8);
+            Creature c = world.AddEntity<Creature>();
+            c.Init(world, 4, 4);
         }
 
         public void Run()
@@ -36,17 +25,9 @@ namespace AlgoritmoEvolutivo
             while (true)
             {
                 world.Tick();
-
-                entities.ForEach(delegate (IEntity e) { e.Tick(); });
-
-                delete.ForEach(delegate (IEntity e) { entities.Remove(e); });
-
-                delete.Clear();
             }
         }
 
-        public List<IEntity> entities { get; private set; }
-        List<IEntity> delete;
-        IWorld world;
+        World world;
     }
 }
