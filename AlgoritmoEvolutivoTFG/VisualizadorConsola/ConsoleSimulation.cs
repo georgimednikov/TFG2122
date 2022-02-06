@@ -49,8 +49,10 @@ namespace VisualizadorConsola
                 Console.Write("e ");
             }
             Console.SetCursorPosition(world.mapSize, world.mapSize);
+            Console.WriteLine("\n" + cr_state);
         }
 
         World world;
+        string cr_state = "";
     }
 }

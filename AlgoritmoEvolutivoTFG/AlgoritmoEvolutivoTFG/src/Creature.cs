@@ -12,6 +12,21 @@ namespace AlgoritmoEvolutivo
     public class Creature : IEntity
     {
         /// <summary>
+        /// Clase privada para representar los estados
+        /// El estado tiene un identificador y una accion asociada
+        /// </summary>
+        private class State
+        {
+            public StateID name;
+            public Action action;
+
+            public State(StateID n, Action a)
+            {
+                name = n; action = a;
+            }
+        }
+
+        /// <summary>
         /// Constructor para factorias
         /// </summary>
         public Creature()
@@ -30,6 +45,12 @@ namespace AlgoritmoEvolutivo
             world = w;
             this.x = x;
             this.y = y;
+            this.fsm = new Stateless.StateMachine<State, TriggerID>(
+                () => currState, 
+                s => currState = s, 
+                Stateless.FiringMode.Queued
+            );
+            ConfigureStateMachine();
         }
 
         /// <summary>
@@ -37,6 +58,23 @@ namespace AlgoritmoEvolutivo
         /// </summary>
         public void Tick()
         {
+            // TODO: Poner los Fire en las acciones de los estados
+            // y quitar esto de aquí
+            if (currState.name == StateID.Dead) return;
+            Speed--;
+            if (Speed <= 0)
+            {
+                Speed = 0;
+                fsm.Fire(TriggerID.Dies);
+            }
+            else if (Speed % 2 == 0)
+            {
+                fsm.Fire(TriggerID.Moves);
+            }
+            else fsm.Fire(TriggerID.Stops);
+
+            // Ejecuta la accion correspondiente al estado actual
+            currState.action();
             Move();
         }
 
@@ -50,11 +88,76 @@ namespace AlgoritmoEvolutivo
             if (world.canMove(nX, nY)) { x = nX; y = nY; }
         }
 
+        /// <summary>
+        /// Devuelve el estado actual de la creatura
+        /// </summary>
+        /// <returns></returns>
+        public string GetState()
+        {
+            return currState.name.ToString();
+        }
+
+        /// <summary>
+        /// Configura la maquina de estados de la creatura
+        /// con los estados que se indiquen.
+        /// TODO: los estados los estamos poniendo a pelo
+        /// </summary>
+        void ConfigureStateMachine()
+        {
+            // Setup de estados
+            State Alive = new State(
+               StateID.Alive,
+               () => { /*TODO: Borrar*/Console.WriteLine("Idle"); }
+           );
+            State Dead = new State(
+                 StateID.Dead,
+                () => { /*TODO: Borrar*/Console.WriteLine("Dead"); }
+            );
+
+            State Idle = new State(
+                StateID.Idle,
+                () => { /*TODO: Borrar*/Console.WriteLine("Idle"); }
+            );
+
+
+            State Moving = new State(
+                 StateID.Moving,
+                () => { /*TODO: Borrar*/Console.WriteLine("Moving"); }
+            );
+
+            // Estado inicial
+            currState = Moving;
+
+            // Establecer cada estado en la FSM y los 
+            // triggers de transiciones
+            fsm.Configure(Alive)
+                .Permit(TriggerID.Dies, Dead)
+                .InitialTransition(Moving);
+
+            fsm.Configure(Dead);
+
+            fsm.Configure(Idle)
+                .SubstateOf(Alive)
+                .Permit(TriggerID.Moves, Moving);
+
+            fsm.Configure(Moving)
+                .SubstateOf(Alive)
+                .Permit(TriggerID.Stops, Idle);
+        }
+
         // Posicion en el mapa del mundo
         public int x, y;
         // Mundo en el que existe la criatura
         World world;
         // Generador de números lolrandom
         Random r;
+        // Maquina de estados
+        // Esquema: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
+        Stateless.StateMachine<State, TriggerID> fsm;
+        // Estado actual
+        State currState;
+
+        // TODO: Velocidad, pero ahora solo es para probar la FSM
+        public float Speed = 10;
     }
 }

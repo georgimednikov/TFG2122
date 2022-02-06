@@ -70,12 +70,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Creature.cs" />
+    <Compile Include="src\CreatureFSM.cs" />
     <Compile Include="src\ISimulation.cs" />
     <Compile Include="src\World.cs" />
     <Compile Include="src\Simulation.cs" />
     <Compile Include="src\IEntity.cs" />
     <Compile Include="src\Plant.cs" />
-    <Compile Include="src\TestFSM.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="GeneticSharp.Domain, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
