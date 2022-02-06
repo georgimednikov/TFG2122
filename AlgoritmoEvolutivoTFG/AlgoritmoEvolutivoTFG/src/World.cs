@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-/*TODO: Temp*/ using System.Threading;
 using System.Threading.Tasks;
 
 namespace AlgoritmoEvolutivo
@@ -10,7 +9,7 @@ namespace AlgoritmoEvolutivo
     /// <summary>
     /// Clase que define el mundo simulado
     /// </summary>
-    class World
+    public class World
     {
         /// <summary>
         /// Datos fisicos de cada casilla del mapa
@@ -54,7 +53,7 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Comprubea si las coordenadas objetivo se encuentran dentro del mapa
+        /// Comprueba si las coordenadas objetivo se encuentran dentro del mapa
         /// </summary>
         /// <param name="x">Coordenada x</param>
         /// <param name="y">Coordenada y</param>
@@ -65,7 +64,7 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Paso de ejeucion de la simulacion del mundo
+        /// Paso de ejecucion de la simulacion del mundo
         /// </summary>
         public void Tick()
         {
@@ -74,32 +73,6 @@ namespace AlgoritmoEvolutivo
             delete.ForEach(delegate (IEntity e) { entities.Remove(e); });
 
             delete.Clear();
-
-            /*TODO: Temp*/ Render();
-            /*TODO: Temp*/ Thread.Sleep(100);
-        }
-
-        /// <summary>
-        /// Renderiza el mapa y las criaturas
-        /// TODO: Temp
-        /// </summary>
-        void Render()
-        {
-            Console.Clear();
-            for (int i = 0; i < map.GetLength(0); i++)
-            {
-                for (int j = 0; j < map.GetLength(1); j++)
-                {
-                    Console.Write(". ");
-                }
-                Console.WriteLine();
-            }
-            foreach (var e in entities)
-            {
-                Console.SetCursorPosition((e as Creature).x * 2, (e as Creature).y);
-                Console.Write("e ");
-            }
-            Console.SetCursorPosition(mapSize, mapSize);
         }
 
         // Entidades en el mundo
@@ -109,6 +82,6 @@ namespace AlgoritmoEvolutivo
         // Mapa fisico
         MapData[,] map;
         // Tamanio del mapa
-        int mapSize;
+        public int mapSize { get; private set; }
     }
 }

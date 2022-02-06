@@ -9,9 +9,8 @@ namespace AlgoritmoEvolutivo
     /// <summary>
     /// Clase que simula la evolucion
     /// </summary>
-    public class Simulation
+    public class Simulation : ISimulation
     {
-
         public void Init()
         {
             world = new World();

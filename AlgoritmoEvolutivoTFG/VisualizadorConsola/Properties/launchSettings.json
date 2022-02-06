@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "VisualizadorConsola": {
+      "commandName": "Project",
+      "workingDirectory": "$(SolutionDir)VisualizadorConsola\\bin"
+    }
+  }
+}

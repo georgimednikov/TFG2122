@@ -9,7 +9,7 @@ namespace AlgoritmoEvolutivo
     /// <summary>
     /// La creatura
     /// </summary>
-    class Creature : IEntity
+    public class Creature : IEntity
     {
         /// <summary>
         /// Constructor para factorias
@@ -20,10 +20,10 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Inicia una criatura en un mundo y posición
+        /// Inicia una criatura en un mundo y posicion
         /// </summary>
         /// <param name="w">El mundo en el que tomara residencia</param>
-        /// <param name="x">Posición x</param>
+        /// <param name="x">Posicion x</param>
         /// <param name="y">Posicion y</param>
         public void Init(World w, int x, int y)
         {
@@ -33,7 +33,7 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Paso de simulación
+        /// Paso de simulacion
         /// </summary>
         public void Tick()
         {

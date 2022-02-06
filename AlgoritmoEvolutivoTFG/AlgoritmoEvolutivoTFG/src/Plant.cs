@@ -2,7 +2,7 @@
 
 namespace AlgoritmoEvolutivo
 {
-    class Plant : IEntity
+    public class Plant : IEntity
     {
         public void Tick()
         {
