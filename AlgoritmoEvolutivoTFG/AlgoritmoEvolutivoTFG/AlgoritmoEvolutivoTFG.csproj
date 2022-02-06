@@ -69,7 +69,12 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\Creature.cs" />
+    <Compile Include="src\IWorld.cs" />
+    <Compile Include="src\Simulation.cs" />
+    <Compile Include="src\IEntity.cs" />
     <Compile Include="src\main.cs" />
+    <Compile Include="src\Plant.cs" />
     <Compile Include="src\TestFSM.cs" />
   </ItemGroup>
   <ItemGroup>
