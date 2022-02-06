@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlgoritmoEvolutivoTFG", "AlgoritmoEvolutivoTFG\AlgoritmoEvolutivoTFG.csproj", "{B9D857CD-4D1A-4C14-8DE1-780FAEED8D9E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EvolutionSimulation", "AlgoritmoEvolutivoTFG\EvolutionSimulation.csproj", "{B9D857CD-4D1A-4C14-8DE1-780FAEED8D9E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Visualizador", "Visualizador\Visualizador.csproj", "{939FFB47-1D91-488E-9D8C-D6C935C07CC7}"
 	ProjectSection(ProjectDependencies) = postProject

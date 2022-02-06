@@ -1,5 +1,5 @@
 ﻿using Stateless;
-namespace AlgoritmoEvolutivo
+namespace EvolutionSimulation
 {
     public enum State
     {

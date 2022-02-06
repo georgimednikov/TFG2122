@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using EvolutionSimulation;
 namespace Visualizador
 {
     static class Program
@@ -14,10 +14,10 @@ namespace Visualizador
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
+            /*Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            AlgoritmoEvolutivo.TestFSM testFSM = new AlgoritmoEvolutivo.TestFSM();
+            EvolutionSimulation.TestFSM testFSM = new EvolutionSimulation.TestFSM();
             
             var result = MessageBox.Show("State: " + testFSM.GetState().ToString() + "\nKill?", "TestFSM",
                      MessageBoxButtons.YesNo,
@@ -25,16 +25,15 @@ namespace Visualizador
 
             if (result == System.Windows.Forms.DialogResult.Yes)
             {
-                testFSM.Fire(AlgoritmoEvolutivo.Trigger.Die);
+                testFSM.Fire(EvolutionSimulation.Trigger.Die);
             }
 
             result = MessageBox.Show("State: " + testFSM.GetState().ToString(), "TestFSM",
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Information);
 
-            Application.Run(new Form1());
-
-
+            Application.Run(new Form1());*/
+            MainClass.Test();
         }
     }
 }
