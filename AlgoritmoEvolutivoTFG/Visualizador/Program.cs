@@ -32,9 +32,7 @@ namespace Visualizador
                             MessageBoxButtons.OK,
                             MessageBoxIcon.Information);
 
-            Application.Run(new Form1());
-
-
+            Application.Run(new Form1())
         }
     }
 }

@@ -14,7 +14,7 @@ namespace VisualizadorConsola
         public void Init()
         {
             world = new World();
-            world.Init(8);
+            world.Init(32);
             Creature c = world.AddEntity<Creature>();
             c.Init(world, 4, 4);
         }
@@ -25,31 +25,96 @@ namespace VisualizadorConsola
             {
                 world.Tick();
                 Render();
-                Thread.Sleep(100);
+                Thread.Sleep(100000);
             }
         }
 
         /// <summary>
         /// Renderiza el mapa y las criaturas
+        /// TODO: Eliminar antes de entregar
         /// </summary>
-        void Render()
+        public void Render()
         {
             Console.Clear();
-            for (int i = 0; i < world.mapSize; i++)
+            for (int i = 0; i < world.map.GetLength(0); i++)
             {
-                for (int j = 0; j < world.mapSize; j++)
+                for (int j = 0; j < world.map.GetLength(1); j++)
                 {
-                    Console.Write(". ");
+                    double val = world.map[j, i].height;
+                    if (val < 0.3) Console.BackgroundColor = ConsoleColor.Black;
+                    else if (val < 0.5) Console.BackgroundColor = ConsoleColor.DarkBlue;
+                    else if (val == 0.5) Console.BackgroundColor = ConsoleColor.DarkGreen;
+                    else if (val < 0.6) Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    else if (val < 0.7) Console.BackgroundColor = ConsoleColor.Blue;
+                    else if (val < 0.8) Console.BackgroundColor = ConsoleColor.Cyan;
+                    else Console.BackgroundColor = ConsoleColor.White;
+
+                    Console.Write((Math.Truncate(world.map[j, i].height * 10) / 1));
+                    Console.BackgroundColor = ConsoleColor.Black;
                 }
+                Console.Write(" ");
+                for (int j = 0; j < world.map.GetLength(1); j++)
+                {
+                    double val = world.map[j, i].humidity;
+
+                    if (val < 0.3) Console.BackgroundColor = ConsoleColor.Red;
+                    else if (val < 0.4) Console.BackgroundColor = ConsoleColor.DarkRed;
+                    else if (val < 0.5) Console.BackgroundColor = ConsoleColor.Green;
+                    else if (val < 0.6) Console.BackgroundColor = ConsoleColor.Cyan;
+                    else if (val < 0.8) Console.BackgroundColor = ConsoleColor.DarkCyan;
+                    else if (val < 1) Console.BackgroundColor = ConsoleColor.DarkBlue;
+                    else Console.BackgroundColor = ConsoleColor.White;
+
+                    val = (Math.Truncate(val * 10) / 1);
+                    if (val == 10) Console.Write("X");
+                    else Console.Write(val);
+                    Console.BackgroundColor = ConsoleColor.Black;
+                }
+                Console.Write(" ");
+                for (int j = 0; j < world.map.GetLength(1); j++)
+                {
+                    double val = world.map[j, i].temperature;
+                    if (val < 0.2) Console.BackgroundColor = ConsoleColor.DarkBlue;
+                    else if (val < 0.3) Console.BackgroundColor = ConsoleColor.Blue;
+                    else if (val < 0.5) Console.BackgroundColor = ConsoleColor.DarkYellow;
+                    else if (val < 0.6) Console.BackgroundColor = ConsoleColor.Yellow;
+                    else if (val < 0.8) Console.BackgroundColor = ConsoleColor.DarkRed;
+                    else Console.BackgroundColor = ConsoleColor.Red;
+
+                    Console.Write((Math.Truncate(val * 10) / 1));
+                    Console.BackgroundColor = ConsoleColor.Black;
+                }
+                Console.Write(" ");
+                for (int j = 0; j < world.map.GetLength(1); j++)
+                {
+                    double val = world.map[j, i].flora;
+                    if (val < 0.1) Console.BackgroundColor = ConsoleColor.Red;
+                    else if (val < 0.3) Console.BackgroundColor = ConsoleColor.DarkRed;
+                    else if (val < 0.4) Console.BackgroundColor = ConsoleColor.DarkYellow;
+                    else if (val < 0.5) Console.BackgroundColor = ConsoleColor.Yellow;
+                    else if (val < 0.7) Console.BackgroundColor = ConsoleColor.DarkGreen;
+                    else Console.BackgroundColor = ConsoleColor.Green;
+
+                    Console.Write((Math.Truncate(val * 10) / 1));
+                    Console.BackgroundColor = ConsoleColor.Black;
+                }
+
                 Console.WriteLine();
             }
-            foreach (var e in world.entities)
-            {
-                Console.SetCursorPosition((e as Creature).x * 2, (e as Creature).y);
-                Console.Write("e ");
-            }
-            Console.SetCursorPosition(world.mapSize, world.mapSize);
-            Console.WriteLine("\n" + cr_state);
+
+            //TODO: Quien sea libre de pecado que tire la primera piedra
+            //TODO: Mateo 7:1
+            Console.Write("Height");
+            Console.Write("                           Humidity");
+            Console.Write("                         Temperature");
+            Console.Write("                      Flora");
+
+            //foreach (var e in entities)
+            //{
+            //    Console.SetCursorPosition((e as Creature).x * 2, (e as Creature).y);
+            //    Console.Write("e ");
+            //}
+            //Console.SetCursorPosition(mapSize, mapSize);
         }
 
         World world;

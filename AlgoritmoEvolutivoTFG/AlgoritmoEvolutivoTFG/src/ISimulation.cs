@@ -21,5 +21,7 @@ namespace AlgoritmoEvolutivo
         /// Simula la evolucion
         /// </summary>
         void Run();
+
+        void Render();
     }
 }

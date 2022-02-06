@@ -69,6 +69,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\Perlin.cs" />
     <Compile Include="src\Creature.cs" />
     <Compile Include="src\CreatureFSM.cs" />
     <Compile Include="src\ISimulation.cs" />

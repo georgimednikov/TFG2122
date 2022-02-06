@@ -14,9 +14,9 @@ namespace AlgoritmoEvolutivo
         public void Init()
         {
             world = new World();
-            world.Init(8);
-            Creature c = world.AddEntity<Creature>();
-            c.Init(world, 4, 4);
+            world.Init(32);
+            //Creature c = world.AddEntity<Creature>();
+            //c.Init(world, 4, 4);
         }
 
         public void Run()
@@ -25,6 +25,10 @@ namespace AlgoritmoEvolutivo
             {
                 world.Tick();
             }
+        }
+
+        public void Render()
+        {
         }
 
         World world;
