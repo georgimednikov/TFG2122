@@ -71,16 +71,11 @@
   <ItemGroup>
     <Compile Include="src\CreatureFeatures.cs" />
     <Compile Include="src\CreatureChromosome.cs" />
+    <Compile Include="src\CrossoverFunction.cs" />
     <Compile Include="src\main.cs" />
     <Compile Include="src\TestFSM.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="GeneticSharp.Domain, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GeneticSharp.2.6.0\lib\net462\GeneticSharp.Domain.dll</HintPath>
-    </Reference>
-    <Reference Include="GeneticSharp.Infrastructure.Framework, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GeneticSharp.2.6.0\lib\net462\GeneticSharp.Infrastructure.Framework.dll</HintPath>
-    </Reference>
     <Reference Include="stateless, Version=4.0.0.0, Culture=neutral, PublicKeyToken=93038f0927583c9a, processorArchitecture=MSIL">
       <HintPath>..\packages\stateless.5.11.0\lib\net472\stateless.dll</HintPath>
     </Reference>
