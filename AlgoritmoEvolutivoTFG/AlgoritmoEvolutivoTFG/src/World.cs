@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AlgoritmoEvolutivo
+namespace EvolutionSimulation
 {
     /// <summary>
     /// Definition of the simulated world
@@ -24,7 +24,7 @@ namespace AlgoritmoEvolutivo
         /// </summary>
         public void Init(int size)
         {
-            p = new Perlin();
+            p = new WorldGeneration.Perlin();
             mapSize = size;
             entities = new List<IEntity>();
             delete = new List<IEntity>();
@@ -237,6 +237,6 @@ namespace AlgoritmoEvolutivo
         public MapData[,] map{ get; private set; }
         int mapSize;
         // Perlin noise generator
-        Perlin p;
+        WorldGeneration.Perlin p;
     }
 }

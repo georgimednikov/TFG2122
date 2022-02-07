@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using AlgoritmoEvolutivo;
+using EvolutionSimulation;
 
 namespace VisualizadorConsola
 {

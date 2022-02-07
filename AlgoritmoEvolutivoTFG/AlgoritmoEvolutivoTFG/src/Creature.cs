@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EvolutionSimulation.FSM;
 
-namespace AlgoritmoEvolutivo
+namespace EvolutionSimulation
 {
     /// <summary>
     /// A creature with attributes and behavior
@@ -89,7 +90,7 @@ namespace AlgoritmoEvolutivo
 
         /// <summary>
         /// Returns the creature's current state
-        /// </summary>W
+        /// </summary>
         public string GetState()
         {
             return currState.name.ToString();
@@ -143,9 +144,6 @@ namespace AlgoritmoEvolutivo
             fsm.Configure(Moving)
                 .SubstateOf(Alive)
                 .Permit(TriggerID.Stops, Idle);
-
-            _State moving = new Moving();
-            mfsm = new StatelessFSM(moving);
         }
 
         // World tile position
@@ -157,8 +155,6 @@ namespace AlgoritmoEvolutivo
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         Stateless.StateMachine<State, TriggerID> fsm;
-        // TODO: Lamo
-        StatelessFSM mfsm;
         // Current state
         State currState;
 
