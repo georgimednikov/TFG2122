@@ -17,18 +17,44 @@ namespace EvolutionSimulation.src
         static public CreatureChromosome UniformCrossover(CreatureChromosome male, CreatureChromosome female)
         {
             Random rnd = new Random();
-
-            BitArray mc = male.GetChromosome();
-            BitArray fc = female.GetChromosome();
-            BitArray cc = new BitArray(mc.Length);
-
-            for (int i = 0; i < mc.Length; ++i)
+            BitArray childChromosome = new BitArray(0);
+            BitArray childGene;
+            BitArray maleFeature, femaleFeature;
+            int features = (int)CreatureAbility.Count - 2; //TODO:CAMBIAR
+            for (int i = 0; i < features; ++i)
             {
-                cc[i] = rnd.Next(0, 2) == 0 ? mc[i] : fc[i];
-            }
-            
+                maleFeature = male.GetGene(i);
+                femaleFeature = female.GetGene(i);
+                childGene = new BitArray(maleFeature.Length);
+                do
+                {
+                    for (int j = 0; j < maleFeature.Length; ++j)
+                    {
+                        childGene[j] = rnd.Next(0, 2) == 0 ? maleFeature[j] : femaleFeature[j];
+                    }
+                }
+                while (CreatureChromosome.IsGeneValid(i, childGene));
 
-            return new CreatureChromosome(cc); //Child Chromosome
+                //Concatenamos
+                childChromosome = ConcatenateBits(childChromosome, childGene);
+            }
+
+            return new CreatureChromosome(childChromosome); //Child Chromosome
+        }
+
+        static private BitArray ConcatenateBits(BitArray original, BitArray expansion)
+        {
+            BitArray result = new BitArray(original.Length + expansion.Length);
+            int index = 0;
+            for (; index < original.Length; ++index)
+            {
+                result[index] = original[index];
+            }
+            for (int i = 0; index < result.Length; ++index, ++i)
+            {
+                result[index] = expansion[i];
+            }
+            return result;
         }
     }
 }

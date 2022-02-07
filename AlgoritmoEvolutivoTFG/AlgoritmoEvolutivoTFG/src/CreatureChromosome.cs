@@ -7,6 +7,11 @@ namespace EvolutionSimulation.src
     public class CreatureChromosome
     {
         /// <summary>
+        /// If the chromosome has been given initial values or not
+        /// </summary>
+        static private bool init;
+
+        /// <summary>
         /// Chromosome in bits and its amount
         /// </summary>
         BitArray chromosome; 
@@ -25,13 +30,36 @@ namespace EvolutionSimulation.src
 
         static private Random rnd;
 
-
-
         /// <summary>
         /// Number of genes in the chromosome and their values
         /// </summary>
         private int numGenes;
         private int[] geneValues;
+
+
+
+
+        //TODO mover estos metodos
+        /// <summary>
+        /// Parses from binary to int
+        /// </summary>
+        static private int BinaryToInt(BitArray bits)
+        {
+            //An int array with a single value is created, and then the binary
+            //content of value is copies in it, so when the first and only
+            //element is accessed, the information is parsed into int
+            int[] array = new int[1];
+            bits.CopyTo(array, 0);
+            return array[0];
+        }
+
+        /// <summary>
+        /// Parses from int to binary
+        /// </summary>
+        static private BitArray IntToBinary(int num)
+        {
+            return new BitArray(new int[] { num });
+        }
 
         /// <summary>
         /// Sets the max value (inclusively) of the different genes in the chromosome
@@ -51,8 +79,22 @@ namespace EvolutionSimulation.src
                 length += (int)geneInfo[i].X;
             }
             rnd = new Random();
+            init = true;
         }
 
+        public static bool IsGeneValid(int geneIndex, BitArray gene)
+        {
+            return BinaryToInt(gene) > geneMaxValues[geneIndex];
+        }
+
+
+
+
+
+        /// <summary>
+        /// Creates a new, random chromosome.
+        /// Must be initilized with SetGeneRange
+        /// </summary>
         public CreatureChromosome() //Number of genes, not bits
         {
             numGenes = geneInfo.Length;
@@ -61,13 +103,101 @@ namespace EvolutionSimulation.src
             GenerateGenes();
         }
 
-        public CreatureChromosome(BitArray chromosome) //Number of genes, not bits
+        /// <summary>
+        /// Creates a chromosome given the genes
+        /// Must be initilized with SetGeneRange
+        /// </summary>
+        public CreatureChromosome(BitArray chromosome)
         {
             numGenes = geneInfo.Length;
             this.chromosome = chromosome;
             geneValues = new int[numGenes];
             AssignValues();
         }
+
+        /// <summary>
+        /// Returns the desired gene in bits.
+        /// </summary>
+        public BitArray GetGene(int geneIndex)
+        {
+            if (!init || geneIndex >= geneInfo.Length || geneIndex < 0) return new BitArray(0);
+
+            //Goes to the gene's position in the chromosome and copies the values to a new
+            //BitArray with the pertinent size
+            BitArray gene = new BitArray((int)geneInfo[geneIndex].X);
+            int endIndex = gene.Length + (int)geneInfo[geneIndex].Y;
+            int cont = 0;
+            for (int i = (int)geneInfo[geneIndex].Y; i < endIndex; ++i, ++cont)
+            {
+                gene[cont] = chromosome[i];
+            }
+            return gene;
+        }
+
+        /// <summary>
+        /// Returns the bit's value at position "bitIndex" in gene "geneIndex".
+        /// Returns -1 if chromosome is not initialized or gene does not exist
+        /// </summary>
+        public int GetGeneBit(int geneIndex, int bitIndex)
+        {
+            if (!init) return -1;
+            if (geneIndex < 0 || geneIndex >= numGenes) return -1;
+            if (bitIndex < 0 || bitIndex >= length) return -1;
+            return chromosome.Get((int)geneInfo[geneIndex].X + bitIndex) ? 1 : 0;
+        }
+
+        /// <summary>
+        /// Returns the chromosome. Returns an empty array if not initialized.
+        /// </summary>
+        public BitArray GetChromosome()
+        {
+            if (!init) return new BitArray(0);
+            return chromosome;
+        }
+
+        /// <summary>
+        /// Get the numeric value of the desired attribute
+        /// Returns -1 if not initilized or the value asked does not exist
+        /// </summary>
+        public int GetAttribute(CreatureAttribute attr)
+        {
+            return GetFeature((int)attr);
+        }
+
+        /// <summary>
+        /// Get the numeric value of the desired ability.
+        /// Returns -1 if not initilized or the value asked does not exist
+        /// </summary>
+        public int GetAbilities(CreatureAbility ab)
+        {
+            return GetFeature((int)ab);
+        }
+
+        /// <summary>
+        /// Prints the chromosome. Debugging purposes
+        /// </summary>
+        public void PrintGenes()
+        {
+            if (!init)
+            {
+                Console.WriteLine("Invalid chromosome, is not initialized");
+                return;
+            }
+            for (int i = 0; i < numGenes; ++i)
+            {
+                Console.WriteLine("Gene " + i + ": " + GetFeature(i));
+            }
+            for (int i = 0; i < numGenes; ++i)
+            {
+                for (int j = (int)geneInfo[i].X - 1; j >= 0; --j)
+                    Console.Write(chromosome[(int)geneInfo[i].Y + j] ? 1 : 0);
+                Console.Write(" ");
+            }
+            Console.WriteLine();
+        }
+
+
+
 
         /// <summary>
         /// Given a chromosome, the values of the genes are assigned
@@ -81,14 +211,10 @@ namespace EvolutionSimulation.src
                 {
                     value[j] = chromosome[(int)geneInfo[i].Y + j];
                 }
-                //An int array with a single value is created, and then the binary
-                //content of value is copies in it, so when the first and only
-                //element is accessed, the information is parsed into int
-                int[] array = new int[1];
-                value.CopyTo(array, 0);
-                geneValues[i] = array[0];
+                geneValues[i] = BinaryToInt(value);
             }
         }
+
 
         /// <summary>
         /// Generates random values from 0 to the max value of each gene
@@ -110,7 +236,7 @@ namespace EvolutionSimulation.src
             geneValues[geneIndex] = value;
 
             Vector2 gene = geneInfo[geneIndex];
-            BitArray bits = new BitArray(new int[] { value });
+            BitArray bits = IntToBinary(value);
             //Copy the new bits to the Chromosome
             for (int j = 0; j < gene.X; ++j)
             {
@@ -118,65 +244,12 @@ namespace EvolutionSimulation.src
             }
         }
 
-        /// <summary>
-        /// Returns the bit's value at position "bitIndex" in gene "geneIndex"
-        /// </summary>
-        public int GetGeneBit(int geneIndex, int bitIndex)
-        {
-            if (geneIndex < 0 || geneIndex >= numGenes) return -1;
-            if (bitIndex < 0 || bitIndex >= length) return -1;
-            return chromosome.Get((int)geneInfo[geneIndex].X + bitIndex) ? 1 : 0;
-        }
-
-        /// <summary>
-        /// Returns the chromosome
-        /// </summary>
-        public BitArray GetChromosome()
-        {
-            return chromosome;
-        }
-
-
-
-        /// <summary>
-        /// Get the numeric value of the desired attribute
-        /// </summary>
-        public int GetAttribute(CreatureAttribute attr)
-        {
-            return GetFeature((int)attr);
-        }
-
-        /// <summary>
-        /// Get the numeric value of the desired ability
-        /// </summary>
-        public int GetAbilities(CreatureAbility ab)
-        {
-            return GetFeature((int)ab);
-        }
-
-
         private int GetFeature(int feature)
         {
-            if (feature >= numGenes || feature < 0)
+            if (!init || feature >= numGenes || feature < 0)
                 return -1;
 
             return geneValues[feature];
-        }
-
-        
-        public void PrintGenes()
-        {
-            for(int i = 0; i < numGenes; ++i)
-            {
-                Console.WriteLine("Gene " + i + ": " + GetFeature(i));
-            }
-            for (int i = 0; i < numGenes; ++i)
-            {
-                for (int j = (int)geneInfo[i].X - 1; j >= 0; --j)
-                    Console.Write(chromosome[(int)geneInfo[i].Y + j] ? 1 : 0);
-                Console.Write(" ");
-            }
-            Console.WriteLine();
         }
     }
 }

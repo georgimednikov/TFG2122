@@ -21,13 +21,13 @@
         Members,
 
         //Must be the last attribute and not used
-        Last
+        Count
     }
 
     //Starts after the attributes
     public enum CreatureAbility
     {
-        Arboreal = CreatureAttribute.Last,
+        Arboreal = CreatureAttribute.Count,
         Wings,
         Venomous,
         NightVision,
@@ -37,6 +37,9 @@
         Thorns,
         Scavenger,
         Hair,
-        Paternity
+        Paternity,
+
+        //Must be the last ability and not used
+        Count
     }
 }
