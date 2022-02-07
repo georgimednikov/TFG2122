@@ -75,6 +75,7 @@ namespace AlgoritmoEvolutivo
 
             // Ejecuta la accion correspondiente al estado actual
             currState.action();
+            // evaluateTransitions();
             Move();
         }
 
@@ -137,12 +138,19 @@ namespace AlgoritmoEvolutivo
             fsm.Configure(Dead);
 
             fsm.Configure(Idle)
-                .SubstateOf(Alive)
+                .SubstateOf(Alive);
+                //.Permit(TriggerID.Moves, Moving);
+
+            fsm.Configure(Idle)
+                //.SubstateOf(Alive)
                 .Permit(TriggerID.Moves, Moving);
 
             fsm.Configure(Moving)
                 .SubstateOf(Alive)
                 .Permit(TriggerID.Stops, Idle);
+
+            _State moving = new Moving();
+            mfsm = new StatelessFSM(moving);
         }
 
         // Posicion en el mapa del mundo
@@ -154,6 +162,7 @@ namespace AlgoritmoEvolutivo
         // Maquina de estados
         // Esquema: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         Stateless.StateMachine<State, TriggerID> fsm;
+        StatelessFSM mfsm;
         // Estado actual
         State currState;
 

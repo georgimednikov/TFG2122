@@ -22,6 +22,5 @@ namespace AlgoritmoEvolutivo
         /// </summary>
         void Run();
 
-        void Render();
     }
 }

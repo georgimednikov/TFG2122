@@ -27,10 +27,6 @@ namespace AlgoritmoEvolutivo
             }
         }
 
-        public void Render()
-        {
-        }
-
         World world;
     }
 }
