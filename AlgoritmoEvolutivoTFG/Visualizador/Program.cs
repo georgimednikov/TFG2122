@@ -17,22 +17,23 @@ namespace Visualizador
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            AlgoritmoEvolutivo.TestFSM testFSM = new AlgoritmoEvolutivo.TestFSM();
-            
-            var result = MessageBox.Show("State: " + testFSM.GetState().ToString() + "\nKill?", "TestFSM",
-                     MessageBoxButtons.YesNo,
-                     MessageBoxIcon.Question);
+            // TODO: ?????
+            //AlgoritmoEvolutivo.TestFSM testFSM = new AlgoritmoEvolutivo.TestFSM();
 
-            if (result == System.Windows.Forms.DialogResult.Yes)
-            {
-                testFSM.Fire(AlgoritmoEvolutivo.Trigger.Die);
-            }
+            //var result = MessageBox.Show("State: " + testFSM.GetState().ToString() + "\nKill?", "TestFSM",
+            //         MessageBoxButtons.YesNo,
+            //         MessageBoxIcon.Question);
 
-            result = MessageBox.Show("State: " + testFSM.GetState().ToString(), "TestFSM",
-                            MessageBoxButtons.OK,
-                            MessageBoxIcon.Information);
+            //if (result == System.Windows.Forms.DialogResult.Yes)
+            //{
+            //    testFSM.Fire(AlgoritmoEvolutivo.Trigger.Die);
+            //}
 
-            Application.Run(new Form1())
+            //result = MessageBox.Show("State: " + testFSM.GetState().ToString(), "TestFSM",
+            //                MessageBoxButtons.OK,
+            //                MessageBoxIcon.Information);
+
+            Application.Run(new Form1());
         }
     }
 }
