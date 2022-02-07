@@ -33,8 +33,6 @@ namespace EvolutionSimulation
             evaluateInfluence = (influenceFunc != null) ? influenceFunc : EvaluateInfluenceCurve;
             p = new Perlin();
             mapSize = size;
-            entities = new List<IEntity>();
-            delete = new List<IEntity>();
             Random rnd = new Random(DateTime.Now.Second);
             heightWaves = new Wave[1];
             heightWaves[0] = new Wave();
@@ -55,26 +53,6 @@ namespace EvolutionSimulation
         }
 
         /// <summary>
-        /// Adds an entity to the list
-        /// </summary>
-        /// <typeparam name="T">Entity type</typeparam>
-        /// <returns>The added entity</returns>
-        public T AddEntity<T>() where T : IEntity, new()
-        {
-            T ent = new T();
-            entities.Add(ent);
-            return ent;
-        }
-
-        /// <summary>
-        /// Designates an entity to be eliminated before the next frame
-        /// </summary>
-        public void Delete(IEntity entity)
-        {
-            delete.Add(entity);
-        }
-
-        /// <summary>
         /// Checks if target coordinates are within the map's boundaries
         /// </summary>
         /// <returns>True if it is within bounds</returns>
@@ -88,11 +66,7 @@ namespace EvolutionSimulation
         /// </summary>
         public void Tick()
         {
-            entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Orders the entity to perform a step
-
-            delete.ForEach(delegate (IEntity e) { entities.Remove(e); });
-
-            delete.Clear();
+            step++;
         }
 
         #region Procedural Generation
@@ -256,10 +230,8 @@ namespace EvolutionSimulation
         }
         #endregion
 
-        // Entities in the world
-        public List<IEntity> entities { get; private set; }
-        // Entities to be deleted
-        List<IEntity> delete;
+
+        public uint step;
         // Map with physical properties
         public MapData[,] map { get; private set; }
         int mapSize;

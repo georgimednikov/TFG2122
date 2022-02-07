@@ -13,10 +13,17 @@ namespace VisualizadorConsola
     {
         public void Init()
         {
+            entities = new List<IEntity>();
+            creatures = new List<Creature>();
+            delete = new List<IEntity>();
             world = new World();
             world.Init(32);
-            Creature c = world.AddEntity<Creature>();
-            c.Init(world, 4, 4);
+            Creature c = CreateEntity<Creature>();
+            c.metabolism = 200;
+            c.Init(world, 16, 16);
+            c = CreateEntity<Creature>();
+            c.metabolism = 100;
+            c.Init(world, 12, 16);
         }
 
         public void Run()
@@ -24,11 +31,46 @@ namespace VisualizadorConsola
             while (true)
             {
                 world.Tick();
+                entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Orders the entity to perform a step
+                creatures.Sort(new SortByMetabolism());
+                creatures.ForEach(delegate (Creature e) { e.Tick(); });
+
+                delete.ForEach(delegate (IEntity e) { entities.Remove(e); });
+
+                delete.Clear();
                 Render();
-                Thread.Sleep(200000);
-                world.Init(477);
+                Thread.Sleep(1000);
             }
         }
+
+        /// <summary>
+        /// Adds an entity to the list
+        /// </summary>
+        /// <typeparam name="T">Entity type</typeparam>
+        /// <returns>The added entity</returns>
+        public T CreateEntity<T>() where T : IEntity, new()
+        {
+            T ent = new T();
+            if (ent is Creature) creatures.Add(ent as Creature);
+            else entities.Add(ent);
+            return ent;
+        }
+
+
+        /// <summary>
+        /// Designates an entity to be eliminated before the next frame
+        /// </summary>
+        public void Delete(IEntity entity)
+        {
+            delete.Add(entity);
+        }
+
+
+        // Entities in the world
+        public List<IEntity> entities { get; private set; }
+        public List<Creature> creatures { get; private set; }
+        // Entities to be deleted
+        List<IEntity> delete;
 
         /// <summary>
         /// Renders the map and creatures
@@ -98,18 +140,18 @@ namespace VisualizadorConsola
                 {
                     double val = world.map[j, i].flora;
                     if (val == 0) Console.BackgroundColor = ConsoleColor.DarkBlue;
-                    //else if (val < 0.3) Console.BackgroundColor = ConsoleColor.DarkRed;
-                    //else if (val < 0.4) Console.BackgroundColor = ConsoleColor.DarkYellow;
-                    //else if (val < 0.5) Console.BackgroundColor = ConsoleColor.Yellow;
-                    //else if (val < 0.7) Console.BackgroundColor = ConsoleColor.DarkGreen;
-                    //else Console.BackgroundColor = ConsoleColor.Green;
-                    if (val >= 0 && r.NextDouble() <= val)
-                        if (val <= 0.5)
-                            Console.BackgroundColor = ConsoleColor.Red;
-                        else if (val <= 0.7)
-                            Console.BackgroundColor = ConsoleColor.Yellow;
-                        else
-                            Console.BackgroundColor = ConsoleColor.Green;
+                    else if (val < 0.3) Console.BackgroundColor = ConsoleColor.DarkRed;
+                    else if (val < 0.4) Console.BackgroundColor = ConsoleColor.DarkYellow;
+                    else if (val < 0.5) Console.BackgroundColor = ConsoleColor.Yellow;
+                    else if (val < 0.7) Console.BackgroundColor = ConsoleColor.DarkGreen;
+                    else Console.BackgroundColor = ConsoleColor.Green;
+                    //if (val >= 0 && r.NextDouble() <= val)
+                    //    if (val <= 0.5)
+                    //        Console.BackgroundColor = ConsoleColor.Red;
+                    //    else if (val <= 0.7)
+                    //        Console.BackgroundColor = ConsoleColor.Yellow;
+                    //    else
+                    //        Console.BackgroundColor = ConsoleColor.Green;
                     val = (Math.Truncate(val * 10) / 1);
                     if (val == 10) Console.Write("X");
                     else 
@@ -127,12 +169,12 @@ namespace VisualizadorConsola
             //Console.Write("                         Temperature");
             //Console.Write("                      Flora");
 
-            //foreach (var e in entities)
-            //{
-            //    Console.SetCursorPosition((e as Creature).x * 2, (e as Creature).y);
-            //    Console.Write("e ");
-            //}
-            //Console.SetCursorPosition(mapSize, mapSize);
+            foreach (var e in creatures)
+            {
+                Console.SetCursorPosition(e.x, e.y);
+                Console.Write("e");
+            }
+            Console.SetCursorPosition(world.map.GetLength(0), world.map.GetLength(0));
         }
 
         World world;

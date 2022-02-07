@@ -12,6 +12,10 @@ namespace EvolutionSimulation
     /// </summary>
     public class Creature : IEntity
     {
+        //TODO: Al que le toque, que seguramente sea yo, que lo quite.
+        public int metabolism { get; set; }
+        public int mobility { get; private set; }
+
         /// <summary>
         /// Private class representing states.
         /// Each state has an ID and an associated action
@@ -33,6 +37,8 @@ namespace EvolutionSimulation
         public Creature()
         {
             r = new Random();
+            metabolism = r.Next(1, 201);
+            mobility = 100;
         }
 
         /// <summary>
@@ -45,8 +51,8 @@ namespace EvolutionSimulation
             this.x = x;
             this.y = y;
             this.fsm = new Stateless.StateMachine<State, TriggerID>(
-                () => currState, 
-                s => currState = s, 
+                () => currState,
+                s => currState = s,
                 Stateless.FiringMode.Queued
             );
             ConfigureStateMachine();
@@ -57,35 +63,52 @@ namespace EvolutionSimulation
         /// </summary>
         public void Tick()
         {
+            actionPoints += metabolism * 10;
+
             // TODO: Put Fire in the states' actions
             // TODO: and yeet this outta here
-            if (currState.name == StateID.Dead) return;
-            Speed--;
-            if (Speed <= 0)
-            {
-                Speed = 0;
-                fsm.Fire(TriggerID.Dies);
-            }
-            else if (Speed % 2 == 0)
-            {
-                fsm.Fire(TriggerID.Moves);
-            }
-            else fsm.Fire(TriggerID.Stops);
+            //if (currState.name == StateID.Dead) return;
+            //Speed--;
+            //if (Speed <= 0)
+            //{
+            //    Speed = 0;
+            //    fsm.Fire(TriggerID.Dies);
+            //}
+            //else if (Speed % 2 == 0)
+            //{
+            //    fsm.Fire(TriggerID.Moves);
+            //}
+            //else fsm.Fire(TriggerID.Stops);
 
-            // Executes the action corresponding to the current state
-            currState.action();
+            // Calculates next action according to the state machine
+            //currState.action();
             // evaluateTransitions();
-            Move();
+            // Checks if there are enough action points to perform said action
+            // If not, "skips" its turn
+            // If yes, performs said action and attempts to use the FSM again
+            while(Move());
         }
 
         /// <summary>
         /// Attempts to move the creature to an adjacent tile
         /// </summary>
-        void Move()
+        bool Move()
         {
-            int nX = x + r.Next(-1, 2),
+            int nX = 0, nY = 0;
+            do
+            {
+                nX = x + r.Next(-1, 2);
                 nY = y + r.Next(-1, 2);
-            if (world.canMove(nX, nY)) { x = nX; y = nY; }
+
+            } while (nX != x && nY != y);
+            if (world.canMove(nX, nY))
+            {
+                if (actionPoints < 1000 * ((200f - mobility) / 100f)) return false;
+                actionPoints -= 1000 * (int)((200f - mobility) / 100f);
+                x = nX; y = nY;
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -135,7 +158,7 @@ namespace EvolutionSimulation
 
             fsm.Configure(Idle)
                 .SubstateOf(Alive);
-                //.Permit(TriggerID.Moves, Moving);
+            //.Permit(TriggerID.Moves, Moving);
 
             fsm.Configure(Idle)
                 //.SubstateOf(Alive)
@@ -157,6 +180,8 @@ namespace EvolutionSimulation
         Stateless.StateMachine<State, TriggerID> fsm;
         // Current state
         State currState;
+
+        int actionPoints;
 
         // TODO: Speed, for now only to test the FSM
         public float Speed = 10;
