@@ -71,7 +71,7 @@
   <ItemGroup>
     <Compile Include="src\CreatureFeatures.cs" />
     <Compile Include="src\CreatureChromosome.cs" />
-    <Compile Include="src\CrossoverFunction.cs" />
+    <Compile Include="src\GeneticFunctions.cs" />
     <Compile Include="src\main.cs" />
     <Compile Include="src\TestFSM.cs" />
   </ItemGroup>
