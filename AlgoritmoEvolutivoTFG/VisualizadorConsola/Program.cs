@@ -11,7 +11,6 @@ namespace VisualizadorConsola
             ISimulation s = new ConsoleSimulation();
             s.Init();
             s.Run();
-            s.Render();
         }
     }
 }

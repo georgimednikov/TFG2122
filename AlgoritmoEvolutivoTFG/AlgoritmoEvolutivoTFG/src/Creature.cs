@@ -73,6 +73,7 @@ namespace AlgoritmoEvolutivo
 
             // Executes the action corresponding to the current state
             currState.action();
+            // evaluateTransitions();
             Move();
         }
 
@@ -132,12 +133,19 @@ namespace AlgoritmoEvolutivo
             fsm.Configure(Dead);
 
             fsm.Configure(Idle)
-                .SubstateOf(Alive)
+                .SubstateOf(Alive);
+                //.Permit(TriggerID.Moves, Moving);
+
+            fsm.Configure(Idle)
+                //.SubstateOf(Alive)
                 .Permit(TriggerID.Moves, Moving);
 
             fsm.Configure(Moving)
                 .SubstateOf(Alive)
                 .Permit(TriggerID.Stops, Idle);
+
+            _State moving = new Moving();
+            mfsm = new StatelessFSM(moving);
         }
 
         // World tile position
