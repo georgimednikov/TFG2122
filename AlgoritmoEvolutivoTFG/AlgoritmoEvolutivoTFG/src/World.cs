@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EvolutionSimulation
+namespace AlgoritmoEvolutivo
 {
     /// <summary>
     /// Definition of the simulated world
@@ -27,7 +27,7 @@ namespace EvolutionSimulation
         /// </summary>
         /// <param name="heightFunc">Function to interpret the results from the Perlin Noise function</param>
         /// <param name="influenceFunc">Function that defines the influence of height on the other parameters</param>
-        public void Init(int size, Func<double, double> heightFunc = default(Func<double, double>), Func<double, double> influenceFunc = default(Func<double, double>))
+        public void Init(int size, Func<double,double> heightFunc = default(Func<double, double>), Func<double, double> influenceFunc = default(Func<double, double>))
         {
             evaluateHeight = (heightFunc != null) ? heightFunc : EvaluateHeightCurve;
             evaluateInfluence = (influenceFunc != null) ? influenceFunc : EvaluateInfluenceCurve;
@@ -38,7 +38,7 @@ namespace EvolutionSimulation
             Random rnd = new Random(DateTime.Now.Second);
             heightWaves = new Wave[1];
             heightWaves[0] = new Wave();
-            heightWaves[0].seed = rnd.Next(0, 10000); //1641;
+            heightWaves[0].seed = rnd.Next(0,10000); //1641;
             heightWaves[0].frequency = 1f;
             heightWaves[0].amplitude = 1f;
             humidityWaves = new Wave[1];
@@ -164,7 +164,7 @@ namespace EvolutionSimulation
                     mapData[xIndex, yIndex].height = evaluateHeight(heightMap[xIndex, yIndex]);
 
                     double evaluation = evaluateInfluence(mapData[xIndex, yIndex].height);
-                    if (evaluation > 0)
+                    if (evaluation > 0) 
                     {
                         mapData[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex] - evaluation;
                         mapData[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] + evaluation;
@@ -174,15 +174,15 @@ namespace EvolutionSimulation
                     else if (evaluation < 0)
                     {
                         mapData[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex];
-                        mapData[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] - evaluation;
-                        for (int i = -(int)(mapScale / 5); i <= (int)(mapScale / 5); i++)
+                        mapData[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] - evaluation ;
+                        for (int i = -(int)(mapScale/5); i <= (int)(mapScale/5); i++)
                         {
-                            for (int j = -(int)(mapScale / 5); j <= (int)(mapScale / 5); j++)
+                            for (int j = -(int)(mapScale/5); j <= (int)(mapScale/5); j++)
                             {
                                 if (j == 0 && i == 0) continue;
                                 if (canMove(xIndex + i, yIndex + j))
                                 {
-                                    mapData[xIndex + i, yIndex + j].humidity += (-evaluation) / (20 * (Math.Sqrt(i * i + j * j)));
+                                    mapData[xIndex + i, yIndex + j].humidity += (- evaluation) / (20 * (Math.Sqrt(i * i + j * j)));
                                     if (mapData[xIndex + i, yIndex + j].humidity > 1f) mapData[xIndex + i, yIndex + j].humidity = 1f;
                                 }
                             }
@@ -261,7 +261,7 @@ namespace EvolutionSimulation
         // Entities to be deleted
         List<IEntity> delete;
         // Map with physical properties
-        public MapData[,] map { get; private set; }
+        public MapData[,] map{ get; private set; }
         int mapSize;
         // Perlin noise generator
         Perlin p;
