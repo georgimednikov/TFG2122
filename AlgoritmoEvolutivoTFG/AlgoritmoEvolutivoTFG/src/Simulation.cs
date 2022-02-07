@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace AlgoritmoEvolutivo
 {
     /// <summary>
-    /// Clase que simula la evolucion
+    /// Simulation of evolution
     /// </summary>
     public class Simulation : ISimulation
     {

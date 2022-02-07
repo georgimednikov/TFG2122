@@ -9,7 +9,7 @@ using Stateless;
 namespace AlgoritmoEvolutivo
 {
     /// <summary>
-    /// IDs para la maquina de estados
+    /// IDs for the State Machine
     /// </summary>
     public enum StateID
     {

@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 namespace AlgoritmoEvolutivo
 {
     /// <summary>
-    /// La creatura
+    /// A creature with attributes and behavior
     /// </summary>
     public class Creature : IEntity
     {
         /// <summary>
-        /// Clase privada para representar los estados
-        /// El estado tiene un identificador y una accion asociada
+        /// Private class representing states.
+        /// Each state has an ID and an associated action
         /// </summary>
         private class State
         {
@@ -27,7 +27,7 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Constructor para factorias
+        /// Constructor for factories
         /// </summary>
         public Creature()
         {
@@ -35,11 +35,9 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Inicia una criatura en un mundo y posicion
+        /// Initializes a creature in a world and position
         /// </summary>
-        /// <param name="w">El mundo en el que tomara residencia</param>
-        /// <param name="x">Posicion x</param>
-        /// <param name="y">Posicion y</param>
+        /// <param name="w">World in which it'll reside</param>
         public void Init(World w, int x, int y)
         {
             world = w;
@@ -54,12 +52,12 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Paso de simulacion
+        /// Simulation step
         /// </summary>
         public void Tick()
         {
-            // TODO: Poner los Fire en las acciones de los estados
-            // y quitar esto de aquí
+            // TODO: Put Fire in the states' actions
+            // TODO: and yeet this outta here
             if (currState.name == StateID.Dead) return;
             Speed--;
             if (Speed <= 0)
@@ -73,13 +71,13 @@ namespace AlgoritmoEvolutivo
             }
             else fsm.Fire(TriggerID.Stops);
 
-            // Ejecuta la accion correspondiente al estado actual
+            // Executes the action corresponding to the current state
             currState.action();
             Move();
         }
 
         /// <summary>
-        /// Intenta mover la criatura a una posicon contigua aleatoria
+        /// Attempts to move the creature to an adjacent tile
         /// </summary>
         void Move()
         {
@@ -89,47 +87,44 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Devuelve el estado actual de la creatura
-        /// </summary>
-        /// <returns></returns>
+        /// Returns the creature's current state
+        /// </summary>W
         public string GetState()
         {
             return currState.name.ToString();
         }
 
         /// <summary>
-        /// Configura la maquina de estados de la creatura
-        /// con los estados que se indiquen.
-        /// TODO: los estados los estamos poniendo a pelo
+        /// Configures the creature's state machine with the given states.
+        /// TODO: We are forcefully cramming these states down the FSM's throat
         /// </summary>
         void ConfigureStateMachine()
         {
-            // Setup de estados
+            // State setup
             State Alive = new State(
                StateID.Alive,
-               () => { /*TODO: Borrar*/Console.WriteLine("Idle"); }
+               () => { /*TODO: Yeet*/Console.WriteLine("Idle"); }
            );
             State Dead = new State(
                  StateID.Dead,
-                () => { /*TODO: Borrar*/Console.WriteLine("Dead"); }
+                () => { /*TODO: Yeet*/Console.WriteLine("Dead"); }
             );
 
             State Idle = new State(
                 StateID.Idle,
-                () => { /*TODO: Borrar*/Console.WriteLine("Idle"); }
+                () => { /*TODO: Yeet*/Console.WriteLine("Idle"); }
             );
 
 
             State Moving = new State(
                  StateID.Moving,
-                () => { /*TODO: Borrar*/Console.WriteLine("Moving"); }
+                () => { /*TODO: Yeet*/Console.WriteLine("Moving"); }
             );
 
-            // Estado inicial
+            // Initial state
             currState = Moving;
 
-            // Establecer cada estado en la FSM y los 
-            // triggers de transiciones
+            // Establishes each state in the FSM and the transition triggers
             fsm.Configure(Alive)
                 .Permit(TriggerID.Dies, Dead)
                 .InitialTransition(Moving);
@@ -145,19 +140,19 @@ namespace AlgoritmoEvolutivo
                 .Permit(TriggerID.Stops, Idle);
         }
 
-        // Posicion en el mapa del mundo
+        // World tile position
         public int x, y;
-        // Mundo en el que existe la criatura
+        // World in which the creature resides
         World world;
-        // Generador de números lolrandom
+        // Random number generator
         Random r;
-        // Maquina de estados
-        // Esquema: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
+        // State machine
+        // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         Stateless.StateMachine<State, TriggerID> fsm;
-        // Estado actual
+        // Current state
         State currState;
 
-        // TODO: Velocidad, pero ahora solo es para probar la FSM
+        // TODO: Speed, for now only to test the FSM
         public float Speed = 10;
     }
 }

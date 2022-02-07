@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace AlgoritmoEvolutivo
 {
     /// <summary>
-    /// Clase que define el mundo simulado
+    /// Definition of the simulated world
     /// </summary>
     public class World
     {
         /// <summary>
-        /// Datos fisicos de cada casilla del mapa
+        /// Properties of each map tile
         /// </summary>
         public struct MapData
         {
@@ -20,9 +20,8 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Inicializa el mapa con una matriz cuadrada
+        /// Initializes the map with a square matrix
         /// </summary>
-        /// <param name="size">Tamanio de la matriz</param>
         public void Init(int size)
         {
             p = new Perlin();
@@ -48,10 +47,10 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Aniade una entidad a la lista del mundo
+        /// Adds an entity to the list
         /// </summary>
-        /// <typeparam name="T">La entidad a aniadir</typeparam>
-        /// <returns>Entidad aniadida</returns>
+        /// <typeparam name="T">Entity type</typeparam>
+        /// <returns>The added entity</returns>
         public T AddEntity<T>() where T : IEntity, new()
         {
             T ent = new T();
@@ -60,45 +59,42 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Marca a una entidad para que se elimine en el siguiente frame
+        /// Designates an entity to be eliminated before the next frame
         /// </summary>
-        /// <param name="entity">Entidad a eliminar</param>
         public void Delete(IEntity entity)
         {
             delete.Add(entity);
         }
 
         /// <summary>
-        /// Comprueba si las coordenadas objetivo se encuentran dentro del mapa
+        /// Checks if target coordinates are within the map's boundaries
         /// </summary>
-        /// <param name="x">Coordenada x</param>
-        /// <param name="y">Coordenada y</param>
-        /// <returns>Si las coordenadas se encuentran en el mapa</returns>
+        /// <returns>True if it is within bounds</returns>
         public bool canMove(int x, int y)
         {
             return (x >= 0 && x < mapSize && y >= 0 && y < mapSize);
         }
 
         /// <summary>
-        /// Paso de ejecucion de la simulacion del mundo
+        /// Performs a step of the simulation
         /// </summary>
         public void Tick()
         {
-            entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Le dice a al entidad que se actualice
+            entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Orders the entity to perform a step
 
             delete.ForEach(delegate (IEntity e) { entities.Remove(e); });
 
             delete.Clear();
         }
 
-        #region Generacion Procedimental
+        #region Procedural Generation
 
-        public Wave[] heightWaves;      // Pasadas realizadas por el ruido de Perlin y sumadas a la altura
-        public Wave[] humidityWaves;    // Pasadas realizadas por el ruido de Perlin y sumadas a la humedad 
-        public Wave[] temperatureWaves; // Pasadas realizadas por el ruido de Perlin y sumadas a la temperatura
+        public Wave[] heightWaves;      // Passes performed by the Perlin noise and added to the height
+        public Wave[] humidityWaves;    // Passes performed by the Perlin noise and added to the humidity
+        public Wave[] temperatureWaves; // Passes performed by the Perlin noise and added to the temperature
 
         /// <summary>
-        /// Funcion usada para meter ruido a lo generado originalmente por Perlin
+        /// Function used to insert further noise into the Perlin noise
         /// </summary>
         public class Wave
         {
@@ -108,15 +104,13 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Genera un mapa de ruido usando ruido de Perlin
+        /// Gnerates a noise map using Perlin noise
         /// </summary>
-        /// <param name="mapDepth">Tamanio del mapa en un eje Z</param>
-        /// <param name="mapWidth">Tamanio del mapa en el eje X</param>
-        /// <param name="scale">Escala del ruido</param>
-        /// <param name="offsetX">Desplazamiento en X</param>
-        /// <param name="offsetZ">Desplazamiento en Z</param>
-        /// <param name="waves">Waves a usar para meter mas ruido</param>
-        /// <returns>Mapa de ruido generado</returns>
+        /// <param name="mapDepth">Map size in the Z axis</param>
+        /// <param name="mapWidth">Map size in the X axis</param>
+        /// <param name="scale">Noise scale</param>
+        /// <param name="waves">Waves used to insert further noise</param>
+        /// <returns>Generated noise map</returns>
         public float[,] GenerateNoiseMap(int mapDepth, int mapWidth, float scale, float offsetX, float offsetZ, Wave[] waves)
         {
             float[,] noiseMap = new float[mapDepth, mapWidth];
@@ -145,13 +139,10 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Procesa los valores de los distintos mapas.
-        /// Estos valores se influyen entre si segun ciertas formulas.
+        /// Processes the values of the maps.
+        /// These waves influence each other following certain formulas.
         /// </summary>
-        /// <param name="heightMap">Mapa de alturas</param>
-        /// <param name="humidityMap">Mapa de humedad</param>
-        /// <param name="temperatureMap">Mapa de temeperatura</param>
-        /// <returns>Mapa fisico generado</returns>
+        /// <returns>Generated physical map</returns>
         private MapData[,] ProcessMapValues(float[,] heightMap, float[,] humidityMap, float[,] temperatureMap)
         {
             int sizeX = heightMap.GetLength(0);
@@ -167,9 +158,9 @@ namespace AlgoritmoEvolutivo
                     double evaluation = EvaluateInfluenceCurve(mapData[xIndex, yIndex].height);
                     if (evaluation > 0) 
                     {
-                        mapData[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex] - evaluation/2;
+                        mapData[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex] - evaluation / 2;
                         mapData[xIndex, yIndex].humidity = humidityMap[xIndex, yIndex] + evaluation;
-                        if (mapData[xIndex, yIndex].temperature < 0) mapData[xIndex, yIndex].temperature = 0; // Para que no se salga del dominio
+                        if (mapData[xIndex, yIndex].temperature < 0) mapData[xIndex, yIndex].temperature = 0; // So it does not excede the domain
                         if (mapData[xIndex, yIndex].humidity > 1f) mapData[xIndex, yIndex].humidity = 1f;
                     }
                     else if (evaluation < 0)
@@ -196,7 +187,7 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Genera todo el mapa de manera aletoria.
+        /// Gneerates the whole map randomly
         /// </summary>
         public void Init()
         {
@@ -215,10 +206,8 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Evalua un valor segun la funcion de altura
+        /// Evaluatues a value according to the height function
         /// </summary>
-        /// <param name="x">Valor a evaluar</param>
-        /// <returns>Valor resultante</returns>
         double EvaluateHeightCurve(double x)
         {
             if (x < 0) return 0f;
@@ -229,10 +218,8 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Evalua un valor segun la funcion de influencia
+        /// Evaluatues a value according to the influence function
         /// </summary>
-        /// <param name="x">Valor a evaluar</param>
-        /// <returns>Valor resultante</returns>
         double EvaluateInfluenceCurve(double x)
         {
             if (x < 0) return -1;
@@ -242,15 +229,14 @@ namespace AlgoritmoEvolutivo
         }
         #endregion
 
-        // Entidades en el mundo
+        // Entities in the world
         public List<IEntity> entities { get; private set; }
-        // Entidades a eliminar
+        // Entities to be deleted
         List<IEntity> delete;
-        // Mapa fisico
+        // Map with physical properties
         public MapData[,] map{ get; private set; }
-        // Tamanio del mapa
         int mapSize;
-        // Generador de rudio de Perlin
+        // Perlin noise generator
         Perlin p;
     }
 }

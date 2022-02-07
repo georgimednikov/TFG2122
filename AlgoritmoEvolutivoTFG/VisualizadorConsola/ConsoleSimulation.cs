@@ -7,7 +7,7 @@ using AlgoritmoEvolutivo;
 namespace VisualizadorConsola
 {
     /// <summary>
-    /// Implementacion de la simulacion con output de consola
+    /// Implementation of a simulation with console output
     /// </summary>
     public class ConsoleSimulation : ISimulation
     {
@@ -30,8 +30,8 @@ namespace VisualizadorConsola
         }
 
         /// <summary>
-        /// Renderiza el mapa y las criaturas
-        /// TODO: Eliminar antes de entregar
+        /// Renders the map and creatures
+        /// TODO: Modify this MF
         /// </summary>
         public void Render()
         {
@@ -102,8 +102,8 @@ namespace VisualizadorConsola
                 Console.WriteLine();
             }
 
-            //TODO: Quien sea libre de pecado que tire la primera piedra
-            //TODO: Mateo 7:1
+            //TODO: Let he who is without sin cast the first stone
+            //TODO: Matthew 7:1
             Console.Write("Height");
             Console.Write("                           Humidity");
             Console.Write("                         Temperature");

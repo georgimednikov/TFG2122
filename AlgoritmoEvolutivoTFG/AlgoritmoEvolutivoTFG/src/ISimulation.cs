@@ -7,18 +7,18 @@ using System.Threading.Tasks;
 namespace AlgoritmoEvolutivo
 {
     /// <summary>
-    /// Interfaz comun para las simulaciones de evolucion
+    /// Common interface for simulations
     /// </summary>
     public interface ISimulation
     {
         /// <summary>
-        /// Inicializacion de la simulacion
-        /// TODO: Pasar archivo con datos iniciales
+        /// Initialization of the simulation
+        /// TODO: Input parameters through text file
         /// </summary>
         void Init();
 
         /// <summary>
-        /// Simula la evolucion
+        /// Starts the simualtion and keeps it running until the exit condition is met
         /// </summary>
         void Run();
 
