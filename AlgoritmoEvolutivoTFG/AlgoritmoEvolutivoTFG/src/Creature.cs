@@ -157,6 +157,8 @@ namespace AlgoritmoEvolutivo
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         Stateless.StateMachine<State, TriggerID> fsm;
+        // TODO: Lamo
+        StatelessFSM mfsm;
         // Current state
         State currState;
 
