@@ -67,6 +67,7 @@ namespace EvolutionSimulation
         public void Tick()
         {
             step++;
+            day = (step % 1200 >= 325 && step % 1200 <= 1000);
         }
 
         #region Procedural Generation
@@ -235,6 +236,7 @@ namespace EvolutionSimulation
         // Map with physical properties
         public MapData[,] map { get; private set; }
         int mapSize;
+        bool day;
         // Perlin noise generator
         Perlin p;
     }
