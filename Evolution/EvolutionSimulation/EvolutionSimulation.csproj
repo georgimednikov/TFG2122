@@ -69,6 +69,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\Genetics\CreatureFeatures.cs" />
+    <Compile Include="src\Genetics\CreatureChromosome.cs" />
+    <Compile Include="src\Genetics\GeneticFunctions.cs" />
     <Compile Include="src\FSM\Creature\States\Alive.cs" />
     <Compile Include="src\FSM\Creature\States\Dead.cs" />
     <Compile Include="src\FSM\Creature\States\Eat.cs" />
@@ -86,15 +89,10 @@
     <Compile Include="src\Plant.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="GeneticSharp.Domain, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GeneticSharp.2.6.0\lib\net462\GeneticSharp.Domain.dll</HintPath>
-    </Reference>
-    <Reference Include="GeneticSharp.Infrastructure.Framework, Version=2.6.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\GeneticSharp.2.6.0\lib\net462\GeneticSharp.Infrastructure.Framework.dll</HintPath>
-    </Reference>
     <Reference Include="stateless, Version=4.0.0.0, Culture=neutral, PublicKeyToken=93038f0927583c9a, processorArchitecture=MSIL">
       <HintPath>..\packages\stateless.5.11.0\lib\net472\stateless.dll</HintPath>
     </Reference>
+    <Reference Include="System.Numerics" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
