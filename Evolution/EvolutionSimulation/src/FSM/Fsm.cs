@@ -54,7 +54,7 @@ namespace EvolutionSimulation.FSM
             {
                 if (machine.CanFire(t) && t.Evaluate())
                 {
-                    //TO DO: Quitar esto, esta pa debugear 
+                    //TODO: Quitar esto, esta pa debugear 
                     Console.WriteLine("Transition: " + t.GetType().Name);
                     
                     machine.Fire(t);
