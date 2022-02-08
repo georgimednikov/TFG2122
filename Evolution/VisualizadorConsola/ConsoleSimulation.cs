@@ -17,14 +17,14 @@ namespace VisualizadorConsola
             creatures = new List<Creature>();
             delete = new List<IEntity>();
             world = new World();
-            world.Init(32);
+            world.Init(8);
             Creature c = CreateEntity<Creature>();
             c.metabolism = 200;
             c.health = 1;
-            c.Init(world, 16, 16);
-            //c = CreateEntity<Creature>();
-            //c.metabolism = 100;
-            //c.Init(world, 12, 16);
+            c.Init(world, 5, 5);
+            c = CreateEntity<Creature>();
+            c.metabolism = 1;
+            c.Init(world, 4, 4);
         }
 
         public void Run()
@@ -40,7 +40,7 @@ namespace VisualizadorConsola
 
                 delete.Clear();
                 Render();
-                Thread.Sleep(1000);
+                Thread.Sleep(100);
             }
         }
 

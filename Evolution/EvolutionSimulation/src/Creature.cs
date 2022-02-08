@@ -51,31 +51,6 @@ namespace EvolutionSimulation
 
             mfsm.Evaluate();
             mfsm.Execute();
-
-            while(Move());
-
-        }
-
-        /// <summary>
-        /// Attempts to move the creature to an adjacent tile
-        /// </summary>
-        bool Move()
-        {
-            int nX = 0, nY = 0;
-            do
-            {
-                nX = x + r.Next(-1, 2);
-                nY = y + r.Next(-1, 2);
-
-            } while (nX != x && nY != y);
-            if (world.canMove(nX, nY))
-            {
-                if (actionPoints < 1000 * ((200f - mobility) / 100f)) return false;
-                actionPoints -= 1000 * (int)((200f - mobility) / 100f);
-                x = nX; y = nY;
-                return true;
-            }
-            return false;
         }
 
         /// <summary>
@@ -94,15 +69,16 @@ namespace EvolutionSimulation
         {
             // States
             IState idle = new Idle();
-            IState moving = new Moving();
+            IState moving = new Moving(this);
             IState dead = new Dead();
             IState alive = new Alive();
             IState eat = new Eat();
 
             mfsm = new Fsm(idle);
-            bool b = false;
-            bool al = false;
-            bool de = true;
+            bool toMove = true;
+            bool toIdle = false;
+            bool toDie = false;
+            bool toMunch = false;
 
             // Substates
             mfsm.AddSubstate(alive, idle);
@@ -110,23 +86,42 @@ namespace EvolutionSimulation
             mfsm.AddSubstate(alive, eat);
 
             // Transitions
-            mfsm.AddTransition(idle, new BooleanTransition(ref b), moving);
-            mfsm.AddTransition(idle, new BooleanTransition(ref de), eat);
-            mfsm.AddTransition(moving, new BooleanTransition(ref b), idle);
-            mfsm.AddTransition(alive, new BooleanTransition(ref al), dead);
+            mfsm.AddTransition(idle, new BooleanTransition(ref toMove), moving);
+            mfsm.AddTransition(idle, new BooleanTransition(ref toMunch), eat);
+            mfsm.AddTransition(moving, new BooleanTransition(ref toIdle), idle);
+            mfsm.AddTransition(alive, new BooleanTransition(ref toDie), dead);
+        }
+
+        /// <summary>
+        /// Moves a creature a specified amount
+        /// </summary>
+        public void Move(int x, int y)
+        {
+            this.x += x;
+            this.y += y;
+        }
+
+        /// <summary>
+        /// Places a creature in the designated coordinates
+        /// </summary>
+        public void Place(int x, int y)
+        {
+            this.x = x;
+            this.y = y;
         }
 
         // World tile position
-        public int x, y;
+        public int x { get; private set; }
+        public int y { get; private set; }
         // World in which the creature resides
-        World world;
+        public World world { get; private set; }
         // Random number generator
-        Random r;
+        public Random r { get; private set; }
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         Fsm mfsm;
 
-        int actionPoints;
+        public int actionPoints;
 
         // TODO: Speed, for now only to test the FSM
         public float Speed = 10;

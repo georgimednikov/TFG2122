@@ -42,7 +42,7 @@ namespace EvolutionSimulation.FSM
         /// </summary>
         public void Execute()
         {
-            machine.State.Action();
+            while(machine.State.Action()) Evaluate();
         }
 
         /// <summary>

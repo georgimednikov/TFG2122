@@ -231,7 +231,6 @@ namespace EvolutionSimulation
         }
         #endregion
 
-
         public uint step;
         // Map with physical properties
         public MapData[,] map { get; private set; }

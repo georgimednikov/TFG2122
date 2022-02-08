@@ -9,9 +9,10 @@ namespace EvolutionSimulation.FSM.Creature.States
     // TODO: Estado para testear, hacer el estado correctamente
     class Idle : IState
     {
-        public void Action()
+        public bool Action()
         {
             Console.WriteLine("Idle");
+            return false;
         }
     }
 }

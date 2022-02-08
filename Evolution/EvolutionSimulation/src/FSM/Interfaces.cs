@@ -14,7 +14,7 @@ namespace EvolutionSimulation.FSM
         /// <summary>
         /// Action which is executed in the state
         /// </summary>
-        void Action();
+        bool Action();
     }
 
     /// <summary>
