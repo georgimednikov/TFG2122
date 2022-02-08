@@ -62,12 +62,13 @@ namespace EvolutionSimulation
         }
 
         /// <summary>
-        /// Performs a step of the simulation
+        /// Performs a step of the simulation.
         /// </summary>
         public void Tick()
         {
             step++;
-            day = (step % 1200 >= 325 && step % 1200 <= 1000);
+            day = (step % (ticksHour * hoursDay) >= (morning * ticksHour) && 
+                step % (ticksHour * hoursDay) <= (night * ticksHour));
         }
 
         #region Procedural Generation
@@ -236,6 +237,10 @@ namespace EvolutionSimulation
         public MapData[,] map { get; private set; }
         int mapSize;
         bool day;
+        // 50 steps equals and hour, and 24 hours equal a day.
+        int ticksHour = 50, hoursDay = 24;
+        // The day begins 6:30 and ends at 20:00.
+        float morning = 6.5f, night = 20;
         // Perlin noise generator
         Perlin p;
     }
