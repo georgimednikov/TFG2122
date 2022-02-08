@@ -11,7 +11,7 @@ namespace EvolutionSimulation.FSM
     {
         public Fsm(IState initalState)
         {
-            machine = new StateMachine<IState, ITransition>(initalState);
+            machine = new StateMachine<IState, ITransition>(initalState, FiringMode.Queued);
         }
 
         /// <summary>
@@ -20,21 +20,41 @@ namespace EvolutionSimulation.FSM
         public void AddTransition(IState og, ITransition t, IState dest)
         {
             machine.Configure(og)
-                .Permit(t, dest); //?
+                .Permit(t, dest);
         }
 
+        public IState GetState()
+        {
+            return machine.State;
+        }
+
+        /// <summary>
+        /// Adds the state sub inside of super
+        /// </summary>
+        public void AddSubstate(IState super, IState sub)
+        {
+            machine.Configure(sub)
+                .SubstateOf(super);
+        }
+
+        /// <summary>
+        /// Executes the current state
+        /// </summary>
         public void Execute()
         {
             machine.State.Action();
         }
+
+        /// <summary>
+        /// Triggers whichever transitions return true on its Evaluate, if there is an available transition
+        /// </summary>
         public void Evaluate()
         {
             foreach (ITransition t in machine.GetPermittedTriggers())
             {
-                if (t.Evaluate())
+                if (machine.CanFire(t) && t.Evaluate())
                 {
                     machine.Fire(t);
-                    break;
                 }
             }
         }

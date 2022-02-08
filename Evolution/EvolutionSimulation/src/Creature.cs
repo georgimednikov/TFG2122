@@ -78,7 +78,7 @@ namespace EvolutionSimulation
         /// </summary>
         public string GetState()
         {
-            return mfsm.State.ToString();
+            return mfsm.GetState().ToString();
         }
 
         /// <summary>
@@ -87,22 +87,22 @@ namespace EvolutionSimulation
         /// </summary>
         void ConfigureStateMachine()
         {
-            State idle = new Idle();
-            State moving = new Moving();
-            State dead = new Dead();
-            State alive = new Alive();
-            State eat = new Eating();
-            mfsm = new StatelessFSM(idle);
-            bool b = true;
-            bool al = false;
-            bool de = true;
-            mfsm.AddSubstate(alive, idle);
-            mfsm.AddSubstate(alive, moving);
-            mfsm.AddSubstate(alive, eat);
-            mfsm.AddTransition(idle, new BooleanTransition(ref de), eat);
-            mfsm.AddTransition(idle, new BooleanTransition(ref b), moving);
-            mfsm.AddTransition(moving, new BooleanTransition(ref b), idle);
-            mfsm.AddTransition(alive, new BooleanTransition(ref al), dead);
+            //IState idle = new Idle();
+            //IState moving = new Moving();
+            //IState dead = new Dead();
+            //IState alive = new Alive();
+            //IState eat = new Eating();
+            //mfsm = new StatelessFSM(idle);
+            //bool b = true;
+            //bool al = false;
+            //bool de = true;
+            //mfsm.AddSubstate(alive, idle);
+            //mfsm.AddSubstate(alive, moving);
+            //mfsm.AddSubstate(alive, eat);
+            //mfsm.AddTransition(idle, new BooleanTransition(ref de), eat);
+            //mfsm.AddTransition(idle, new BooleanTransition(ref b), moving);
+            //mfsm.AddTransition(moving, new BooleanTransition(ref b), idle);
+            //mfsm.AddTransition(alive, new BooleanTransition(ref al), dead);
         }
 
         // World tile position
@@ -113,7 +113,7 @@ namespace EvolutionSimulation
         Random r;
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
-        StatelessFSM mfsm;
+        Fsm mfsm;
 
         int actionPoints;
 
