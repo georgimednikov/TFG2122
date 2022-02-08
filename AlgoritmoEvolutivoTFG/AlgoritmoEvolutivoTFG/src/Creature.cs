@@ -12,21 +12,6 @@ namespace AlgoritmoEvolutivo
     public class Creature : IEntity
     {
         /// <summary>
-        /// Private class representing states.
-        /// Each state has an ID and an associated action
-        /// </summary>
-        private class State
-        {
-            public StateID name;
-            public Action action;
-
-            public State(StateID n, Action a)
-            {
-                name = n; action = a;
-            }
-        }
-
-        /// <summary>
         /// Constructor for factories
         /// </summary>
         public Creature()
@@ -43,11 +28,11 @@ namespace AlgoritmoEvolutivo
             world = w;
             this.x = x;
             this.y = y;
-            this.fsm = new Stateless.StateMachine<State, TriggerID>(
-                () => currState, 
-                s => currState = s, 
-                Stateless.FiringMode.Queued
-            );
+            //this.fsm = new Stateless.StateMachine<State, TriggerID>(
+            //    () => currState, 
+            //    s => currState = s, 
+            //    Stateless.FiringMode.Queued
+            //);
             ConfigureStateMachine();
         }
 
@@ -56,6 +41,7 @@ namespace AlgoritmoEvolutivo
         /// </summary>
         public void Tick()
         {
+            /*
             // TODO: Put Fire in the states' actions
             // TODO: and yeet this outta here
             if (currState.name == StateID.Dead) return;
@@ -68,12 +54,17 @@ namespace AlgoritmoEvolutivo
             else if (Speed % 2 == 0)
             {
                 fsm.Fire(TriggerID.Moves);
+                fsm.Fire(TriggerID.Dies);
             }
             else fsm.Fire(TriggerID.Stops);
 
             // Executes the action corresponding to the current state
             currState.action();
-            // evaluateTransitions();
+            /*/
+
+            mfsm.Evaluate();
+            mfsm.Execute();
+            //*/
             Move();
         }
 
@@ -89,10 +80,10 @@ namespace AlgoritmoEvolutivo
 
         /// <summary>
         /// Returns the creature's current state
-        /// </summary>W
+        /// </summary>
         public string GetState()
         {
-            return currState.name.ToString();
+            return "";// currState.name.ToString();
         }
 
         /// <summary>
@@ -101,51 +92,26 @@ namespace AlgoritmoEvolutivo
         /// </summary>
         void ConfigureStateMachine()
         {
-            // State setup
-            State Alive = new State(
-               StateID.Alive,
-               () => { /*TODO: Yeet*/Console.WriteLine("Idle"); }
-           );
-            State Dead = new State(
-                 StateID.Dead,
-                () => { /*TODO: Yeet*/Console.WriteLine("Dead"); }
-            );
-
-            State Idle = new State(
-                StateID.Idle,
-                () => { /*TODO: Yeet*/Console.WriteLine("Idle"); }
-            );
-
-
-            State Moving = new State(
-                 StateID.Moving,
-                () => { /*TODO: Yeet*/Console.WriteLine("Moving"); }
-            );
 
             // Initial state
-            currState = Moving;
+            //currState = Moving;
 
-            // Establishes each state in the FSM and the transition triggers
-            fsm.Configure(Alive)
-                .Permit(TriggerID.Dies, Dead)
-                .InitialTransition(Moving);
-
-            fsm.Configure(Dead);
-
-            fsm.Configure(Idle)
-                .SubstateOf(Alive);
-                //.Permit(TriggerID.Moves, Moving);
-
-            fsm.Configure(Idle)
-                //.SubstateOf(Alive)
-                .Permit(TriggerID.Moves, Moving);
-
-            fsm.Configure(Moving)
-                .SubstateOf(Alive)
-                .Permit(TriggerID.Stops, Idle);
-
-            _State moving = new Moving();
-            mfsm = new StatelessFSM(moving);
+            State idle = new Idle();
+            State moving = new Moving();
+            State dead = new Dead();
+            State alive = new Alive();
+            State eat = new Eating();
+            mfsm = new StatelessFSM(idle);
+            bool b = true;
+            bool al = false;
+            bool de = true;
+            mfsm.AddSubstate(alive, idle);
+            mfsm.AddSubstate(alive, moving);
+            mfsm.AddSubstate(alive, eat);
+            mfsm.AddTransition(idle, new BooleanTransition(ref de), eat);
+            mfsm.AddTransition(idle, new BooleanTransition(ref b), moving);
+            mfsm.AddTransition(moving, new BooleanTransition(ref b), idle);
+            mfsm.AddTransition(alive, new BooleanTransition(ref al), dead);
         }
 
         // World tile position
@@ -156,11 +122,9 @@ namespace AlgoritmoEvolutivo
         Random r;
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
-        Stateless.StateMachine<State, TriggerID> fsm;
-        // TODO: Lamo
         StatelessFSM mfsm;
         // Current state
-        State currState;
+        //State currState;
 
         // TODO: Speed, for now only to test the FSM
         public float Speed = 10;

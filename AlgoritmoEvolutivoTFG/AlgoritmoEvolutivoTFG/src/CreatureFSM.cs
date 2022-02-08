@@ -16,24 +16,26 @@ namespace AlgoritmoEvolutivo
         Idle,
         Moving,
         Alive,
-        Dead
+        Dead,
+        Eat
     }
     public enum TriggerID
     {
         Moves,
         Stops,
-        Dies
+        Dies,
+        Eats
     }
 
-    public abstract class _State
+    public abstract class State
     {
         protected StateID id;
         public abstract void Action();
     }
 
-    public class Moving : _State
+    public class Moving : State
     {
-        public Moving ()
+        public Moving()
         {
             id = StateID.Moving;
         }
@@ -44,11 +46,90 @@ namespace AlgoritmoEvolutivo
         }
     }
 
+    public class Idle : State
+    {
+        public Idle()
+        {
+            id = StateID.Idle;
+        }
+
+        override public void Action()
+        {
+            Console.WriteLine("Idle");
+        }
+    }
+
+    public class Dead : State
+    {
+        public Dead()
+        {
+            id = StateID.Dead;
+        }
+
+        override public void Action()
+        {
+            Console.WriteLine("Dead");
+        }
+    }
+
+    public class Alive : State
+    {
+        public Alive()
+        {
+            id = StateID.Alive;
+        }
+
+        override public void Action()
+        {
+            Console.WriteLine("Alive");
+        }
+    }
+
+    public class Eating : State
+    {
+        public Eating()
+        {
+            id = StateID.Eat;
+        }
+
+        override public void Action()
+        {
+            Console.WriteLine("Eating");
+        }
+    }
+
     public abstract class Transition
     {
-        protected TriggerID id;
+        /// <summary>
+        /// Evaluates the transition and, if it returns true, the transition occurs
+        /// </summary>
         public abstract bool Evaluate();
     }
+
+    public class BooleanTransition : Transition
+    {
+        /// <summary>
+        /// Constructor for the boolean transition, which evaluates true if the given bool is true
+        /// </summary>
+        public BooleanTransition(ref bool boolCondition)
+        {
+            b = boolCondition;
+        }
+
+        /// <summary>
+        /// Evaluates true if the given bool is true
+        /// </summary>
+        /// <returns></returns>
+        public override bool Evaluate()
+        {
+            return b;
+        }
+
+        bool b;
+    }
+
+
+
 
 
     public interface FSM
@@ -59,34 +140,44 @@ namespace AlgoritmoEvolutivo
 
     public class StatelessFSM : FSM
     {
-        public StatelessFSM(_State initalState)
+        public StatelessFSM(State initalState)
         {
-            fsm = new StateMachine<_State, Transition>(initalState);
+            fsm = new StateMachine<State, Transition>(initalState, FiringMode.Queued);
         }
 
-        public void AddTransition(_State og, Transition t, _State dest)
+        public void AddTransition(State og, Transition t, State dest)
         {
             fsm.Configure(og)
                 .Permit(t, dest); //?
+        }
+
+        public void AddSubstate(State super, State sub)
+        {
+            fsm.Configure(sub)
+                .SubstateOf(super);
         }
 
         public void Execute()
         {
             fsm.State.Action();
         }
+
+        /// <summary>
+        /// Triggers whichever transitions return true on its Evaluate, if there is an available transition
+        /// </summary>
         public void Evaluate()
         {
             Transition[] currTransitions = fsm.GetPermittedTriggers().ToArray();
-
+            
             foreach(Transition t in currTransitions)
             {
-                if (t.Evaluate())
+                if (fsm.CanFire(t) && t.Evaluate())
                 {
                     fsm.Fire(t);
-                    break;
+                    //break;
                 }
             }
         }
-        Stateless.StateMachine<_State, Transition> fsm;
+        Stateless.StateMachine<State, Transition> fsm;
     }
 }
