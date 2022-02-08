@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AlgoritmoEvolutivo
+namespace EvolutionSimulation
 {
     /// <summary>
     /// Definition of the simulated world
@@ -27,18 +27,16 @@ namespace AlgoritmoEvolutivo
         /// </summary>
         /// <param name="heightFunc">Function to interpret the results from the Perlin Noise function</param>
         /// <param name="influenceFunc">Function that defines the influence of height on the other parameters</param>
-        public void Init(int size, Func<double,double> heightFunc = default(Func<double, double>), Func<double, double> influenceFunc = default(Func<double, double>))
+        public void Init(int size, Func<double, double> heightFunc = default(Func<double, double>), Func<double, double> influenceFunc = default(Func<double, double>))
         {
             evaluateHeight = (heightFunc != null) ? heightFunc : EvaluateHeightCurve;
             evaluateInfluence = (influenceFunc != null) ? influenceFunc : EvaluateInfluenceCurve;
             p = new Perlin();
             mapSize = size;
-            entities = new List<IEntity>();
-            delete = new List<IEntity>();
             Random rnd = new Random(DateTime.Now.Second);
             heightWaves = new Wave[1];
             heightWaves[0] = new Wave();
-            heightWaves[0].seed = rnd.Next(0,10000); //1641;
+            heightWaves[0].seed = rnd.Next(0, 10000); //1641;
             heightWaves[0].frequency = 1f;
             heightWaves[0].amplitude = 1f;
             humidityWaves = new Wave[1];
@@ -55,26 +53,6 @@ namespace AlgoritmoEvolutivo
         }
 
         /// <summary>
-        /// Adds an entity to the list
-        /// </summary>
-        /// <typeparam name="T">Entity type</typeparam>
-        /// <returns>The added entity</returns>
-        public T AddEntity<T>() where T : IEntity, new()
-        {
-            T ent = new T();
-            entities.Add(ent);
-            return ent;
-        }
-
-        /// <summary>
-        /// Designates an entity to be eliminated before the next frame
-        /// </summary>
-        public void Delete(IEntity entity)
-        {
-            delete.Add(entity);
-        }
-
-        /// <summary>
         /// Checks if target coordinates are within the map's boundaries
         /// </summary>
         /// <returns>True if it is within bounds</returns>
@@ -88,11 +66,8 @@ namespace AlgoritmoEvolutivo
         /// </summary>
         public void Tick()
         {
-            entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Orders the entity to perform a step
-
-            delete.ForEach(delegate (IEntity e) { entities.Remove(e); });
-
-            delete.Clear();
+            step++;
+            day = (step % 1200 >= 325 && step % 1200 <= 1000);
         }
 
         #region Procedural Generation
@@ -164,7 +139,7 @@ namespace AlgoritmoEvolutivo
                     mapData[xIndex, yIndex].height = evaluateHeight(heightMap[xIndex, yIndex]);
 
                     double evaluation = evaluateInfluence(mapData[xIndex, yIndex].height);
-                    if (evaluation > 0) 
+                    if (evaluation > 0)
                     {
                         mapData[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex] - evaluation;
                         mapData[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] + evaluation;
@@ -174,15 +149,15 @@ namespace AlgoritmoEvolutivo
                     else if (evaluation < 0)
                     {
                         mapData[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex];
-                        mapData[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] - evaluation ;
-                        for (int i = -(int)(mapScale/5); i <= (int)(mapScale/5); i++)
+                        mapData[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] - evaluation;
+                        for (int i = -(int)(mapScale / 5); i <= (int)(mapScale / 5); i++)
                         {
-                            for (int j = -(int)(mapScale/5); j <= (int)(mapScale/5); j++)
+                            for (int j = -(int)(mapScale / 5); j <= (int)(mapScale / 5); j++)
                             {
                                 if (j == 0 && i == 0) continue;
                                 if (canMove(xIndex + i, yIndex + j))
                                 {
-                                    mapData[xIndex + i, yIndex + j].humidity += (- evaluation) / (20 * (Math.Sqrt(i * i + j * j)));
+                                    mapData[xIndex + i, yIndex + j].humidity += (-evaluation) / (20 * (Math.Sqrt(i * i + j * j)));
                                     if (mapData[xIndex + i, yIndex + j].humidity > 1f) mapData[xIndex + i, yIndex + j].humidity = 1f;
                                 }
                             }
@@ -256,13 +231,12 @@ namespace AlgoritmoEvolutivo
         }
         #endregion
 
-        // Entities in the world
-        public List<IEntity> entities { get; private set; }
-        // Entities to be deleted
-        List<IEntity> delete;
+
+        public uint step;
         // Map with physical properties
-        public MapData[,] map{ get; private set; }
+        public MapData[,] map { get; private set; }
         int mapSize;
+        bool day;
         // Perlin noise generator
         Perlin p;
     }

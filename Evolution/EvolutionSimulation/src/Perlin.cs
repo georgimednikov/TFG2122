@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace AlgoritmoEvolutivo
+namespace EvolutionSimulation
 {
 	public class Perlin
 	{

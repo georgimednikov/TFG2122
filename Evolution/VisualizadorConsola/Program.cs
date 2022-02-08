@@ -1,4 +1,4 @@
-﻿using AlgoritmoEvolutivo;
+﻿using EvolutionSimulation;
 using System;
 using System.IO;
 

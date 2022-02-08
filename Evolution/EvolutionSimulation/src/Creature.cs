@@ -3,20 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using EvolutionSimulation.FSM;
 
-namespace AlgoritmoEvolutivo
+namespace EvolutionSimulation
 {
     /// <summary>
     /// A creature with attributes and behavior
     /// </summary>
     public class Creature : IEntity
     {
+        //TODO: Al que le toque, que seguramente sea yo, que lo quite.
+        public int metabolism { get; set; }
+        public int mobility { get; private set; }
+
         /// <summary>
         /// Constructor for factories
         /// </summary>
         public Creature()
         {
             r = new Random();
+            metabolism = r.Next(1, 201);
+            mobility = 100;
         }
 
         /// <summary>
@@ -28,11 +35,6 @@ namespace AlgoritmoEvolutivo
             world = w;
             this.x = x;
             this.y = y;
-            //this.fsm = new Stateless.StateMachine<State, TriggerID>(
-            //    () => currState, 
-            //    s => currState = s, 
-            //    Stateless.FiringMode.Queued
-            //);
             ConfigureStateMachine();
         }
 
@@ -41,41 +43,34 @@ namespace AlgoritmoEvolutivo
         /// </summary>
         public void Tick()
         {
-            /*
-            // TODO: Put Fire in the states' actions
-            // TODO: and yeet this outta here
-            if (currState.name == StateID.Dead) return;
-            Speed--;
-            if (Speed <= 0)
-            {
-                Speed = 0;
-                fsm.Fire(TriggerID.Dies);
-            }
-            else if (Speed % 2 == 0)
-            {
-                fsm.Fire(TriggerID.Moves);
-                fsm.Fire(TriggerID.Dies);
-            }
-            else fsm.Fire(TriggerID.Stops);
-
-            // Executes the action corresponding to the current state
-            currState.action();
-            /*/
+            actionPoints += metabolism * 10;
 
             mfsm.Evaluate();
             mfsm.Execute();
-            //*/
-            Move();
+
+            while(Move());
         }
 
         /// <summary>
         /// Attempts to move the creature to an adjacent tile
         /// </summary>
-        void Move()
+        bool Move()
         {
-            int nX = x + r.Next(-1, 2),
+            int nX = 0, nY = 0;
+            do
+            {
+                nX = x + r.Next(-1, 2);
                 nY = y + r.Next(-1, 2);
-            if (world.canMove(nX, nY)) { x = nX; y = nY; }
+
+            } while (nX != x && nY != y);
+            if (world.canMove(nX, nY))
+            {
+                if (actionPoints < 1000 * ((200f - mobility) / 100f)) return false;
+                actionPoints -= 1000 * (int)((200f - mobility) / 100f);
+                x = nX; y = nY;
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -83,7 +78,7 @@ namespace AlgoritmoEvolutivo
         /// </summary>
         public string GetState()
         {
-            return "";// currState.name.ToString();
+            return mfsm.State.ToString();
         }
 
         /// <summary>
@@ -92,10 +87,6 @@ namespace AlgoritmoEvolutivo
         /// </summary>
         void ConfigureStateMachine()
         {
-
-            // Initial state
-            //currState = Moving;
-
             State idle = new Idle();
             State moving = new Moving();
             State dead = new Dead();
@@ -123,8 +114,8 @@ namespace AlgoritmoEvolutivo
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         StatelessFSM mfsm;
-        // Current state
-        //State currState;
+
+        int actionPoints;
 
         // TODO: Speed, for now only to test the FSM
         public float Speed = 10;

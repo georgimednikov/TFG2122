@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B9D857CD-4D1A-4C14-8DE1-780FAEED8D9E}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>AlgoritmoEvolutivoTFG</RootNamespace>
-    <AssemblyName>GeneracionEspecies</AssemblyName>
+    <RootNamespace>EvolutionSimulation</RootNamespace>
+    <AssemblyName>EvolutionSimulation</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -69,9 +69,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\FSM\Fsm.cs" />
+    <Compile Include="src\FSM\Interfaces.cs" />
     <Compile Include="src\Perlin.cs" />
     <Compile Include="src\Creature.cs" />
-    <Compile Include="src\CreatureFSM.cs" />
     <Compile Include="src\ISimulation.cs" />
     <Compile Include="src\World.cs" />
     <Compile Include="src\Simulation.cs" />
