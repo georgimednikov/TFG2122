@@ -20,10 +20,12 @@
             Piercing,
             Aggressiveness,
             Metabolism,
-            BodyTemperature,
+            IdealTemperature,
+            TemperatureRange,
             Longevity,
             Diet,
             Members,
+            //Abilities
             Arboreal,
             Wings,
             Venomous,

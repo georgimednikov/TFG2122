@@ -74,9 +74,11 @@ namespace EvolutionSimulation.src
         /// </summary>
         public static void SetStructure(List<Gene> genes)
         {
-            if (genes.Count != CreatureFeatures.Features)
+            if (genes.Count != CreatureFeatures.Features + 1)
                 throw new Exception("The number of genes and max values must be the same as the total features");
             rnd = new Random();
+
+            geneMaxValues = new int[genes.Count];
 
             for (int i = 0; i < genes.Count; ++i)
             {
