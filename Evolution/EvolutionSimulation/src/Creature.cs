@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EvolutionSimulation.FSM;
+using EvolutionSimulation.FSM.Creature.States;
+using EvolutionSimulation.FSM.Creature.Transitions;
+
 
 namespace EvolutionSimulation
 {
@@ -89,22 +92,28 @@ namespace EvolutionSimulation
         /// </summary>
         void ConfigureStateMachine()
         {
-            //IState idle = new Idle();
-            //IState moving = new Moving();
-            //IState dead = new Dead();
-            //IState alive = new Alive();
-            //IState eat = new Eating();
-            //mfsm = new StatelessFSM(idle);
-            //bool b = true;
-            //bool al = false;
-            //bool de = true;
-            //mfsm.AddSubstate(alive, idle);
-            //mfsm.AddSubstate(alive, moving);
-            //mfsm.AddSubstate(alive, eat);
-            //mfsm.AddTransition(idle, new BooleanTransition(ref de), eat);
-            //mfsm.AddTransition(idle, new BooleanTransition(ref b), moving);
-            //mfsm.AddTransition(moving, new BooleanTransition(ref b), idle);
-            //mfsm.AddTransition(alive, new BooleanTransition(ref al), dead);
+            // States
+            IState idle = new Idle();
+            IState moving = new Moving();
+            IState dead = new Dead();
+            IState alive = new Alive();
+            IState eat = new Eat();
+
+            mfsm = new Fsm(idle);
+            bool b = false;
+            bool al = false;
+            bool de = true;
+
+            // Substates
+            mfsm.AddSubstate(alive, idle);
+            mfsm.AddSubstate(alive, moving);
+            mfsm.AddSubstate(alive, eat);
+
+            // Transitions
+            mfsm.AddTransition(idle, new BooleanTransition(ref b), moving);
+            mfsm.AddTransition(idle, new BooleanTransition(ref de), eat);
+            mfsm.AddTransition(moving, new BooleanTransition(ref b), idle);
+            mfsm.AddTransition(alive, new BooleanTransition(ref al), dead);
         }
 
         // World tile position

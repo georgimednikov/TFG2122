@@ -32,14 +32,14 @@ namespace VisualizadorConsola
             while (true)
             {
                 world.Tick();
-                //entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Orders the entity to perform a step
-                //creatures.Sort(new SortByMetabolism());
+                entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Orders the entity to perform a step
+                creatures.Sort(new SortByMetabolism());
                 creatures.ForEach(delegate (Creature e) { e.Tick(); });
 
                 delete.ForEach(delegate (IEntity e) { entities.Remove(e); });
 
                 delete.Clear();
-                //Render();
+                Render();
                 Thread.Sleep(1000);
             }
         }
@@ -179,6 +179,5 @@ namespace VisualizadorConsola
         }
 
         World world;
-        string cr_state = "";
     }
 }

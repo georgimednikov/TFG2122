@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace EvolutionSimulation.FSM.Creature.States
 {
+    // TODO: Estado para testear, hacer el estado correctamente
     class Dead : IState
     {
         public void Action()

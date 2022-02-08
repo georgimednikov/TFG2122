@@ -7,12 +7,11 @@ using System.Threading.Tasks;
 namespace EvolutionSimulation.FSM.Creature.States
 {
     // TODO: Estado para testear, hacer el estado correctamente
-
-    class Alive : IState
+    class Eat : IState
     {
         public void Action()
         {
-            Console.WriteLine("Alive");
+            Console.WriteLine("Eat");
         }
     }
 }

@@ -6,33 +6,25 @@ using System.Threading.Tasks;
 
 namespace EvolutionSimulation.FSM
 {
-    // TODO: Estos enums se pueden ir
     /// <summary>
-    /// State IDs for the State Machine
+    /// State machine state interface
     /// </summary>
-    public enum StateID
+    public interface IState 
     {
-        Idle,
-        Moving,
-        Alive,
-        Dead
+        /// <summary>
+        /// Action which is executed in the state
+        /// </summary>
+        void Action();
     }
 
     /// <summary>
-    /// Trigger IDs for the State Machine
+    /// State machine transition interface
     /// </summary>
-    public enum TriggerID
-    {
-        Moves,
-        Stops,
-        Dies
-    }
-    public interface IState 
-    {
-        void Action();
-    }
     public interface ITransition
     {
+        /// <summary>
+        /// Evaluates if the transition is fullfilled
+        /// </summary>
         bool Evaluate();
     }
 }
