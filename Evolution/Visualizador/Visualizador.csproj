@@ -77,7 +77,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AlgoritmoEvolutivoTFG\EvolutionSimulation.csproj">
+    <ProjectReference Include="..\EvolutionSimulation\EvolutionSimulation.csproj">
       <Project>{b9d857cd-4d1a-4c14-8de1-780faeed8d9e}</Project>
       <Name>EvolutionSimulation</Name>
     </ProjectReference>
