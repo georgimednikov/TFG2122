@@ -16,8 +16,8 @@ namespace Visualizador
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            AlgoritmoEvolutivo.Creature c = new AlgoritmoEvolutivo.Creature();
-            AlgoritmoEvolutivo.World w = new AlgoritmoEvolutivo.World();
+            EvolutionSimulation.Creature c = new EvolutionSimulation.Creature();
+            EvolutionSimulation.World w = new EvolutionSimulation.World();
             c.Init(w, 0, 0);
             int a = 20;
             while (a > 0)
