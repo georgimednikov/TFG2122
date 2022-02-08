@@ -22,8 +22,17 @@ namespace EvolutionSimulation.Genetics
             relations = new List<Tuple<float, CreatureFeature>>();
         }
 
+        /// <summary>
+        /// Add a new relation and the percentage of the relation.
+        /// Check that the gene does not have other relation with the same CreatureFeature
+        /// </summary>
         public void AddRelation(float percentage, CreatureFeature relation)
         {
+            // Check that the relation is unique
+            foreach (Tuple<float, CreatureFeature> cF in relations)
+                if (cF.Item2 == relation)
+                    return;
+            // Add the relation
             relations.Add(new Tuple<float, CreatureFeature>(percentage, relation));
         }
     }
