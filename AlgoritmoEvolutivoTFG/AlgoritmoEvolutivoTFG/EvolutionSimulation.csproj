@@ -69,9 +69,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\CreatureFeatures.cs" />
-    <Compile Include="src\CreatureChromosome.cs" />
-    <Compile Include="src\GeneticFunctions.cs" />
+    <Compile Include="src\Genetics\CreatureFeatures.cs" />
+    <Compile Include="src\Genetics\CreatureChromosome.cs" />
+    <Compile Include="src\Genetics\GeneticFunctions.cs" />
     <Compile Include="src\main.cs" />
     <Compile Include="src\TestFSM.cs" />
   </ItemGroup>

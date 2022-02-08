@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace EvolutionSimulation.src
+namespace EvolutionSimulation.Genetics
 {
     /// <summary>
     /// Contains the information of a gene: its maximum value and the other genes
@@ -89,10 +89,14 @@ namespace EvolutionSimulation.src
                 int featureIndex = (int)gene.feature;
 
                 int relationsMaxValue = 0;
-                foreach (Tuple<float, CreatureFeature> rel in gene.relations)
+                foreach (Tuple<float, CreatureFeature> relation in gene.relations)
                 {
-                    //The highest possible value of the features related is calculated (percentaje * maxValue)
-                    relationsMaxValue += (int)(rel.Item1 * maxValues[(int)rel.Item2]); //The percetaje gets truncated!!!
+                    //If the relation is positive, the max value of the gene can be surpassed so the max value of the relations is substracted
+                    //If the relation is negative, the max value of the gene must not be surpassed with an addition, so it is not accounted.
+                    //In other words, a negative relation may not modify the value, but if it is accounted for it would add extra bits surpassing the max value.
+                    if (relation.Item1 > 0)
+                        //The highest possible value of the features related is calculated (percentaje * maxValue)
+                        relationsMaxValue += (int)(relation.Item1 * maxValues[(int)relation.Item2]); //The percetaje gets truncated!!!
                 }
 
                 int leftover = maxValues[featureIndex] - relationsMaxValue;
@@ -171,7 +175,7 @@ namespace EvolutionSimulation.src
                     //total += percentage of usage of the related gene * the value of the gene
                     total += (int)(relation.Item1 * geneValues[(int)relation.Item2]);
                 }
-                geneValues[feature] = total;
+                geneValues[feature] = Math.Max(0, total);
             }
         }
 

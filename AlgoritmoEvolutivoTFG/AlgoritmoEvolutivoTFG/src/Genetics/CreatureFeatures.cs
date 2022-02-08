@@ -1,4 +1,4 @@
-﻿namespace EvolutionSimulation.src
+﻿namespace EvolutionSimulation.Genetics
 {
     public enum CreatureFeature
     {

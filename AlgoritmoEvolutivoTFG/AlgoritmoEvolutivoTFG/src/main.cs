@@ -1,6 +1,7 @@
 using Stateless;
 using System;
 using System.Collections.Generic;
+using EvolutionSimulation.Genetics;
 
 namespace EvolutionSimulation
 {
@@ -15,22 +16,22 @@ namespace EvolutionSimulation
         {
             SetChromosome();
 
-            src.CreatureChromosome chromosome1 = new src.CreatureChromosome();
+            CreatureChromosome chromosome1 = new CreatureChromosome();
             Console.WriteLine("First Chromosome:");
             chromosome1.PrintChromosome();
             Console.WriteLine();
 
-            src.CreatureChromosome chromosome2 = new src.CreatureChromosome();
+            CreatureChromosome chromosome2 = new CreatureChromosome();
             Console.WriteLine("Second Chromosome:");
             chromosome2.PrintChromosome();
             Console.WriteLine();
 
-            src.CreatureChromosome chromosome3 = src.GeneticFunctions.UniformCrossover(chromosome1, chromosome2, 0.5f);
+            CreatureChromosome chromosome3 = GeneticFunctions.UniformCrossover(chromosome1, chromosome2, 0.5f);
             Console.WriteLine("Crossover Result:");
             chromosome3.PrintChromosome();
             Console.WriteLine();
 
-            src.GeneticFunctions.Mutation(chromosome3, 0.1f);
+            GeneticFunctions.Mutation(chromosome3, 0.1f);
             Console.WriteLine("Child's Chromosome After Mutation:");
             chromosome3.PrintChromosome();
             Console.WriteLine();
@@ -40,102 +41,102 @@ namespace EvolutionSimulation
 
         private static void SetChromosome()
         {
-            List<src.Gene> genes = new List<src.Gene>();
+            List<Gene> genes = new List<Gene>();
 
             //Base Attributes
 
-            src.Gene strength = new src.Gene(src.CreatureFeature.Strength, 50);
+            Gene strength = new Gene(CreatureFeature.Strength, 50);
             genes.Add(strength);
-            src.Gene constitution = new src.Gene(src.CreatureFeature.Constitution, 50);
+            Gene constitution = new Gene(CreatureFeature.Constitution, 50);
             genes.Add(constitution);
-            src.Gene fortitude = new src.Gene(src.CreatureFeature.Fortitude, 50);
+            Gene fortitude = new Gene(CreatureFeature.Fortitude, 50);
             genes.Add(fortitude);
-            src.Gene perception = new src.Gene(src.CreatureFeature.Perception, 50);
+            Gene perception = new Gene(CreatureFeature.Perception, 50);
             genes.Add(perception);
-            src.Gene aggressiveness = new src.Gene(src.CreatureFeature.Aggressiveness, 50);
+            Gene aggressiveness = new Gene(CreatureFeature.Aggressiveness, 50);
             genes.Add(aggressiveness);
-            src.Gene members = new src.Gene(src.CreatureFeature.Members, 50);
+            Gene members = new Gene(CreatureFeature.Members, 50);
             genes.Add(members);
 
             //The rest of the genes IN ORDER OF DEPENDENCY
 
             //Other Attributes
 
-            src.Gene piercing = new src.Gene(src.CreatureFeature.Piercing, 50);
-            piercing.AddRelation(0.1f, src.CreatureFeature.Strength);
+            Gene piercing = new Gene(CreatureFeature.Piercing, 50);
+            piercing.AddRelation(0.1f, CreatureFeature.Strength);
             genes.Add(piercing);
 
-            src.Gene resistence = new src.Gene(src.CreatureFeature.Resistence, 50);
-            resistence.AddRelation(0.1f, src.CreatureFeature.Constitution);
+            Gene resistence = new Gene(CreatureFeature.Resistence, 50);
+            resistence.AddRelation(0.1f, CreatureFeature.Constitution);
             genes.Add(resistence);
 
-            src.Gene size = new src.Gene(src.CreatureFeature.Size, 50);
-            size.AddRelation(0.1f, src.CreatureFeature.Constitution);
-            size.AddRelation(0.1f, src.CreatureFeature.Strength);
+            Gene size = new Gene(CreatureFeature.Size, 50);
+            size.AddRelation(0.1f, CreatureFeature.Constitution);
+            size.AddRelation(0.1f, CreatureFeature.Strength);
             genes.Add(size);
 
-            src.Gene knowledge = new src.Gene(src.CreatureFeature.Knowledge, 50);
-            knowledge.AddRelation(0.1f, src.CreatureFeature.Size);
-            knowledge.AddRelation(0.1f, src.CreatureFeature.Perception);
+            Gene knowledge = new Gene(CreatureFeature.Knowledge, 50);
+            knowledge.AddRelation(0.1f, CreatureFeature.Size);
+            knowledge.AddRelation(0.1f, CreatureFeature.Perception);
             genes.Add(knowledge);
 
-            src.Gene camouflage = new src.Gene(src.CreatureFeature.Camouflage, 50);
-            camouflage.AddRelation(-0.1f, src.CreatureFeature.Size);
+            Gene camouflage = new Gene(CreatureFeature.Camouflage, 50);
+            camouflage.AddRelation(-0.1f, CreatureFeature.Size);
             genes.Add(camouflage);
 
-            src.Gene metabolism = new src.Gene(src.CreatureFeature.Metabolism, 50);
-            metabolism.AddRelation(0.1f, src.CreatureFeature.Size);
+            Gene metabolism = new Gene(CreatureFeature.Metabolism, 50);
+            metabolism.AddRelation(0.1f, CreatureFeature.Size);
             genes.Add(metabolism);
 
-            src.Gene idealTemp = new src.Gene(src.CreatureFeature.IdealTemperature, 50);
-            idealTemp.AddRelation(0.1f, src.CreatureFeature.Metabolism);
-            idealTemp.AddRelation(-0.1f, src.CreatureFeature.Size);
+            Gene idealTemp = new Gene(CreatureFeature.IdealTemperature, 50);
+            idealTemp.AddRelation(0.1f, CreatureFeature.Metabolism);
+            idealTemp.AddRelation(-0.1f, CreatureFeature.Size);
             genes.Add(idealTemp);
 
-            src.Gene tempRange = new src.Gene(src.CreatureFeature.TemperatureRange, 50);
-            tempRange.AddRelation(0.1f, src.CreatureFeature.Resistence);
+            Gene tempRange = new Gene(CreatureFeature.TemperatureRange, 50);
+            tempRange.AddRelation(0.1f, CreatureFeature.Resistence);
             genes.Add(tempRange);
 
-            src.Gene longevity = new src.Gene(src.CreatureFeature.Longevity, 50);
-            longevity.AddRelation(-0.1f, src.CreatureFeature.Metabolism);
+            Gene longevity = new Gene(CreatureFeature.Longevity, 50);
+            longevity.AddRelation(-0.1f, CreatureFeature.Metabolism);
             genes.Add(longevity);
 
-            src.Gene diet = new src.Gene(src.CreatureFeature.Diet, 50);
-            diet.AddRelation(0.1f, src.CreatureFeature.Aggressiveness);
+            Gene diet = new Gene(CreatureFeature.Diet, 50);
+            diet.AddRelation(0.1f, CreatureFeature.Aggressiveness);
             genes.Add(diet);
 
-            src.Gene mobility = new src.Gene(src.CreatureFeature.Mobility, 50);
-            mobility.AddRelation(0.1f, src.CreatureFeature.Members);
-            mobility.AddRelation(-0.1f, src.CreatureFeature.Size);
-            mobility.AddRelation(-0.1f, src.CreatureFeature.Fortitude);
+            Gene mobility = new Gene(CreatureFeature.Mobility, 50);
+            mobility.AddRelation(0.1f, CreatureFeature.Members);
+            mobility.AddRelation(-0.1f, CreatureFeature.Size);
+            mobility.AddRelation(-0.1f, CreatureFeature.Fortitude);
             genes.Add(mobility);
 
             //Abilities
 
-            src.Gene arboreal = new src.Gene(src.CreatureFeature.Arboreal, 10);
+            Gene arboreal = new Gene(CreatureFeature.Arboreal, 10);
             genes.Add(arboreal);
-            src.Gene wings = new src.Gene(src.CreatureFeature.Wings, 10);
+            Gene wings = new Gene(CreatureFeature.Wings, 10);
             genes.Add(wings);
-            src.Gene venomous = new src.Gene(src.CreatureFeature.Venomous, 10);
+            Gene venomous = new Gene(CreatureFeature.Venomous, 10);
             genes.Add(venomous);
-            src.Gene nightvision = new src.Gene(src.CreatureFeature.NightVision, 10);
+            Gene nightvision = new Gene(CreatureFeature.NightVision, 10);
             genes.Add(nightvision);
-            src.Gene horns = new src.Gene(src.CreatureFeature.Horns, 10);
+            Gene horns = new Gene(CreatureFeature.Horns, 10);
             genes.Add(horns);
-            src.Gene mimic = new src.Gene(src.CreatureFeature.Mimic, 10);
+            Gene mimic = new Gene(CreatureFeature.Mimic, 10);
             genes.Add(mimic);
-            src.Gene upright = new src.Gene(src.CreatureFeature.Upright, 10);
+            Gene upright = new Gene(CreatureFeature.Upright, 10);
             genes.Add(upright);
-            src.Gene thorns = new src.Gene(src.CreatureFeature.Thorns, 10);
+            Gene thorns = new Gene(CreatureFeature.Thorns, 10);
             genes.Add(thorns);
-            src.Gene scavenger = new src.Gene(src.CreatureFeature.Scavenger, 10);
+            Gene scavenger = new Gene(CreatureFeature.Scavenger, 10);
             genes.Add(scavenger);
-            src.Gene hair = new src.Gene(src.CreatureFeature.Hair, 10);
+            Gene hair = new Gene(CreatureFeature.Hair, 10);
             genes.Add(hair);
-            src.Gene paternity = new src.Gene(src.CreatureFeature.Paternity, 10);
+            Gene paternity = new Gene(CreatureFeature.Paternity, 10);
             genes.Add(paternity);
 
-            src.CreatureChromosome.SetStructure(genes);
+            CreatureChromosome.SetStructure(genes);
         }
     }
 }

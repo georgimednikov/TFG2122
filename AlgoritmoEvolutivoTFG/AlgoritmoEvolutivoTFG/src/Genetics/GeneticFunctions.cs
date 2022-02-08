@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections;
 
-namespace EvolutionSimulation.src
+namespace EvolutionSimulation.Genetics
 {
     public class GeneticFunctions
     {
