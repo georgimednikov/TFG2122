@@ -69,6 +69,16 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\FSM\CompoundState.cs" />
+    <Compile Include="src\FSM\Creature\States\Alive.cs" />
+    <Compile Include="src\FSM\Creature\States\Dead.cs" />
+    <Compile Include="src\FSM\Creature\States\Idle.cs" />
+    <Compile Include="src\FSM\Creature\States\Moving.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\CreatureTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Revives.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Dies.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Moves.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Stops.cs" />
     <Compile Include="src\FSM\Fsm.cs" />
     <Compile Include="src\FSM\Interfaces.cs" />
     <Compile Include="src\Perlin.cs" />

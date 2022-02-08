@@ -20,10 +20,11 @@ namespace VisualizadorConsola
             world.Init(32);
             Creature c = CreateEntity<Creature>();
             c.metabolism = 200;
+            c.health = 1;
             c.Init(world, 16, 16);
-            c = CreateEntity<Creature>();
-            c.metabolism = 100;
-            c.Init(world, 12, 16);
+            //c = CreateEntity<Creature>();
+            //c.metabolism = 100;
+            //c.Init(world, 12, 16);
         }
 
         public void Run()
@@ -31,14 +32,14 @@ namespace VisualizadorConsola
             while (true)
             {
                 world.Tick();
-                entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Orders the entity to perform a step
-                creatures.Sort(new SortByMetabolism());
+                //entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Orders the entity to perform a step
+                //creatures.Sort(new SortByMetabolism());
                 creatures.ForEach(delegate (Creature e) { e.Tick(); });
 
                 delete.ForEach(delegate (IEntity e) { entities.Remove(e); });
 
                 delete.Clear();
-                Render();
+                //Render();
                 Thread.Sleep(1000);
             }
         }
