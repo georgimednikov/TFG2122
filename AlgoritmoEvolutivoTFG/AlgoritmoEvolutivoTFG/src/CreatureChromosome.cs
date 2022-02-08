@@ -12,19 +12,19 @@ namespace EvolutionSimulation.src
     public class Gene
     {
         public int maxValue;
-        public CreatureFeatures.CreatureFeature feature;
-        public List<Tuple<float, CreatureFeatures.CreatureFeature>> relations { get; }
+        public CreatureFeature feature;
+        public List<Tuple<float, CreatureFeature>> relations { get; }
 
-        public Gene(CreatureFeatures.CreatureFeature feat, int max)
+        public Gene(CreatureFeature feat, int max)
         {
             maxValue = max;
             feature = feat;
-            relations = new List<Tuple<float, CreatureFeatures.CreatureFeature>>();
+            relations = new List<Tuple<float, CreatureFeature>>();
         }
 
-        public void AddRelation(float percentage, CreatureFeatures.CreatureFeature relation)
+        public void AddRelation(float percentage, CreatureFeature relation)
         {
-            relations.Add(new Tuple<float, CreatureFeatures.CreatureFeature>(percentage, relation));
+            relations.Add(new Tuple<float, CreatureFeature>(percentage, relation));
         }
     }
 
@@ -45,16 +45,12 @@ namespace EvolutionSimulation.src
         /// <summary>
         /// The max value of each gene
         /// </summary>
-        static private int[] geneMaxValues;
+        static private Gene[] geneInfo;
         /// <summary>
         /// First: First bit of each gene
         /// Second: The length of the gene
         /// </summary>
-        static private Tuple<int, int>[] geneInfo;
-        /// <summary>
-        /// The different relations and their percentages that each gene has with others
-        /// </summary>
-        static Tuple<float, CreatureFeatures.CreatureFeature>[][] geneRelations;
+        static private Tuple<int, int>[] genePos;
 
         static private Random rnd;
 
@@ -74,39 +70,37 @@ namespace EvolutionSimulation.src
         /// </summary>
         public static void SetStructure(List<Gene> genes)
         {
-            if (genes.Count != CreatureFeatures.Features)
+            if (genes.Count != (int)CreatureFeature.Count)
                 throw new Exception("The number of genes and max values must be the same as the total features");
             rnd = new Random();
 
+            geneInfo = genes.ToArray();
+            int[] maxValues = new int[genes.Count];
             for (int i = 0; i < genes.Count; ++i)
             {
-                geneMaxValues[i] = genes[i].maxValue;
+                maxValues[(int)genes[i].feature] = genes[i].maxValue;
             }
-            geneInfo = new Tuple<int, int>[genes.Count];
+
+            genePos = new Tuple<int, int>[genes.Count];
             chromosomeSize = 0;
-            int relationsMaxValue = 0;
             foreach (Gene gene in genes)
             {
                 //The numeric value of the feature
                 int featureIndex = (int)gene.feature;
 
-                //The relations are saved for later use
-                geneRelations[featureIndex] = gene.relations.ToArray();
-                
-                foreach (Tuple<float, CreatureFeatures.CreatureFeature> rel in gene.relations)
+                int relationsMaxValue = 0;
+                foreach (Tuple<float, CreatureFeature> rel in gene.relations)
                 {
                     //The highest possible value of the features related is calculated (percentaje * maxValue)
-                    relationsMaxValue += (int)(rel.Item1 * geneMaxValues[(int)rel.Item2]); //The percetaje gets truncated!!!
+                    relationsMaxValue += (int)(rel.Item1 * maxValues[(int)rel.Item2]); //The percetaje gets truncated!!!
                 }
 
-                int leftover = geneMaxValues[featureIndex] - relationsMaxValue;
+                int leftover = maxValues[featureIndex] - relationsMaxValue;
                 if (leftover <= 0)
                     throw new Exception("The genes must not depend completely on other genes and must have percetage values in their relations between 0 and 1");
 
-                //The lowest power of 2 needed to store the remaining values after substracting the relations
-                int bitsNeeded = (int)Math.Log(leftover, 2) + 1;// the min number of bites to store the range;
-                geneInfo[featureIndex] = new Tuple<int, int>(chromosomeSize, bitsNeeded); //Start and length in bits of the feature
-                chromosomeSize += bitsNeeded;
+                genePos[featureIndex] = new Tuple<int, int>(chromosomeSize, leftover); //Start and length in bits of the feature
+                chromosomeSize += leftover;
             }
 
             init = true;
@@ -150,29 +144,34 @@ namespace EvolutionSimulation.src
         }
 
         /// <summary>
-        /// Given the chromosome values, calculates the values of the features
+        /// Given the chromosome values, calculates the values of the features and sets them.
+        /// Only call this function is the chromosome is modified
         /// </summary>
-        private void SetFeatures()
+        public void SetFeatures()
         {
-            geneValues = Enumerable.Repeat(-1, geneInfo.Length).ToArray();
+            geneValues = Enumerable.Repeat(-1, genePos.Length).ToArray();
             //For each feature (gene)
-            for (int feat = 0; feat < CreatureFeatures.Features; ++feat)
+            for (int i = 0; i < (int)CreatureFeature.Count; ++i)
             {
-                int startPoint = geneInfo[feat].Item1;
+                //The genes have to be iterated following the order stablished in geneInfo so there's no
+                //incomplete dependency between genes (gene A depends on gene B but B has not been calculated yet)
+                //The values of the features have to be stored following the enum CreatureFeature for easy access
+                int feature = (int)geneInfo[i].feature;
+                int startPoint = genePos[feature].Item1;
                 int total = 0;
                 //The amount of its exclusive bits gets counted
-                for (int j = startPoint; j < startPoint + geneInfo[feat].Item2; ++j)
+                for (int j = startPoint; j < startPoint + genePos[feature].Item2; ++j)
                 {
                     if (chromosome[j]) ++total; //If the bit is 1 then the total count is aumented
                 }
-                foreach (Tuple<float, CreatureFeatures.CreatureFeature> relation in geneRelations[feat])
+                foreach (Tuple<float, CreatureFeature> relation in geneInfo[i].relations)
                 {
                     if (geneValues[(int)relation.Item2] < 0)
                         throw new Exception("The genes must have been passed in order of dependency of relations");
                     //total += percentage of usage of the related gene * the value of the gene
                     total += (int)(relation.Item1 * geneValues[(int)relation.Item2]);
                 }
-                geneValues[feat] = total;
+                geneValues[feature] = total;
             }
         }
 
@@ -180,45 +179,27 @@ namespace EvolutionSimulation.src
         /// Get the numeric value of the desired feature (attribute or ability)
         /// Returns -1 if not initilized or the value asked does not exist
         /// </summary>
-        public int GetFeature(CreatureFeatures.CreatureFeature feat)
+        public int GetFeature(CreatureFeature feat)
         {
             if (!init) throw new Exception("The chromosome was not initialized");
             return geneValues[(int)feat];
         }
 
-
-
-        //private int GetFeatureWithinConfines(int value, int feature)
-        //{
-        //    int bits = (int)Math.Log(geneMaxValues[feature], 2) + 1;// the min number of bites to store the range
-        //    return (int)(value / Math.Pow(2, bits) * geneMaxValues[feature]);
-        //}
-
-        ///// <summary>
-        ///// Dados un número de posiciones en el chromosoma
-        ///// se cogen los bits en el orden dado y se convierten a entero
-        ///// </summary>
-        //private int CombineBits(params int[] bits)
-        //{
-        //    BitArray result = new BitArray(bits.Length);
-        //    for (int i = 0; i < bits.Length; ++i)
-        //    {
-        //        result[i] = chromosome[i];
-        //    }
-        //    return BinaryToInt(result);
-        //}
-
-        ///// <summary>
-        ///// Parses from binary to int
-        ///// </summary>
-        //private int BinaryToInt(BitArray bits)
-        //{
-        //    //An int array with a single value is created, and then the binary
-        //    //content of value is copies in it, so when the first and only
-        //    //element is accessed, the information is parsed into int
-        //    int[] array = new int[1];
-        //    bits.CopyTo(array, 0);
-        //    return array[0];
-        //}
+        /// <summary>
+        /// Writes on console the values of the genes of the chromosome, as well as its binary value
+        /// </summary>
+        public void PrintChromosome()
+        {
+            for (int i = 0; i < geneValues.Length; ++i)
+            {
+                Console.WriteLine("Gene " + i + ": " + geneValues[i] + " out of " + geneInfo[i].maxValue);
+            }
+            Console.WriteLine();
+            foreach (bool bit in chromosome)
+            {
+                Console.Write(bit ? 1 : 0);
+            }
+            Console.WriteLine();
+        }
     }
 }
