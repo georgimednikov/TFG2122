@@ -18,21 +18,6 @@ namespace EvolutionSimulation
         public int health { get; set; }
 
         /// <summary>
-        /// Private class representing states.
-        /// Each state has an ID and an associated action
-        /// </summary>
-        private class State
-        {
-            public StateID name;
-            public Action action;
-
-            public State(StateID n, Action a)
-            {
-                name = n; action = a;
-            }
-        }
-
-        /// <summary>
         /// Constructor for factories
         /// </summary>
         public Creature()
@@ -51,12 +36,6 @@ namespace EvolutionSimulation
             world = w;
             this.x = x;
             this.y = y;
-            this.fsm = new Stateless.StateMachine<State, TriggerID>(
-                () => currState,
-                s => currState = s,
-                Stateless.FiringMode.Queued
-            );
-
             ConfigureStateMachine();
         }
 
@@ -65,36 +44,13 @@ namespace EvolutionSimulation
         /// </summary>
         public void Tick()
         {
-            //actionPoints += metabolism * 10;
+            actionPoints += metabolism * 10;
 
-            // TODO: Put Fire in the states' actions
-            // TODO: and yeet this outta here
-            //if (currState.name == StateID.Dead) return;
-            //Speed--;
-            //if (Speed <= 0)
-            //{
-            //    Speed = 0;
-            //    fsm.Fire(TriggerID.Dies);
-            //}
-            //else if (Speed % 2 == 0)
-            //{
-            //    fsm.Fire(TriggerID.Moves);
-            //}
-            //else fsm.Fire(TriggerID.Stops);
+            mfsm.Evaluate();
+            mfsm.Execute();
 
-            // Calculates next action according to the state machine
-            //currState.action();
-            // evaluateTransitions();
-            // Checks if there are enough action points to perform said action
-            // If not, "skips" its turn
-            // If yes, performs said action and attempts to use the FSM again
-            //while(Move());
-            stateMachine.Evaluate();
-            stateMachine.Execute();
-            if (health <= 0)
-                health++;
-            else
-                health--;
+            while(Move());
+
         }
 
         /// <summary>
@@ -124,7 +80,7 @@ namespace EvolutionSimulation
         /// </summary>
         public string GetState()
         {
-            return currState.name.ToString();
+            return mfsm.GetState().ToString();
         }
 
         /// <summary>
@@ -133,62 +89,22 @@ namespace EvolutionSimulation
         /// </summary>
         void ConfigureStateMachine()
         {
-            // State setup
-            State Alive = new State(
-               StateID.Alive,
-               () => { /*TODO: Yeet*/Console.WriteLine("Idle"); }
-           );
-            State Dead = new State(
-                 StateID.Dead,
-                () => { /*TODO: Yeet*/Console.WriteLine("Dead"); }
-            );
-
-            State Idle = new State(
-                StateID.Idle,
-                () => { /*TODO: Yeet*/Console.WriteLine("Idle"); }
-            );
-
-
-            State Moving = new State(
-                 StateID.Moving,
-                () => { /*TODO: Yeet*/Console.WriteLine("Moving"); }
-            );
-
-            // Initial state
-            currState = Moving;
-
-            // Establishes each state in the FSM and the transition triggers
-            fsm.Configure(Alive)
-                .Permit(TriggerID.Dies, Dead)
-                .InitialTransition(Moving);
-
-            fsm.Configure(Dead);
-
-            fsm.Configure(Idle)
-                .SubstateOf(Alive);
-            //.Permit(TriggerID.Moves, Moving);
-
-            fsm.Configure(Idle)
-                //.SubstateOf(Alive)
-                .Permit(TriggerID.Moves, Moving);
-
-            fsm.Configure(Moving)
-                .SubstateOf(Alive)
-                .Permit(TriggerID.Stops, Idle);
-
-            // FSM wrapper
-            // States 
-            FSM.Creature.States.Alive alive = new FSM.Creature.States.Alive();
-            FSM.Creature.States.Dead dead = new FSM.Creature.States.Dead();
-
-            // Transitions
-            FSM.Creature.Transitions.Dies dies = new FSM.Creature.Transitions.Dies(this);
-            FSM.Creature.Transitions.Revives revives = new FSM.Creature.Transitions.Revives(this);
-
-            // FSM Configuration
-            this.stateMachine = new Fsm(alive);
-            stateMachine.AddTransition(alive, dies, dead);
-            stateMachine.AddTransition(dead, revives, alive);
+            //IState idle = new Idle();
+            //IState moving = new Moving();
+            //IState dead = new Dead();
+            //IState alive = new Alive();
+            //IState eat = new Eating();
+            //mfsm = new StatelessFSM(idle);
+            //bool b = true;
+            //bool al = false;
+            //bool de = true;
+            //mfsm.AddSubstate(alive, idle);
+            //mfsm.AddSubstate(alive, moving);
+            //mfsm.AddSubstate(alive, eat);
+            //mfsm.AddTransition(idle, new BooleanTransition(ref de), eat);
+            //mfsm.AddTransition(idle, new BooleanTransition(ref b), moving);
+            //mfsm.AddTransition(moving, new BooleanTransition(ref b), idle);
+            //mfsm.AddTransition(alive, new BooleanTransition(ref al), dead);
         }
 
         // World tile position
@@ -199,10 +115,7 @@ namespace EvolutionSimulation
         Random r;
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
-        Stateless.StateMachine<State, TriggerID> fsm;
-        // Current state
-        State currState;
-        Fsm stateMachine;
+        Fsm mfsm;
 
         int actionPoints;
 

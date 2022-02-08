@@ -16,6 +16,15 @@ namespace Visualizador
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            AlgoritmoEvolutivo.Creature c = new AlgoritmoEvolutivo.Creature();
+            AlgoritmoEvolutivo.World w = new AlgoritmoEvolutivo.World();
+            c.Init(w, 0, 0);
+            int a = 20;
+            while (a > 0)
+            {
+                --a;
+                c.Tick();
+            }
 
             // TODO: ?????
             //AlgoritmoEvolutivo.TestFSM testFSM = new AlgoritmoEvolutivo.TestFSM();
@@ -33,7 +42,7 @@ namespace Visualizador
             //                MessageBoxButtons.OK,
             //                MessageBoxIcon.Information);
 
-            Application.Run(new Form1());
+            //Application.Run(new Form1());
         }
     }
 }
