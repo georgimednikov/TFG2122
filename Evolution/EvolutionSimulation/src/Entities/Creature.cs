@@ -247,11 +247,10 @@ namespace EvolutionSimulation
             //restRecovery;
             //restExpense;
 
-            ////Environment related stats
-            //percepcion;
-            //camouflage;
-            //aggressiveness;
-            //intimidation;
+            //Environment related stats
+            percepcion = chromosome.GetFeature(CreatureFeature.Perception);
+            camouflage = chromosome.GetFeature(CreatureFeature.Camouflage);
+            aggressiveness = chromosome.GetFeature(CreatureFeature.Aggressiveness);
 
             ////Physique related stats
             size = chromosome.GetFeature(CreatureFeature.Size);
@@ -283,6 +282,8 @@ namespace EvolutionSimulation
             else venom = chromosome.GetFeature(CreatureFeature.Venomous);
             if (!HasAbility(CreatureFeature.Thorns)) counter = -1;
             else counter = chromosome.GetFeature(CreatureFeature.Thorns);
+            if (!HasAbility(CreatureFeature.Mimic)) intimidation = -1;
+            else intimidation = chromosome.GetFeature(CreatureFeature.Mimic);
         }
 
         private bool HasAbility(CreatureFeature feat)

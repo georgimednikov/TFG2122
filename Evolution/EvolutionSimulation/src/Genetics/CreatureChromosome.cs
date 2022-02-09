@@ -53,6 +53,7 @@ namespace EvolutionSimulation.Genetics
 
         /// <summary>
         /// The max value of each gene
+        /// It is ordeded by how you pass the Genes in method SetStructure
         /// </summary>
         static private Gene[] geneInfo;
         /// <summary>
@@ -74,6 +75,7 @@ namespace EvolutionSimulation.Genetics
         BitArray chromosome;
         /// <summary>
         /// The current value of each gene
+        /// It is ordered by CreatureFeatures 
         /// </summary>
         public int[] geneValues;
 
@@ -95,8 +97,11 @@ namespace EvolutionSimulation.Genetics
             }
 
             genePos = new Tuple<int, int>[genes.Count];
-            //TODO: Cambiar este comentario
-            chromosomeSize = 1; //One bit to represent sex https://www.youtube.com/watch?v=c9GGBv1n4qI&t=10s
+            
+            chromosomeSize = 1;
+            float aux = 0;
+            int aux2 = 0;
+            int aux3 = 0;
             foreach (Gene gene in genes)
             {
                 //The numeric value of the feature
@@ -110,22 +115,23 @@ namespace EvolutionSimulation.Genetics
                     //In other words, a negative relation may not modify the value, but if it is accounted for it would add extra bits surpassing the max value.
                     if (relation.Item1 > 0)
                         //The highest possible value of the features related is calculated (percentaje * maxValue)
-                        relationsMaxValue += (int)(relation.Item1 * geneMaxValues[(int)relation.Item2]); //The percetaje gets truncated!!!
+                        relationsMaxValue += (int)Math.Ceiling(relation.Item1 * geneMaxValues[(int)relation.Item2]); //The percetaje gets truncated!!!
+                    if (relation.Item1 > 0)
+                        aux += relation.Item1 * geneMaxValues[(int)relation.Item2];
                 }
-
                 int leftover = geneMaxValues[featureIndex] - relationsMaxValue;
+                aux2 += geneMaxValues[featureIndex];
+                aux3 += relationsMaxValue;
                 if (leftover <= 0)
                     throw new Exception("The genes must not depend completely on other genes and must have percetage values in their relations between 0 and 1");
 
                 genePos[featureIndex] = new Tuple<int, int>(chromosomeSize, leftover); //Start and length in bits of the feature
                 chromosomeSize += leftover;
             }
+            
 
             init = true;
         }
-
-
-
 
 
         /// <summary>
@@ -231,7 +237,7 @@ namespace EvolutionSimulation.Genetics
         {
             for (int i = 0; i < geneValues.Length; ++i)
             {
-                Console.WriteLine("Gene " + i + ": " + geneValues[i] + " out of " + geneInfo[i].maxValue);
+                Console.WriteLine("Gene " + geneInfo[i].feature + ": " + geneValues[(int)geneInfo[i].feature] + " out of " + geneInfo[i].maxValue);
             }
             Console.WriteLine();
             foreach (bool bit in chromosome)

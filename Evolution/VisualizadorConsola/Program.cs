@@ -9,10 +9,10 @@ namespace VisualizadorConsola
     {
         static void Main(string[] args)
         {
-            ISimulation s = new ConsoleSimulation();
+            /*ISimulation s = new ConsoleSimulation();
             s.Init();
-            s.Run();
-            //GeneticTest();
+            s.Run();*/
+            GeneticTest();
         }
 
         static public void GeneticTest()
@@ -24,22 +24,22 @@ namespace VisualizadorConsola
             chromosome1.PrintChromosome();
             Console.WriteLine();
 
-            CreatureChromosome chromosome2 = new CreatureChromosome();
-            Console.WriteLine("Second Chromosome:");
-            chromosome2.PrintChromosome();
-            Console.WriteLine();
+            //CreatureChromosome chromosome2 = new CreatureChromosome();
+            //Console.WriteLine("Second Chromosome:");
+            //chromosome2.PrintChromosome();
+            //Console.WriteLine();
 
-            CreatureChromosome chromosome3 = GeneticFunctions.UniformCrossover(chromosome1, chromosome2, 0.5f);
-            Console.WriteLine("Crossover Result:");
-            chromosome3.PrintChromosome();
+            //CreatureChromosome chromosome3 = GeneticFunctions.UniformCrossover(chromosome1, chromosome2, 0.5f);
+            //Console.WriteLine("Crossover Result:");
+            //chromosome3.PrintChromosome();
 
-            Console.WriteLine();
+            //Console.WriteLine();
 
-            GeneticFunctions.FlipBitMutation(chromosome3, 0.1f);
-            Console.WriteLine("Child's Chromosome After Mutation:");
-            chromosome3.PrintChromosome();
+            //GeneticFunctions.FlipBitMutation(chromosome3, 0.1f);
+            //Console.WriteLine("Child's Chromosome After Mutation:");
+            //chromosome3.PrintChromosome();
 
-            Console.WriteLine();
+            //Console.WriteLine();
         }
 
         //NO BORRAR HASTA QUE SE COPIE A OTRO LADO
@@ -57,24 +57,24 @@ namespace VisualizadorConsola
             genes.Add(fortitude);
             Gene perception = new Gene(CreatureFeature.Perception, 50);
             genes.Add(perception);
-            Gene aggressiveness = new Gene(CreatureFeature.Aggressiveness, 50);
+            Gene aggressiveness = new Gene(CreatureFeature.Aggressiveness, 20);
             genes.Add(aggressiveness);
             Gene members = new Gene(CreatureFeature.Members, 50);//It will be divided by 10, so 100 means 10 maximum members
             genes.Add(members);
-
             //The rest of the genes IN ORDER OF DEPENDENCY
 
             //Other Attributes
+            Gene resistence = new Gene(CreatureFeature.Resistence, 50);
+            resistence.AddRelation(0.25f, CreatureFeature.Constitution);
+            genes.Add(resistence);
 
             Gene piercing = new Gene(CreatureFeature.Piercing, 25);
             piercing.AddRelation(0.4f, CreatureFeature.Strength);
             genes.Add(piercing);
 
-            Gene resistence = new Gene(CreatureFeature.Resistence, 50);
-            resistence.AddRelation(0.25f, CreatureFeature.Constitution);
-            genes.Add(resistence);
 
-            Gene size = new Gene(CreatureFeature.Size, 50);
+            int maxSize = 80;
+            Gene size = new Gene(CreatureFeature.Size, maxSize);
             size.AddRelation(0.4f, CreatureFeature.Constitution);
             size.AddRelation(0.25f, CreatureFeature.Strength);
             genes.Add(size);
@@ -84,9 +84,11 @@ namespace VisualizadorConsola
             knowledge.AddRelation(0.25f, CreatureFeature.Perception);
             genes.Add(knowledge);
 
-            Gene camouflage = new Gene(CreatureFeature.Camouflage, 50);
+            //if its a low value, it will be always 0 because of the negative dependency with size
+            int maxCamouflage = (int)(maxSize * 0.5);
+            Gene camouflage = new Gene(CreatureFeature.Camouflage, maxCamouflage);
             camouflage.AddRelation(-0.5f, CreatureFeature.Size);
-            genes.Add(camouflage);
+            genes.Add(camouflage);//540
 
             Gene metabolism = new Gene(CreatureFeature.Metabolism, 50);
             metabolism.AddRelation(-0.2f, CreatureFeature.Size);
@@ -97,8 +99,8 @@ namespace VisualizadorConsola
             idealTemp.AddRelation(-0.25f, CreatureFeature.Size);
             genes.Add(idealTemp);
 
-            Gene tempRange = new Gene(CreatureFeature.TemperatureRange, 15);
-            tempRange.AddRelation(0.4f, CreatureFeature.Resistence);
+            Gene tempRange = new Gene(CreatureFeature.TemperatureRange, 20);
+            tempRange.AddRelation(0.3f, CreatureFeature.Resistence);
             genes.Add(tempRange);
 
             Gene longevity = new Gene(CreatureFeature.Longevity, 50);
@@ -126,7 +128,7 @@ namespace VisualizadorConsola
             Gene venomous = new Gene(CreatureFeature.Venomous, 10);
             genes.Add(venomous);
             Gene nightvision = new Gene(CreatureFeature.NightVision, 10);
-            wings.AddRelation(0.15f, CreatureFeature.Perception);
+            nightvision.AddRelation(0.15f, CreatureFeature.Perception);
             genes.Add(nightvision);
             Gene horns = new Gene(CreatureFeature.Horns, 10);
             genes.Add(horns);
