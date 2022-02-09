@@ -69,6 +69,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\Entities\Corpse.cs" />
+    <Compile Include="src\Entities\EntityManager.cs" />
     <Compile Include="src\Genetics\CreatureFeatures.cs" />
     <Compile Include="src\Genetics\CreatureChromosome.cs" />
     <Compile Include="src\Genetics\GeneticFunctions.cs" />
@@ -80,13 +82,14 @@
     <Compile Include="src\FSM\Creature\Transitions\BooleanTransition.cs" />
     <Compile Include="src\FSM\Fsm.cs" />
     <Compile Include="src\FSM\Interfaces.cs" />
+    <Compile Include="src\IInteractable.cs" />
     <Compile Include="src\Perlin.cs" />
-    <Compile Include="src\Creature.cs" />
+    <Compile Include="src\Entities\Creature.cs" />
     <Compile Include="src\ISimulation.cs" />
     <Compile Include="src\World.cs" />
     <Compile Include="src\Simulation.cs" />
-    <Compile Include="src\IEntity.cs" />
-    <Compile Include="src\Plant.cs" />
+    <Compile Include="src\Entities\IEntity.cs" />
+    <Compile Include="src\Entities\Plant.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="stateless, Version=4.0.0.0, Culture=neutral, PublicKeyToken=93038f0927583c9a, processorArchitecture=MSIL">
