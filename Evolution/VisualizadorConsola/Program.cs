@@ -117,6 +117,7 @@ namespace VisualizadorConsola
             genes.Add(paternity);
 
             CreatureChromosome.SetStructure(genes);
+
         }
     }
 }
