@@ -126,30 +126,30 @@ namespace EvolutionSimulation
         /// These waves influence each other following certain formulas.
         /// </summary>
         /// <returns>Generated physical map</returns>
-        private MapData[,] ProcessMapValues(float[,] heightMap, float[,] humidityMap, float[,] temperatureMap, float mapScale)
+        private void ProcessMapValues(float[,] heightMap, float[,] humidityMap, float[,] temperatureMap, float mapScale)
         {
             int sizeX = heightMap.GetLength(0);
             int sizeY = heightMap.GetLength(1);
-            MapData[,] mapData = new MapData[sizeX, sizeY];
+            map = new MapData[sizeX, sizeY];
 
             for (int yIndex = 0; yIndex < sizeY; yIndex++)
             {
                 for (int xIndex = 0; xIndex < sizeX; xIndex++)
                 {
-                    mapData[xIndex, yIndex].height = evaluateHeight(heightMap[xIndex, yIndex]);
+                    map[xIndex, yIndex].height = evaluateHeight(heightMap[xIndex, yIndex]);
 
-                    double evaluation = evaluateInfluence(mapData[xIndex, yIndex].height);
+                    double evaluation = evaluateInfluence(map[xIndex, yIndex].height);
                     if (evaluation > 0)
                     {
-                        mapData[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex] - evaluation;
-                        mapData[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] + evaluation;
-                        if (mapData[xIndex, yIndex].temperature < 0) mapData[xIndex, yIndex].temperature = 0; // So it does not excede the domain
-                        if (mapData[xIndex, yIndex].humidity > 1f) mapData[xIndex, yIndex].humidity = 1f;
+                        map[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex] - evaluation;
+                        map[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] + evaluation;
+                        if (map[xIndex, yIndex].temperature < 0) map[xIndex, yIndex].temperature = 0; // So it does not excede the domain
+                        if (map[xIndex, yIndex].humidity > 1f) map[xIndex, yIndex].humidity = 1f;
                     }
                     else if (evaluation < 0)
                     {
-                        mapData[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex];
-                        mapData[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] - evaluation;
+                        map[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex];
+                        map[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] - evaluation;
                         for (int i = -(int)(mapScale / 5); i <= (int)(mapScale / 5); i++)
                         {
                             for (int j = -(int)(mapScale / 5); j <= (int)(mapScale / 5); j++)
@@ -157,30 +157,29 @@ namespace EvolutionSimulation
                                 if (j == 0 && i == 0) continue;
                                 if (canMove(xIndex + i, yIndex + j))
                                 {
-                                    mapData[xIndex + i, yIndex + j].humidity += (-evaluation) / (20 * (Math.Sqrt(i * i + j * j)));
-                                    if (mapData[xIndex + i, yIndex + j].humidity > 1f) mapData[xIndex + i, yIndex + j].humidity = 1f;
+                                    map[xIndex + i, yIndex + j].humidity += (-evaluation) / (20 * (Math.Sqrt(i * i + j * j)));
+                                    if (map[xIndex + i, yIndex + j].humidity > 1f) map[xIndex + i, yIndex + j].humidity = 1f;
                                 }
                             }
                         }
 
-                        if (mapData[xIndex, yIndex].humidity > 1f) mapData[xIndex, yIndex].humidity = 1f;
+                        if (map[xIndex, yIndex].humidity > 1f) map[xIndex, yIndex].humidity = 1f;
                     }
                     else
                     {
-                        mapData[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex];
-                        mapData[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex];
+                        map[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex];
+                        map[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex];
                     }
                 }
             }
 
             for (int yIndex = 0; yIndex < sizeY; yIndex++)
                 for (int xIndex = 0; xIndex < sizeX; xIndex++)
-                    if (mapData[xIndex, yIndex].height >= 0.5f)
-                        mapData[xIndex, yIndex].flora = Math.Min(Math.Max(Math.Pow(EvaluateFloraCurve(xIndex, yIndex, mapData), 2), 0), 1.0f);
+                    if (map[xIndex, yIndex].height >= 0.5f)
+                        map[xIndex, yIndex].flora = EvaluateFloraCurve(xIndex, yIndex);
                     else
-                        mapData[xIndex, yIndex].flora = 0;
+                        map[xIndex, yIndex].flora = 0;
 
-            return mapData;
         }
 
         /// <summary>
@@ -188,7 +187,7 @@ namespace EvolutionSimulation
         /// </summary>
         public void InitMap()
         {
-            float mapScale = 100;
+            float mapScale = 50;
             int tileDepth = mapSize;
             int tileWidth = mapSize;
 
@@ -199,12 +198,15 @@ namespace EvolutionSimulation
             float[,] humidityMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, humidityWaves);
             float[,] temperatureMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, temperatureWaves);
 
-            map = ProcessMapValues(heightMap, humidityMap, temperatureMap, mapScale);
+            ProcessMapValues(heightMap, humidityMap, temperatureMap, mapScale);
         }
 
-        double EvaluateFloraCurve(int xIndex, int yIndex, MapData[,] mapData)
+        double EvaluateFloraCurve(int xIndex, int yIndex)
         {
-            return 2 * Math.Pow((0.5f * (-2 * (Math.Pow(Math.Sqrt(2) * ((mapData[xIndex, yIndex].temperature) - 0.5), 2)) + 1) + (0.5f * mapData[xIndex, yIndex].humidity)), 4);
+            double a = 1, c = 1, d = 1, e = 2, g = 0, p = 0;
+            double data = ((a / c) * Math.Pow(c * map[xIndex, yIndex].humidity - map[xIndex, yIndex].temperature * p, e) - Math.Pow(2 * map[xIndex, yIndex].temperature - 1 - map[xIndex, yIndex].humidity * g, 2 * d));
+            return Math.Min(Math.Max(data, 0), 1.0f);
+            //return 2 * Math.Pow((0.5f * (-2 * (Math.Pow(Math.Sqrt(2) * ((mapData[xIndex, yIndex].temperature) - 0.5), 2)) + 1) + (0.5f * mapData[xIndex, yIndex].humidity)), 4);
         }
 
         /// <summary>
