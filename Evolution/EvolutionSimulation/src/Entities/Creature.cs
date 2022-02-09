@@ -184,6 +184,7 @@ namespace EvolutionSimulation
         public int metabolism;
         public float minTemperature;
         public float maxTemperature;
+        public float idealTemperature;
 
         //Behaviour related stats
         public int knowledge;
@@ -208,7 +209,7 @@ namespace EvolutionSimulation
 
             //The max value is divided in ranges based on the amount of diets and then a diet is assigned based on the range it fall in
             diet = (Diet)(chromosome.GetFeature(CreatureFeature.Diet) / (chromosome.GetFeatureMax(CreatureFeature.Diet) / (int)Diet.Count));
-
+            if (diet >= Diet.Count) diet = Diet.Count;
 
             int min = 10; //Minimum amount of health
             int value = 2; //Health gained per point of constitution
@@ -253,12 +254,18 @@ namespace EvolutionSimulation
             //intimidation;
 
             ////Physique related stats
-            //size;
+            size = chromosome.GetFeature(CreatureFeature.Size);
             //lifeSpan;
-            //members;
+
+            //TODO mover de sitio el numero maximo de patas
+            int maxMembers = 10;
+            members = chromosome.GetFeature(CreatureFeature.Members) / (chromosome.GetFeatureMax(CreatureFeature.Members) / maxMembers);
+            if (members >= maxMembers) members = maxMembers;
+
             //metabolism;
-            //minTemperature;
-            //maxTemperature;
+            idealTemperature = chromosome.GetFeature(CreatureFeature.IdealTemperature);
+            minTemperature = idealTemperature - chromosome.GetFeature(CreatureFeature.TemperatureRange);
+            maxTemperature = idealTemperature + chromosome.GetFeature(CreatureFeature.TemperatureRange);
 
             ////Behaviour related stats
             //knowledge;
@@ -280,7 +287,7 @@ namespace EvolutionSimulation
 
         private bool HasAbility(CreatureFeature feat)
         {
-            return abilityUnlock < chromosome.GetFeature(CreatureFeature.Scavenger) / chromosome.GetFeatureMax(CreatureFeature.Scavenger);
+            return abilityUnlock < chromosome.GetFeature(feat) / chromosome.GetFeatureMax(feat);
         }
     }
 }

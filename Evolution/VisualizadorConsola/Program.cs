@@ -59,7 +59,7 @@ namespace VisualizadorConsola
             genes.Add(perception);
             Gene aggressiveness = new Gene(CreatureFeature.Aggressiveness, 50);
             genes.Add(aggressiveness);
-            Gene members = new Gene(CreatureFeature.Members, 10);
+            Gene members = new Gene(CreatureFeature.Members, 50);//It will be divided by 10, so 100 means 10 maximum members
             genes.Add(members);
 
             //The rest of the genes IN ORDER OF DEPENDENCY
@@ -97,7 +97,7 @@ namespace VisualizadorConsola
             idealTemp.AddRelation(-0.25f, CreatureFeature.Size);
             genes.Add(idealTemp);
 
-            Gene tempRange = new Gene(CreatureFeature.TemperatureRange, 50);
+            Gene tempRange = new Gene(CreatureFeature.TemperatureRange, 15);
             tempRange.AddRelation(0.4f, CreatureFeature.Resistence);
             genes.Add(tempRange);
 
