@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using System.Threading;
 using EvolutionSimulation;
@@ -17,7 +18,7 @@ namespace VisualizadorConsola
             creatures = new List<Creature>();
             delete = new List<IEntity>();
             world = new World();
-            world.Init(270);
+            world.Init(1080);
             Creature c = CreateEntity<Creature>();
             c.metabolism = 200;
             c.health = 1;
@@ -27,8 +28,10 @@ namespace VisualizadorConsola
             //c.Init(world, 12, 16);
         }
 
+
         public void Run()
         {
+
             while (true)
             {
                 world.Tick();
@@ -142,6 +145,7 @@ namespace VisualizadorConsola
                     //else if (val < 0.5) Console.BackgroundColor = ConsoleColor.Yellow;
                     //else if (val < 0.7) Console.BackgroundColor = ConsoleColor.DarkGreen;
                     //else Console.BackgroundColor = ConsoleColor.Green;
+
                     if (val >= 0 && r.NextDouble() <= val)
                         if (val <= 0.3)
                             Console.BackgroundColor = ConsoleColor.Red;
@@ -151,11 +155,11 @@ namespace VisualizadorConsola
                             Console.BackgroundColor = ConsoleColor.Green;
                     val = (Math.Truncate(val * 10) / 1);
                     if (val == 10) Console.Write("X");
-                    else 
+                    else
                         Console.Write(" ");
                     Console.BackgroundColor = ConsoleColor.Black;
                 }
-                
+
                 Console.WriteLine();
             }
 
@@ -166,12 +170,94 @@ namespace VisualizadorConsola
             Console.Write("                         Temperature");
             Console.Write("                      Flora");
 
-            foreach (var e in creatures)
+            //foreach (var e in creatures)
+            //{
+            //    Console.SetCursorPosition(e.x, e.y);
+            //    Console.Write("e");
+            //}
+            //Console.SetCursorPosition(world.map.GetLength(0), world.map.GetLength(0));
+        }
+
+        public void WorldToBmp()
+        {
+
+            Bitmap treeMap = new Bitmap(world.map.GetLength(0), world.map.GetLength(0), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap floraMap = new Bitmap(world.map.GetLength(0), world.map.GetLength(0), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap heightMap = new Bitmap(world.map.GetLength(0), world.map.GetLength(0), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap tempMap = new Bitmap(world.map.GetLength(0), world.map.GetLength(0), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap hMap = new Bitmap(world.map.GetLength(0), world.map.GetLength(0), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            Console.Clear();
+            for (int i = 0; i < world.map.GetLength(0); i++)
             {
-                Console.SetCursorPosition(e.x, e.y);
-                Console.Write("e");
+                for (int j = 0; j < world.map.GetLength(1); j++)
+                {
+                    double val = world.map[j, i].height;
+                    if (val < 0.3) heightMap.SetPixel(j, i, Color.DarkBlue);
+                    else if (val < 0.5) heightMap.SetPixel(j, i, Color.Blue);
+                    else if (val == 0.5) heightMap.SetPixel(j, i, Color.DarkGreen);
+                    else if (val < 0.6) heightMap.SetPixel(j, i, Color.Green);
+                    else if (val < 0.7) heightMap.SetPixel(j, i, Color.Yellow);
+                    else if (val < 0.8) heightMap.SetPixel(j, i, Color.LightYellow);
+                    else heightMap.SetPixel(j, i, Color.White);
+                }
+
+                for (int j = 0; j < world.map.GetLength(1); j++)
+                {
+                    double val = world.map[j, i].humidity;
+
+                    if (val < 0.3) hMap.SetPixel(j, i, Color.DarkRed);
+                    else if (val < 0.4) hMap.SetPixel(j, i, Color.Red);
+                    else if (val < 0.5) hMap.SetPixel(j, i, Color.IndianRed);
+                    else if (val < 0.6) hMap.SetPixel(j, i, Color.MediumVioletRed);
+                    else if (val < 0.8) hMap.SetPixel(j, i, Color.Blue);
+                    else if (val < 1) hMap.SetPixel(j, i, Color.DarkBlue);
+                    else Console.BackgroundColor = ConsoleColor.White;
+                }
+
+                for (int j = 0; j < world.map.GetLength(1); j++)
+                {
+                    double val = world.map[j, i].temperature;
+                    if (val < 0.2) tempMap.SetPixel(j, i, Color.DarkBlue);
+                    else if (val < 0.3) tempMap.SetPixel(j, i, Color.Blue);
+                    else if (val < 0.5) tempMap.SetPixel(j, i, Color.Yellow);
+                    else if (val < 0.6) tempMap.SetPixel(j, i, Color.Orange);
+                    else if (val < 0.8) tempMap.SetPixel(j, i, Color.OrangeRed);
+                    else tempMap.SetPixel(j, i, Color.Red);
+                }
+
+                Random r = new Random();
+                for (int j = 0; j < world.map.GetLength(1); j++)
+                {
+                    double val = world.map[j, i].flora;
+                    if (val == 0)
+                        if (world.map[j, i].height < 0.5) { treeMap.SetPixel(j, i, Color.DarkBlue); floraMap.SetPixel(j, i, Color.DarkBlue); }
+                        else floraMap.SetPixel(j, i, Color.Black);
+                    else if (val < 0.1) floraMap.SetPixel(j, i, Color.DarkRed);
+                    else if (val < 0.2) floraMap.SetPixel(j, i, Color.Red);
+                    else if (val < 0.3) floraMap.SetPixel(j, i, Color.OrangeRed);
+                    else if (val < 0.4) floraMap.SetPixel(j, i, Color.Orange);
+                    else if (val < 0.5) floraMap.SetPixel(j, i, Color.Yellow);
+                    else if (val < 0.7) floraMap.SetPixel(j, i, Color.YellowGreen);
+                    else floraMap.SetPixel(j, i, Color.Green);
+
+                    if (val >= 0 && r.NextDouble() <= val)
+                        if (val <= 0.3)
+                            treeMap.SetPixel(j, i, Color.DarkOliveGreen);
+                        else if (val <= 0.35)
+                            treeMap.SetPixel(j, i, Color.ForestGreen);
+                        else if (val < 0.7)
+                            treeMap.SetPixel(j, i, Color.LawnGreen);
+                        else
+                            treeMap.SetPixel(j, i, Color.LimeGreen);
+                }
             }
-            Console.SetCursorPosition(world.map.GetLength(0), world.map.GetLength(0));
+
+            treeMap.Save("treeTest.bmp");
+            floraMap.Save("flora.bmp");
+            heightMap.Save("height.bmp");
+            tempMap.Save("temp.bmp");
+            hMap.Save("humidity.bmp");
         }
 
         World world;
