@@ -9,9 +9,10 @@ namespace VisualizadorConsola
     {
         static void Main(string[] args)
         {
-            ISimulation s = new ConsoleSimulation();
+            /*ISimulation s = new ConsoleSimulation();
             s.Init();
-            s.Run();
+            s.Run();*/
+            GeneticTest();
         }
 
         static public void GeneticTest()
@@ -31,11 +32,13 @@ namespace VisualizadorConsola
             CreatureChromosome chromosome3 = GeneticFunctions.UniformCrossover(chromosome1, chromosome2, 0.5f);
             Console.WriteLine("Crossover Result:");
             chromosome3.PrintChromosome();
+
             Console.WriteLine();
 
-            GeneticFunctions.Mutation(chromosome3, 0.1f);
+            GeneticFunctions.FlipBitMutation(chromosome3, 0.1f);
             Console.WriteLine("Child's Chromosome After Mutation:");
             chromosome3.PrintChromosome();
+
             Console.WriteLine();
         }
 
@@ -137,6 +140,7 @@ namespace VisualizadorConsola
             genes.Add(paternity);
 
             CreatureChromosome.SetStructure(genes);
+
         }
     }
 }
