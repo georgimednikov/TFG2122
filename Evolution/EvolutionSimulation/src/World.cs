@@ -39,6 +39,14 @@ namespace EvolutionSimulation
             heightWaves[0].seed = rnd.Next(0, 10000); //1641;
             heightWaves[0].frequency = 1f;
             heightWaves[0].amplitude = 1f;
+            //heightWaves[1] = new Wave();
+            //heightWaves[1].seed = rnd.Next(0, 10000); //1641;
+            //heightWaves[1].frequency = 0.5f;
+            //heightWaves[1].amplitude = 1f;
+            //heightWaves[2] = new Wave();
+            //heightWaves[2].seed = rnd.Next(0, 10000); //1641;
+            //heightWaves[2].frequency = 0.5f;
+            //heightWaves[2].amplitude = 1f;
             humidityWaves = new Wave[1];
             humidityWaves[0] = new Wave();
             humidityWaves[0].seed = rnd.Next(0, 10000);//4534;
@@ -176,7 +184,7 @@ namespace EvolutionSimulation
             for (int yIndex = 0; yIndex < sizeY; yIndex++)
                 for (int xIndex = 0; xIndex < sizeX; xIndex++)
                     if (mapData[xIndex, yIndex].height >= 0.5f)
-                        mapData[xIndex, yIndex].flora = Math.Min(Math.Max(Math.Pow(EvaluateFloraCurve(xIndex, yIndex, mapData), 2), 0), 1.0f);
+                        mapData[xIndex, yIndex].flora = Math.Min(Math.Max(EvaluateFloraCurve(xIndex, yIndex, mapData), 0), 1.0f);
                     else
                         mapData[xIndex, yIndex].flora = 0;
 
@@ -204,7 +212,9 @@ namespace EvolutionSimulation
 
         double EvaluateFloraCurve(int xIndex, int yIndex, MapData[,] mapData)
         {
-            return 2 * Math.Pow((0.5f * (-2 * (Math.Pow(Math.Sqrt(2) * ((mapData[xIndex, yIndex].temperature) - 0.5), 2)) + 1) + (0.5f * mapData[xIndex, yIndex].humidity)), 4);
+            double a = 1, c = 1, d = 1, e = 1.75;
+            return (a / c) * (Math.Pow(c * mapData[xIndex, yIndex].humidity, e) - Math.Pow(2 * (mapData[xIndex, yIndex].temperature) - 1, 2 * d));
+            //return 2 * Math.Pow((0.5f * (-2 * (Math.Pow(Math.Sqrt(2) * ((mapData[xIndex, yIndex].temperature) - 0.5), 2)) + 1) + (0.5f * mapData[xIndex, yIndex].humidity)), 4);
         }
 
         /// <summary>
