@@ -42,7 +42,7 @@ namespace EvolutionSimulation.FSM
         /// </summary>
         public void Execute()
         {
-            machine.State.Action();
+            while(machine.State.Action()) Evaluate();
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace EvolutionSimulation.FSM
             {
                 if (machine.CanFire(t) && t.Evaluate())
                 {
-                    //TO DO: Quitar esto, esta pa debugear 
+                    //TODO: Quitar esto, esta pa debugear 
                     Console.WriteLine("Transition: " + t.GetType().Name);
                     
                     machine.Fire(t);

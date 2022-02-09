@@ -10,9 +10,10 @@ namespace EvolutionSimulation.FSM.Creature.States
 
     class Alive : IState
     {
-        public void Action()
+        public bool Action()
         {
             Console.WriteLine("Alive");
+            return false;
         }
     }
 }
