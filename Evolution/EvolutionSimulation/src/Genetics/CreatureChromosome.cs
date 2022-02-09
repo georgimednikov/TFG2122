@@ -60,6 +60,10 @@ namespace EvolutionSimulation.Genetics
         /// Second: The length of the gene
         /// </summary>
         static private Tuple<int, int>[] genePos;
+        /// <summary>
+        /// Max values of each gene ORDERED BY FEATURE
+        /// </summary>
+        static private int[] geneMaxValues;
 
         static private Random rnd;
 
@@ -71,7 +75,7 @@ namespace EvolutionSimulation.Genetics
         /// <summary>
         /// The current value of each gene
         /// </summary>
-        private int[] geneValues;
+        public int[] geneValues;
 
 
         /// <summary>
@@ -84,14 +88,15 @@ namespace EvolutionSimulation.Genetics
             rnd = new Random();
 
             geneInfo = genes.ToArray();
-            int[] maxValues = new int[genes.Count];
+            geneMaxValues = new int[genes.Count];
             for (int i = 0; i < genes.Count; ++i)
             {
-                maxValues[(int)genes[i].feature] = genes[i].maxValue;
+                geneMaxValues[(int)genes[i].feature] = genes[i].maxValue;
             }
 
             genePos = new Tuple<int, int>[genes.Count];
-            chromosomeSize = 0;
+            //TODO: Cambiar este comentario
+            chromosomeSize = 1; //One bit to represent sex https://www.youtube.com/watch?v=c9GGBv1n4qI&t=10s
             foreach (Gene gene in genes)
             {
                 //The numeric value of the feature
@@ -105,10 +110,10 @@ namespace EvolutionSimulation.Genetics
                     //In other words, a negative relation may not modify the value, but if it is accounted for it would add extra bits surpassing the max value.
                     if (relation.Item1 > 0)
                         //The highest possible value of the features related is calculated (percentaje * maxValue)
-                        relationsMaxValue += (int)(relation.Item1 * maxValues[(int)relation.Item2]); //The percetaje gets truncated!!!
+                        relationsMaxValue += (int)(relation.Item1 * geneMaxValues[(int)relation.Item2]); //The percetaje gets truncated!!!
                 }
 
-                int leftover = maxValues[featureIndex] - relationsMaxValue;
+                int leftover = geneMaxValues[featureIndex] - relationsMaxValue;
                 if (leftover <= 0)
                     throw new Exception("The genes must not depend completely on other genes and must have percetage values in their relations between 0 and 1");
 
@@ -192,10 +197,31 @@ namespace EvolutionSimulation.Genetics
         /// Get the numeric value of the desired feature (attribute or ability)
         /// Returns -1 if not initilized or the value asked does not exist
         /// </summary>
+        public Gender GetGender()
+        {
+            if (!init) throw new Exception("The chromosome was not initialized");
+            if (chromosome[0]) return Gender.Male;
+            else return Gender.Female;
+        }
+
+        /// <summary>
+        /// Get the numeric value of the desired feature (attribute or ability)
+        /// Returns -1 if not initilized or the value asked does not exist
+        /// </summary>
         public int GetFeature(CreatureFeature feat)
         {
             if (!init) throw new Exception("The chromosome was not initialized");
             return geneValues[(int)feat];
+        }
+
+        /// <summary>
+        /// Get the max value of the desired feature (attribute or ability)
+        /// Returns -1 if not initilized or the value asked does not exist
+        /// </summary>
+        public int GetFeatureMax(CreatureFeature feat)
+        {
+            if (!init) throw new Exception("The chromosome was not initialized");
+            return geneMaxValues[(int)feat];
         }
 
         /// <summary>
