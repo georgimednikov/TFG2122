@@ -18,7 +18,7 @@ namespace VisualizadorConsola
             creatures = new List<Creature>();
             delete = new List<IEntity>();
             world = new World();
-            world.Init(1080);
+            world.Init(16);
             Creature c = CreateEntity<Creature>();
             c.metabolism = 200;
             c.health = 1;
@@ -31,7 +31,6 @@ namespace VisualizadorConsola
 
         public void Run()
         {
-
             while (true)
             {
                 world.Tick();
@@ -43,7 +42,7 @@ namespace VisualizadorConsola
 
                 delete.Clear();
                 Render();
-                Thread.Sleep(100000);
+                Thread.Sleep(1000);
             }
         }
 
@@ -212,7 +211,6 @@ namespace VisualizadorConsola
                     else if (val < 0.6) hMap.SetPixel(j, i, Color.MediumVioletRed);
                     else if (val < 0.8) hMap.SetPixel(j, i, Color.Blue);
                     else if (val < 1) hMap.SetPixel(j, i, Color.DarkBlue);
-                    else Console.BackgroundColor = ConsoleColor.White;
                 }
 
                 for (int j = 0; j < world.map.GetLength(1); j++)
