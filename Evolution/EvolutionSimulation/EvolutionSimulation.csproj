@@ -97,6 +97,7 @@
     </Reference>
     <Reference Include="System.Numerics" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

@@ -9,10 +9,10 @@ namespace VisualizadorConsola
     {
         static void Main(string[] args)
         {
-            /*ISimulation s = new ConsoleSimulation();
+            ISimulation s = new ConsoleSimulation();
             s.Init();
-            s.Run();*/
-            GeneticTest();
+            s.Run();
+            //GeneticTest();
         }
 
         static public void GeneticTest()

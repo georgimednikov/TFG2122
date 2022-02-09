@@ -1,49 +1,80 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EvolutionSimulation
 {
     class Corpse : IEntity, IInteractable<Creature>
     {
+        public enum CorpseState
+        {
+            Edible,
+            Putrid
+        }
         public Corpse()
         {
             rnd = new Random();
         }
-        
 
         /// <summary>
         /// Initializes the corpse.
-        /// </summary>
-        /// <param name="timeLimit"> The number of ticks that the corpses stays </param>
-        /// <param name="poisonProbability"> 
-        /// The probability of being poisone when interacting with the copse. 
+        /// <param name="corpseDuration"> 
+        /// The number of ticks that the corpses stays
+        /// </param>
+        /// <param name="putridStart">
+        /// The % of the corpse duration when the corpse starts putrefying
+        /// </param>
+        /// <param name="putridPoisonProb">
+        /// The probability of being poisoned when interacting with the putrid corpse. 
         /// A value between 0 and 100 (%), higher or lower values will be clamped.
         /// </param>
-        public void Init(int timeLimit, int poisonProbability)
+        /// <param name="maxNutritionPoints">
+        /// Nutrition points acquired when consuming the corpse.
+        /// They get lower the more putrid the corpse gets
+        /// TODO: Hacer que sea menos puntos de nutricion cuando se este pudriendo
+        /// </param>
+        public void Init(int corpseDuration,  float putridStart, int poisonProb, int maxNutritionPoints)
         {
-            lifeTime = timeLimit;
-            poisonProb = poisonProbability;
+            this.corpseTimeLeft = corpseDuration;
+            this.poisonProb = poisonProb;
+            this.nutritionPoints = maxNutritionPoints;
+            poisonProb = 0;
+            // Corpse starts putrefying when the corpse consumed putridStart% of its duration
+            putridTime = (int)(corpseDuration * putridStart);
         }
 
         public void OnInteract(Creature other)
         {
+            int prob = rnd.Next(0, 100);
+            if(state == CorpseState.Putrid)
+            {
+                // Putrid corpse, probability to be poisoned gets higher the more time it passes 
+                int actualPoisonProb = poisonProb + (int)(putridTime / (float)corpseTimeLeft);
+                if (prob < actualPoisonProb)
+                    Console.WriteLine("The creature is poisoned");
+            }
             // TODO: Considerar la habilidad carroniero
-            if(rnd.Next(0,100) < poisonProb)
-                Console.WriteLine("The creature is poisoned");  //TODO: Hacer que se envenene la creatura de verdad
+            // TODO: Aniadir puntos de nutricion a la creatura
         }
 
         public void Tick()
         {
-            lifeTime--;
-            if (lifeTime == 0)
+            corpseTimeLeft--;
+            state = corpseTimeLeft > putridTime ? CorpseState.Edible : CorpseState.Putrid;
+
+            if (corpseTimeLeft == 0)
+            {
                 Console.WriteLine("Desaparece");
+                EntityManager.Instance.Delete(this);
+            }
         }
 
         Random rnd;
-        float lifeTime;
-        float poisonProb;
+        int corpseTimeLeft;
+        int poisonProb;
+        int nutritionPoints;
+
+        // States
+        CorpseState state;
+        int putridTime;
     }
 }
