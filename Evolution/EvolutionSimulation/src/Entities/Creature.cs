@@ -61,11 +61,11 @@ namespace EvolutionSimulation.Entities
         void ConfigureStateMachine()
         {
             // States
-            IState idle = new Idle();
+            IState idle = new Idle(this);
             IState moving = new Moving(this);
-            IState dead = new Dead();
-            IState alive = new Alive();
-            IState eat = new Eat();
+            IState dead = new Dead(this);
+            IState alive = new Alive(this);
+            IState eat = new Eat(this);
 
             mfsm = new Fsm(idle);
             toMove = true;

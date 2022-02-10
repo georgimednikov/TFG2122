@@ -21,8 +21,8 @@ namespace VisualizadorConsola
             world.Init(16);
             Animal c = CreateEntity<Animal>();
             c.Init(world, 5, 5);
-            c = CreateEntity<Animal>();
-            c.Init(world, 4, 4);
+            //c = CreateEntity<Animal>();
+            //c.Init(world, 4, 4);
         }
 
 

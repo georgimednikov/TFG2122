@@ -1,21 +1,16 @@
 ﻿namespace EvolutionSimulation.FSM.Creature.States
 {
     // TODO: Estado para testear, hacer el estado correctamente
-    class Moving : IState
+    class Moving : CreatureState
     {
-        Entities.Creature creature;
+        public Moving(Entities.Creature c) : base(c) { creature = c; }
 
-        public Moving(Entities.Creature c)
+        public override bool canPerformAction(int actionPoints)
         {
-            creature = c;
+            return actionPoints >= 1000 * ((20f - creature.stats.groundSpeed) / 10f);
         }
 
-        public bool canPerformAction(int actionPoints)
-        {
-            return actionPoints >= 1000 * ((200f - creature.stats.groundSpeed) / 100f);
-        }
-
-        public int Action()
+        public override int Action()
         {
             int nX = 0, nY = 0;
             do
@@ -27,7 +22,7 @@
             if (creature.world.canMove(nX, nY))
             {
                 creature.Place(nX, nY);
-                return 1000 * (int)((200f - creature.stats.groundSpeed) / 100f); // Cost of the action performed
+                return (int)(1000 * ((20f - creature.stats.groundSpeed) / 10f)); // Cost of the action performed
             }
             return 0;
         }
