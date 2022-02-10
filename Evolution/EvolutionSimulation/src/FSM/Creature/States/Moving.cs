@@ -10,23 +10,26 @@
             creature = c;
         }
 
-        public bool Action()
+        public bool canPerformAction(int actionPoints)
+        {
+            return actionPoints >= 1000 * ((200f - creature.stats.groundSpeed) / 100f);
+        }
+
+        public int Action()
         {
             int nX = 0, nY = 0;
             do
             {
-                nX = creature.x + creature.r.Next(-1, 2);
-                nY = creature.y + creature.r.Next(-1, 2);
+                nX = creature.x + RandomGenerator.Next(-1, 2);
+                nY = creature.y + RandomGenerator.Next(-1, 2);
 
-            } while (nX != creature.x && nY != creature.y);
+            } while (nX == creature.x && nY == creature.y);
             if (creature.world.canMove(nX, nY))
             {
-                if (creature.actionPoints < 1000 * ((200f - creature.stats.groundSpeed) / 100f)) return false;
-                creature.actionPoints -= 1000 * (int)((200f - creature.stats.groundSpeed) / 100f);
                 creature.Place(nX, nY);
-                return true;
+                return 1000 * (int)((200f - creature.stats.groundSpeed) / 100f); // Cost of the action performed
             }
-            return false;
+            return 0;
         }
     }
 }

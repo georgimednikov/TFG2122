@@ -12,9 +12,16 @@ namespace EvolutionSimulation.FSM
     public interface IState 
     {
         /// <summary>
+        /// Returns if the state can perform 
+        /// its action with the FSm's current AP.
+        /// </summary>
+        /// <param name="actionPoints"></param>
+        bool canPerformAction(int actionPoints);
+
+        /// <summary>
         /// Action which is executed in the state
         /// </summary>
-        bool Action();
+        int Action();
     }
 
     /// <summary>

@@ -11,12 +11,13 @@ namespace EvolutionSimulation.src.Entities
     /// </summary>
     public abstract class Creature : IEntity
     {
+        bool toMove, toIdle, toDie, toMunch;
+
         /// <summary>
         /// Constructor for factories
         /// </summary>
         public Creature()
         {
-            r = new Random();
             chromosome = new CreatureChromosome();
             stats = new CreatureStats();
             SetStats();
@@ -39,10 +40,10 @@ namespace EvolutionSimulation.src.Entities
         /// </summary>
         public void Tick()
         {
-            actionPoints += stats.metabolism * 10;
-
-            mfsm.Evaluate();
-            mfsm.Execute();
+            toDie = (stats.currAge++ >= stats.lifeSpan);
+            mfsm.obtainActionPoints(stats.metabolism);
+            do { mfsm.Evaluate(); } // While the creature can keep performing actions
+            while (mfsm.Execute());// Maintains the evaluation - execution action
         }
 
         /// <summary>
@@ -67,10 +68,10 @@ namespace EvolutionSimulation.src.Entities
             IState eat = new Eat();
 
             mfsm = new Fsm(idle);
-            bool toMove = true;
-            bool toIdle = false;
-            bool toDie = false;
-            bool toMunch = false;
+            toMove = true;
+            toIdle = false;
+            toDie = false;
+            toMunch = false;
 
             // Substates
             mfsm.AddSubstate(alive, idle);
@@ -102,16 +103,24 @@ namespace EvolutionSimulation.src.Entities
             this.y = y;
         }
 
+        /// <summary>
+        /// Modifies the given stat based on age
+        /// </summary>
+        float ModifyStatByAge(float stat)
+        {
+            return stat * Math.Min(1.0f, (1 - startMultiplier) / (stats.lifeSpan * adulthoodThreshold) * stats.currAge + startMultiplier);
+        }
+
+        /// <summary>
+        /// Sets the stats of the creature.
+        /// </summary>
+        abstract public void SetStats();
+
         // World tile position
         public int x { get; private set; }
         public int y { get; private set; }
         // World in which the creature resides
-        public World world { get; private set; }
-        // Random number generator
-        public Random r { get; private set; }
-        // State machine
-        // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
-        private Fsm mfsm;
+        public World world { get; private set; } 
 
         // Genetic
         public CreatureChromosome chromosome { get; private set; }
@@ -119,10 +128,11 @@ namespace EvolutionSimulation.src.Entities
 
         public int actionPoints;
 
-        /// <summary>
-        /// Sets the stats of the creature.
-        /// </summary>
-        abstract public void SetStats();
+        // State machine
+        // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
+        private Fsm mfsm;
+        private float startMultiplier = 0.33f; //Starting multiplier of newborns
+        private float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
     }
 
     public struct CreatureStats
@@ -177,6 +187,7 @@ namespace EvolutionSimulation.src.Entities
         //Physique related stats
         public int size;
         public int lifeSpan;
+        public int currAge;
         public int members;
         public int metabolism;
         public float minTemperature;
