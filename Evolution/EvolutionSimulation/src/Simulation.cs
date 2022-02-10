@@ -24,47 +24,18 @@ namespace EvolutionSimulation
             while (true)
             {
                 world.Tick();
-                entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Orders the entity to perform a step
-                creatures.Sort(new SortByMetabolism());
-
-                delete.ForEach(delegate (IEntity e) { entities.Remove(e); });
-
-                delete.Clear();
+                //entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Orders the entity to perform a step
+                //creatures.Sort(new SortByMetabolism());
+                //
+                //delete.ForEach(delegate (IEntity e) { entities.Remove(e); });
+                //
+                //delete.Clear();
             }
         }
-
-        /// <summary>
-        /// Adds an entity to the list
-        /// </summary>
-        /// <typeparam name="T">Entity type</typeparam>
-        /// <returns>The added entity</returns>
-        public T CreateEntity<T>() where T : IEntity, new()
-        {
-            T ent = new T();
-            if(ent is Creature) creatures.Add(ent as Creature);
-            else entities.Add(ent);
-            return ent;
-        }
-
-
-        /// <summary>
-        /// Designates an entity to be eliminated before the next frame
-        /// </summary>
-        public void Delete(IEntity entity)
-        {
-            delete.Add(entity);
-        }
-
-
-        // Entities in the world
-        public List<IEntity> entities { get; private set; }
-        public List<Creature> creatures { get; private set; }
-        // Entities to be deleted
-        List<IEntity> delete;
-
         World world;
     }
 
+    // TODO: esto moverlo a otro sitio
     public class SortByMetabolism : Comparer<Creature>
     {
         public override int Compare(Creature x, Creature y)

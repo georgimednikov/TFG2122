@@ -14,16 +14,13 @@ namespace VisualizadorConsola
     {
         public void Init()
         {
-            entities = new List<IEntity>();
-            creatures = new List<Creature>();
-            delete = new List<IEntity>();
             world = new World();
             world.Init(16);
-            Creature c = CreateEntity<Creature>();
+            Creature c = world.CreateCreature();
             c.metabolism = 200;
             c.health = 1;
             c.Init(world, 5, 5);
-            c = CreateEntity<Creature>();
+            c = world.CreateCreature();
             c.metabolism = 1;
             c.Init(world, 4, 4);
         }
@@ -34,46 +31,10 @@ namespace VisualizadorConsola
             while (true)
             {
                 world.Tick();
-                entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Orders the entity to perform a step
-                creatures.Sort(new SortByMetabolism());
-                creatures.ForEach(delegate (Creature e) { e.Tick(); });
-
-                delete.ForEach(delegate (IEntity e) { entities.Remove(e); });
-
-                delete.Clear();
                 Render();
                 Thread.Sleep(1000);
             }
         }
-
-        /// <summary>
-        /// Adds an entity to the list
-        /// </summary>
-        /// <typeparam name="T">Entity type</typeparam>
-        /// <returns>The added entity</returns>
-        public T CreateEntity<T>() where T : IEntity, new()
-        {
-            T ent = new T();
-            if (ent is Creature) creatures.Add(ent as Creature);
-            else entities.Add(ent);
-            return ent;
-        }
-
-
-        /// <summary>
-        /// Designates an entity to be eliminated before the next frame
-        /// </summary>
-        public void Delete(IEntity entity)
-        {
-            delete.Add(entity);
-        }
-
-
-        // Entities in the world
-        public List<IEntity> entities { get; private set; }
-        public List<Creature> creatures { get; private set; }
-        // Entities to be deleted
-        List<IEntity> delete;
 
         /// <summary>
         /// Renders the map and creatures

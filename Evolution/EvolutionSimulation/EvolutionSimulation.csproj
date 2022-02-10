@@ -70,7 +70,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Entities\Corpse.cs" />
-    <Compile Include="src\Entities\EntityManager.cs" />
     <Compile Include="src\Genetics\CreatureFeatures.cs" />
     <Compile Include="src\Genetics\CreatureChromosome.cs" />
     <Compile Include="src\Genetics\GeneticFunctions.cs" />
