@@ -3,9 +3,9 @@
     // TODO: Estado para testear, hacer el estado correctamente
     class Moving : IState
     {
-        src.Entities.Creature creature;
+        Entities.Creature creature;
 
-        public Moving(src.Entities.Creature c)
+        public Moving(Entities.Creature c)
         {
             creature = c;
         }

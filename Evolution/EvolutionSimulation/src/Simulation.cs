@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using EvolutionSimulation.src.Entities;
+using EvolutionSimulation.Entities;
 
 namespace EvolutionSimulation
 {

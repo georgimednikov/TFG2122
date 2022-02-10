@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Threading;
 using EvolutionSimulation;
-using EvolutionSimulation.src.Entities;
+using EvolutionSimulation.Entities;
 
 namespace VisualizadorConsola
 {

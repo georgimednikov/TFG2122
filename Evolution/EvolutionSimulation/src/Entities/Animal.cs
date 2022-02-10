@@ -1,7 +1,6 @@
-﻿using EvolutionSimulation.src.Entities;
-using EvolutionSimulation.Genetics;
+﻿using EvolutionSimulation.Genetics;
 
-namespace EvolutionSimulation.src.Entities
+namespace EvolutionSimulation.Entities
 {
     public class Animal : Creature
     {

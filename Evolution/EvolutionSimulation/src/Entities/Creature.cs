@@ -4,7 +4,7 @@ using EvolutionSimulation.FSM.Creature.States;
 using EvolutionSimulation.FSM.Creature.Transitions;
 using EvolutionSimulation.Genetics;
 
-namespace EvolutionSimulation.src.Entities
+namespace EvolutionSimulation.Entities
 {
     /// <summary>
     /// A creature with attributes and behavior

@@ -1,5 +1,5 @@
 ﻿using System;
-using EvolutionSimulation.src.Entities;
+using EvolutionSimulation.Entities;
 
 namespace EvolutionSimulation
 {
