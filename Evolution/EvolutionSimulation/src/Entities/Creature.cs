@@ -4,26 +4,22 @@ using EvolutionSimulation.FSM.Creature.States;
 using EvolutionSimulation.FSM.Creature.Transitions;
 using EvolutionSimulation.Genetics;
 
-namespace EvolutionSimulation
+namespace EvolutionSimulation.src.Entities
 {
     /// <summary>
     /// A creature with attributes and behavior
     /// </summary>
-    public class Creature : IEntity
+    public abstract class Creature : IEntity
     {
-        //TODO: Al que le toque, que seguramente sea yo, que lo quite.
-        public int metabolism { get; set; }
-        public int mobility { get; private set; }
-        public int health { get; set; }
-
         /// <summary>
         /// Constructor for factories
         /// </summary>
         public Creature()
         {
             r = new Random();
-            //chromosome = new CreatureChromosome();
-            //stats = new CreatureStats(chromosome);
+            chromosome = new CreatureChromosome();
+            stats = new CreatureStats();
+            SetStats();
         }
 
         /// <summary>
@@ -43,7 +39,7 @@ namespace EvolutionSimulation
         /// </summary>
         public void Tick()
         {
-            actionPoints += metabolism * 10;
+            actionPoints += stats.metabolism * 10;
 
             mfsm.Evaluate();
             mfsm.Execute();
@@ -119,18 +115,18 @@ namespace EvolutionSimulation
 
         // Genetic
         public CreatureChromosome chromosome { get; private set; }
-        public CreatureStats stats { get; private set; }
+        public CreatureStats stats;
 
         public int actionPoints;
 
-        public int GetScavenger() { return chromosome.GetFeature(CreatureFeature.Scavenger); }
+        /// <summary>
+        /// Sets the stats of the creature.
+        /// </summary>
+        abstract public void SetStats();
     }
 
-    public class CreatureStats
+    public struct CreatureStats
     {
-        //The percentage of an ability that has to be had in order to unlock it
-        private float abilityUnlock = 0.4f;
-
         public Gender gender;
 
         //Nutrition related stats
@@ -172,10 +168,11 @@ namespace EvolutionSimulation
         public float restExpense;
 
         //Environment related stats
-        public int percepcion;
         public int camouflage;
         public int aggressiveness;
         public int intimidation;
+        public int perception;
+        public float nightDebuff;
 
         //Physique related stats
         public int size;
@@ -193,102 +190,5 @@ namespace EvolutionSimulation
         //Multipliers
         public float healthRegeneration;
         public float maxSpeed;
-        public float nightDebuff;
-
-        private CreatureChromosome chromosome;
-
-        public CreatureStats(CreatureChromosome chr)
-        {
-            chromosome = chr;
-            SetStats();
-        }
-
-        private void SetStats()
-        {
-            gender = chromosome.GetGender();
-
-            //The max value is divided in ranges based on the amount of diets and then a diet is assigned based on the range it fall in
-            diet = (Diet)(chromosome.GetFeature(CreatureFeature.Diet) / (chromosome.GetFeatureMax(CreatureFeature.Diet) / (int)Diet.Count));
-            if (diet >= Diet.Count) diet = Diet.Count;
-
-            int min = 10; //Minimum amount of health
-            int value = 2; //Health gained per point of constitution
-            //Minimum health plus bonus health
-            maxHealth = chromosome.GetFeature(CreatureFeature.Constitution) * value + min;
-            currHealth = maxHealth;
-
-            damage = chromosome.GetFeature(CreatureFeature.Strength);
-            armor = chromosome.GetFeature(CreatureFeature.Fortitude);
-            perforation = chromosome.GetFeature(CreatureFeature.Piercing);
-
-            bool wings = HasAbility(CreatureFeature.Wings);
-            bool arboreal = HasAbility(CreatureFeature.Arboreal);
-            bool upright = HasAbility(CreatureFeature.Upright);
-            int mobility = chromosome.GetFeature(CreatureFeature.Mobility);
-            airReach = wings;
-            treeReach = wings || arboreal || upright;
-            //TODO rellenar entre todos en concordancia con el resto de acciones para no mover muy rapido/lento
-            if (!wings) aerialSpeed = -1;
-            else aerialSpeed = chromosome.GetFeature(CreatureFeature.Wings);
-            if (!arboreal) arborealSpeed = -1;
-            else arborealSpeed = chromosome.GetFeature(CreatureFeature.Arboreal);
-            groundSpeed = mobility;
-
-            //maxEnergy = 100;
-            //currEnergy = maxEnergy;
-            //energyExpense;
-
-            //maxHydratation = 100;
-            //currHydratation = maxHydratation;
-            //hydratationExpense;
-
-            //maxRest = 100;
-            //currRest = maxRest;
-            //restRecovery;
-            //restExpense;
-
-            //Environment related stats
-            percepcion = chromosome.GetFeature(CreatureFeature.Perception);
-            camouflage = chromosome.GetFeature(CreatureFeature.Camouflage);
-            aggressiveness = chromosome.GetFeature(CreatureFeature.Aggressiveness);
-
-            ////Physique related stats
-            size = chromosome.GetFeature(CreatureFeature.Size);
-            //lifeSpan;
-
-            //TODO mover de sitio el numero maximo de patas
-            int maxMembers = 10;
-            members = chromosome.GetFeature(CreatureFeature.Members) / (chromosome.GetFeatureMax(CreatureFeature.Members) / maxMembers);
-            if (members >= maxMembers) members = maxMembers;
-
-            //metabolism;
-            idealTemperature = chromosome.GetFeature(CreatureFeature.IdealTemperature);
-            minTemperature = idealTemperature - chromosome.GetFeature(CreatureFeature.TemperatureRange);
-            maxTemperature = idealTemperature + chromosome.GetFeature(CreatureFeature.TemperatureRange);
-
-            ////Behaviour related stats
-            //knowledge;
-            //paternity;
-
-            ////Multipliers
-            //healthRegeneration;
-            //maxSpeed;
-            //nightDebuff;
-
-
-            if (!HasAbility(CreatureFeature.Scavenger)) scavenger = -1;
-            else scavenger = chromosome.GetFeature(CreatureFeature.Scavenger) / chromosome.GetFeatureMax(CreatureFeature.Scavenger);
-            if (!HasAbility(CreatureFeature.Venomous)) venom = -1;
-            else venom = chromosome.GetFeature(CreatureFeature.Venomous);
-            if (!HasAbility(CreatureFeature.Thorns)) counter = -1;
-            else counter = chromosome.GetFeature(CreatureFeature.Thorns);
-            if (!HasAbility(CreatureFeature.Mimic)) intimidation = -1;
-            else intimidation = chromosome.GetFeature(CreatureFeature.Mimic);
-        }
-
-        private bool HasAbility(CreatureFeature feat)
-        {
-            return abilityUnlock < chromosome.GetFeature(feat) / chromosome.GetFeatureMax(feat);
-        }
     }
 }

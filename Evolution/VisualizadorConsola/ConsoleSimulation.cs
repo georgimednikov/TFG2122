@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Threading;
 using EvolutionSimulation;
+using EvolutionSimulation.src.Entities;
 
 namespace VisualizadorConsola
 {
@@ -19,12 +19,9 @@ namespace VisualizadorConsola
             delete = new List<IEntity>();
             world = new World();
             world.Init(16);
-            Creature c = CreateEntity<Creature>();
-            c.metabolism = 200;
-            c.health = 1;
+            Animal c = CreateEntity<Animal>();
             c.Init(world, 5, 5);
-            c = CreateEntity<Creature>();
-            c.metabolism = 1;
+            c = CreateEntity<Animal>();
             c.Init(world, 4, 4);
         }
 
