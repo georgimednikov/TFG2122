@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace EvolutionSimulation
 {
+    // TODO: Remove?
     public sealed class EntityManager
     {
         /// <summary>
@@ -31,7 +32,10 @@ namespace EvolutionSimulation
 
         // Singleton stuff
         static readonly EntityManager _instance = new EntityManager();
-        private EntityManager() { }
+        private EntityManager() 
+        {
+            entities = new List<IEntity>();
+        }
         public static EntityManager Instance { get { return _instance; } }
         
         // Attributes

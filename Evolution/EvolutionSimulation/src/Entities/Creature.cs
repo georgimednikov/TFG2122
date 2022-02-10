@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using EvolutionSimulation.FSM;
 using EvolutionSimulation.FSM.Creature.States;
 using EvolutionSimulation.FSM.Creature.Transitions;
@@ -44,6 +45,8 @@ namespace EvolutionSimulation
         public void Tick()
         {
             actionPoints += metabolism * 10;
+
+            seenEntities = Percieve();
 
             mfsm.Evaluate();
             mfsm.Execute();
@@ -106,6 +109,29 @@ namespace EvolutionSimulation
             this.y = y;
         }
 
+        /// <summary>
+        /// Checks the perception area around this entity for other entities
+        /// </summary>
+        /// <returns>A list of every other entity in the area</returns>
+        List<IEntity> Percieve()
+        {
+            int perceptionRadius = 4; // TODO: calculate this using the Perception stat
+            List<IEntity> list = new List<IEntity>();
+
+            foreach (IEntity e in world.entities) // TODO: use this?
+            {
+                if (e == this) continue; // Reference comparison
+                if (Math.Abs(e.x - x) <= perceptionRadius && Math.Abs(e.y - y) <= perceptionRadius) // Square vision
+                {
+                    list.Add(e);
+                    Console.WriteLine("Seeing " + e.ToString()); // TODO: Remove
+                }
+            }
+            Console.WriteLine(); // TODO: Remove
+
+            return list;
+        }
+
         // World tile position
         public int x { get; private set; }
         public int y { get; private set; }
@@ -122,6 +148,9 @@ namespace EvolutionSimulation
         public CreatureStats stats { get; private set; }
 
         public int actionPoints;
+
+        // List of entities seen at this moment by this creature
+        public List<IEntity> seenEntities { get; private set; }
 
         public int GetScavenger() { return chromosome.GetFeature(CreatureFeature.Scavenger); }
     }

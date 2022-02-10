@@ -76,5 +76,9 @@ namespace EvolutionSimulation
         // States
         CorpseState state;
         int putridTime;
+
+        public int x => throw new NotImplementedException();
+
+        public int y => throw new NotImplementedException();
     }
 }

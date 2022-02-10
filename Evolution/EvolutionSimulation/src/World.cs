@@ -29,6 +29,10 @@ namespace EvolutionSimulation
         /// <param name="influenceFunc">Function that defines the influence of height on the other parameters</param>
         public void Init(int size, Func<double, double> heightFunc = default(Func<double, double>), Func<double, double> influenceFunc = default(Func<double, double>))
         {
+            entities = new List<IEntity>();
+            creatures = new List<Creature>();
+            delete = new List<IEntity>();
+
             evaluateHeight = (heightFunc != null) ? heightFunc : EvaluateHeightCurve;
             evaluateInfluence = (influenceFunc != null) ? influenceFunc : EvaluateInfluenceCurve;
             p = new Perlin();
@@ -70,10 +74,39 @@ namespace EvolutionSimulation
         }
 
         /// <summary>
+        /// Adds an entity to the list
+        /// </summary>
+        /// <typeparam name="T">Entity type</typeparam>
+        /// <returns>The added entity</returns>
+        public T CreateEntity<T>() where T : IEntity, new()
+        {
+            T ent = new T();
+            entities.Add(ent);
+            return ent;
+        }
+
+        /// <summary>
+        /// Designates an entity to be eliminated before the next frame
+        /// </summary>
+        public void Delete(IEntity entity)
+        {
+            delete.Add(entity);
+        }
+
+        /// <summary>
         /// Performs a step of the simulation.
         /// </summary>
         public void Tick()
         {
+            // TODO: Remove if EntityManager is used
+            entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Orders the entity to perform a step
+            creatures.Sort(new SortByMetabolism());
+            creatures.ForEach(delegate (Creature e) { e.Tick(); }); // TODO: creatures will tick twice every tick
+
+            delete.ForEach(delegate (IEntity e) { entities.Remove(e); });
+
+            delete.Clear();
+
             step++;
             day = (step % (ticksHour * hoursDay) >= (morning * ticksHour) && 
                 step % (ticksHour * hoursDay) <= (night * ticksHour));
@@ -243,6 +276,13 @@ namespace EvolutionSimulation
         #endregion
 
         public uint step;
+
+        // Entities in the world
+        public List<IEntity> entities { get; private set; }
+        public List<Creature> creatures { get; private set; }
+        // Entities to be deleted
+        List<IEntity> delete;
+
         // Map with physical properties
         public MapData[,] map { get; private set; }
         int mapSize;
