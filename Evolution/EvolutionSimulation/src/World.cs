@@ -34,15 +34,15 @@ namespace EvolutionSimulation
             p = new Perlin();
             mapSize = size;
             Random rnd = new Random(DateTime.Now.Second);
-            heightWaves = new Wave[1];
+            heightWaves = new Wave[2];
             heightWaves[0] = new Wave();
             heightWaves[0].seed = rnd.Next(0, 10000); //1641;
-            heightWaves[0].frequency = 1f;
+            heightWaves[0].frequency = 0.5f;
             heightWaves[0].amplitude = 1f;
-            //heightWaves[1] = new Wave();
-            //heightWaves[1].seed = rnd.Next(0, 10000); //1641;
-            //heightWaves[1].frequency = 0.5f;
-            //heightWaves[1].amplitude = 1f;
+            heightWaves[1] = new Wave();
+            heightWaves[1].seed = rnd.Next(0, 10000); //1641;
+            heightWaves[1].frequency = 1f;
+            heightWaves[1].amplitude = 0;
             //heightWaves[2] = new Wave();
             //heightWaves[2].seed = rnd.Next(0, 10000); //1641;
             //heightWaves[2].frequency = 0.5f;
@@ -75,7 +75,7 @@ namespace EvolutionSimulation
         public void Tick()
         {
             step++;
-            day = (step % (ticksHour * hoursDay) >= (morning * ticksHour) && 
+            day = (step % (ticksHour * hoursDay) >= (morning * ticksHour) &&
                 step % (ticksHour * hoursDay) <= (night * ticksHour));
         }
 
@@ -223,10 +223,14 @@ namespace EvolutionSimulation
         /// </summary>
         double EvaluateHeightCurve(double x)
         {
+            //A sets the end of the first slope
+            //B sets the height where A stops
+            //C1 sets the start of the second slope
+            double a = 0.3, b = 0.5, c1 = 0.6, b1 = 1 - b, a1 = 1 - c1, d1 = b;
             if (x < 0) return 0f;
-            else if (x < 0.3) return (1 / 4f) * Math.Sin((10f / 3f) * Math.PI * (x - 0.15)) + 0.25f;
-            else if (x < 0.5) return 0.5f;
-            else if (x < 1) return (1 / 4f) * Math.Sin(2 * Math.PI * (x - 0.75f)) + 0.75f;
+            else if (x < a) return (b / 2) * Math.Sin((Math.PI / a) * (x - a / 2)) + b / 2;
+            else if (x < c1) return b;
+            else if (x < 1) return (b1 / 2) * Math.Sin((Math.PI / a1) * (x - a1 / 2 - c1)) + b1 / 2 + d1;
             else return 1;
         }
 
