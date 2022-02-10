@@ -26,8 +26,8 @@ namespace EvolutionSimulation.FSM.Creature.States
             int nX = 0, nY = 0;
             do
             {
-                nX = creatura.x + creatura.r.Next(-1, 2);
-                nY = creatura.y + creatura.r.Next(-1, 2);
+                nX = creatura.x + RandomGenerator.Next(-1, 2);
+                nY = creatura.y + RandomGenerator.Next(-1, 2);
 
             } while (nX == creatura.x && nY == creatura.y);
             if (creatura.world.canMove(nX, nY))

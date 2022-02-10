@@ -66,7 +66,6 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         static private int[] geneMaxValues;
 
-        static private Random rnd;
 
 
         /// <summary>
@@ -87,7 +86,6 @@ namespace EvolutionSimulation.Genetics
         {
             if (genes.Count != (int)CreatureFeature.Count)
                 throw new Exception("The number of genes and max values must be the same as the total features");
-            rnd = new Random();
 
             geneInfo = genes.ToArray();
             geneMaxValues = new int[genes.Count];
@@ -142,7 +140,7 @@ namespace EvolutionSimulation.Genetics
         {
             chromosome = new BitArray(chromosomeSize);
             for (int i = 0; i < chromosomeSize; ++i)
-                chromosome[i] = rnd.Next(0, 2) == 0;
+                chromosome[i] = RandomGenerator.Next(0, 2) == 0;
             SetFeatures();
         }
 

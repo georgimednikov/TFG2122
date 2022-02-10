@@ -145,7 +145,7 @@ namespace VisualizadorConsola
                 //    //else if (val < 0.7) Console.BackgroundColor = ConsoleColor.DarkGreen;
                 //    //else Console.BackgroundColor = ConsoleColor.Green;
 
-                //    if (val >= 0 && r.NextDouble() <= val)
+                //    if (val >= 0 && RandomGenerator.NextDouble() <= val)
                 //        if (val <= 0.3)
                 //            Console.BackgroundColor = ConsoleColor.Red;
                 //        else if (val <= 0.35)
@@ -224,7 +224,6 @@ namespace VisualizadorConsola
                     else tempMap.SetPixel(j, i, Color.Red);
                 }
 
-                Random r = new Random();
                 for (int j = 0; j < world.map.GetLength(1); j++)
                 {
                     double val = world.map[j, i].flora;
@@ -239,7 +238,7 @@ namespace VisualizadorConsola
                     else if (val < 0.7) floraMap.SetPixel(j, i, Color.YellowGreen);
                     else floraMap.SetPixel(j, i, Color.Green);
 
-                    if (val >= 0 && r.NextDouble() <= val)
+                    if (val >= 0 && RandomGenerator.NextDouble() <= val)
                         if (val <= 0.3)
                             treeMap.SetPixel(j, i, Color.DarkOliveGreen);
                         else if (val <= 0.35)

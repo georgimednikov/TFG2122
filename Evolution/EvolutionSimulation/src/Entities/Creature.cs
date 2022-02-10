@@ -24,7 +24,6 @@ namespace EvolutionSimulation
         /// </summary>
         public Creature()
         {
-            r = new Random();
             //chromosome = new CreatureChromosome();
             //stats = new CreatureStats(chromosome);
         }
@@ -113,9 +112,7 @@ namespace EvolutionSimulation
         public int x { get; private set; }
         public int y { get; private set; }
         // World in which the creature resides
-        public World world { get; private set; }
-        // Random number generator
-        public Random r { get; private set; }
+        public World world { get; private set; 
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         private Fsm mfsm;
