@@ -12,9 +12,12 @@ namespace EvolutionSimulation
     public class Creature : IEntity
     {
         //TODO: Al que le toque, que seguramente sea yo, que lo quite.
+        //Edit: Close call
         public int metabolism { get; set; }
         public int mobility { get; private set; }
         public int health { get; set; }
+
+        bool toMove, toIdle, toDie, toMunch;
 
         /// <summary>
         /// Constructor for factories
@@ -43,9 +46,10 @@ namespace EvolutionSimulation
         /// </summary>
         public void Tick()
         {
-            mfsm.obtainActionPoints(metabolism);
+            toDie = (stats.currAge++ >= stats.lifeSpan);
+            mfsm.obtainActionPoints(stats.metabolism);
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
-            while (mfsm.Execute()) ;// Mainatins the evaluation - execution action
+            while (mfsm.Execute());// Maintains the evaluation - execution action
         }
 
         /// <summary>
@@ -70,10 +74,10 @@ namespace EvolutionSimulation
             IState eat = new Eat();
 
             mfsm = new Fsm(idle);
-            bool toMove = true;
-            bool toIdle = false;
-            bool toDie = false;
-            bool toMunch = false;
+            toMove = true;
+            toIdle = false;
+            toDie = false;
+            toMunch = false;
 
             // Substates
             mfsm.AddSubstate(alive, idle);
@@ -177,6 +181,7 @@ namespace EvolutionSimulation
         //Physique related stats
         public int size;
         public int lifeSpan;
+        public int currAge;
         public int members;
         public int metabolism;
         public float minTemperature;
@@ -252,6 +257,7 @@ namespace EvolutionSimulation
             ////Physique related stats
             size = chromosome.GetFeature(CreatureFeature.Size);
             //lifeSpan;
+            currAge = 0;
 
             //TODO mover de sitio el numero maximo de patas
             int maxMembers = 10;
@@ -281,6 +287,15 @@ namespace EvolutionSimulation
             else counter = chromosome.GetFeature(CreatureFeature.Thorns);
             if (!HasAbility(CreatureFeature.Mimic)) intimidation = -1;
             else intimidation = chromosome.GetFeature(CreatureFeature.Mimic);
+        }
+
+        float startMultiplier = 0.33f, //Starting multiplier of newborns
+             adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
+
+        //Call this method before returning a stat modified by age.
+        float ModifyStatByAge(float stat)
+        {
+            return Math.Min(1.0f, (1 - startMultiplier) / (lifeSpan * adulthoodThreshold) * stat + startMultiplier);
         }
 
         private bool HasAbility(CreatureFeature feat)
