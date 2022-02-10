@@ -9,10 +9,15 @@ namespace EvolutionSimulation.FSM.Creature.States
     // TODO: Estado para testear, hacer el estado correctamente
     class Dead : IState
     {
-        public bool Action()
+        public bool canPerformAction(int actionPoints)
+        {
+            return actionPoints < 1000;
+        }
+
+        public int Action()
         {
             Console.WriteLine("Dead");
-            return false;
+            return 1000;
         }
     }
 }

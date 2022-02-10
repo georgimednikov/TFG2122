@@ -9,10 +9,15 @@ namespace EvolutionSimulation.FSM.Creature.States
     // TODO: Estado para testear, hacer el estado correctamente
     class Eat : IState
     {
-        public bool Action()
+        public bool canPerformAction(int actionPoints)
+        {
+            return actionPoints < 1000;
+        }
+
+        public int Action()
         {
             Console.WriteLine("Eat");
-            return false;
+            return 1000;
         }
     }
 }
