@@ -38,11 +38,20 @@ namespace EvolutionSimulation.FSM
         }
 
         /// <summary>
-        /// Executes the current state
+        /// Attempts to execute the current state.
+        /// If the action could not be executed returns false.
         /// </summary>
-        public void Execute()
+        public bool Execute()
         {
-            while(machine.State.Action()) Evaluate();
+            int cost = 0;
+            if(machine.State.canPerformAction(actionPoints))
+                cost = machine.State.Action();
+            if (cost > 0)   //TODO: Ver si hay que hacer esta comprobacion de si se hace o no accion porque ya esta canPerform
+            {
+                actionPoints -= cost;
+                return true;
+            }
+            else return false;
         }
 
         /// <summary>
@@ -61,6 +70,15 @@ namespace EvolutionSimulation.FSM
                 }
             }
         }
+
+        public void obtainActionPoints(int metabolism)
+        {
+            actionPoints += metabolism * 10;
+        }
+
+        // action points of the creature the fsm belongs to
+        public int actionPoints;
+
         StateMachine<IState, ITransition> machine;
     }
 }

@@ -43,10 +43,9 @@ namespace EvolutionSimulation
         /// </summary>
         public void Tick()
         {
-            actionPoints += metabolism * 10;
-
-            mfsm.Evaluate();
-            mfsm.Execute();
+            mfsm.obtainActionPoints(metabolism);
+            do { mfsm.Evaluate(); } // While the creature can keep performing actions
+            while (mfsm.Execute()) ;// Mainatins the evaluation - execution action
         }
 
         /// <summary>
@@ -120,8 +119,6 @@ namespace EvolutionSimulation
         // Genetic
         public CreatureChromosome chromosome { get; private set; }
         public CreatureStats stats { get; private set; }
-
-        public int actionPoints;
 
         public int GetScavenger() { return chromosome.GetFeature(CreatureFeature.Scavenger); }
     }
