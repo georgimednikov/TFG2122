@@ -112,7 +112,7 @@ namespace EvolutionSimulation
         public int x { get; private set; }
         public int y { get; private set; }
         // World in which the creature resides
-        public World world { get; private set; 
+        public World world { get; private set; } 
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         private Fsm mfsm;
