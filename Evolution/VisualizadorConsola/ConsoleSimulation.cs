@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Text;
 using System.Threading;
 using EvolutionSimulation;
+using EvolutionSimulation.Entities;
 
 namespace VisualizadorConsola
 {
@@ -14,6 +14,7 @@ namespace VisualizadorConsola
     {
         public void Init()
         {
+            //*/
             world = new World();
             world.Init(16);
             Creature c = world.CreateCreature();
@@ -23,6 +24,13 @@ namespace VisualizadorConsola
             c = world.CreateCreature();
             c.metabolism = 100;
             c.Init(world, 4, 4);
+            /*/
+            Animal c = CreateEntity<Animal>();
+            c.chromosome.PrintChromosome();
+            c.Init(world, 5, 5);
+            //c = CreateEntity<Animal>();
+            //c.Init(world, 4, 4);
+            */
         }
 
 
@@ -106,7 +114,7 @@ namespace VisualizadorConsola
                 //    //else if (val < 0.7) Console.BackgroundColor = ConsoleColor.DarkGreen;
                 //    //else Console.BackgroundColor = ConsoleColor.Green;
 
-                //    if (val >= 0 && r.NextDouble() <= val)
+                //    if (val >= 0 && RandomGenerator.NextDouble() <= val)
                 //        if (val <= 0.3)
                 //            Console.BackgroundColor = ConsoleColor.Red;
                 //        else if (val <= 0.35)
@@ -185,7 +193,6 @@ namespace VisualizadorConsola
                     else tempMap.SetPixel(j, i, Color.Red);
                 }
 
-                Random r = new Random();
                 for (int j = 0; j < world.map.GetLength(1); j++)
                 {
                     double val = world.map[j, i].flora;
@@ -200,7 +207,7 @@ namespace VisualizadorConsola
                     else if (val < 0.7) floraMap.SetPixel(j, i, Color.YellowGreen);
                     else floraMap.SetPixel(j, i, Color.Green);
 
-                    if (val >= 0 && r.NextDouble() <= val)
+                    if (val >= 0 && RandomGenerator.NextDouble() <= val)
                         if (val <= 0.3)
                             treeMap.SetPixel(j, i, Color.DarkOliveGreen);
                         else if (val <= 0.35)

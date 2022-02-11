@@ -7,17 +7,19 @@ using System.Threading.Tasks;
 namespace EvolutionSimulation.FSM.Creature.States
 {
     // TODO: Estado para testear, hacer el estado correctamente
-    class Idle : IState
+    class Idle : CreatureState
     {
-        public bool canPerformAction(int actionPoints)
+        public Idle(Entities.Creature c) : base(c) { creature = c; }
+
+        public override bool canPerformAction(int actionPoints)
         {
-            return actionPoints < 1000;
+            return actionPoints >= 10 * creature.stats.metabolism;
         }
 
-        public int Action()
+        public override int Action()
         {
             Console.WriteLine("Idle");
-            return 1000;
+            return 10 * creature.stats.metabolism;
         }
     }
 }

@@ -1,25 +1,42 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace EvolutionSimulation.Genetics
 {
+    public struct Relation
+    {
+        [JsonConverter(typeof(StringEnumConverter))]
+        public CreatureFeature feature;
+        public float percentage;
+
+        public Relation(float percentage, CreatureFeature relation) : this()
+        {
+            this.percentage = percentage;
+            feature = relation;
+        }
+    }
     /// <summary>
     /// Contains the information of a gene: its maximum value and the other genes
     /// it is related to as well as the percentage of the relation
     /// </summary>
-    public class Gene
+    public class Gene : IComparable<Gene>
     {
-        public int maxValue;
+
+        [JsonConverter(typeof(StringEnumConverter))]
         public CreatureFeature feature;
-        public List<Tuple<float, CreatureFeature>> relations { get; }
+        public int maxValue;
+        public List<Relation> relations { get; }
 
         public Gene(CreatureFeature feat, int max)
         {
             maxValue = max;
             feature = feat;
-            relations = new List<Tuple<float, CreatureFeature>>();
+            relations = new List<Relation>();
         }
 
         /// <summary>
@@ -29,12 +46,23 @@ namespace EvolutionSimulation.Genetics
         public void AddRelation(float percentage, CreatureFeature relation)
         {
             // Check that the relation is unique
-            foreach (Tuple<float, CreatureFeature> cF in relations)
-                if (cF.Item2 == relation)
+            foreach (Relation cF in relations)
+                if (cF.feature == relation)
                     return;
             // Add the relation
-            relations.Add(new Tuple<float, CreatureFeature>(percentage, relation));
+            relations.Add(new Relation(percentage, relation));
         }
+
+        /// <summary>
+        /// Comparator to order arrays or lists of Genes by features
+        /// </summary>
+        public int CompareTo(Gene other)
+        {
+            if (other.feature == feature) return 0;
+            return other.feature > feature ? -1 : 1;
+        }
+
+        
     }
 
 
@@ -66,7 +94,6 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         static private int[] geneMaxValues;
 
-        static private Random rnd;
 
 
         /// <summary>
@@ -79,16 +106,16 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         public int[] geneValues;
 
-
         /// <summary>
-        /// Sets the internal extructure of the chromosome given the genes and their respectives max values
+        /// Sets the internal extructure of the chromosome given the genes and their respectives max values.
+        /// The genes MUST be given in such an order that there is no incomplete dependency between them.
+        /// Example: Gene A depends on Gene B, therefore Gene B must be passed before Gene A
         /// </summary>
         public static void SetStructure(List<Gene> genes)
         {
             if (genes.Count != (int)CreatureFeature.Count)
                 throw new Exception("The number of genes and max values must be the same as the total features");
-            rnd = new Random();
-
+            
             geneInfo = genes.ToArray();
             geneMaxValues = new int[genes.Count];
             for (int i = 0; i < genes.Count; ++i)
@@ -108,16 +135,16 @@ namespace EvolutionSimulation.Genetics
                 int featureIndex = (int)gene.feature;
 
                 int relationsMaxValue = 0;
-                foreach (Tuple<float, CreatureFeature> relation in gene.relations)
+                foreach (Relation relation in gene.relations)
                 {
                     //If the relation is positive, the max value of the gene can be surpassed so the max value of the relations is substracted
                     //If the relation is negative, the max value of the gene must not be surpassed with an addition, so it is not accounted.
                     //In other words, a negative relation may not modify the value, but if it is accounted for it would add extra bits surpassing the max value.
-                    if (relation.Item1 > 0)
+                    if (relation.percentage > 0)
                         //The highest possible value of the features related is calculated (percentaje * maxValue)
-                        relationsMaxValue += (int)Math.Ceiling(relation.Item1 * geneMaxValues[(int)relation.Item2]); //The percetaje gets truncated!!!
-                    if (relation.Item1 > 0)
-                        aux += relation.Item1 * geneMaxValues[(int)relation.Item2];
+                        relationsMaxValue += (int)Math.Ceiling(relation.percentage * geneMaxValues[featureIndex]); //The percetaje gets truncated!!!
+                    if (relation.percentage > 0)
+                        aux += relation.percentage * geneMaxValues[featureIndex];
                 }
                 int leftover = geneMaxValues[featureIndex] - relationsMaxValue;
                 aux2 += geneMaxValues[featureIndex];
@@ -128,8 +155,6 @@ namespace EvolutionSimulation.Genetics
                 genePos[featureIndex] = new Tuple<int, int>(chromosomeSize, leftover); //Start and length in bits of the feature
                 chromosomeSize += leftover;
             }
-            
-
             init = true;
         }
 
@@ -142,7 +167,7 @@ namespace EvolutionSimulation.Genetics
         {
             chromosome = new BitArray(chromosomeSize);
             for (int i = 0; i < chromosomeSize; ++i)
-                chromosome[i] = rnd.Next(0, 2) == 0;
+                chromosome[i] = true;//= RandomGenerator.Next(0, 2) == 0;
             SetFeatures();
         }
 
@@ -174,6 +199,9 @@ namespace EvolutionSimulation.Genetics
         public void SetFeatures()
         {
             geneValues = Enumerable.Repeat(-1, genePos.Length).ToArray();
+            //We need to order geneInfo because the relations of the genes 
+            Gene[] geneInfoOrdered = (Gene[])geneInfo.Clone();
+            Array.Sort(geneInfoOrdered);
             //For each feature (gene)
             for (int i = 0; i < (int)CreatureFeature.Count; ++i)
             {
@@ -188,12 +216,17 @@ namespace EvolutionSimulation.Genetics
                 {
                     if (chromosome[j]) ++total; //If the bit is 1 then the total count is aumented
                 }
-                foreach (Tuple<float, CreatureFeature> relation in geneInfo[i].relations)
+                foreach (Relation relation in geneInfo[i].relations)
                 {
-                    if (geneValues[(int)relation.Item2] < 0)
+                    if (geneValues[(int)relation.feature] < 0)
                         throw new Exception("The genes must have been passed in order of dependency of relations");
                     //total += percentage of usage of the related gene * the value of the gene
-                    total += (int)(relation.Item1 * geneValues[(int)relation.Item2]);
+                    //total += (int)(relation.percentage * geneValues[(int)relation.feature]);
+
+                    //total += relationValue / (relationMaxValue / (relationPercentage * featureMaxValue))
+                    int relationMaxValue = geneInfoOrdered[(int)relation.feature].maxValue;
+                    int relationValue = geneValues[(int)relation.feature];
+                    total += (int)Math.Ceiling(relationValue / (relationMaxValue / (relation.percentage * geneInfo[i].maxValue)));
                 }
                 geneValues[feature] = Math.Max(0, total);
             }
@@ -245,6 +278,19 @@ namespace EvolutionSimulation.Genetics
                 Console.Write(bit ? 1 : 0);
             }
             Console.WriteLine();
+        }
+
+        /// <summary>
+        /// Sets the chromosome structure reading the values of the given JSON file.
+        /// </summary>
+        /// <param name="json">Address of the JSON file</param>
+        static public void SetChromosome(string json)
+        {
+            if (!File.Exists(json))
+                throw new Exception("Cannot find JSON with chromosome information");
+            string file = File.ReadAllText(json);
+            List<Gene> genes = JsonConvert.DeserializeObject<List<Gene>>(file);
+            SetStructure(genes);
         }
     }
 }

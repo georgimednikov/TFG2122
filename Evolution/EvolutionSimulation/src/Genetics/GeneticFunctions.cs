@@ -12,14 +12,13 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         static public CreatureChromosome UniformCrossover(CreatureChromosome male, CreatureChromosome female, float prob)
         {
-            Random rnd = new Random();
             BitArray mc = male.GetChromosome();
             BitArray fc = female.GetChromosome();
             BitArray cc = new BitArray(mc.Length);
 
             for (int i = 0; i < cc.Length; ++i)
             {
-                cc[i] = rnd.NextDouble() < prob ? mc[i] : fc[i];
+                cc[i] = RandomGenerator.NextDouble() < prob ? mc[i] : fc[i];
             }
 
             return new CreatureChromosome(cc);
@@ -31,14 +30,13 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         static public void FlipBitMutation(CreatureChromosome creature, float prob, int startIndex = 0, int endIndex = -1)
         {
-            Random rnd = new Random();
             BitArray chromosome = creature.GetChromosome();
 
             if (endIndex == -1 || endIndex > chromosome.Length) endIndex = chromosome.Length;
             if (startIndex < 0) startIndex = 0;
             for (int i = startIndex; i < endIndex; ++i)
             {
-                if (rnd.NextDouble() < prob) chromosome[i] = !chromosome[i];
+                if (RandomGenerator.NextDouble() < prob) chromosome[i] = !chromosome[i];
             }
             creature.SetFeatures();
         }
@@ -49,15 +47,14 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         static public void UniformMutation(CreatureChromosome creature, float prob, int startIndex = 0, int endIndex = -1)
         {
-            Random rnd = new Random();
             BitArray chromosome = creature.GetChromosome();
             if (endIndex == -1 || endIndex > chromosome.Length) endIndex = chromosome.Length;
             if (startIndex < 0) startIndex = 0;
             for (int i = startIndex; i < endIndex; ++i)
             {
-                if (rnd.NextDouble() < prob)
+                if (RandomGenerator.NextDouble() < prob)
                 {
-                    if (rnd.NextDouble() < 0.5f)
+                    if (RandomGenerator.NextDouble() < 0.5f)
                         chromosome[i] = false;
                     else
                         chromosome[i] = true;

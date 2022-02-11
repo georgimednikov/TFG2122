@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using EvolutionSimulation.Entities;
 
 namespace EvolutionSimulation
 {
@@ -13,6 +10,7 @@ namespace EvolutionSimulation
     {
         public void Init()
         {
+            delete = new List<IEntity>();
             world = new World();
             world.Init(32);
             //Creature c = world.AddEntity<Creature>();
@@ -40,7 +38,7 @@ namespace EvolutionSimulation
     {
         public override int Compare(Creature x, Creature y)
         {
-            return -x.metabolism.CompareTo(y.metabolism);
+            return -x.stats.metabolism.CompareTo(y.stats.metabolism);
         }
     }
 }

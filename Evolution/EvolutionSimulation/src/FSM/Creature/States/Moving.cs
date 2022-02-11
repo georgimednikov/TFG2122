@@ -1,39 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EvolutionSimulation.FSM.Creature.States
+﻿namespace EvolutionSimulation.FSM.Creature.States
 {
     // TODO: Estado para testear, hacer el estado correctamente
-    class Moving : IState
+    class Moving : CreatureState
     {
-        EvolutionSimulation.Creature creatura;
+        public Moving(Entities.Creature c) : base(c) { creature = c; }
 
-        public Moving(EvolutionSimulation.Creature c)
+        public override bool canPerformAction(int actionPoints)
         {
-            creatura = c;
+            return actionPoints >= 1000 * ((200f - creature.stats.groundSpeed) / 100f);
         }
 
-        public bool canPerformAction(int actionPoints)
-        {
-            return actionPoints >= 1000 * ((200f - creatura.mobility) / 100f);
-        }
-
-        public int Action()
+        public override int Action()
         {
             int nX = 0, nY = 0;
             do
             {
-                nX = creatura.x + creatura.r.Next(-1, 2);
-                nY = creatura.y + creatura.r.Next(-1, 2);
+                nX = creature.x + RandomGenerator.Next(-1, 2);
+                nY = creature.y + RandomGenerator.Next(-1, 2);
 
-            } while (nX == creatura.x && nY == creatura.y);
-            if (creatura.world.canMove(nX, nY))
+            } while (nX == creature.x && nY == creature.y);
+            if (creature.world.canMove(nX, nY))
             {
-                creatura.Place(nX, nY);
-                return 1000 * (int)((200f - creatura.mobility) / 100f); // Cost of the action performed
+                creature.Place(nX, nY);
+                return (int)(1000 * ((200f - creature.stats.groundSpeed) / 100f)); // Cost of the action performed
             }
             return 0;
         }

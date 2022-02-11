@@ -5,26 +5,24 @@ using EvolutionSimulation.FSM.Creature.States;
 using EvolutionSimulation.FSM.Creature.Transitions;
 using EvolutionSimulation.Genetics;
 
-namespace EvolutionSimulation
+namespace EvolutionSimulation.Entities
 {
     /// <summary>
     /// A creature with attributes and behavior
     /// </summary>
-    public class Creature : IEntity
+    public abstract class Creature : IEntity
     {
-        //TODO: Al que le toque, que seguramente sea yo, que lo quite.
-        public int metabolism { get; set; }
-        public int mobility { get; private set; }
-        public int health { get; set; }
+        BooleanWrapper toMove, toIdle, toDie, toMunch,
+            toSleep, toWake;
 
         /// <summary>
         /// Constructor for factories
         /// </summary>
         public Creature()
         {
-            r = new Random();
-            //chromosome = new CreatureChromosome();
-            //stats = new CreatureStats(chromosome);
+            chromosome = new CreatureChromosome();
+            stats = new CreatureStats();
+            SetStats();
         }
 
         /// <summary>
@@ -44,12 +42,17 @@ namespace EvolutionSimulation
         /// </summary>
         public void Tick()
         {
-            mfsm.obtainActionPoints(metabolism);
-
+            toDie.value = (stats.currAge++ >= stats.lifeSpan);
+            stats.currRest -= stats.restExpense;
+            if (stats.currRest < 0) stats.currRest = 0;
+            toSleep.value = (stats.currRest <= 0.1 * stats.maxRest);
+            toWake.value = (stats.currRest >= stats.maxRest);
+            mfsm.obtainActionPoints(stats.metabolism);
+            
             seenEntities = Percieve();
 
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
-            while (mfsm.Execute()) ;// Mainatins the evaluation - execution action
+            while (mfsm.Execute());// Maintains the evaluation - execution action
         }
 
         /// <summary>
@@ -67,28 +70,35 @@ namespace EvolutionSimulation
         void ConfigureStateMachine()
         {
             // States
-            IState idle = new Idle();
+            IState idle = new Idle(this);
             IState moving = new Moving(this);
-            IState dead = new Dead();
-            IState alive = new Alive();
-            IState eat = new Eat();
+            IState dead = new Dead(this);
+            IState alive = new Alive(this);
+            IState eat = new Eat(this);
+            IState sleep = new Sleeping(this);
 
             mfsm = new Fsm(idle);
-            bool toMove = true;
-            bool toIdle = false;
-            bool toDie = false;
-            bool toMunch = false;
+            toMove = new BooleanWrapper(false);
+            toIdle = new BooleanWrapper(false);
+            toDie = new BooleanWrapper(false);
+            toMunch = new BooleanWrapper(false);
+            toSleep = new BooleanWrapper(false);
+            toWake = new BooleanWrapper(false);
 
             // Substates
             mfsm.AddSubstate(alive, idle);
             mfsm.AddSubstate(alive, moving);
             mfsm.AddSubstate(alive, eat);
+            mfsm.AddSubstate(alive, sleep);
 
             // Transitions
-            mfsm.AddTransition(idle, new BooleanTransition(ref toMove), moving);
-            mfsm.AddTransition(idle, new BooleanTransition(ref toMunch), eat);
-            mfsm.AddTransition(moving, new BooleanTransition(ref toIdle), idle);
-            mfsm.AddTransition(alive, new BooleanTransition(ref toDie), dead);
+            mfsm.AddTransition(idle, new BooleanTransition(toMove), moving);
+            mfsm.AddTransition(idle, new BooleanTransition(toMunch), eat);
+            mfsm.AddTransition(moving, new BooleanTransition(toIdle), idle);
+            mfsm.AddTransition(moving, new BooleanTransition(toSleep), sleep);
+            mfsm.AddTransition(idle, new BooleanTransition(toSleep), sleep);
+            mfsm.AddTransition(sleep, new BooleanTransition(toWake), idle);
+            mfsm.AddTransition(alive, new BooleanTransition(toDie), dead);
         }
 
         /// <summary>
@@ -132,16 +142,24 @@ namespace EvolutionSimulation
             return list;
         }
 
+        /// <summary>
+        /// Modifies the given stat based on age
+        /// </summary>
+        float ModifyStatByAge(float stat)
+        {
+            return stat * Math.Min(1.0f, (1 - startMultiplier) / (stats.lifeSpan * adulthoodThreshold) * stats.currAge + startMultiplier);
+        }
+
+        /// <summary>
+        /// Sets the stats of the creature.
+        /// </summary>
+        abstract public void SetStats();
+
         // World tile position
         public int x { get; private set; }
         public int y { get; private set; }
         // World in which the creature resides
-        public World world { get; private set; }
-        // Random number generator
-        public Random r { get; private set; }
-        // State machine
-        // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
-        private Fsm mfsm;
+        public World world { get; private set; } 
 
         // Genetic
         public CreatureChromosome chromosome { get; private set; }
@@ -150,14 +168,17 @@ namespace EvolutionSimulation
         // List of entities seen at this moment by this creature
         public List<IEntity> seenEntities { get; private set; }
 
-        public int GetScavenger() { return chromosome.GetFeature(CreatureFeature.Scavenger); }
+        public int actionPoints;
+
+        // State machine
+        // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
+        private Fsm mfsm;
+        private float startMultiplier = 0.33f; //Starting multiplier of newborns
+        private float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
     }
 
-    public class CreatureStats
+    public struct CreatureStats
     {
-        //The percentage of an ability that has to be had in order to unlock it
-        private float abilityUnlock = 0.4f;
-
         public Gender gender;
 
         //Nutrition related stats
@@ -199,14 +220,16 @@ namespace EvolutionSimulation
         public float restExpense;
 
         //Environment related stats
-        public int percepcion;
         public int camouflage;
         public int aggressiveness;
         public int intimidation;
+        public int perception;
+        public float nightDebuff;
 
         //Physique related stats
         public int size;
         public int lifeSpan;
+        public int currAge;
         public int members;
         public int metabolism;
         public float minTemperature;
@@ -220,102 +243,5 @@ namespace EvolutionSimulation
         //Multipliers
         public float healthRegeneration;
         public float maxSpeed;
-        public float nightDebuff;
-
-        private CreatureChromosome chromosome;
-
-        public CreatureStats(CreatureChromosome chr)
-        {
-            chromosome = chr;
-            SetStats();
-        }
-
-        private void SetStats()
-        {
-            gender = chromosome.GetGender();
-
-            //The max value is divided in ranges based on the amount of diets and then a diet is assigned based on the range it fall in
-            diet = (Diet)(chromosome.GetFeature(CreatureFeature.Diet) / (chromosome.GetFeatureMax(CreatureFeature.Diet) / (int)Diet.Count));
-            if (diet >= Diet.Count) diet = Diet.Count;
-
-            int min = 10; //Minimum amount of health
-            int value = 2; //Health gained per point of constitution
-            //Minimum health plus bonus health
-            maxHealth = chromosome.GetFeature(CreatureFeature.Constitution) * value + min;
-            currHealth = maxHealth;
-
-            damage = chromosome.GetFeature(CreatureFeature.Strength);
-            armor = chromosome.GetFeature(CreatureFeature.Fortitude);
-            perforation = chromosome.GetFeature(CreatureFeature.Piercing);
-
-            bool wings = HasAbility(CreatureFeature.Wings);
-            bool arboreal = HasAbility(CreatureFeature.Arboreal);
-            bool upright = HasAbility(CreatureFeature.Upright);
-            int mobility = chromosome.GetFeature(CreatureFeature.Mobility);
-            airReach = wings;
-            treeReach = wings || arboreal || upright;
-            //TODO rellenar entre todos en concordancia con el resto de acciones para no mover muy rapido/lento
-            if (!wings) aerialSpeed = -1;
-            else aerialSpeed = chromosome.GetFeature(CreatureFeature.Wings);
-            if (!arboreal) arborealSpeed = -1;
-            else arborealSpeed = chromosome.GetFeature(CreatureFeature.Arboreal);
-            groundSpeed = mobility;
-
-            //maxEnergy = 100;
-            //currEnergy = maxEnergy;
-            //energyExpense;
-
-            //maxHydratation = 100;
-            //currHydratation = maxHydratation;
-            //hydratationExpense;
-
-            //maxRest = 100;
-            //currRest = maxRest;
-            //restRecovery;
-            //restExpense;
-
-            //Environment related stats
-            percepcion = chromosome.GetFeature(CreatureFeature.Perception);
-            camouflage = chromosome.GetFeature(CreatureFeature.Camouflage);
-            aggressiveness = chromosome.GetFeature(CreatureFeature.Aggressiveness);
-
-            ////Physique related stats
-            size = chromosome.GetFeature(CreatureFeature.Size);
-            //lifeSpan;
-
-            //TODO mover de sitio el numero maximo de patas
-            int maxMembers = 10;
-            members = chromosome.GetFeature(CreatureFeature.Members) / (chromosome.GetFeatureMax(CreatureFeature.Members) / maxMembers);
-            if (members >= maxMembers) members = maxMembers;
-
-            //metabolism;
-            idealTemperature = chromosome.GetFeature(CreatureFeature.IdealTemperature);
-            minTemperature = idealTemperature - chromosome.GetFeature(CreatureFeature.TemperatureRange);
-            maxTemperature = idealTemperature + chromosome.GetFeature(CreatureFeature.TemperatureRange);
-
-            ////Behaviour related stats
-            //knowledge;
-            //paternity;
-
-            ////Multipliers
-            //healthRegeneration;
-            //maxSpeed;
-            //nightDebuff;
-
-
-            if (!HasAbility(CreatureFeature.Scavenger)) scavenger = -1;
-            else scavenger = chromosome.GetFeature(CreatureFeature.Scavenger) / chromosome.GetFeatureMax(CreatureFeature.Scavenger);
-            if (!HasAbility(CreatureFeature.Venomous)) venom = -1;
-            else venom = chromosome.GetFeature(CreatureFeature.Venomous);
-            if (!HasAbility(CreatureFeature.Thorns)) counter = -1;
-            else counter = chromosome.GetFeature(CreatureFeature.Thorns);
-            if (!HasAbility(CreatureFeature.Mimic)) intimidation = -1;
-            else intimidation = chromosome.GetFeature(CreatureFeature.Mimic);
-        }
-
-        private bool HasAbility(CreatureFeature feat)
-        {
-            return abilityUnlock < chromosome.GetFeature(feat) / chromosome.GetFeatureMax(feat);
-        }
     }
 }

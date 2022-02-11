@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using EvolutionSimulation.Entities;
 
 namespace EvolutionSimulation
 {
@@ -44,7 +44,7 @@ namespace EvolutionSimulation
 
         public void OnInteract(Creature other)
         {
-            int prob = rnd.Next(0, 100);
+            int prob = RandomGenerator.Next(0, 100);
             if(state == CorpseState.Putrid)
             {
                 // Putrid corpse, probability to be poisoned gets higher the more time it passes 

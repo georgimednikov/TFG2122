@@ -11,7 +11,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         /// <summary>
         /// Constructor for the boolean transition, which evaluates true if the given bool is true
         /// </summary>
-        public BooleanTransition(ref bool b)
+        public BooleanTransition(BooleanWrapper b)
         {
             flag = b;
         }
@@ -21,9 +21,9 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         /// </summary>
         public bool Evaluate()
         {
-            return flag;
+            return flag.value;
         }
 
-        bool flag;
+        BooleanWrapper flag;
     }
 }

@@ -16,7 +16,9 @@ namespace Visualizador
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            EvolutionSimulation.Creature c = new EvolutionSimulation.Creature();
+            EvolutionSimulation.Genetics.CreatureChromosome.SetChromosome("../../Chromosome.json");
+
+            EvolutionSimulation.Entities.Animal c = new EvolutionSimulation.Entities.Animal();
             EvolutionSimulation.World w = new EvolutionSimulation.World();
             c.Init(w, 0, 0);
             int a = 20;

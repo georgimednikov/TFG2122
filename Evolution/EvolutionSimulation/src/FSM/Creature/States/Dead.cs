@@ -7,14 +7,16 @@ using System.Threading.Tasks;
 namespace EvolutionSimulation.FSM.Creature.States
 {
     // TODO: Estado para testear, hacer el estado correctamente
-    class Dead : IState
+    class Dead : CreatureState
     {
-        public bool canPerformAction(int actionPoints)
+        public Dead(Entities.Creature c) : base(c) { creature = c; }
+
+        public override bool canPerformAction(int actionPoints)
         {
             return actionPoints < 1000;
         }
 
-        public int Action()
+        public override int Action()
         {
             Console.WriteLine("Dead");
             return 1000;
