@@ -79,9 +79,8 @@ namespace EvolutionSimulation
         /// <returns>The added entity</returns>
         public T CreateEntity<T>() where T : IEntity, new()
         {
-            T ent = new T();
-            entities.Add(ent);
-            return ent;
+            return new T();
+        
         }
 
         /// <summary>
@@ -102,6 +101,7 @@ namespace EvolutionSimulation
         public Creature CreateCreature()
         {
             Creature ent = CreateEntity<Creature>();
+            Creatures.Add(ent);
             return ent;
         }
 

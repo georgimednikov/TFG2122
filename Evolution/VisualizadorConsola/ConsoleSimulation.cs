@@ -130,7 +130,7 @@ namespace VisualizadorConsola
             Console.Write("                         Temperature");
             Console.Write("                      Flora");
 
-            foreach (var e in world.creatures)
+            foreach (var e in world.Creatures)
             {
                 Console.SetCursorPosition(e.x, e.y);
                 Console.Write("e");

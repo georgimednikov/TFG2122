@@ -118,7 +118,7 @@ namespace EvolutionSimulation
             int perceptionRadius = 4; // TODO: calculate this using the Perception stat
             List<IEntity> list = new List<IEntity>();
 
-            foreach (IEntity e in world.entities) // TODO: use this?
+            foreach (IEntity e in world.Creatures) // TODO: use this?
             {
                 if (e == this) continue; // Reference comparison
                 if (Math.Abs(e.x - x) <= perceptionRadius && Math.Abs(e.y - y) <= perceptionRadius) // Square vision
