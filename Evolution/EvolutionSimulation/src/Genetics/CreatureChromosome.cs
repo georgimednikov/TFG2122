@@ -125,10 +125,7 @@ namespace EvolutionSimulation.Genetics
 
             genePos = new Tuple<int, int>[genes.Count];
             
-            chromosomeSize = 1;
-            float aux = 0;
-            int aux2 = 0;
-            int aux3 = 0;
+            chromosomeSize = 0;
             foreach (Gene gene in genes)
             {
                 //The numeric value of the feature
@@ -143,12 +140,9 @@ namespace EvolutionSimulation.Genetics
                     if (relation.percentage > 0)
                         //The highest possible value of the features related is calculated (percentaje * maxValue)
                         relationsMaxValue += (int)Math.Ceiling(relation.percentage * geneMaxValues[featureIndex]); //The percetaje gets truncated!!!
-                    if (relation.percentage > 0)
-                        aux += relation.percentage * geneMaxValues[featureIndex];
+                    
                 }
                 int leftover = geneMaxValues[featureIndex] - relationsMaxValue;
-                aux2 += geneMaxValues[featureIndex];
-                aux3 += relationsMaxValue;
                 if (leftover <= 0)
                     throw new Exception("The genes must not depend completely on other genes and must have percetage values in their relations between 0 and 1");
 
@@ -160,20 +154,37 @@ namespace EvolutionSimulation.Genetics
 
 
         /// <summary>
-        /// Creates a new, random chromosome.
-        /// Must be initilized with SetGeneRange
+        /// Creates a new, random chromosome. 
+        /// It is created with randoms between 0 and the max value of the gene that is being setting
+        /// and adding the same bits of the random as 1 to the chromosome
         /// </summary>
         public CreatureChromosome()
         {
             chromosome = new BitArray(chromosomeSize);
-            for (int i = 0; i < chromosomeSize; ++i)
-                chromosome[i] = true;//= RandomGenerator.Next(0, 2) == 0;
+
+            for (int i = 0; i < genePos.Length; ++i)
+            {
+                int ini = genePos[i].Item1;
+                int genRandom = RandomGenerator.Next(0, genePos[i].Item2 + 1);
+                for (int j = 0; j < genePos[i].Item2 && j + genePos[i].Item2 < chromosomeSize; ++j)
+                {
+                    chromosome[ini + j] = j < genRandom;
+                }
+                //shuffle the bits to not have all the 1s at the initial positions of the gene and the 0s afterwards
+                for (int j = 0; j < genePos[i].Item2 && j + genePos[i].Item2 < chromosomeSize; ++j)
+                {
+                    int randomPos = RandomGenerator.Next(0, genePos[i].Item2 + 1);
+                    bool tmp = chromosome[ini + j];
+                    chromosome[ini + j] = chromosome[randomPos];
+                    chromosome[randomPos] = tmp;
+                }
+            }
+           
             SetFeatures();
         }
 
         /// <summary>
         /// Creates a chromosome given the genes
-        /// Must be initilized with SetGeneRange
         /// </summary>
         public CreatureChromosome(BitArray chromosome)
         {
