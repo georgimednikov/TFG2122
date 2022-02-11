@@ -44,12 +44,12 @@ namespace EvolutionSimulation
         /// </summary>
         public void Tick()
         {
-            actionPoints += metabolism * 10;
+            mfsm.obtainActionPoints(metabolism);
 
             seenEntities = Percieve();
 
-            mfsm.Evaluate();
-            mfsm.Execute();
+            do { mfsm.Evaluate(); } // While the creature can keep performing actions
+            while (mfsm.Execute()) ;// Mainatins the evaluation - execution action
         }
 
         /// <summary>
@@ -146,9 +146,7 @@ namespace EvolutionSimulation
         // Genetic
         public CreatureChromosome chromosome { get; private set; }
         public CreatureStats stats { get; private set; }
-
-        public int actionPoints;
-
+        
         // List of entities seen at this moment by this creature
         public List<IEntity> seenEntities { get; private set; }
 

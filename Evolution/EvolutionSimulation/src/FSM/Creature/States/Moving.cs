@@ -16,7 +16,12 @@ namespace EvolutionSimulation.FSM.Creature.States
             creatura = c;
         }
 
-        public bool Action()
+        public bool canPerformAction(int actionPoints)
+        {
+            return actionPoints >= 1000 * ((200f - creatura.mobility) / 100f);
+        }
+
+        public int Action()
         {
             int nX = 0, nY = 0;
             do
@@ -24,15 +29,13 @@ namespace EvolutionSimulation.FSM.Creature.States
                 nX = creatura.x + creatura.r.Next(-1, 2);
                 nY = creatura.y + creatura.r.Next(-1, 2);
 
-            } while (nX != creatura.x && nY != creatura.y);
+            } while (nX == creatura.x && nY == creatura.y);
             if (creatura.world.canMove(nX, nY))
             {
-                if (creatura.actionPoints < 1000 * ((200f - creatura.mobility) / 100f)) return false;
-                creatura.actionPoints -= 1000 * (int)((200f - creatura.mobility) / 100f);
                 creatura.Place(nX, nY);
-                return true;
+                return 1000 * (int)((200f - creatura.mobility) / 100f); // Cost of the action performed
             }
-            return false;
+            return 0;
         }
     }
 }
