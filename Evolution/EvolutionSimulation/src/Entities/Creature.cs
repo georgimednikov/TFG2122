@@ -11,7 +11,8 @@ namespace EvolutionSimulation.Entities
     /// </summary>
     public abstract class Creature : IEntity
     {
-        bool toMove, toIdle, toDie, toMunch;
+        BooleanWrapper toMove, toIdle, toDie, toMunch,
+            toSleep, toWake;
 
         /// <summary>
         /// Constructor for factories
@@ -40,7 +41,11 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void Tick()
         {
-            toDie = (stats.currAge++ >= stats.lifeSpan);
+            toDie.value = (stats.currAge++ >= stats.lifeSpan);
+            stats.currRest -= stats.restExpense;
+            if (stats.currRest < 0) stats.currRest = 0;
+            toSleep.value = (stats.currRest <= 0.1 * stats.maxRest);
+            toWake.value = (stats.currRest >= stats.maxRest);
             mfsm.obtainActionPoints(stats.metabolism);
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
             while (mfsm.Execute());// Maintains the evaluation - execution action
@@ -66,23 +71,30 @@ namespace EvolutionSimulation.Entities
             IState dead = new Dead(this);
             IState alive = new Alive(this);
             IState eat = new Eat(this);
+            IState sleep = new Sleeping(this);
 
             mfsm = new Fsm(idle);
-            toMove = true;
-            toIdle = false;
-            toDie = false;
-            toMunch = false;
+            toMove = new BooleanWrapper(false);
+            toIdle = new BooleanWrapper(false);
+            toDie = new BooleanWrapper(false);
+            toMunch = new BooleanWrapper(false);
+            toSleep = new BooleanWrapper(false);
+            toWake = new BooleanWrapper(false);
 
             // Substates
             mfsm.AddSubstate(alive, idle);
             mfsm.AddSubstate(alive, moving);
             mfsm.AddSubstate(alive, eat);
+            mfsm.AddSubstate(alive, sleep);
 
             // Transitions
-            mfsm.AddTransition(idle, new BooleanTransition(ref toMove), moving);
-            mfsm.AddTransition(idle, new BooleanTransition(ref toMunch), eat);
-            mfsm.AddTransition(moving, new BooleanTransition(ref toIdle), idle);
-            mfsm.AddTransition(alive, new BooleanTransition(ref toDie), dead);
+            mfsm.AddTransition(idle, new BooleanTransition(toMove), moving);
+            mfsm.AddTransition(idle, new BooleanTransition(toMunch), eat);
+            mfsm.AddTransition(moving, new BooleanTransition(toIdle), idle);
+            mfsm.AddTransition(moving, new BooleanTransition(toSleep), sleep);
+            mfsm.AddTransition(idle, new BooleanTransition(toSleep), sleep);
+            mfsm.AddTransition(sleep, new BooleanTransition(toWake), idle);
+            mfsm.AddTransition(alive, new BooleanTransition(toDie), dead);
         }
 
         /// <summary>
