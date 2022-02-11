@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EvolutionSimulation.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -97,9 +98,9 @@ namespace EvolutionSimulation
         /// Creates a creature in the world
         /// </summary>
         // TODO: Hacer luego create y delete para cada tipo de entidad supongo
-        public Creature CreateCreature()
+        public Animal CreateCreature()
         {
-            Creature ent = CreateEntity<Creature>();
+            Animal ent = CreateEntity<Animal>();
             Creatures.Add(ent);
             return ent;
         }

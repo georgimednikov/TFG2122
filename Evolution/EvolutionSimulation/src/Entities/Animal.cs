@@ -4,10 +4,6 @@ namespace EvolutionSimulation.Entities
 {
     public class Animal : Creature
     {
-
-        
-
-     
         public override void SetStats()
         {
             //The percentage of an ability that has to be had in order to unlock it

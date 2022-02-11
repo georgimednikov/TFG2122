@@ -17,12 +17,9 @@ namespace VisualizadorConsola
             //*/
             world = new World();
             world.Init(16);
-            Creature c = world.CreateCreature();
-            c.metabolism = 200;
-            c.health = 1;
+            Animal c = world.CreateCreature();
             c.Init(world, 5, 5);
             c = world.CreateCreature();
-            c.metabolism = 100;
             c.Init(world, 4, 4);
             /*/
             Animal c = CreateEntity<Animal>();

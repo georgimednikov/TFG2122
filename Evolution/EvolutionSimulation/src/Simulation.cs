@@ -10,7 +10,6 @@ namespace EvolutionSimulation
     {
         public void Init()
         {
-            delete = new List<IEntity>();
             world = new World();
             world.Init(32);
             //Creature c = world.AddEntity<Creature>();

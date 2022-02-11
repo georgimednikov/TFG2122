@@ -177,7 +177,7 @@ namespace EvolutionSimulation.Entities
         private float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
     }
 
-    public struct CreatureStats
+    public class CreatureStats
     {
         public Gender gender;
 
