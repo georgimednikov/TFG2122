@@ -4,6 +4,10 @@ namespace EvolutionSimulation.Entities
 {
     public class Animal : Creature
     {
+
+        
+
+     
         public override void SetStats()
         {
             //The percentage of an ability that has to be had in order to unlock it
@@ -11,7 +15,7 @@ namespace EvolutionSimulation.Entities
 
             int minHealth = 10; //Minimum amount of health
             int healthValue = 2; //Health gained per point of constitution
-            int maxMembers = 10;
+            int maxMembers = 11;//its not inclusive [0-11)
             int minRestExpense = 1;
             int maxRestExpense = 5;
             int minEnergy = 50;
@@ -30,10 +34,7 @@ namespace EvolutionSimulation.Entities
 
             stats.gender = chromosome.GetGender();
 
-            //The max value is divided in ranges based on the amount of diets and then a diet is assigned based on the range it fall in
-            //Calculating the max value +1 to include the 0 since the range is inclusive.
-            stats.diet = (Diet)(chromosome.GetFeature(CreatureFeature.Diet) / (chromosome.GetFeatureMax(CreatureFeature.Diet) + 1 / (int)Diet.Count));
-            if (stats.diet >= Diet.Count) stats.diet = Diet.Count;
+            stats.diet = (Diet)SetStatInRange(CreatureFeature.Diet, (int)Diet.Count);
 
             //Minimum health plus bonus health
             stats.maxHealth = chromosome.GetFeature(CreatureFeature.Constitution) * healthValue + minHealth;
@@ -68,12 +69,12 @@ namespace EvolutionSimulation.Entities
                 stats.groundSpeed = speed;
             }
 
-            ////Physique related stats
+            //Physique related stats
             stats.size = chromosome.GetFeature(CreatureFeature.Size);
             stats.lifeSpan = chromosome.GetFeature(CreatureFeature.Longevity);
 
-            //Calculating the max value +1 to include the 0 since the range is inclusive.
-            stats.members = chromosome.GetFeature(CreatureFeature.Members) / (chromosome.GetFeatureMax(CreatureFeature.Members + 1) / maxMembers);
+            
+            stats.members = SetStatInRange(CreatureFeature.Members, maxMembers);
 
             stats.metabolism = chromosome.GetFeature(CreatureFeature.Metabolism);
             stats.idealTemperature = chromosome.GetFeature(CreatureFeature.IdealTemperature);
@@ -118,6 +119,23 @@ namespace EvolutionSimulation.Entities
             if (!HasAbility(CreatureFeature.Mimic, abilityUnlock)) stats.intimidation = -1;
             else stats.intimidation = chromosome.GetFeature(CreatureFeature.Mimic);
         }
+
+        /// <summary>
+        /// Calculate a number that represent the stat of a given feature
+        /// It's calculated dividing the maxValue of the feature in ranges by max
+        /// It's not inclusive, the values are in the range [0,max)
+        /// </summary>
+        private int SetStatInRange(CreatureFeature feature, int max)
+        {
+            if (max < 0) return -1;
+            //+1 to avoid a number greater than the max value
+            int maxstat = chromosome.GetFeatureMax(feature) + 1;
+            if (maxstat <= 0) return -1;
+            int statCh = chromosome.GetFeature(feature);
+            int stat = (int)(statCh / (maxstat / ((float)max)));
+            return stat;
+        }
+
 
         private bool HasAbility(CreatureFeature feat, float unlock)
         {

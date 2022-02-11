@@ -24,7 +24,7 @@ namespace EvolutionSimulation.Genetics
     /// Contains the information of a gene: its maximum value and the other genes
     /// it is related to as well as the percentage of the relation
     /// </summary>
-    public class Gene
+    public class Gene : IComparable<Gene>
     {
 
         [JsonConverter(typeof(StringEnumConverter))]
@@ -52,6 +52,17 @@ namespace EvolutionSimulation.Genetics
             // Add the relation
             relations.Add(new Relation(percentage, relation));
         }
+
+        /// <summary>
+        /// Comparator to order arrays or lists of Genes by features
+        /// </summary>
+        public int CompareTo(Gene other)
+        {
+            if (other.feature == feature) return 0;
+            return other.feature > feature ? -1 : 1;
+        }
+
+        
     }
 
 
@@ -104,7 +115,7 @@ namespace EvolutionSimulation.Genetics
         {
             if (genes.Count != (int)CreatureFeature.Count)
                 throw new Exception("The number of genes and max values must be the same as the total features");
-
+            
             geneInfo = genes.ToArray();
             geneMaxValues = new int[genes.Count];
             for (int i = 0; i < genes.Count; ++i)
@@ -131,9 +142,9 @@ namespace EvolutionSimulation.Genetics
                     //In other words, a negative relation may not modify the value, but if it is accounted for it would add extra bits surpassing the max value.
                     if (relation.percentage > 0)
                         //The highest possible value of the features related is calculated (percentaje * maxValue)
-                        relationsMaxValue += (int)Math.Ceiling(relation.percentage * geneMaxValues[(int)relation.feature]); //The percetaje gets truncated!!!
+                        relationsMaxValue += (int)Math.Ceiling(relation.percentage * geneMaxValues[featureIndex]); //The percetaje gets truncated!!!
                     if (relation.percentage > 0)
-                        aux += relation.percentage * geneMaxValues[(int)relation.feature];
+                        aux += relation.percentage * geneMaxValues[featureIndex];
                 }
                 int leftover = geneMaxValues[featureIndex] - relationsMaxValue;
                 aux2 += geneMaxValues[featureIndex];
@@ -156,7 +167,7 @@ namespace EvolutionSimulation.Genetics
         {
             chromosome = new BitArray(chromosomeSize);
             for (int i = 0; i < chromosomeSize; ++i)
-                chromosome[i] = RandomGenerator.Next(0, 2) == 0;
+                chromosome[i] = true;//= RandomGenerator.Next(0, 2) == 0;
             SetFeatures();
         }
 
@@ -188,6 +199,9 @@ namespace EvolutionSimulation.Genetics
         public void SetFeatures()
         {
             geneValues = Enumerable.Repeat(-1, genePos.Length).ToArray();
+            //We need to order geneInfo because the relations of the genes 
+            Gene[] geneInfoOrdered = (Gene[])geneInfo.Clone();
+            Array.Sort(geneInfoOrdered);
             //For each feature (gene)
             for (int i = 0; i < (int)CreatureFeature.Count; ++i)
             {
@@ -207,7 +221,12 @@ namespace EvolutionSimulation.Genetics
                     if (geneValues[(int)relation.feature] < 0)
                         throw new Exception("The genes must have been passed in order of dependency of relations");
                     //total += percentage of usage of the related gene * the value of the gene
-                    total += (int)(relation.percentage * geneValues[(int)relation.feature]);
+                    //total += (int)(relation.percentage * geneValues[(int)relation.feature]);
+
+                    //total += relationValue / (relationMaxValue / (relationPercentage * featureMaxValue))
+                    int relationMaxValue = geneInfoOrdered[(int)relation.feature].maxValue;
+                    int relationValue = geneValues[(int)relation.feature];
+                    total += (int)Math.Ceiling(relationValue / (relationMaxValue / (relation.percentage * geneInfo[i].maxValue)));
                 }
                 geneValues[feature] = Math.Max(0, total);
             }
