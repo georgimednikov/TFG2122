@@ -306,8 +306,8 @@ namespace EvolutionSimulation.Genetics
             camouflage.AddRelation(-0.3f, CreatureFeature.Size);
             genes.Add(camouflage);//540
 
-            Gene metabolism = new Gene(CreatureFeature.Metabolism, 50);
-            metabolism.AddRelation(-0.2f, CreatureFeature.Size);
+            Gene metabolism = new Gene(CreatureFeature.Metabolism, 200);
+            metabolism.AddRelation(-0.05f, CreatureFeature.Size);
             genes.Add(metabolism);
 
             Gene idealTemp = new Gene(CreatureFeature.IdealTemperature, 50);
@@ -327,10 +327,10 @@ namespace EvolutionSimulation.Genetics
             diet.AddRelation(0.35f, CreatureFeature.Aggressiveness);
             genes.Add(diet);
 
-            Gene mobility = new Gene(CreatureFeature.Mobility, 50);
-            mobility.AddRelation(0.4f, CreatureFeature.Members);
-            mobility.AddRelation(-0.2f, CreatureFeature.Size);
-            mobility.AddRelation(-0.2f, CreatureFeature.Fortitude);
+            Gene mobility = new Gene(CreatureFeature.Mobility, 200);
+            mobility.AddRelation(0.1f, CreatureFeature.Members);
+            mobility.AddRelation(-0.05f, CreatureFeature.Size);
+            mobility.AddRelation(-0.05f, CreatureFeature.Fortitude);
             genes.Add(mobility);
 
             //Abilities
