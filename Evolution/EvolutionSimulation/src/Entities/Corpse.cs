@@ -32,7 +32,7 @@ namespace EvolutionSimulation
         /// They get lower the more putrid the corpse gets
         /// TODO: Hacer que sea menos puntos de nutricion cuando se este pudriendo
         /// </param>
-        public void Init(int corpseDuration,  float putridStart, int poisonProb, int maxNutritionPoints)
+        public void Init(World w, int corpseDuration,  float putridStart, int poisonProb, int maxNutritionPoints)
         {
             this.corpseTimeLeft = corpseDuration;
             this.poisonProb = poisonProb;
@@ -64,10 +64,11 @@ namespace EvolutionSimulation
             if (corpseTimeLeft == 0)
             {
                 Console.WriteLine("Desaparece");
-                EntityManager.Instance.Delete(this);
+                world.DeleteEntity(this);
             }
         }
 
+        World world;
         Random rnd;
         int corpseTimeLeft;
         int poisonProb;
@@ -76,5 +77,9 @@ namespace EvolutionSimulation
         // States
         CorpseState state;
         int putridTime;
+
+        public int x => throw new NotImplementedException();
+
+        public int y => throw new NotImplementedException();
     }
 }

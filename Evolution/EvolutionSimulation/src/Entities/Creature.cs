@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using EvolutionSimulation.FSM;
 using EvolutionSimulation.FSM.Creature.States;
 using EvolutionSimulation.FSM.Creature.Transitions;
@@ -47,6 +48,9 @@ namespace EvolutionSimulation.Entities
             toSleep.value = (stats.currRest <= 0.1 * stats.maxRest);
             toWake.value = (stats.currRest >= stats.maxRest);
             mfsm.obtainActionPoints(stats.metabolism);
+            
+            seenEntities = Percieve();
+
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
             while (mfsm.Execute());// Maintains the evaluation - execution action
         }
@@ -116,6 +120,29 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
+        /// Checks the perception area around this entity for other entities
+        /// </summary>
+        /// <returns>A list of every other entity in the area</returns>
+        List<IEntity> Percieve()
+        {
+            int perceptionRadius = 4; // TODO: calculate this using the Perception stat
+            List<IEntity> list = new List<IEntity>();
+
+            foreach (IEntity e in world.Creatures) // TODO: use this?
+            {
+                if (e == this) continue; // Reference comparison
+                if (Math.Abs(e.x - x) <= perceptionRadius && Math.Abs(e.y - y) <= perceptionRadius) // Square vision
+                {
+                    list.Add(e);
+                    Console.WriteLine("Seeing " + e.ToString()); // TODO: Remove
+                }
+            }
+            Console.WriteLine(); // TODO: Remove
+
+            return list;
+        }
+
+        /// <summary>
         /// Modifies the given stat based on age
         /// </summary>
         float ModifyStatByAge(float stat)
@@ -136,7 +163,10 @@ namespace EvolutionSimulation.Entities
 
         // Genetic
         public CreatureChromosome chromosome { get; private set; }
-        public CreatureStats stats;
+        public CreatureStats stats { get; private set; }
+        
+        // List of entities seen at this moment by this creature
+        public List<IEntity> seenEntities { get; private set; }
 
         public int actionPoints;
 
@@ -147,7 +177,7 @@ namespace EvolutionSimulation.Entities
         private float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
     }
 
-    public struct CreatureStats
+    public class CreatureStats
     {
         public Gender gender;
 

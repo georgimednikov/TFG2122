@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EvolutionSimulation.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,6 +30,9 @@ namespace EvolutionSimulation
         /// <param name="influenceFunc">Function that defines the influence of height on the other parameters</param>
         public void Init(int size, Func<double, double> heightFunc = default(Func<double, double>), Func<double, double> influenceFunc = default(Func<double, double>))
         {
+            Creatures = new List<Creature>();
+            ToDelete = new List<IEntity>();
+
             evaluateHeight = (heightFunc != null) ? heightFunc : EvaluateHeightCurve;
             evaluateInfluence = (influenceFunc != null) ? influenceFunc : EvaluateInfluenceCurve;
             p = new Perlin();
@@ -69,14 +73,64 @@ namespace EvolutionSimulation
         }
 
         /// <summary>
+        /// Adds an entity to the list
+        /// </summary>
+        /// <typeparam name="T">Entity type</typeparam>
+        /// <returns>The added entity</returns>
+        public T CreateEntity<T>() where T : IEntity, new()
+        {
+            return new T();
+        
+        }
+
+        /// <summary>
         /// Performs a step of the simulation.
         /// </summary>
         public void Tick()
         {
+            EntitiesTick();
             step++;
             day = (step % (ticksHour * hoursDay) >= (morning * ticksHour) &&
                 step % (ticksHour * hoursDay) <= (night * ticksHour));
         }
+
+        /// <summary>
+        /// Creates a creature in the world
+        /// </summary>
+        // TODO: Hacer luego create y delete para cada tipo de entidad supongo
+        public Animal CreateCreature()
+        {
+            Animal ent = CreateEntity<Animal>();
+            Creatures.Add(ent);
+            return ent;
+        }
+
+        /// <summary>
+        /// Designates an entity to be eliminated before the next frame
+        /// </summary>
+        public void DeleteEntity(IEntity entity)
+        {
+            ToDelete.Add(entity);
+        }
+
+        /// <summary>
+        /// Performs a tick of the simulation of every entity.
+        /// Deletes all entities that need to be destroyed after the tick
+        /// </summary>
+        private void EntitiesTick()
+        {
+            Creatures.Sort(new SortByMetabolism()); // TODO: priority queue ?
+            Creatures.ForEach(delegate (Creature e) { e.Tick(); });
+
+            ToDelete.ForEach(delegate (IEntity e)
+            {
+                if(e.GetType() == typeof(Creature)){ // TODO: xdddd
+                    Creatures.Remove(e as Creature);
+                }
+            });
+            ToDelete.Clear();
+        }
+
 
         #region Procedural Generation
 
@@ -246,6 +300,8 @@ namespace EvolutionSimulation
         #endregion
 
         public uint step;
+
+
         // Map with physical properties
         public MapData[,] map { get; private set; }
         int mapSize;
@@ -256,5 +312,11 @@ namespace EvolutionSimulation
         float morning = 6.5f, night = 20;
         // Perlin noise generator
         Perlin p;
+
+        // Entities management
+        public List<Creature> Creatures { get; private set; }
+        // TODO: otra lista para corpses y para follaje
+        List<IEntity> ToDelete;
+
     }
 }

@@ -8,6 +8,10 @@ namespace EvolutionSimulation
     /// </summary>
     public class Plant : IEntity
     {
+        public int x => throw new NotImplementedException();
+
+        public int y => throw new NotImplementedException();
+
         public void Tick()
         {
             throw new NotImplementedException();
