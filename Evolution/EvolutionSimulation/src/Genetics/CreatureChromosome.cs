@@ -1,25 +1,42 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace EvolutionSimulation.Genetics
 {
+    public struct Relation
+    {
+        [JsonConverter(typeof(StringEnumConverter))]
+        public CreatureFeature feature;
+        public float percentage;
+
+        public Relation(float percentage, CreatureFeature relation) : this()
+        {
+            this.percentage = percentage;
+            feature = relation;
+        }
+    }
     /// <summary>
     /// Contains the information of a gene: its maximum value and the other genes
     /// it is related to as well as the percentage of the relation
     /// </summary>
     public class Gene
     {
-        public int maxValue;
+
+        [JsonConverter(typeof(StringEnumConverter))]
         public CreatureFeature feature;
-        public List<Tuple<float, CreatureFeature>> relations { get; }
+        public int maxValue;
+        public List<Relation> relations { get; }
 
         public Gene(CreatureFeature feat, int max)
         {
             maxValue = max;
             feature = feat;
-            relations = new List<Tuple<float, CreatureFeature>>();
+            relations = new List<Relation>();
         }
 
         /// <summary>
@@ -29,11 +46,11 @@ namespace EvolutionSimulation.Genetics
         public void AddRelation(float percentage, CreatureFeature relation)
         {
             // Check that the relation is unique
-            foreach (Tuple<float, CreatureFeature> cF in relations)
-                if (cF.Item2 == relation)
+            foreach (Relation cF in relations)
+                if (cF.feature == relation)
                     return;
             // Add the relation
-            relations.Add(new Tuple<float, CreatureFeature>(percentage, relation));
+            relations.Add(new Relation(percentage, relation));
         }
     }
 
@@ -78,8 +95,6 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         public int[] geneValues;
 
-        //TODO: NO inclusivo, decir que gen ha petado
-
         /// <summary>
         /// Sets the internal extructure of the chromosome given the genes and their respectives max values.
         /// The genes MUST be given in such an order that there is no incomplete dependency between them.
@@ -109,16 +124,16 @@ namespace EvolutionSimulation.Genetics
                 int featureIndex = (int)gene.feature;
 
                 int relationsMaxValue = 0;
-                foreach (Tuple<float, CreatureFeature> relation in gene.relations)
+                foreach (Relation relation in gene.relations)
                 {
                     //If the relation is positive, the max value of the gene can be surpassed so the max value of the relations is substracted
                     //If the relation is negative, the max value of the gene must not be surpassed with an addition, so it is not accounted.
                     //In other words, a negative relation may not modify the value, but if it is accounted for it would add extra bits surpassing the max value.
-                    if (relation.Item1 > 0)
+                    if (relation.percentage > 0)
                         //The highest possible value of the features related is calculated (percentaje * maxValue)
-                        relationsMaxValue += (int)Math.Ceiling(relation.Item1 * geneMaxValues[(int)relation.Item2]); //The percetaje gets truncated!!!
-                    if (relation.Item1 > 0)
-                        aux += relation.Item1 * geneMaxValues[(int)relation.Item2];
+                        relationsMaxValue += (int)Math.Ceiling(relation.percentage * geneMaxValues[(int)relation.feature]); //The percetaje gets truncated!!!
+                    if (relation.percentage > 0)
+                        aux += relation.percentage * geneMaxValues[(int)relation.feature];
                 }
                 int leftover = geneMaxValues[featureIndex] - relationsMaxValue;
                 aux2 += geneMaxValues[featureIndex];
@@ -187,12 +202,12 @@ namespace EvolutionSimulation.Genetics
                 {
                     if (chromosome[j]) ++total; //If the bit is 1 then the total count is aumented
                 }
-                foreach (Tuple<float, CreatureFeature> relation in geneInfo[i].relations)
+                foreach (Relation relation in geneInfo[i].relations)
                 {
-                    if (geneValues[(int)relation.Item2] < 0)
+                    if (geneValues[(int)relation.feature] < 0)
                         throw new Exception("The genes must have been passed in order of dependency of relations");
                     //total += percentage of usage of the related gene * the value of the gene
-                    total += (int)(relation.Item1 * geneValues[(int)relation.Item2]);
+                    total += (int)(relation.percentage * geneValues[(int)relation.feature]);
                 }
                 geneValues[feature] = Math.Max(0, total);
             }
@@ -246,123 +261,17 @@ namespace EvolutionSimulation.Genetics
             Console.WriteLine();
         }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-        static public void SetChromosome()
+        /// <summary>
+        /// Sets the chromosome structure reading the values of the given JSON file.
+        /// </summary>
+        /// <param name="json">Address of the JSON file</param>
+        static public void SetChromosome(string json)
         {
-            List<Gene> genes = new List<Gene>();
-
-            //Base Attributes
-
-            Gene strength = new Gene(CreatureFeature.Strength, 50);
-            genes.Add(strength);
-            Gene constitution = new Gene(CreatureFeature.Constitution, 100);
-            genes.Add(constitution);
-            Gene fortitude = new Gene(CreatureFeature.Fortitude, 25);
-            genes.Add(fortitude);
-            Gene perception = new Gene(CreatureFeature.Perception, 50);
-            genes.Add(perception);
-            Gene aggressiveness = new Gene(CreatureFeature.Aggressiveness, 20);
-            genes.Add(aggressiveness);
-            Gene members = new Gene(CreatureFeature.Members, 50);
-            genes.Add(members);
-            //The rest of the genes IN ORDER OF DEPENDENCY
-
-            //Other Attributes
-            Gene resistence = new Gene(CreatureFeature.Resistence, 50);
-            resistence.AddRelation(0.25f, CreatureFeature.Constitution);
-            genes.Add(resistence);
-
-            Gene piercing = new Gene(CreatureFeature.Piercing, 25);
-            piercing.AddRelation(0.4f, CreatureFeature.Strength);
-            genes.Add(piercing);
-
-
-            //int maxSize = 80;
-            Gene size = new Gene(CreatureFeature.Size, 200);
-            size.AddRelation(0.4f, CreatureFeature.Constitution);
-            size.AddRelation(0.25f, CreatureFeature.Strength);
-            genes.Add(size);
-
-            Gene knowledge = new Gene(CreatureFeature.Knowledge, 50);
-            knowledge.AddRelation(0.1f, CreatureFeature.Size);
-            knowledge.AddRelation(0.25f, CreatureFeature.Perception);
-            genes.Add(knowledge);
-
-            //if its a low value, it will be always 0 because of the negative dependency with size
-            //int maxCamouflage = (int)(maxSize * 0.5);
-            Gene camouflage = new Gene(CreatureFeature.Camouflage, 50);
-            camouflage.AddRelation(-0.3f, CreatureFeature.Size);
-            genes.Add(camouflage);//540
-
-            Gene metabolism = new Gene(CreatureFeature.Metabolism, 200);
-            metabolism.AddRelation(-0.05f, CreatureFeature.Size);
-            genes.Add(metabolism);
-
-            Gene idealTemp = new Gene(CreatureFeature.IdealTemperature, 50);
-            idealTemp.AddRelation(0.15f, CreatureFeature.Metabolism);
-            idealTemp.AddRelation(-0.25f, CreatureFeature.Size);
-            genes.Add(idealTemp);
-
-            Gene tempRange = new Gene(CreatureFeature.TemperatureRange, 20);
-            tempRange.AddRelation(0.3f, CreatureFeature.Resistence);
-            genes.Add(tempRange);
-
-            Gene longevity = new Gene(CreatureFeature.Longevity, 50);
-            longevity.AddRelation(-0.5f, CreatureFeature.Metabolism);
-            genes.Add(longevity);
-
-            Gene diet = new Gene(CreatureFeature.Diet, 15);
-            diet.AddRelation(0.35f, CreatureFeature.Aggressiveness);
-            genes.Add(diet);
-
-            Gene mobility = new Gene(CreatureFeature.Mobility, 200);
-            mobility.AddRelation(0.1f, CreatureFeature.Members);
-            mobility.AddRelation(-0.05f, CreatureFeature.Size);
-            mobility.AddRelation(-0.05f, CreatureFeature.Fortitude);
-            genes.Add(mobility);
-
-            //Abilities
-
-            Gene arboreal = new Gene(CreatureFeature.Arboreal, 10);
-            arboreal.AddRelation(-0.15f, CreatureFeature.Size);
-            genes.Add(arboreal);
-            Gene wings = new Gene(CreatureFeature.Wings, 10);
-            wings.AddRelation(-0.3f, CreatureFeature.Size);
-            genes.Add(wings);
-            Gene venomous = new Gene(CreatureFeature.Venomous, 10);
-            genes.Add(venomous);
-            Gene nightvision = new Gene(CreatureFeature.NightVision, 10);
-            nightvision.AddRelation(0.15f, CreatureFeature.Perception);
-            genes.Add(nightvision);
-            Gene horns = new Gene(CreatureFeature.Horns, 10);
-            genes.Add(horns);
-            Gene mimic = new Gene(CreatureFeature.Mimic, 10);
-            genes.Add(mimic);
-            Gene upright = new Gene(CreatureFeature.Upright, 10);
-            genes.Add(upright);
-            Gene thorns = new Gene(CreatureFeature.Thorns, 50);
-            thorns.AddRelation(0.2f, CreatureFeature.Fortitude);
-            genes.Add(thorns);
-            Gene scavenger = new Gene(CreatureFeature.Scavenger, 10);
-            genes.Add(scavenger);
-            Gene hair = new Gene(CreatureFeature.Hair, 10);
-            genes.Add(hair);
-            Gene paternity = new Gene(CreatureFeature.Paternity, 10);
-            genes.Add(paternity);
-
-            CreatureChromosome.SetStructure(genes);
+            if (!File.Exists(json))
+                throw new Exception("Cannot find JSON with chromosome information");
+            string file = File.ReadAllText(json);
+            List<Gene> genes = JsonConvert.DeserializeObject<List<Gene>>(file);
+            SetStructure(genes);
         }
     }
 }

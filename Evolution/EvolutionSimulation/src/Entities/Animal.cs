@@ -50,22 +50,21 @@ namespace EvolutionSimulation.Entities
             int speed = chromosome.GetFeature(CreatureFeature.Mobility);
             stats.airReach = wings;
             stats.treeReach = wings || arboreal || upright;
+
+            stats.aerialSpeed = stats.arborealSpeed = -1;
             if (wings)
             {
                 stats.aerialSpeed = speed * (chromosome.GetFeature(CreatureFeature.Wings) * chromosome.GetFeatureMax(CreatureFeature.Wings));
                 stats.arborealSpeed = (int)(stats.aerialSpeed * mobilityPenalty);
                 stats.groundSpeed = (int)(stats.arborealSpeed * mobilityPenalty);
             }
-            else if (arboreal)
+            if (arboreal)
             {
-                stats.aerialSpeed = -1;
                 stats.arborealSpeed = speed * (chromosome.GetFeature(CreatureFeature.Arboreal) * chromosome.GetFeatureMax(CreatureFeature.Arboreal));
                 stats.groundSpeed = (int)(stats.arborealSpeed * mobilityPenalty);
             }
-            else
+            if (!wings && !arboreal)
             {
-                stats.aerialSpeed = -1;
-                stats.arborealSpeed = -1;
                 stats.groundSpeed = speed;
             }
 

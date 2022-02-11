@@ -20,6 +20,7 @@ namespace VisualizadorConsola
             world = new World();
             world.Init(16);
             Animal c = CreateEntity<Animal>();
+            c.chromosome.PrintChromosome();
             c.Init(world, 5, 5);
             //c = CreateEntity<Animal>();
             //c.Init(world, 4, 4);

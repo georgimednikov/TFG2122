@@ -9,7 +9,7 @@ namespace VisualizadorConsola
     {
         static void Main(string[] args)
         {
-            CreatureChromosome.SetChromosome();
+            CreatureChromosome.SetChromosome("Chromosome.json");
             ISimulation s = new ConsoleSimulation();
             s.Init();
             s.Run();
