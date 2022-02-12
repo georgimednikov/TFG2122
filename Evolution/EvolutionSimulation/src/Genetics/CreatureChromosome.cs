@@ -125,7 +125,7 @@ namespace EvolutionSimulation.Genetics
 
             genePos = new Tuple<int, int>[genes.Count];
             
-            chromosomeSize = 0;
+            chromosomeSize = 1;//first bit is for gender
             foreach (Gene gene in genes)
             {
                 //The numeric value of the feature
@@ -161,6 +161,7 @@ namespace EvolutionSimulation.Genetics
         public CreatureChromosome()
         {
             chromosome = new BitArray(chromosomeSize);
+            chromosome[0] = RandomGenerator.Next(0, 2) == 0;//first chromosome is for creature's gender
 
             for (int i = 0; i < genePos.Length; ++i)
             {

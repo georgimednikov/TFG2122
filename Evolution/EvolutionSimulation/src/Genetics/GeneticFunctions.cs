@@ -7,8 +7,9 @@ namespace EvolutionSimulation.Genetics
     {
         /// <summary>
         /// Function that receives 2 chromosomes and uses UniformCrossover to cross them
-        /// UniformCrossover means that all the bits in both chromosomes have the same
-        /// probability to be selected
+        /// UniformCrossover means that male chromosome's bits has prob probability to be selected 
+        /// if you want that all the bits in both chromosomes have the same
+        /// probability to be selected, prob has to be 0.5
         /// </summary>
         static public CreatureChromosome UniformCrossover(CreatureChromosome male, CreatureChromosome female, float prob)
         {
