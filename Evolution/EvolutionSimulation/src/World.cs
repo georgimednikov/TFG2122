@@ -31,8 +31,9 @@ namespace EvolutionSimulation
         public void Init(int size, Func<double, double> heightFunc = default(Func<double, double>), Func<double, double> influenceFunc = default(Func<double, double>))
         {
             Creatures = new List<Creature>();
-            ToDelete = new List<IEntity>();
-
+            StableEntities = new List<StableEntity>();
+            CreaturesToDelete = new List<IEntity>();
+            SEntitiesToDelete = new List<IEntity>();
             evaluateHeight = (heightFunc != null) ? heightFunc : EvaluateHeightCurve;
             evaluateInfluence = (influenceFunc != null) ? influenceFunc : EvaluateInfluenceCurve;
             p = new Perlin();
@@ -72,17 +73,7 @@ namespace EvolutionSimulation
             return (x >= 0 && x < mapSize && y >= 0 && y < mapSize);
         }
 
-        /// <summary>
-        /// Adds an entity to the list
-        /// </summary>
-        /// <typeparam name="T">Entity type</typeparam>
-        /// <returns>The added entity</returns>
-        public T CreateEntity<T>() where T : IEntity, new()
-        {
-            return new T();
-        
-        }
-
+        #region EntitiesManagement
         /// <summary>
         /// Performs a step of the simulation.
         /// </summary>
@@ -94,23 +85,45 @@ namespace EvolutionSimulation
                 step % (ticksHour * hoursDay) <= (night * ticksHour));
         }
 
+
         /// <summary>
-        /// Creates a creature in the world
+        /// Creates a creature in the world.
+        /// Creatures are entities with abilities and  'complex' behaviours.
+        /// T: Any subclass of Creature i.e. Animal
         /// </summary>
-        // TODO: Hacer luego create y delete para cada tipo de entidad supongo
-        public Animal CreateCreature()
+        public T CreateCreature<T>() where T : Creature, new()
         {
-            Animal ent = CreateEntity<Animal>();
+            T ent = CreateEntity<T>();
             Creatures.Add(ent);
             return ent;
         }
 
         /// <summary>
+        /// Creates a stable entity in the world.
+        /// StableEntities are enitities that do not have complex behaviours,
+        /// and fulfill the same objecive during all their life-time.
+        /// T: Any subclass of StableEntites i.e. Plant, Corpse
+        /// </summary>
+        public T CreateStableEntity<T>() where T : StableEntity, new()
+        {
+            T ent = CreateEntity<T>();
+            StableEntities.Add(ent);
+            return ent;
+        }
+        /// <summary>
         /// Designates an entity to be eliminated before the next frame
         /// </summary>
-        public void DeleteEntity(IEntity entity)
+        public void Destroy(Creature entity)
         {
-            ToDelete.Add(entity);
+            CreaturesToDelete.Add(entity);
+        }
+
+        /// <summary>
+        /// Designates an entity to be eliminated before the next frame
+        /// </summary>
+        public void Destroy(StableEntity entity)
+        {
+            SEntitiesToDelete.Add(entity);
         }
 
         /// <summary>
@@ -119,18 +132,29 @@ namespace EvolutionSimulation
         /// </summary>
         private void EntitiesTick()
         {
+            // Tick for every entity
             Creatures.Sort(new SortByMetabolism()); // TODO: priority queue ?
             Creatures.ForEach(delegate (Creature e) { e.Tick(); });
+            StableEntities.ForEach(delegate (StableEntity e) { e.Tick(); });
 
-            ToDelete.ForEach(delegate (IEntity e)
-            {
-                if(e.GetType() == typeof(Creature)){ // TODO: xdddd
-                    Creatures.Remove(e as Creature);
-                }
-            });
-            ToDelete.Clear();
+            // Entity deletion
+            CreaturesToDelete.ForEach(delegate (IEntity e) { Creatures.Remove(e as Creature); });
+            SEntitiesToDelete.ForEach(delegate (IEntity e) { StableEntities.Remove(e as StableEntity); });
+            CreaturesToDelete.Clear();
+            SEntitiesToDelete.Clear();
         }
 
+        /// <summary>
+        /// Adds an entity to the list
+        /// </summary>
+        /// <typeparam name="T">Entity type</typeparam>
+        /// <returns>The added entity</returns>
+        T CreateEntity<T>() where T : IEntity, new()
+        {
+            return new T();
+
+        }
+        #endregion
 
         #region Procedural Generation
 
@@ -301,7 +325,6 @@ namespace EvolutionSimulation
 
         public uint step;
 
-
         // Map with physical properties
         public MapData[,] map { get; private set; }
         int mapSize;
@@ -315,8 +338,10 @@ namespace EvolutionSimulation
 
         // Entities management
         public List<Creature> Creatures { get; private set; }
-        // TODO: otra lista para corpses y para follaje
-        List<IEntity> ToDelete;
+        public List<StableEntity> StableEntities { get; private set; }
 
+        // TODO: podemos dejar esto asi o comparar los tipos en una sola lista
+        List<IEntity> CreaturesToDelete;
+        List<IEntity> SEntitiesToDelete;
     }
 }

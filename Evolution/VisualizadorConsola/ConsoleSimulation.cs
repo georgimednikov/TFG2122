@@ -17,10 +17,12 @@ namespace VisualizadorConsola
             //*/
             world = new World();
             world.Init(16);
-            Animal c = world.CreateCreature();
+            Animal c = world.CreateCreature<Animal>();
             c.Init(world, 5, 5);
-            c = world.CreateCreature();
+            c = world.CreateCreature<Animal>();
             c.Init(world, 4, 4);
+            Corpse corpse = world.CreateStableEntity<Corpse>();
+            corpse.Init(world, 5, 3, 3, 40, 70, 80);
             /*/
             Animal c = CreateEntity<Animal>();
             c.chromosome.PrintChromosome();
@@ -139,6 +141,15 @@ namespace VisualizadorConsola
             {
                 Console.SetCursorPosition(e.x, e.y);
                 Console.Write("e");
+            }
+
+            foreach (var e in world.StableEntities)
+            {
+                if (e.GetType() == typeof(Corpse))
+                {
+                    Console.SetCursorPosition(e.x, e.y);
+                    Console.Write("x");
+                }
             }
             //Console.SetCursorPosition(world.map.GetLength(0), world.map.GetLength(0));
         }

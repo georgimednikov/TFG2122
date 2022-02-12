@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Entities\Animal.cs" />
+    <Compile Include="src\Entities\StableEntity.cs" />
     <Compile Include="src\FSM\Creature\States\Sleeping.cs" />
     <Compile Include="src\FSM\Creature\States\CreatureState.cs" />
     <Compile Include="src\FSM\Creature\Transitions\BooleanWrapper.cs" />

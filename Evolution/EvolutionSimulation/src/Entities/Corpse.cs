@@ -3,27 +3,25 @@ using EvolutionSimulation.Entities;
 
 namespace EvolutionSimulation
 {
-    class Corpse : IEntity, IInteractable<Creature>
+    public class Corpse : StableEntity, IInteractable<Creature>
     {
         public enum CorpseState
         {
             Edible,
             Putrid
         }
-        public Corpse()
-        {
-            rnd = new Random();
-        }
 
         /// <summary>
-        /// Initializes the corpse.
-        /// <param name="corpseDuration"> 
-        /// The number of ticks that the corpses stays
-        /// </param>
+        /// Initializes the Corpse
+        /// </summary>
+        /// <param name="w"> World in which it'll reside </param>
+        /// <param name="lifeTime"> LifeTime in Ticks of the Entity </param>
+        /// <param name="x"> X World position </param>
+        /// <param name="y"> Y World position </param>
         /// <param name="putridStart">
         /// The % of the corpse duration when the corpse starts putrefying
         /// </param>
-        /// <param name="putridPoisonProb">
+        /// <param name="poisonProb">
         /// The probability of being poisoned when interacting with the putrid corpse. 
         /// A value between 0 and 100 (%), higher or lower values will be clamped.
         /// </param>
@@ -32,14 +30,13 @@ namespace EvolutionSimulation
         /// They get lower the more putrid the corpse gets
         /// TODO: Hacer que sea menos puntos de nutricion cuando se este pudriendo
         /// </param>
-        public void Init(World w, int corpseDuration,  float putridStart, int poisonProb, int maxNutritionPoints)
+        public void Init(World w, int lifeTime, int x, int y,  float putridStart, int poisonProb, int maxNutritionPoints)
         {
-            this.corpseTimeLeft = corpseDuration;
+            base.Init(w, lifeTime, x, y);
             this.poisonProb = poisonProb;
             this.nutritionPoints = maxNutritionPoints;
-            poisonProb = 0;
             // Corpse starts putrefying when the corpse consumed putridStart% of its duration
-            putridTime = (int)(corpseDuration * putridStart);
+            putridTime = (int)(lifeTime * putridStart);
         }
 
         public void OnInteract(Creature other)
@@ -48,7 +45,7 @@ namespace EvolutionSimulation
             if(state == CorpseState.Putrid)
             {
                 // Putrid corpse, probability to be poisoned gets higher the more time it passes 
-                int actualPoisonProb = poisonProb + (int)(putridTime / (float)corpseTimeLeft);
+                int actualPoisonProb = (int)(poisonProb + (putridTime / (float)lifeTime));
                 if (prob < actualPoisonProb)
                     Console.WriteLine("The creature is poisoned");
             }
@@ -56,30 +53,28 @@ namespace EvolutionSimulation
             // TODO: Aniadir puntos de nutricion a la creatura
         }
 
-        public void Tick()
+        override protected void Update()
         {
-            corpseTimeLeft--;
-            state = corpseTimeLeft > putridTime ? CorpseState.Edible : CorpseState.Putrid;
+            state = lifeTime > putridTime ? CorpseState.Edible : CorpseState.Putrid;
 
-            if (corpseTimeLeft == 0)
+            if (state == CorpseState.Putrid)
+                nutritionPoints -= putridTime / (float)lifeTime;
+
+            if (lifeTime <= 0)
             {
                 Console.WriteLine("Desaparece");
-                world.DeleteEntity(this);
+                world.Destroy(this);
             }
         }
 
-        World world;
-        Random rnd;
-        int corpseTimeLeft;
-        int poisonProb;
-        int nutritionPoints;
+        // Probability of being poisoned when interacting
+        float poisonProb;
+        // Nutrition points added to creatures that eat the corpse
+        float nutritionPoints;
 
-        // States
+        // Current Corpse State
         CorpseState state;
+        // Time when the corpse starts putrefying
         int putridTime;
-
-        public int x => throw new NotImplementedException();
-
-        public int y => throw new NotImplementedException();
     }
 }

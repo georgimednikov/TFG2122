@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace EvolutionSimulation
 {
+    //TODO: Probablemente las interacciones no sean con esto
     /// <summary>
     /// Interface to represent an object that can be interacted with
     /// </summary>
