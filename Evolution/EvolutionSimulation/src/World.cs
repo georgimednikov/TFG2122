@@ -162,7 +162,11 @@ namespace EvolutionSimulation
 
         }
 
-        public List<Creature> PercieveCreatures(Creature c, int x, int y, int radius)
+        /// <summary>
+        /// Returns the creatures in an area with a determined radius.
+        /// </summary>
+        /// <param name="c">The creature that is perceiving</param>
+        public List<Creature> PerceiveCreatures(Creature c, int x, int y, int radius)
         {
             List<Creature> results = new List<Creature>();
             foreach (Creature e in Creatures) // TODO: use this?
@@ -174,7 +178,11 @@ namespace EvolutionSimulation
             return results;
         }
 
-        public List<StableEntity> PercieveEntities(Creature c, int x, int y, int radius)
+        /// <summary>
+        /// Returns the entities in an area with a determined radius.
+        /// </summary>
+        /// <param name="c">The creature that is perceiving</param>
+        public List<StableEntity> PerceiveEntities(Creature c, int x, int y, int radius)
         {
             List<StableEntity> results = new List<StableEntity>();
             foreach (StableEntity e in StableEntities) // TODO: use this?

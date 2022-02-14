@@ -49,11 +49,13 @@ namespace EvolutionSimulation.Entities
             toWake.value = (stats.currRest >= stats.maxRest);
             mfsm.obtainActionPoints(stats.metabolism);
             
-            seenEntities = Percieve();
+            Perceive();
             // TODO: Interactuar con entidades vistas
-
+            // TomarDecision(); (Asignar Criatura Objetivo) -> Trigger Transicion -> Cambio de estado
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
             while (mfsm.Execute());// Maintains the evaluation - execution action
+            // Creatura 1 ->  Ataca -> Creatura 2       Desde Creatura1 : Creatura2.Interact(Creatura 1, attack);
+            //                                          Desde Creatura2 : Creatura1.Interact(Creatura2, attack);
         }
 
         /// <summary>
@@ -123,14 +125,11 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Checks the perception area around this entity for other entities
         /// </summary>
-        /// <returns>A list of every other entity in the area</returns>
-        List<IEntity> Percieve()
+        void Perceive()
         {
             int perceptionRadius = 4; // TODO: calculate this using the Perception stat
-            List<IEntity> list = new List<IEntity>();
-            list.AddRange(world.PercieveCreatures(this, x, y, perceptionRadius));   //TODO: Diferenciar criaturas de entidades?
-            list.AddRange(world.PercieveEntities(this, x, y, perceptionRadius));
-            return list;
+            seenCreatures = world.PerceiveCreatures(this, x, y, perceptionRadius);
+            seenEntities = world.PerceiveEntities(this, x, y, perceptionRadius);
         }
 
         /// <summary>
@@ -142,10 +141,41 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
+        /// Manages an interaction between creatures
+        /// </summary>
+        public void Interact(Creature interacter, Interactions type)
+        {
+            switch (type)
+            {
+                case Interactions.attack:
+                    stats.currHealth -= computeDamage(interacter.stats.damage, interacter.stats.perforation);
+                    //hasBeenHit = true; O MEJOR INCLUSO forzar el cambio al igual que TomarDecision()
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Returns the taken damage
+        /// </summary>
+        /// <param name="dmg">Incoming damage</param>
+        /// <param name="pen">Damage penetratione</param>
+        float computeDamage(float dmg, float pen)
+        {
+            float amount = 0;
+            amount = (dmg) - (stats.armor - pen);
+            amount = Math.Max(0, amount);
+            amount = Math.Min(amount, stats.currHealth);
+            return amount;
+        }
+
+        /// <summary>
         /// Sets the stats of the creature.
         /// </summary>
         abstract public void SetStats();
 
+        #region Attributes
         // World tile position
         public int x { get; private set; }
         public int y { get; private set; }
@@ -156,9 +186,11 @@ namespace EvolutionSimulation.Entities
         public Species species;
         public CreatureChromosome chromosome { get; private set; }
         public CreatureStats stats { get; private set; }
-        
+
+        // List of creatures seen at this moment by this creature
+        public List<Creature> seenCreatures { get; private set; }
         // List of entities seen at this moment by this creature
-        public List<IEntity> seenEntities { get; private set; }
+        public List<StableEntity> seenEntities { get; private set; }
 
         public int actionPoints;
 
@@ -167,6 +199,8 @@ namespace EvolutionSimulation.Entities
         private Fsm mfsm;
         private float startMultiplier = 0.33f; //Starting multiplier of newborns
         private float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
+
+        #endregion
     }
 
     public class CreatureStats
@@ -236,4 +270,6 @@ namespace EvolutionSimulation.Entities
         public float healthRegeneration;
         public float maxSpeed;
     }
+
+    public enum Interactions { attack, initmidate, mate }
 }
