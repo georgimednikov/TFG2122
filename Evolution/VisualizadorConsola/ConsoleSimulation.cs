@@ -18,10 +18,10 @@ namespace VisualizadorConsola
             creatures = new List<Creature>();
             delete = new List<IEntity>();
             world = new World();
-            world.Init(16);
-            Animal c = CreateEntity<Animal>();
-            c.chromosome.PrintChromosome();
-            c.Init(world, 5, 5);
+            world.Init(750);
+            //Animal c = CreateEntity<Animal>();
+            //c.chromosome.PrintChromosome();
+            //c.Init(world, 5, 5);
             //c = CreateEntity<Animal>();
             //c.Init(world, 4, 4);
         }
@@ -29,7 +29,8 @@ namespace VisualizadorConsola
 
         public void Run()
         {
-            while (true)
+            WorldToBmp();
+            while (false)
             {
                 world.Tick();
                 entities.ForEach(delegate (IEntity e) { e.Tick(); });   // Orders the entity to perform a step
@@ -109,7 +110,7 @@ namespace VisualizadorConsola
                     else if (val < 1) Console.BackgroundColor = ConsoleColor.DarkBlue;
                     else Console.BackgroundColor = ConsoleColor.White;
 
-                    if (world.map[j, i].height < 0.5f) Console.BackgroundColor = ConsoleColor.Magenta ;
+                    if (world.map[j, i].height < 0.5f) Console.BackgroundColor = ConsoleColor.Magenta;
 
                     val = (Math.Truncate(val * 10) / 1);
                     if (val >= 10) Console.Write("X");
@@ -184,7 +185,6 @@ namespace VisualizadorConsola
             Bitmap tempMap = new Bitmap(world.map.GetLength(0), world.map.GetLength(0), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap hMap = new Bitmap(world.map.GetLength(0), world.map.GetLength(0), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-            Console.Clear();
             for (int i = 0; i < world.map.GetLength(0); i++)
             {
                 for (int j = 0; j < world.map.GetLength(1); j++)
@@ -234,17 +234,18 @@ namespace VisualizadorConsola
                     else if (val < 0.4) floraMap.SetPixel(j, i, Color.Orange);
                     else if (val < 0.5) floraMap.SetPixel(j, i, Color.Yellow);
                     else if (val < 0.7) floraMap.SetPixel(j, i, Color.YellowGreen);
-                    else floraMap.SetPixel(j, i, Color.Green);
+                    else if (val < 1) floraMap.SetPixel(j, i, Color.Green);
+                    else floraMap.SetPixel(j, i, Color.White);
 
-                    if (val >= 0 && RandomGenerator.NextDouble() <= val)
-                        if (val <= 0.3)
-                            treeMap.SetPixel(j, i, Color.DarkOliveGreen);
-                        else if (val <= 0.35)
-                            treeMap.SetPixel(j, i, Color.ForestGreen);
-                        else if (val < 0.7)
-                            treeMap.SetPixel(j, i, Color.LawnGreen);
-                        else
-                            treeMap.SetPixel(j, i, Color.LimeGreen);
+                    Plant plant = world.map[j, i].plant;
+                    if (plant as EvolutionSimulation.Grass != null)
+                        treeMap.SetPixel(j, i, Color.Blue);
+                    else if (plant as EvolutionSimulation.Bush != null)
+                        treeMap.SetPixel(j, i, Color.Yellow);
+                    else if (plant as EvolutionSimulation.Tree != null)
+                        treeMap.SetPixel(j, i, Color.Green);
+                    else if (plant as EvolutionSimulation.EdibleTree != null)
+                        treeMap.SetPixel(j, i, Color.Red);
                 }
             }
 
