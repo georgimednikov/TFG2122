@@ -222,28 +222,8 @@ namespace EvolutionSimulation
                                 break;
                         }
                     }
-                    //if (val >= 0 && RandomGenerator.NextDouble() <= val)
-                    //{
-                    //    maxFlora++;
-                    //    if (val <= 0.3)
-                    //        map[xIndex, yIndex].plant = new Grass();
-                    //    else if (val <= 0.35)
-                    //        map[xIndex, yIndex].plant = new Bush();
-                    //    else
-                    //    {
-                    //        maxTrees++;
-                    //        if (RandomGenerator.NextDouble() < 0.95)
-                    //            map[xIndex, yIndex].plant = new Tree();
-                    //        else
-                    //        {
-                    //            trees++;
-                    //            map[xIndex, yIndex].flora = 1;
-                    //            map[xIndex, yIndex].plant = new EdibleTree();
-                    //        }
-                    //    }
-                    //}
                 }
-
+#if DEBUG
             Console.WriteLine("Average Temperature: " + Math.Truncate((avgTemp * 100 / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
             Console.WriteLine("Average Humidity: " + Math.Truncate((avgHumidity * 100 / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
             Console.WriteLine("Average Flora: " + Math.Truncate((avgFlora * 100 / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
@@ -251,6 +231,7 @@ namespace EvolutionSimulation
             Console.WriteLine("EdibleTrees / Map: " + Math.Truncate(((float)trees * 100f / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
             Console.WriteLine("Total Trees / Map: " + Math.Truncate(((float)maxTrees * 100f / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
             Console.WriteLine("Total Flora / Map: " + Math.Truncate(((float)maxFlora * 100f / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
+#endif
         }
 
         /// <summary>
@@ -307,17 +288,17 @@ namespace EvolutionSimulation
             else return 1;
         }
 
-        double NormalDistribution(double x, double m, double sigma)
-        {
-            return Math.Pow(Math.E, -1 / 2 * Math.Pow((x - m) / sigma, 2)) / (sigma * Math.Sqrt(2 * Math.PI));
-        }
-
         int ChoosePlant(double floraProb)
         {
-            if (floraProb <= 0.3)
-                return 0;
-            else if (floraProb <= 0.35)
-                return 1;
+            double treeThreshold = 0.4;
+            if (floraProb <= treeThreshold)
+            {
+                double bushThreshold = 0.2;
+                if (RandomGenerator.NextDouble() <= ((1 / (treeThreshold - bushThreshold)) * (floraProb - bushThreshold)))
+                    return 1;
+                else
+                    return 0;
+            }
             else
             {
                 if (RandomGenerator.NextDouble() < 0.95)
@@ -325,21 +306,7 @@ namespace EvolutionSimulation
                 else
                     return 3;
             }
-
-            double sigma = 0.4;
-            double grassProb = NormalDistribution(floraProb, 0.3, sigma), bushProb = NormalDistribution(floraProb, 0.35, sigma + 0.1), treeProb = NormalDistribution(floraProb, 1, sigma);
-            double totalProb = grassProb + bushProb + treeProb;
-            grassProb /= totalProb;
-            bushProb /= totalProb;
-            treeProb /= treeProb;
-
-            double r = RandomGenerator.NextDouble();
-
-            if (r < grassProb) return 0;
-            else if (r < grassProb + bushProb) return 1;
-            else return 2;
         }
-
         #endregion
 
         public uint step;
