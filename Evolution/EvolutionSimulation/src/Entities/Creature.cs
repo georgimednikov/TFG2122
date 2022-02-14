@@ -150,9 +150,10 @@ namespace EvolutionSimulation.Entities
         public int x { get; private set; }
         public int y { get; private set; }
         // World in which the creature resides
-        public World world { get; private set; } 
+        public World world { get; private set; }
 
         // Genetic
+        public Species species;
         public CreatureChromosome chromosome { get; private set; }
         public CreatureStats stats { get; private set; }
         

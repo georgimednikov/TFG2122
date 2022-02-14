@@ -35,7 +35,8 @@ namespace VisualizadorConsola
 
         public void Run()
         {
-            while (true)
+            WorldToBmp();
+            while (false)
             {
                 world.Tick();
                 Render();
@@ -79,7 +80,7 @@ namespace VisualizadorConsola
                     else if (val < 1) Console.BackgroundColor = ConsoleColor.DarkBlue;
                     else Console.BackgroundColor = ConsoleColor.White;
 
-                    if (world.map[j, i].height < 0.5f) Console.BackgroundColor = ConsoleColor.Magenta ;
+                    if (world.map[j, i].height < 0.5f) Console.BackgroundColor = ConsoleColor.Magenta;
 
                     val = (Math.Truncate(val * 10) / 1);
                     if (val >= 10) Console.Write("X");
@@ -156,74 +157,65 @@ namespace VisualizadorConsola
 
         public void WorldToBmp()
         {
+            int scale = 2;
+            Bitmap treeMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap floraMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap heightMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap tempMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap hMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
 
-            Bitmap treeMap = new Bitmap(world.map.GetLength(0), world.map.GetLength(0), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            Bitmap floraMap = new Bitmap(world.map.GetLength(0), world.map.GetLength(0), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            Bitmap heightMap = new Bitmap(world.map.GetLength(0), world.map.GetLength(0), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            Bitmap tempMap = new Bitmap(world.map.GetLength(0), world.map.GetLength(0), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            Bitmap hMap = new Bitmap(world.map.GetLength(0), world.map.GetLength(0), System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
-            Console.Clear();
-            for (int i = 0; i < world.map.GetLength(0); i++)
+            for (int i = 0; i < world.map.GetLength(0) * scale; i += scale)
             {
-                for (int j = 0; j < world.map.GetLength(1); j++)
+                for (int j = 0; j < world.map.GetLength(1) * scale; j += scale)
                 {
-                    double val = world.map[j, i].height;
-                    if (val < 0.3) heightMap.SetPixel(j, i, Color.DarkBlue);
-                    else if (val < 0.5) heightMap.SetPixel(j, i, Color.Blue);
-                    else if (val == 0.5) heightMap.SetPixel(j, i, Color.DarkGreen);
-                    else if (val < 0.6) heightMap.SetPixel(j, i, Color.Green);
-                    else if (val < 0.7) heightMap.SetPixel(j, i, Color.Yellow);
-                    else if (val < 0.8) heightMap.SetPixel(j, i, Color.LightYellow);
-                    else heightMap.SetPixel(j, i, Color.White);
-                }
+                    double val = world.map[j/ scale, i/ scale].height;
+                    if (val < 0.3) SetPixel(j, i, Color.DarkBlue, heightMap, scale);
+                    else if (val < 0.5) SetPixel(j, i, Color.Blue, heightMap, scale);
+                    else if (val == 0.5) SetPixel(j, i, Color.DarkGreen, heightMap, scale);
+                    else if (val < 0.6) SetPixel(j, i, Color.Green, heightMap, scale);
+                    else if (val < 0.7) SetPixel(j, i, Color.Yellow, heightMap, scale);
+                    else if (val < 0.8) SetPixel(j, i, Color.LightYellow, heightMap, scale);
+                    else SetPixel(j, i, Color.White, heightMap, scale);
 
-                for (int j = 0; j < world.map.GetLength(1); j++)
-                {
-                    double val = world.map[j, i].humidity;
+                     val = world.map[j / scale, i / scale].humidity;
 
-                    if (val < 0.3) hMap.SetPixel(j, i, Color.DarkRed);
-                    else if (val < 0.4) hMap.SetPixel(j, i, Color.Red);
-                    else if (val < 0.5) hMap.SetPixel(j, i, Color.IndianRed);
-                    else if (val < 0.6) hMap.SetPixel(j, i, Color.MediumVioletRed);
-                    else if (val < 0.8) hMap.SetPixel(j, i, Color.Blue);
-                    else if (val < 1) hMap.SetPixel(j, i, Color.DarkBlue);
-                }
+                    if (val < 0.3) SetPixel(j, i, Color.DarkRed, hMap, scale);
+                    else if (val < 0.4) SetPixel(j, i, Color.Red, hMap, scale);
+                    else if (val < 0.5) SetPixel(j, i, Color.IndianRed, hMap, scale);
+                    else if (val < 0.6) SetPixel(j, i, Color.MediumVioletRed, hMap, scale);
+                    else if (val < 0.8) SetPixel(j, i, Color.Blue, hMap, scale);
+                    else if (val < 1) SetPixel(j, i, Color.DarkBlue, hMap, scale);
 
-                for (int j = 0; j < world.map.GetLength(1); j++)
-                {
-                    double val = world.map[j, i].temperature;
-                    if (val < 0.2) tempMap.SetPixel(j, i, Color.DarkBlue);
-                    else if (val < 0.3) tempMap.SetPixel(j, i, Color.Blue);
-                    else if (val < 0.5) tempMap.SetPixel(j, i, Color.Yellow);
-                    else if (val < 0.6) tempMap.SetPixel(j, i, Color.Orange);
-                    else if (val < 0.8) tempMap.SetPixel(j, i, Color.OrangeRed);
-                    else tempMap.SetPixel(j, i, Color.Red);
-                }
+                     val = world.map[j / scale, i / scale].temperature;
+                    if (val < 0.2) SetPixel(j, i, Color.DarkBlue, tempMap, scale);
+                    else if (val < 0.3) SetPixel(j, i, Color.Blue, tempMap, scale);
+                    else if (val < 0.5) SetPixel(j, i, Color.Yellow, tempMap, scale);
+                    else if (val < 0.6) SetPixel(j, i, Color.Orange, tempMap, scale);
+                    else if (val < 0.8) SetPixel(j, i, Color.OrangeRed, tempMap, scale);
+                    else SetPixel(j, i, Color.Red, tempMap, scale);
 
-                for (int j = 0; j < world.map.GetLength(1); j++)
-                {
-                    double val = world.map[j, i].flora;
+                    val = world.map[j / scale, i / scale].flora;
                     if (val == 0)
-                        if (world.map[j, i].height < 0.5) { treeMap.SetPixel(j, i, Color.DarkBlue); floraMap.SetPixel(j, i, Color.DarkBlue); }
-                        else floraMap.SetPixel(j, i, Color.Black);
-                    else if (val < 0.1) floraMap.SetPixel(j, i, Color.DarkRed);
-                    else if (val < 0.2) floraMap.SetPixel(j, i, Color.Red);
-                    else if (val < 0.3) floraMap.SetPixel(j, i, Color.OrangeRed);
-                    else if (val < 0.4) floraMap.SetPixel(j, i, Color.Orange);
-                    else if (val < 0.5) floraMap.SetPixel(j, i, Color.Yellow);
-                    else if (val < 0.7) floraMap.SetPixel(j, i, Color.YellowGreen);
-                    else floraMap.SetPixel(j, i, Color.Green);
+                        if (world.map[j / scale, i / scale].height < 0.5) { SetPixel(j, i, Color.DarkBlue, treeMap, scale); SetPixel(j, i, Color.DarkBlue, floraMap, scale); }
+                        else SetPixel(j, i, Color.Black, floraMap, scale);
+                    else if (val < 0.1) SetPixel(j, i, Color.DarkRed, floraMap, scale);
+                    else if (val < 0.2) SetPixel(j, i, Color.Red, floraMap, scale);
+                    else if (val < 0.3) SetPixel(j, i, Color.OrangeRed, floraMap, scale);
+                    else if (val < 0.4) SetPixel(j, i, Color.Orange, floraMap, scale);
+                    else if (val < 0.5) SetPixel(j, i, Color.Yellow, floraMap, scale);
+                    else if (val < 0.7) SetPixel(j, i, Color.YellowGreen, floraMap, scale);
+                    else if (val < 1) SetPixel(j, i, Color.Green, floraMap, scale);
+                    else SetPixel(j, i, Color.White, floraMap, scale);
 
-                    if (val >= 0 && RandomGenerator.NextDouble() <= val)
-                        if (val <= 0.3)
-                            treeMap.SetPixel(j, i, Color.DarkOliveGreen);
-                        else if (val <= 0.35)
-                            treeMap.SetPixel(j, i, Color.ForestGreen);
-                        else if (val < 0.7)
-                            treeMap.SetPixel(j, i, Color.LawnGreen);
-                        else
-                            treeMap.SetPixel(j, i, Color.LimeGreen);
+                    Plant plant = world.map[j / scale, i / scale].plant;
+                    if (plant as EvolutionSimulation.Grass != null)
+                        SetPixel(j, i, Color.DarkOliveGreen, treeMap, scale);
+                    else if (plant as EvolutionSimulation.Bush != null)
+                        SetPixel(j, i, Color.ForestGreen, treeMap, scale);
+                    else if (plant as EvolutionSimulation.Tree != null)
+                        SetPixel(j, i, Color.LawnGreen, treeMap, scale);
+                    else if (plant as EvolutionSimulation.EdibleTree != null)
+                        SetPixel(j, i, Color.Red, treeMap, scale);
                 }
             }
 
@@ -232,6 +224,17 @@ namespace VisualizadorConsola
             heightMap.Save("height.bmp");
             tempMap.Save("temp.bmp");
             hMap.Save("humidity.bmp");
+        }
+
+        void SetPixel(int x, int y, Color color, Bitmap bitmap, int scale = 2)
+        {
+            for (int i = 0; i < scale; i++)
+            {
+                for (int j = 0; j < scale; j++)
+                {
+                    bitmap.SetPixel(x + i, y + j, color);
+                }
+            }
         }
 
         World world;
