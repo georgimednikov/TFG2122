@@ -154,6 +154,29 @@ namespace EvolutionSimulation
             return new T();
 
         }
+
+        public List<Creature> PercieveCreatures(Creature c, int x, int y, int radius)
+        {
+            List<Creature> results = new List<Creature>();
+            foreach (Creature e in Creatures) // TODO: use this?
+            {
+                if (e == c) continue; // Reference comparison
+                if (Math.Abs(e.x - x) <= radius && Math.Abs(e.y - y) <= radius) // Square vision
+                    results.Add(e);
+            }
+            return results;
+        }
+
+        public List<StableEntity> PercieveEntities(Creature c, int x, int y, int radius)
+        {
+            List<StableEntity> results = new List<StableEntity>();
+            foreach (StableEntity e in StableEntities) // TODO: use this?
+            {
+                if (Math.Abs(e.x - x) <= radius && Math.Abs(e.y - y) <= radius) // Square vision
+                    results.Add(e);
+            }
+            return results;
+        }
         #endregion
 
         #region Procedural Generation

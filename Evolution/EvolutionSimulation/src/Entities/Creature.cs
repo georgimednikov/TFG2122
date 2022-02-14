@@ -50,6 +50,7 @@ namespace EvolutionSimulation.Entities
             mfsm.obtainActionPoints(stats.metabolism);
             
             seenEntities = Percieve();
+            // TODO: Interactuar con entidades vistas
 
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
             while (mfsm.Execute());// Maintains the evaluation - execution action
@@ -127,18 +128,8 @@ namespace EvolutionSimulation.Entities
         {
             int perceptionRadius = 4; // TODO: calculate this using the Perception stat
             List<IEntity> list = new List<IEntity>();
-
-            foreach (IEntity e in world.Creatures) // TODO: use this?
-            {
-                if (e == this) continue; // Reference comparison
-                if (Math.Abs(e.x - x) <= perceptionRadius && Math.Abs(e.y - y) <= perceptionRadius) // Square vision
-                {
-                    list.Add(e);
-                    Console.WriteLine("Seeing " + e.ToString()); // TODO: Remove
-                }
-            }
-            Console.WriteLine(); // TODO: Remove
-
+            list.AddRange(world.PercieveCreatures(this, x, y, perceptionRadius));   //TODO: Diferenciar criaturas de entidades?
+            list.AddRange(world.PercieveEntities(this, x, y, perceptionRadius));
             return list;
         }
 
