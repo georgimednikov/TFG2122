@@ -12,8 +12,6 @@ namespace EvolutionSimulation
         {
             world = new World();
             world.Init(32);
-            //Creature c = world.AddEntity<Creature>();
-            //c.Init(world, 4, 4);
         }
 
         public void Run()

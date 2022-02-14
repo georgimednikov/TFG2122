@@ -1,4 +1,5 @@
 ﻿using EvolutionSimulation.Entities;
+using EvolutionSimulation.Genetics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,7 @@ namespace EvolutionSimulation
         /// <param name="influenceFunc">Function that defines the influence of height on the other parameters</param>
         public void Init(int size, Func<double, double> heightFunc = default(Func<double, double>), Func<double, double> influenceFunc = default(Func<double, double>))
         {
+            taxonomy = new GeneticTaxonomy("../../SimilarityGeneWeight.json", "../../SimilaritySpecies.json");
             Creatures = new List<Creature>();
             StableEntities = new List<StableEntity>();
             CreaturesToDelete = new List<IEntity>();
@@ -339,6 +341,8 @@ namespace EvolutionSimulation
         // Entities management
         public List<Creature> Creatures { get; private set; }
         public List<StableEntity> StableEntities { get; private set; }
+        GeneticTaxonomy taxonomy;
+
 
         // TODO: podemos dejar esto asi o comparar los tipos en una sola lista
         List<IEntity> CreaturesToDelete;
