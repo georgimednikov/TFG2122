@@ -16,14 +16,14 @@ namespace EvolutionSimulation.Genetics
 
         public Species(Creature creature)
         {
+            chromosome = creature.chromosome;
+
             if (creature.species == null)
                 progenitor = creature.species.name;
-
             else
                 progenitor = "None";
 
-            name = "Nombre";
-            chromosome = creature.chromosome;
+            name = NameGenerator.GenerateName(chromosome);
             members = new List<Creature>();
             members.Add(creature);
             creature.species = this;
@@ -68,6 +68,7 @@ namespace EvolutionSimulation.Genetics
                 speciesGeneWeights[(int)t.Item1] = t.Item2;
             }
             existingSpecies = new List<Species>();
+            speciesRecord = new List<Species>();
 
             file = File.ReadAllText(jsonSimilarity);
             minGeneticSimilarity = JsonConvert.DeserializeObject<float>(file);
@@ -149,14 +150,14 @@ namespace EvolutionSimulation.Genetics
 
             if (speciesGeneWeights.Length != (int)CreatureFeature.Count - 1)
             {
-                throw new Exception("Weigths must have the same length as CreatureFeatures");
+                throw new Exception("Weights must have the same length as CreatureFeatures");
             }
             float sum = 0;
             foreach (float w in speciesGeneWeights)
                 sum += w;
             if (sum != 1)
             {
-                throw new Exception("Weigths sum must be 1");
+                throw new Exception("Weights sum must be 1");
             }
 
             float total = 0;

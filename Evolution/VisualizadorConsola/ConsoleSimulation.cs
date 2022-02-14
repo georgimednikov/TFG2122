@@ -23,6 +23,12 @@ namespace VisualizadorConsola
             c.Init(world, 4, 4);
             Corpse corpse = world.CreateStableEntity<Corpse>();
             corpse.Init(world, 5, 3, 3, 40, 70, 80);
+
+            for (int i = 0; i < 5; i++)
+            {
+                Animal animal = new Animal();
+                Console.WriteLine(NameGenerator.GenerateName(animal.chromosome));
+            }
             /*/
             Animal c = CreateEntity<Animal>();
             c.chromosome.PrintChromosome();
