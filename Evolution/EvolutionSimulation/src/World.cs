@@ -19,6 +19,7 @@ namespace EvolutionSimulation
         public struct MapData
         {
             public double height, humidity, temperature, flora;
+            public Plant plant;
         }
 
         Func<double, double> evaluateHeight;
@@ -219,7 +220,7 @@ namespace EvolutionSimulation
             int sizeX = heightMap.GetLength(0);
             int sizeY = heightMap.GetLength(1);
             map = new MapData[sizeX, sizeY];
-
+            double avgTemp = 0, avgHumidity = 0;
             for (int yIndex = 0; yIndex < sizeY; yIndex++)
             {
                 for (int xIndex = 0; xIndex < sizeX; xIndex++)
@@ -258,16 +259,59 @@ namespace EvolutionSimulation
                         map[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex];
                         map[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex];
                     }
+                    avgTemp += map[xIndex, yIndex].temperature;
+                    avgHumidity += map[xIndex, yIndex].humidity;
                 }
             }
-
+            int trees = 0;
+            int maxTrees = 0;
+            int maxFlora = 0;
+            double avgFlora = 0;
             for (int yIndex = 0; yIndex < sizeY; yIndex++)
                 for (int xIndex = 0; xIndex < sizeX; xIndex++)
+                {
+
                     if (map[xIndex, yIndex].height >= 0.5f)
                         map[xIndex, yIndex].flora = EvaluateFloraCurve(xIndex, yIndex);
                     else
                         map[xIndex, yIndex].flora = 0;
-
+                    double val = map[xIndex, yIndex].flora;
+                    avgFlora += val;
+                    if (val >= 0 && RandomGenerator.NextDouble() <= val)
+                    {
+                        int plantType = ChoosePlant(val);
+                        maxFlora++;
+                        switch (plantType)
+                        {
+                            case 0:
+                                map[xIndex, yIndex].plant = new Grass();
+                                break;
+                            case 1:
+                                map[xIndex, yIndex].plant = new Bush();
+                                break;
+                            case 2:
+                                maxTrees++;
+                                map[xIndex, yIndex].plant = new Tree();
+                                break;
+                            case 3:
+                                maxTrees++;
+                                trees++;
+                                map[xIndex, yIndex].plant = new EdibleTree();
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                }
+#if DEBUG
+            Console.WriteLine("Average Temperature: " + Math.Truncate((avgTemp * 100 / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
+            Console.WriteLine("Average Humidity: " + Math.Truncate((avgHumidity * 100 / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
+            Console.WriteLine("Average Flora: " + Math.Truncate((avgFlora * 100 / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
+            Console.WriteLine("EdibleTrees / Total Trees: " + Math.Truncate(((float)trees * 100f / maxTrees) * 100) / 100 + " %");
+            Console.WriteLine("EdibleTrees / Map: " + Math.Truncate(((float)trees * 100f / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
+            Console.WriteLine("Total Trees / Map: " + Math.Truncate(((float)maxTrees * 100f / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
+            Console.WriteLine("Total Flora / Map: " + Math.Truncate(((float)maxFlora * 100f / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
+#endif
         }
 
         /// <summary>
@@ -322,6 +366,26 @@ namespace EvolutionSimulation
             else if (x < 0.5) return Math.Pow((2 * x), 2) - 1;
             else if (x < 1) return 2 * (x - 0.5);
             else return 1;
+        }
+
+        int ChoosePlant(double floraProb)
+        {
+            double treeThreshold = 0.4;
+            if (floraProb <= treeThreshold)
+            {
+                double bushThreshold = 0.2;
+                if (RandomGenerator.NextDouble() <= ((1 / (treeThreshold - bushThreshold)) * (floraProb - bushThreshold)))
+                    return 1;
+                else
+                    return 0;
+            }
+            else
+            {
+                if (RandomGenerator.NextDouble() < 0.95)
+                    return 2;
+                else
+                    return 3;
+            }
         }
         #endregion
 
