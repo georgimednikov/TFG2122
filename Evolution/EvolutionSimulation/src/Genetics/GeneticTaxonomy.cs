@@ -7,36 +7,47 @@ using System.IO;
 
 namespace EvolutionSimulation.Genetics
 {
+    public class Species
+    {
+        public string name;
+        public string progenitor;
+        public CreatureChromosome chromosome;
+        public List<Creature> members;
+
+        public Species(Creature creature)
+        {
+            if (creature.species == null)
+                progenitor = creature.species.name;
+
+            else
+                progenitor = "None";
+
+            name = "Nombre";
+            chromosome = creature.chromosome;
+            members = new List<Creature>();
+            members.Add(creature);
+            creature.species = this;
+        }
+    }
+
     public class GeneticTaxonomy
     {
-        struct Species
-        {
-            public string name;
-            public CreatureChromosome chromosome;
-            public List<Creature> members;
-
-            public Species(Creature creature)
-            {
-                chromosome = creature.chromosome;
-                members = new List<Creature>();
-                members.Add(creature);
-                name = "k";
-            }
-        }
-
         // The different weights of each gene when calculating the genetic similarity between two creatures
         float[] speciesGeneWeights;
         List<Species> existingSpecies;
+        // List containing the information of every species that has spawned, as well as the forming tree.
+        // A new species is inserted right after its progenitor, so the order to create the tree is mantained.
+        // See RenderSpeciesTree for details about the tree structure
+        List<Species> speciesRecord;
         // The mininum genetic similarity to be the same species
         float minGeneticSimilarity;
 
-        //Mapa extinctSpecies?
 
         /// <summary>
         /// Create the GeneticTaxonomy using both json
         /// </summary>
-        /// <param name="jsonWeigths"> path with gene weights to calculate genetic similarities </param>
-        /// <param name="jsonSimilarity">path with species similarity</param>
+        /// <param name="jsonWeigths">Path with gene weights to calculate genetic similarities </param>
+        /// <param name="jsonSimilarity">Path with species similarity</param>
         public GeneticTaxonomy(string jsonWeigths, string jsonSimilarity)
         {
             //The different weights for each gene when calculating the similarities
@@ -63,18 +74,67 @@ namespace EvolutionSimulation.Genetics
         }
 
 
-        public void UpdateSpecies(Creature creature)
+        /// <summary>
+        /// This method is supposed to be called when a new creature is spawned.
+        /// It is added to an existing species or a new one is created based on its genetics.
+        /// </summary>
+        public void AddCreatureToSpecies(Creature creature)
         {
-            for (int i = 0; i < existingSpecies.Count; ++i)
+            //If the creature belongs to an existing species, it is added to its members
+            foreach (Species sp in existingSpecies)
             {
-                if (GeneticSimilarity(creature.chromosome, existingSpecies[i].chromosome) > minGeneticSimilarity)
+                if (GeneticSimilarity(creature.chromosome, sp.chromosome) > minGeneticSimilarity)
                 {
-                    existingSpecies[i].members.Add(creature);
+                    sp.members.Add(creature);
                     return;
                 }
             }
+            //Else a new species is created
             Species newSpecies = new Species(creature);
             existingSpecies.Add(newSpecies);
+
+            //If the new species is made from scratch, it is simply added
+            if (creature.species.progenitor == "None")
+            {
+                speciesRecord.Add(newSpecies);
+                return;
+            }
+
+            //If not, it is added after its progenitor, following the tree structure of speciesRecord
+            int i = 0;
+            for (; i < speciesRecord.Count; ++i)
+            {
+                if (speciesRecord[i].name == newSpecies.progenitor)
+                {
+                    speciesRecord.Insert(i + 1, newSpecies);
+                    break;
+                }
+            }
+            if (i == speciesRecord.Count)
+                throw new Exception("There is a discrepancy between the new species' progenitor name and the existing species' names");
+        }
+
+        /// <summary>
+        /// This method is supposed to be called when a new creature dies.
+        /// It is removed from its species pool of members. If it was the last one, the species is extinct.
+        /// </summary>
+        public void RemoveCreatureToSpecies(Creature creature)
+        {
+            foreach (Species sp in existingSpecies)
+            {
+                int pos = sp.members.FindIndex(x => x == creature);
+                if (pos != -1)
+                {
+                    sp.members.RemoveAt(pos);
+                    if (sp.members.Count == 0)
+                    {
+                        existingSpecies.Remove(sp);
+                    }
+                    return;
+                }
+            }
+            throw new Exception("A creature was tried to be removed from the list of species but it was never added. " +
+                "AddCreatureToSpecies has to be called when a creature is created");
         }
 
         /// <summary>
@@ -117,6 +177,14 @@ namespace EvolutionSimulation.Genetics
                 total += genEqual * speciesGeneWeights[i];
             }
             return total;
+        }
+
+        /// <summary>
+        /// Renders the record of all the species created, alive and dead, giving the dependencies between them
+        /// </summary>
+        public void RenderSpeciesTree()
+        {
+
         }
     }
 }
