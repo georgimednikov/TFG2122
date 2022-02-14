@@ -24,13 +24,15 @@ namespace EvolutionSimulation
 
         Func<double, double> evaluateHeight;
         Func<double, double> evaluateInfluence;
+        Func<int, int, double> evaluateFlora;
+        Func<double, int> selectFlora;
 
         /// <summary>
         /// Initializes the map with a square matrix, optionally you can pass additional function to change how the Perlin Noise is interpreted and how much the height influences the rest.
         /// </summary>
         /// <param name="heightFunc">Function to interpret the results from the Perlin Noise function</param>
         /// <param name="influenceFunc">Function that defines the influence of height on the other parameters</param>
-        public void Init(int size, Func<double, double> heightFunc = default(Func<double, double>), Func<double, double> influenceFunc = default(Func<double, double>))
+        public void Init(int size, Func<double, double> heightFunc = default(Func<double, double>), Func<double, double> influenceFunc = default(Func<double, double>), Func<int, int, double> floraFunc = default(Func<int, int, double>), Func<double, int> floraSelectorFunc = default(Func<double, int>))
         {
             taxonomy = new GeneticTaxonomy("../../SimilarityGeneWeight.json", "../../SimilaritySpecies.json");
             Creatures = new List<Creature>();
@@ -39,6 +41,8 @@ namespace EvolutionSimulation
             SEntitiesToDelete = new List<IEntity>();
             evaluateHeight = (heightFunc != null) ? heightFunc : EvaluateHeightCurve;
             evaluateInfluence = (influenceFunc != null) ? influenceFunc : EvaluateInfluenceCurve;
+            evaluateFlora = (floraFunc != null) ? floraFunc : EvaluateFloraCurve;
+            selectFlora = (floraSelectorFunc != null) ? floraSelectorFunc : ChoosePlant;
             p = new Perlin();
             mapSize = size;
             heightWaves = new Wave[2];
@@ -157,6 +161,37 @@ namespace EvolutionSimulation
             return new T();
 
         }
+
+        /// <summary>
+        /// Returns the creatures in an area with a determined radius.
+        /// </summary>
+        /// <param name="c">The creature that is perceiving</param>
+        public List<Creature> PerceiveCreatures(Creature c, int x, int y, int radius)
+        {
+            List<Creature> results = new List<Creature>();
+            foreach (Creature e in Creatures) // TODO: use this?
+            {
+                if (e == c) continue; // Reference comparison
+                if (Math.Abs(e.x - x) <= radius && Math.Abs(e.y - y) <= radius) // Square vision
+                    results.Add(e);
+            }
+            return results;
+        }
+
+        /// <summary>
+        /// Returns the entities in an area with a determined radius.
+        /// </summary>
+        /// <param name="c">The creature that is perceiving</param>
+        public List<StableEntity> PerceiveEntities(Creature c, int x, int y, int radius)
+        {
+            List<StableEntity> results = new List<StableEntity>();
+            foreach (StableEntity e in StableEntities) // TODO: use this?
+            {
+                if (Math.Abs(e.x - x) <= radius && Math.Abs(e.y - y) <= radius) // Square vision
+                    results.Add(e);
+            }
+            return results;
+        }
         #endregion
 
         #region Procedural Generation
@@ -272,14 +307,14 @@ namespace EvolutionSimulation
                 {
 
                     if (map[xIndex, yIndex].height >= 0.5f)
-                        map[xIndex, yIndex].flora = EvaluateFloraCurve(xIndex, yIndex);
+                        map[xIndex, yIndex].flora = evaluateFlora(xIndex, yIndex);
                     else
                         map[xIndex, yIndex].flora = 0;
                     double val = map[xIndex, yIndex].flora;
                     avgFlora += val;
                     if (val >= 0 && RandomGenerator.NextDouble() <= val)
                     {
-                        int plantType = ChoosePlant(val);
+                        int plantType = selectFlora(val);
                         maxFlora++;
                         switch (plantType)
                         {
