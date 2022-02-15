@@ -19,9 +19,9 @@ namespace EvolutionSimulation.Genetics
             chromosome = creature.chromosome;
 
             if (creature.species == null)
-                progenitor = creature.species.name;
-            else
                 progenitor = "None";
+            else
+                progenitor = creature.species.name;
 
             name = NameGenerator.GenerateName(chromosome);
             members = new List<Creature>();
@@ -147,15 +147,14 @@ namespace EvolutionSimulation.Genetics
         /// <returns> Value between 0-1. 1 has the same values and 0 different values</returns>
         private float GeneticSimilarity(CreatureChromosome creature1, CreatureChromosome creature2)
         {
-
-            if (speciesGeneWeights.Length != (int)CreatureFeature.Count - 1)
+            if (speciesGeneWeights.Length != (int)CreatureFeature.Count)
             {
                 throw new Exception("Weights must have the same length as CreatureFeatures");
             }
             float sum = 0;
             foreach (float w in speciesGeneWeights)
                 sum += w;
-            if (sum != 1)
+            if (sum < 0.98 || sum > 1) //Wiggle room
             {
                 throw new Exception("Weights sum must be 1");
             }
@@ -175,6 +174,8 @@ namespace EvolutionSimulation.Genetics
                 }
 
                 genEqual /= gen1.Length;
+                //The value is multiplied by its weight, and the added values of the weights is 1
+                //Therefore, the total value goes from 0 to 1
                 total += genEqual * speciesGeneWeights[i];
             }
             return total;
