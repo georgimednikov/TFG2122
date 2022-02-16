@@ -183,45 +183,60 @@ namespace EvolutionSimulation.Genetics
             return total;
         }
 
+
         /// <summary>
         /// Renders the record of all the species created, alive and dead, giving the dependencies between them
+        /// SpeciesRecord has to be ordered, the progenitor has to be before the species or it will not work
         /// </summary>
-        public void RenderSpeciesTree()
+        /// <param name="path">path to save in a file the speciesTree</param>
+        public void RenderSpeciesTree(string path)
         {
-            StreamWriter writer = new StreamWriter("../../tree.txt");
+            StreamWriter writer = new StreamWriter(path);
+            //runs through all species 
             for (int i = 0; i < speciesRecord.Count; ++i)
             {
-                //Console.WriteLine(speciesRecord[i].name);
-
                 i = RenderSpeciesTree( speciesRecord[i].name, 0, i, writer);                
             }
             writer.Close();
-            Console.WriteLine("\n"); 
         }
 
-        
 
-        private int RenderSpeciesTree( string name, int lvl, int index, StreamWriter writer)
+        /// <summary>
+        /// Recursive method that really saves the speciesTree in the file
+        /// The stop condition is to be at the end of the speciesRecord list
+        /// It receive the name of the species that is going to be save and analyze the next 
+        /// species in the speciesRecord list 
+        /// 
+        /// We differentiate 4 cases:
+        /// - The species being analyzed progenitor's name is the name of 
+        /// the species that is being saved (parent-child) (A and A1)
+        /// 
+        /// - The species being analyzed progenitor's name is the progenitor's name 
+        /// of the species that is being saved (siblings) (A11 and A12)
+        /// 
+        /// - The species being analyzed progenitor's name is a far aways progenitor's name 
+        /// of the species that is being saved(cousin, aunts...)(A1 and A2)
+        /// 
+        /// -The species being analyzed progenitor's name is "None"(A and B)
+        ///  
+        /// Example
+        /// A
+        ///     A1
+        ///         A11
+        ///         A12
+        ///     A2
+        /// B
+        /// </summary>
+        /// <param name="name"> name of the species</param>
+        /// <param name="lvl"> level of the generations</param>
+        /// <param name="index"> index in the list </param>
+        /// <param name="writer"> where to save the tree</param>
+        /// <returns> Returns index to not check again the same species</returns>
+        private int RenderSpeciesTree(string name, int lvl, int index, StreamWriter writer)
         {
+            SaveTree(name, lvl, writer);
+
             // Stop condition, end of the species
-            if (lvl != 0)
-            {
-                for (int i = 0; i < lvl; ++i)
-                {
-                    Console.Write("│" + "".PadLeft(4));
-                    writer.Write("│" + "".PadLeft(4));
-
-                }
-                Console.WriteLine( "└───" + name);
-                writer.WriteLine("└───" + name);
-
-            }
-            else
-            {
-                Console.WriteLine("├───" + name);
-                writer.WriteLine("├───" + name);
-
-            }
             if (index >= speciesRecord.Count-1) return index;
             
 
@@ -236,6 +251,7 @@ namespace EvolutionSimulation.Genetics
             {
                 bool siblings = false;
                 int cont = index - 1;
+                //find the lvl of the progenitor
                 while(!siblings && cont > 0 && speciesRecord[cont].progenitor != "None")
                 {
                     if (speciesRecord[cont].progenitor == speciesRecord[index + 1].progenitor)
@@ -247,6 +263,28 @@ namespace EvolutionSimulation.Genetics
                     index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl - (index-cont), ++index, writer);
             }
             return index;
+        }
+
+        /// <summary>
+        /// Method used to save the evolution tree over time
+        /// </summary>
+        /// <param name="name">Name of the species </param>
+        /// <param name="lvl">Number of progenitors that the species has</param>
+        /// <param name="writer">Where to save the tree</param>
+        private void SaveTree(string name, int lvl, StreamWriter writer)
+        {
+            if (lvl != 0)
+            {
+                for (int i = 0; i < lvl; ++i)
+                {
+                    writer.Write("│" + "".PadLeft(4));
+                }
+                writer.WriteLine("└───" + name);
+            }
+            else
+            {
+                writer.WriteLine("├───" + name);
+            }
         }
     }
 }

@@ -111,17 +111,15 @@ namespace EvolutionSimulation
 
             if(Creatures.Count == 8)
             {
-                //taxonomy.RenderSpeciesTree();
+                //taxonomy.RenderSpeciesTree("../../tree");
 
                 ent = CreateEntity<T>();
                 Creatures.Add(ent);
                 taxonomy.AddCreatureToSpecies(ent);
-                taxonomy.RenderSpeciesTree();
+                //taxonomy.RenderSpeciesTree("../../tree");
             }
-            if(Creatures.Count == 11)
-                taxonomy.RenderSpeciesTree();
-
-
+            if (Creatures.Count == 11)
+                taxonomy.RenderSpeciesTree("../../tree.txt");
             return ent;
         }
 
