@@ -21,5 +21,10 @@ namespace EvolutionSimulation.FSM.Creature.States
             Console.WriteLine("Eat");
             return 1000;
         }
+
+        public override string ToString()
+        {
+            return "EatState";
+        }
     }
 }

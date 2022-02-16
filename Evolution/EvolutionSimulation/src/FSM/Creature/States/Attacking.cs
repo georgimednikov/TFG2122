@@ -20,5 +20,10 @@
             obj.ReceiveInteraction(creature, Entities.Interactions.attack);
             return 1000; // Cost of the action performed
         }
+
+        public override string ToString()
+        {
+            return "AttackingState";
+        }
     }
 }

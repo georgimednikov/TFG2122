@@ -24,5 +24,10 @@ namespace EvolutionSimulation.FSM.Creature.States
             creature.world.Destroy(creature);
             return creature.actionPoints;
         }
+
+        public override string ToString()
+        {
+            return "DeadState";
+        }
     }
 }

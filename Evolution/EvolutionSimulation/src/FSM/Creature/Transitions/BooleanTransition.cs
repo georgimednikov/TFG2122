@@ -24,6 +24,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             return flag.value;
         }
 
+        public override string ToString()
+        {
+            return "BooleanTransition";
+        }
+
         BooleanWrapper flag;
     }
 }

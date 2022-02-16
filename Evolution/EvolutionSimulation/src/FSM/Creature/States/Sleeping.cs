@@ -17,5 +17,10 @@
             if (creature.stats.CurrRest > creature.stats.MaxRest) creature.stats.CurrRest = creature.stats.MaxRest;
             return 10 * creature.stats.Metabolism; // Cost of the action performed
         }
+
+        public override string ToString()
+        {
+            return "SleepingState";
+        }
     }
 }

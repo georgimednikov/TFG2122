@@ -22,5 +22,10 @@ namespace EvolutionSimulation.FSM.Creature.States
             Console.WriteLine("Alive");
             return 1000;
         }
+
+        public override string ToString()
+        {
+            return "AliveState";
+        }
     }
 }

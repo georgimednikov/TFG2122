@@ -10,5 +10,10 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
     {
         protected Entities.Creature creature;
         public abstract bool Evaluate();
+
+        public override string ToString()
+        {
+            return "CreatureTransition";
+        }
     }
 }

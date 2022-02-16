@@ -17,6 +17,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         {
             return creature.stats.CurrRest >= creature.stats.MaxRest;
         }
-    
+
+        public override string ToString()
+        {
+            return "WakeTransition";
+        }
+
     }
 }

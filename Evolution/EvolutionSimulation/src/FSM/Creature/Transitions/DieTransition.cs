@@ -18,6 +18,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             return  creature.stats.CurrHealth <= 0
                 || creature.stats.CurrAge++ >= creature.stats.LifeSpan;
         }
-    
+
+        public override string ToString()
+        {
+            return "DieTransition";
+        }
+
     }
 }

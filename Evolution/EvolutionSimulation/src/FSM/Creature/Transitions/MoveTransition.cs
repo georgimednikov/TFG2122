@@ -18,5 +18,10 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             return false;
             //TODO: return creature.speed > 0;
         }
+
+        public override string ToString()
+        {
+            return "MoveTransition";
+        }
     }
 }

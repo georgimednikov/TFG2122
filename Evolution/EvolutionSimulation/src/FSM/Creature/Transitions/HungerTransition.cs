@@ -18,6 +18,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             return false;
             //TODO: return creature.energy < 5;
         }
-    
+
+        public override string ToString()
+        {
+            return "HungerTransition";
+        }
+
     }
 }

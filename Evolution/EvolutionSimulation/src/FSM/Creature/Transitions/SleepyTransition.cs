@@ -16,6 +16,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         public override bool Evaluate()
         {
             return creature.stats.CurrRest <= 0.1 * creature.stats.MaxRest;
-        } 
+        }
+
+        public override string ToString()
+        {
+            return "SleepyTransition";
+        }
     }
 }

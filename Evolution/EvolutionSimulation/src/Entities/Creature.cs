@@ -37,7 +37,7 @@ namespace EvolutionSimulation.Entities
             this.y = y;
             ConfigureStateMachine();
             AddInteraction(Interactions.attack, OnAttack);
-
+            Console.WriteLine(mfsm.ExportToDotGraph());
         }
 
         /// <summary>

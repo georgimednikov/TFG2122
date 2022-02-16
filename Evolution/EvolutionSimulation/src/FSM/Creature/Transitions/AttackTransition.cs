@@ -19,6 +19,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
                 && creature.stats.Aggressiveness > 0;
             //TODO: revisar entidades vistas y considerar agresividad
         }
-    
+
+        public override string ToString()
+        {
+            return "AttackTransition";
+        }
+
     }
 }

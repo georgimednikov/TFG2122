@@ -1,5 +1,6 @@
 ﻿using System;
 using Stateless;
+using Stateless.Graph;
 
 namespace EvolutionSimulation.FSM
 {
@@ -35,6 +36,15 @@ namespace EvolutionSimulation.FSM
         {
             machine.Configure(sub)
                 .SubstateOf(super);
+        }
+
+        /// <summary>
+        /// Returns a string representation of the state machine in the DOT graph language
+        /// It can then be visualized by pasting the output in http://www.webgraphviz.com/
+        /// </summary>
+        public string ExportToDotGraph()
+        {
+            return UmlDotGraph.Format(machine.GetInfo());
         }
 
         /// <summary>

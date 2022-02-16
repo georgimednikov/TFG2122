@@ -18,6 +18,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             return false;
             //TODO: hacer bien esta transicion
         }
-    
+
+        public override string ToString()
+        {
+            return "IdleTransition";
+        }
+
     }
 }

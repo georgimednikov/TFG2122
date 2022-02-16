@@ -21,5 +21,10 @@ namespace EvolutionSimulation.FSM.Creature.States
             Console.WriteLine("Idle");
             return 10 * creature.stats.Metabolism;
         }
+
+        public override string ToString()
+        {
+            return "IdleState";
+        }
     }
 }
