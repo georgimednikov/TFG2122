@@ -53,7 +53,7 @@ namespace EvolutionSimulation
 
         static private int GetIndexByWeight(double value, float[] weights)
         {
-            float count = 0;
+            float count = 0.001f; //In case the weights are slightly below 1 and value is precisely 1
             for (int i = 0; i < weights.Length; ++i)
             {
                 count += weights[i];

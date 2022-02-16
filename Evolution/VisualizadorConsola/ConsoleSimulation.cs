@@ -17,10 +17,15 @@ namespace VisualizadorConsola
             //*/
             world = new World();
             world.Init(16);
+            Console.WriteLine("\n");
+            
             Animal c = world.CreateCreature<Animal>();
             c.Init(world, 5, 5);
             c = world.CreateCreature<Animal>();
             c.Init(world, 4, 4);
+           
+            
+            
             Corpse corpse = world.CreateStableEntity<Corpse>();
             corpse.Init(world, 5, 3, 3, 40, 70, 80);
         }
