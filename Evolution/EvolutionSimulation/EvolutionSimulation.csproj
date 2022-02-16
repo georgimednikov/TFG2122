@@ -75,6 +75,7 @@
     <Compile Include="src\Entities\EdiblePlant.cs" />
     <Compile Include="src\Entities\EdibleTree.cs" />
     <Compile Include="src\Entities\Tree.cs" />
+    <Compile Include="src\FSM\Creature\States\Attacking.cs" />
     <Compile Include="src\FSM\Creature\States\Sleeping.cs" />
     <Compile Include="src\FSM\Creature\States\CreatureState.cs" />
     <Compile Include="src\FSM\Creature\Transitions\BooleanWrapper.cs" />

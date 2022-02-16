@@ -35,8 +35,8 @@ namespace VisualizadorConsola
 
         public void Run()
         {
-            WorldToBmp();
-            while (false)
+            //WorldToBmp();
+            while (true)
             {
                 world.Tick();
                 Render();

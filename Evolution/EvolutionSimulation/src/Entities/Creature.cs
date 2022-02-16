@@ -4,6 +4,7 @@ using EvolutionSimulation.FSM;
 using EvolutionSimulation.FSM.Creature.States;
 using EvolutionSimulation.FSM.Creature.Transitions;
 using EvolutionSimulation.Genetics;
+using System.Numerics;
 
 namespace EvolutionSimulation.Entities
 {
@@ -13,7 +14,7 @@ namespace EvolutionSimulation.Entities
     public abstract class Creature : IEntity
     {
         BooleanWrapper toMove, toIdle, toDie, toMunch,
-            toSleep, toWake;
+            toSleep, toWake, toFlee, toAttack;
 
         /// <summary>
         /// Constructor for factories
@@ -22,6 +23,8 @@ namespace EvolutionSimulation.Entities
         {
             chromosome = new CreatureChromosome();
             stats = new CreatureStats();
+            seenCreatures = new List<Creature>();
+            seenEntities = new List<StableEntity>();
             SetStats();
         }
 
@@ -48,14 +51,36 @@ namespace EvolutionSimulation.Entities
             toSleep.value = (stats.currRest <= 0.1 * stats.maxRest);
             toWake.value = (stats.currRest >= stats.maxRest);
             mfsm.obtainActionPoints(stats.metabolism);
-            
+
+            seenCreatures.Clear();
+            seenEntities.Clear();
             Perceive();
-            // TODO: Interactuar con entidades vistas
+
+            MakeDecision();
             // TomarDecision(); (Asignar Criatura Objetivo) -> Trigger Transicion -> Cambio de estado
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
             while (mfsm.Execute());// Maintains the evaluation - execution action
             // Creatura 1 ->  Ataca -> Creatura 2       Desde Creatura1 : Creatura2.Interact(Creatura 1, attack);
             //                                          Desde Creatura2 : Creatura1.Interact(Creatura2, attack);
+        }
+
+        /// <summary>
+        /// Affects the transitions of the FSM based on perceived entities
+        /// </summary>
+        void MakeDecision()
+        {
+            if (seenCreatures.Count > 0)
+            {
+                objective = seenCreatures[0];
+                objectivePos = new Vector2(objective.x, objective.y);
+                toAttack.value = true;
+                toIdle.value = false;
+            }
+            else
+            {
+                toAttack.value = false;
+                toIdle.value = true;
+            }
         }
 
         /// <summary>
@@ -79,6 +104,7 @@ namespace EvolutionSimulation.Entities
             IState alive = new Alive(this);
             IState eat = new Eat(this);
             IState sleep = new Sleeping(this);
+            IState attack = new Attacking(this);
 
             mfsm = new Fsm(idle);
             toMove = new BooleanWrapper(false);
@@ -87,20 +113,29 @@ namespace EvolutionSimulation.Entities
             toMunch = new BooleanWrapper(false);
             toSleep = new BooleanWrapper(false);
             toWake = new BooleanWrapper(false);
+            toAttack = new BooleanWrapper(false);
 
             // Substates
             mfsm.AddSubstate(alive, idle);
             mfsm.AddSubstate(alive, moving);
             mfsm.AddSubstate(alive, eat);
             mfsm.AddSubstate(alive, sleep);
+            mfsm.AddSubstate(alive, attack);
 
             // Transitions
             mfsm.AddTransition(idle, new BooleanTransition(toMove), moving);
             mfsm.AddTransition(idle, new BooleanTransition(toMunch), eat);
+            mfsm.AddTransition(idle, new BooleanTransition(toSleep), sleep);
+            mfsm.AddTransition(idle, new BooleanTransition(toAttack), attack);
+
             mfsm.AddTransition(moving, new BooleanTransition(toIdle), idle);
             mfsm.AddTransition(moving, new BooleanTransition(toSleep), sleep);
-            mfsm.AddTransition(idle, new BooleanTransition(toSleep), sleep);
+            mfsm.AddTransition(moving, new BooleanTransition(toAttack), attack);
+
+            mfsm.AddTransition(attack, new BooleanTransition(toIdle), idle);
+
             mfsm.AddTransition(sleep, new BooleanTransition(toWake), idle);
+
             mfsm.AddTransition(alive, new BooleanTransition(toDie), dead);
         }
 
@@ -143,12 +178,14 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Manages an interaction between creatures
         /// </summary>
-        public void Interact(Creature interacter, Interactions type)
+        public void ReceiveInteraction(Creature interacter, Interactions type)
         {
             switch (type)
             {
                 case Interactions.attack:
                     stats.currHealth -= computeDamage(interacter.stats.damage, interacter.stats.perforation);
+                    toFlee = new BooleanWrapper(interacter.stats.aggressiveness < 1 || interacter.stats.currHealth < interacter.stats.maxHealth * 0.2);
+                    toAttack = new BooleanWrapper(!toFlee.value);
                     //hasBeenHit = true; O MEJOR INCLUSO forzar el cambio al igual que TomarDecision()
                     break;
                 default:
@@ -161,7 +198,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         /// <param name="dmg">Incoming damage</param>
         /// <param name="pen">Damage penetratione</param>
-        float computeDamage(float dmg, float pen)
+        public float computeDamage(float dmg, float pen)
         {
             float amount = 0;
             amount = (dmg) - (stats.armor - pen);
@@ -199,6 +236,12 @@ namespace EvolutionSimulation.Entities
         private Fsm mfsm;
         private float startMultiplier = 0.33f; //Starting multiplier of newborns
         private float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
+
+        public IEntity objective;
+        Vector2 objectivePos;
+
+        List<Interactions> interactions;
+        //other.interactions.add(new Attack(this));
 
         #endregion
     }
