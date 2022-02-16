@@ -443,7 +443,6 @@ namespace EvolutionSimulation
         public List<StableEntity> StableEntities { get; private set; }
         GeneticTaxonomy taxonomy;
 
-
         // TODO: podemos dejar esto asi o comparar los tipos en una sola lista
         List<IEntity> CreaturesToDelete;
         List<IEntity> SEntitiesToDelete;
