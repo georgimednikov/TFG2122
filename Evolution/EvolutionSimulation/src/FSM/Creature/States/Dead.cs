@@ -13,13 +13,16 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override bool canPerformAction(int actionPoints)
         {
-            return actionPoints < 1000;
+            return actionPoints > 0;
         }
 
+        /// If the creature dies, it consumes all its action points to avoid
+        /// doing actions while dead
         public override int Action()
         {
             Console.WriteLine("Dead");
-            return 1000;
+            creature.world.Destroy(creature);
+            return creature.actionPoints;
         }
     }
 }

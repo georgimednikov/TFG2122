@@ -39,8 +39,9 @@ namespace EvolutionSimulation
             putridTime = (int)(lifeTime * putridStart);
         }
 
-        public void OnInteract(Creature other)
+        public void ReceiveInteraction(Creature other, Interactions type)
         {
+            if (type != Interactions.eat) return;
             int prob = RandomGenerator.Next(0, 100);
             if(state == CorpseState.Putrid)
             {

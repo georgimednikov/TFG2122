@@ -11,14 +11,8 @@ namespace EvolutionSimulation.Entities
     /// <summary>
     /// A creature with attributes and behavior
     /// </summary>
-    public abstract class Creature : IEntity
+    public abstract class Creature : IEntity, IInteractable<Creature>
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        // TODO: Puede ser que queramos aniadir mas de una interaccion
-        public Dictionary<Interactions, Action<Creature>> InteractionsDict { get; private set; }
-
         /// <summary>
         /// Constructor for factories
         /// </summary>
@@ -28,7 +22,7 @@ namespace EvolutionSimulation.Entities
             stats = new CreatureStats();
             seenCreatures = new List<Creature>();
             seenEntities = new List<StableEntity>();
-            InteractionsDict = new Dictionary<Interactions, Action<Creature>>();
+            InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
             SetStats();
         }
 
@@ -42,7 +36,8 @@ namespace EvolutionSimulation.Entities
             this.x = x;
             this.y = y;
             ConfigureStateMachine();
-            InteractionsDict.Add(Interactions.attack, OnAttack);
+            AddInteraction(Interactions.attack, OnAttack);
+
         }
 
         /// <summary>
@@ -177,17 +172,45 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
-        /// Manages an interaction between creatures
+        /// Executes every response that this creature has to an interaction with other creature
         /// </summary>
         public void ReceiveInteraction(Creature interacter, Interactions type)
         {
             if (InteractionsDict.ContainsKey(type))
-                InteractionsDict[type](interacter);
+                foreach(Action<Creature> response in InteractionsDict[type])
+                    response(interacter);
+        }
+
+        /// <summary>
+        /// Adds a response to a interaction type, given 
+        /// the creature that interacts with this.
+        /// </summary>
+        public void AddInteraction(Interactions type, Action<Creature> response)
+        {
+            if (!InteractionsDict.ContainsKey(type))
+                InteractionsDict[type] = new List<Action<Creature>>();
+            InteractionsDict[type].Add(response);
+        }
+        /// <summary>
+        /// Removes a response to an interaction type, given the
+        /// creature that interacts with this. 
+        /// If the interaction type or the response is not registered, it does nothing.
+        /// If no responses remain after the removal, it removes the interaction entry
+        /// </summary>
+        // TODO: Quitamos la entrada del diccionario si no quedan reacciones?
+        public void RemoveInteraction(Interactions type, Action<Creature> response)
+        {
+            if (!InteractionsDict.ContainsKey(type)) return;
+
+            InteractionsDict[type].Remove(response);
+            if (InteractionsDict[type].Count == 0)
+                InteractionsDict.Remove(type);
         }
 
         private void OnAttack(Creature interacter)
         {
             stats.currHealth -= computeDamage(interacter.stats.damage, interacter.stats.perforation);
+
             objective = interacter;
             objectivePos = new Vector2(interacter.x, interacter.y);
             hasBeenHit = true; //O MEJOR INCLUSO forzar el cambio al igual que TomarDecision()
@@ -242,6 +265,9 @@ namespace EvolutionSimulation.Entities
 
         public bool hasBeenHit;
 
+        // Interactions that the creature can react to. Keys are the Interaction type
+        // and values are the actions that the creature performs when something interacts with it.
+        Dictionary<Interactions, List<Action<Creature>>> InteractionsDict;
         #endregion
     }
 
@@ -313,5 +339,4 @@ namespace EvolutionSimulation.Entities
         public float maxSpeed;
     }
 
-    public enum Interactions { attack, initmidate, mate }
 }

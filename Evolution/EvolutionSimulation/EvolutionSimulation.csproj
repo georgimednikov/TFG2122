@@ -103,7 +103,7 @@
     <Compile Include="src\FSM\Creature\Transitions\BooleanTransition.cs" />
     <Compile Include="src\FSM\Fsm.cs" />
     <Compile Include="src\FSM\Interfaces.cs" />
-    <Compile Include="src\IInteractable.cs" />
+    <Compile Include="src\Entities\IInteractable.cs" />
     <Compile Include="src\Perlin.cs" />
     <Compile Include="src\Entities\Creature.cs" />
     <Compile Include="src\ISimulation.cs" />
