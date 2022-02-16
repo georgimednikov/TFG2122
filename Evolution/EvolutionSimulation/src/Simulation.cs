@@ -37,7 +37,7 @@ namespace EvolutionSimulation
     {
         public override int Compare(Creature x, Creature y)
         {
-            return -x.stats.metabolism.CompareTo(y.stats.metabolism);
+            return -x.stats.Metabolism.CompareTo(y.stats.Metabolism);
         }
     }
 }

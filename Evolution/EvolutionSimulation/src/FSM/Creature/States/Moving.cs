@@ -7,7 +7,7 @@
 
         public override bool canPerformAction(int actionPoints)
         {
-            return actionPoints >= 1000 * ((200f - creature.stats.groundSpeed) / 100f);
+            return actionPoints >= 1000 * ((200f - creature.stats.GroundSpeed) / 100f);
         }
 
         public override int Action()
@@ -22,7 +22,7 @@
             if (creature.world.canMove(nX, nY))
             {
                 creature.Place(nX, nY);
-                return (int)(1000 * ((200f - creature.stats.groundSpeed) / 100f)); // Cost of the action performed
+                return (int)(1000 * ((200f - creature.stats.GroundSpeed) / 100f)); // Cost of the action performed
             }
             return 0;
         }

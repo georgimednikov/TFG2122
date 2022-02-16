@@ -13,13 +13,13 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override bool canPerformAction(int actionPoints)
         {
-            return actionPoints >= 10 * creature.stats.metabolism;
+            return actionPoints >= 10 * creature.stats.Metabolism;
         }
 
         public override int Action()
         {
             Console.WriteLine("Idle");
-            return 10 * creature.stats.metabolism;
+            return 10 * creature.stats.Metabolism;
         }
     }
 }

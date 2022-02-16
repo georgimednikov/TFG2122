@@ -1,4 +1,5 @@
 ﻿using EvolutionSimulation.Genetics;
+using System;
 
 namespace EvolutionSimulation.Entities
 {
@@ -24,96 +25,95 @@ namespace EvolutionSimulation.Entities
                                           //An arboreal creature moves fast through trees, but arborealSpeed * mobilityPenalty on the ground
                                           //An aerial creature moves fast in the air, but arborealSpeed = aerialSpeed * mobilityPenalty and groundSpeed = arborealSpeed * mobilityPenalty
 
+            stats.LifeSpan = chromosome.GetFeature(CreatureFeature.Longevity);
+
             ////Multipliers
-            stats.healthRegeneration = 0.1f;
-            stats.maxSpeed = 1.5f;
+            stats.HealthRegeneration = 0.1f;
+            stats.MaxSpeed = 1.5f;
 
-            stats.gender = chromosome.GetGender();
+            stats.Gender = chromosome.GetGender();
 
-            stats.diet = (Diet)SetStatInRange(CreatureFeature.Diet, (int)Diet.Count);
+            stats.Diet = (Diet)SetStatInRange(CreatureFeature.Diet, (int)Diet.Count);
 
             //Minimum health plus bonus health
-            stats.maxHealth = chromosome.GetFeature(CreatureFeature.Constitution) * healthValue + minHealth;
-            stats.currHealth = stats.maxHealth;
-
-            stats.damage = chromosome.GetFeature(CreatureFeature.Strength);
-            stats.armor = chromosome.GetFeature(CreatureFeature.Fortitude);
-            stats.perforation = chromosome.GetFeature(CreatureFeature.Piercing);
+            stats.MaxHealth = chromosome.GetFeature(CreatureFeature.Constitution) * healthValue + minHealth;
+            // Setting CurrHealth is unnecessary
+            stats.Damage = chromosome.GetFeature(CreatureFeature.Strength);
+            stats.Armor = chromosome.GetFeature(CreatureFeature.Fortitude);
+            stats.Perforation = chromosome.GetFeature(CreatureFeature.Piercing);
 
             //See mobilityPenalty commentary
             bool wings = HasAbility(CreatureFeature.Wings, abilityUnlock);
             bool arboreal = HasAbility(CreatureFeature.Arboreal, abilityUnlock);
             bool upright = HasAbility(CreatureFeature.Upright, abilityUnlock);
             int speed = chromosome.GetFeature(CreatureFeature.Mobility);
-            stats.airReach = wings;
-            stats.treeReach = wings || arboreal || upright;
+            stats.AirReach = wings;
+            stats.TreeReach = wings || arboreal || upright;
 
-            stats.aerialSpeed = stats.arborealSpeed = -1;
+            stats.AerialSpeed = stats.ArborealSpeed = -1;
             if (wings)
             {
-                stats.aerialSpeed = speed * (chromosome.GetFeature(CreatureFeature.Wings) * chromosome.GetFeatureMax(CreatureFeature.Wings));
-                stats.arborealSpeed = (int)(stats.aerialSpeed * mobilityPenalty);
-                stats.groundSpeed = (int)(stats.arborealSpeed * mobilityPenalty);
+                stats.AerialSpeed = speed * (chromosome.GetFeature(CreatureFeature.Wings) * chromosome.GetFeatureMax(CreatureFeature.Wings));
+                stats.ArborealSpeed = (int)(stats.AerialSpeed * mobilityPenalty);
+                stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
             }
             if (arboreal)
             {
-                stats.arborealSpeed = speed * (chromosome.GetFeature(CreatureFeature.Arboreal) * chromosome.GetFeatureMax(CreatureFeature.Arboreal));
-                stats.groundSpeed = (int)(stats.arborealSpeed * mobilityPenalty);
+                stats.ArborealSpeed = speed * (chromosome.GetFeature(CreatureFeature.Arboreal) * chromosome.GetFeatureMax(CreatureFeature.Arboreal));
+                stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
             }
             if (!wings && !arboreal)
             {
-                stats.groundSpeed = speed;
+                stats.GroundSpeed = speed;
             }
 
             //Physique related stats
-            stats.size = chromosome.GetFeature(CreatureFeature.Size);
-            stats.lifeSpan = chromosome.GetFeature(CreatureFeature.Longevity);
+            stats.Size = chromosome.GetFeature(CreatureFeature.Size);
 
             
-            stats.members = SetStatInRange(CreatureFeature.Members, maxMembers);
+            stats.Members = SetStatInRange(CreatureFeature.Members, maxMembers);
 
-            stats.metabolism = chromosome.GetFeature(CreatureFeature.Metabolism);
-            stats.idealTemperature = chromosome.GetFeature(CreatureFeature.IdealTemperature);
-            stats.minTemperature = stats.idealTemperature - chromosome.GetFeature(CreatureFeature.TemperatureRange);
-            stats.maxTemperature = stats.idealTemperature + chromosome.GetFeature(CreatureFeature.TemperatureRange);
+            stats.Metabolism = chromosome.GetFeature(CreatureFeature.Metabolism);
+            stats.IdealTemperature = chromosome.GetFeature(CreatureFeature.IdealTemperature);
+            stats.MinTemperature = stats.IdealTemperature - chromosome.GetFeature(CreatureFeature.TemperatureRange);
+            stats.MaxTemperature = stats.IdealTemperature + chromosome.GetFeature(CreatureFeature.TemperatureRange);
 
-            stats.maxEnergy = minEnergy + stats.size / sizeToEnergyRatio;
-            stats.currEnergy = stats.maxEnergy;
-            stats.energyExpense = 1 + stats.metabolism / chromosome.GetFeatureMax(CreatureFeature.Metabolism);
+            stats.MaxEnergy = minEnergy + stats.Size / sizeToEnergyRatio;
+            stats.CurrEnergy = stats.MaxEnergy;
+            stats.EnergyExpense = 1 + stats.Metabolism / chromosome.GetFeatureMax(CreatureFeature.Metabolism);
+            stats.MaxHydration = resourceAmount;
+            stats.CurrHydration = stats.MaxHydration;
+            stats.HydrationExpense = stats.EnergyExpense;
 
-            stats.maxHydratation = resourceAmount;
-            stats.currHydratation = stats.maxHydratation;
-            stats.hydratationExpense = stats.energyExpense;
-
-            stats.maxRest = resourceAmount;
-            stats.currRest = stats.maxRest;
-            stats.restExpense = minRestExpense + (maxRestExpense - minRestExpense) * (1 - chromosome.GetFeature(CreatureFeature.Resistence) / chromosome.GetFeatureMax(CreatureFeature.Resistence));
-            stats.restRecovery = stats.restExpense * exhaustToSleepRatio;
+            stats.MaxRest = resourceAmount;
+            stats.CurrRest = stats.MaxRest;
+            stats.RestExpense = minRestExpense + (maxRestExpense - minRestExpense) * (1 - chromosome.GetFeature(CreatureFeature.Resistence) / chromosome.GetFeatureMax(CreatureFeature.Resistence));
+            stats.RestRecovery = stats.RestExpense * exhaustToSleepRatio;
 
             //Environment related stats
-            stats.camouflage = chromosome.GetFeature(CreatureFeature.Camouflage);
-            stats.aggressiveness = chromosome.GetFeature(CreatureFeature.Aggressiveness);
-            stats.perception = chromosome.GetFeature(CreatureFeature.Perception);
+            stats.Camouflage = chromosome.GetFeature(CreatureFeature.Camouflage);
+            stats.Aggressiveness = chromosome.GetFeature(CreatureFeature.Aggressiveness);
+            stats.Perception = chromosome.GetFeature(CreatureFeature.Perception);
 
             //A percentage equal to nightPerceptionPenalty of the max perception is lost at night
-            stats.nightDebuff = chromosome.GetFeatureMax(CreatureFeature.Perception) * nightPerceptionPenalty;
+            stats.NightDebuff = chromosome.GetFeatureMax(CreatureFeature.Perception) * nightPerceptionPenalty;
             //If the creature can see in the dark, that penalty is reduced the better sight it has
             if (HasAbility(CreatureFeature.NightVision, abilityUnlock))
-                stats.nightDebuff *= 1 - (chromosome.GetFeature(CreatureFeature.NightVision) / chromosome.GetFeatureMax(CreatureFeature.NightVision));
+                stats.NightDebuff *= 1 - (chromosome.GetFeature(CreatureFeature.NightVision) / chromosome.GetFeatureMax(CreatureFeature.NightVision));
 
 
             ////Behaviour related stats
-            stats.knowledge = chromosome.GetFeature(CreatureFeature.Knowledge);
-            stats.paternity = chromosome.GetFeature(CreatureFeature.Paternity);
+            stats.Knowledge = chromosome.GetFeature(CreatureFeature.Knowledge);
+            stats.Paternity = chromosome.GetFeature(CreatureFeature.Paternity);
 
-            if (!HasAbility(CreatureFeature.Scavenger, abilityUnlock)) stats.scavenger = -1;
-            else stats.scavenger = chromosome.GetFeature(CreatureFeature.Scavenger) / chromosome.GetFeatureMax(CreatureFeature.Scavenger);
-            if (!HasAbility(CreatureFeature.Venomous, abilityUnlock)) stats.venom = -1;
-            else stats.venom = chromosome.GetFeature(CreatureFeature.Venomous);
-            if (!HasAbility(CreatureFeature.Thorns, abilityUnlock)) stats.counter = -1;
-            else stats.counter = chromosome.GetFeature(CreatureFeature.Thorns);
-            if (!HasAbility(CreatureFeature.Mimic, abilityUnlock)) stats.intimidation = -1;
-            else stats.intimidation = chromosome.GetFeature(CreatureFeature.Mimic);
+            if (!HasAbility(CreatureFeature.Scavenger, abilityUnlock)) stats.Scavenger = -1;
+            else stats.Scavenger = chromosome.GetFeature(CreatureFeature.Scavenger) / chromosome.GetFeatureMax(CreatureFeature.Scavenger);
+            if (!HasAbility(CreatureFeature.Venomous, abilityUnlock)) stats.Venom = -1;
+            else stats.Venom = chromosome.GetFeature(CreatureFeature.Venomous);
+            if (!HasAbility(CreatureFeature.Thorns, abilityUnlock)) stats.Counter = -1;
+            else stats.Counter = chromosome.GetFeature(CreatureFeature.Thorns);
+            if (!HasAbility(CreatureFeature.Mimic, abilityUnlock)) stats.Intimidation = -1;
+            else stats.Intimidation = chromosome.GetFeature(CreatureFeature.Mimic);
         }
 
         /// <summary>

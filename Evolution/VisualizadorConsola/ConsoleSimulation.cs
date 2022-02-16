@@ -19,8 +19,8 @@ namespace VisualizadorConsola
             world.Init(16);
             Animal c = world.CreateCreature<Animal>();
             c.Init(world, 5, 5);
-            c = world.CreateCreature<Animal>();
-            c.Init(world, 4, 4);
+            //c = world.CreateCreature<Animal>();
+            //c.Init(world, 4, 4);
             Corpse corpse = world.CreateStableEntity<Corpse>();
             corpse.Init(world, 5, 3, 3, 40, 70, 80);
             /*/
@@ -38,7 +38,7 @@ namespace VisualizadorConsola
             while (true)
             {
                 world.Tick();
-                Render();
+                //Render();
                 Thread.Sleep(1000);
             }
         }

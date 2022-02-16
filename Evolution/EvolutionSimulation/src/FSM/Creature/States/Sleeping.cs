@@ -7,15 +7,15 @@
         // This move is energy netural, costing the same nergy that is obtained in a tick
         public override bool canPerformAction(int actionPoints)
         {
-            return actionPoints >= 10 * creature.stats.metabolism;
+            return actionPoints >= 10 * creature.stats.Metabolism;
         }
 
         // Increases current rest
         public override int Action()
         {
-            creature.stats.currRest += creature.stats.restRecovery;
-            if (creature.stats.currRest > creature.stats.maxRest) creature.stats.currRest = creature.stats.maxRest;
-            return 10 * creature.stats.metabolism; // Cost of the action performed
+            creature.stats.CurrRest += creature.stats.RestRecovery;
+            if (creature.stats.CurrRest > creature.stats.MaxRest) creature.stats.CurrRest = creature.stats.MaxRest;
+            return 10 * creature.stats.Metabolism; // Cost of the action performed
         }
     }
 }

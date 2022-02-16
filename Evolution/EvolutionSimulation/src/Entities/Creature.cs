@@ -42,15 +42,15 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void Tick()
         {
-            toDie.value = (stats.currAge++ >= stats.lifeSpan);
-            stats.currRest -= stats.restExpense;
-            if (stats.currRest < 0) stats.currRest = 0;
-            toSleep.value = (stats.currRest <= 0.1 * stats.maxRest);
-            toWake.value = (stats.currRest >= stats.maxRest);
-            mfsm.obtainActionPoints(stats.metabolism);
+            toDie.value = (stats.CurrAge++ >= stats.LifeSpan);
+            stats.CurrRest -= stats.RestExpense;
+            toSleep.value = (stats.CurrRest <= 0.1 * stats.MaxRest);
+            toWake.value = (stats.CurrRest >= stats.MaxRest);
+            mfsm.obtainActionPoints(stats.Metabolism);
             
             seenEntities = Percieve();
-
+            Console.WriteLine(stats.MaxEnergy);
+            Console.WriteLine(stats.CurrEnergy);
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
             while (mfsm.Execute());// Maintains the evaluation - execution action
         }
@@ -134,20 +134,10 @@ namespace EvolutionSimulation.Entities
                 if (Math.Abs(e.x - x) <= perceptionRadius && Math.Abs(e.y - y) <= perceptionRadius) // Square vision
                 {
                     list.Add(e);
-                    Console.WriteLine("Seeing " + e.ToString()); // TODO: Remove
                 }
             }
-            Console.WriteLine(); // TODO: Remove
 
             return list;
-        }
-
-        /// <summary>
-        /// Modifies the given stat based on age
-        /// </summary>
-        float ModifyStatByAge(float stat)
-        {
-            return stat * Math.Min(1.0f, (1 - startMultiplier) / (stats.lifeSpan * adulthoodThreshold) * stats.currAge + startMultiplier);
         }
 
         /// <summary>
@@ -173,75 +163,99 @@ namespace EvolutionSimulation.Entities
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         private Fsm mfsm;
-        private float startMultiplier = 0.33f; //Starting multiplier of newborns
-        private float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
     }
 
     public class CreatureStats
     {
-        public Gender gender;
+        private float startMultiplier = 0.33f; //Starting multiplier of newborns
+        private float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
+
+        /// <summary>
+        /// Modifies the given stat based on age
+        /// </summary>
+        float ModifyStatByAge(float stat)
+        {
+            return stat * Math.Min(1.0f, (1 - startMultiplier) / (LifeSpan * adulthoodThreshold) * currAge + startMultiplier);
+        }
+
+        public Gender Gender { get; set; }
 
         //Nutrition related stats
-        public Diet diet;
-        public float scavenger; //From 0 (normal chance of getting poisoned) to 1 (cannot get poisoned)
+        public Diet Diet { get; set; }
+        public float Scavenger { get; set; } //From 0 (normal chance of getting poisoned) to 1 (cannot get poisoned)
 
         //Health and damage related stats
-        public float maxHealth;
-        public float currHealth;
-        public int damage;
-        public int armor;
-        public int perforation;
-        public float venom;
-        public float counter;
+        float maxHealth;
+        public float MaxHealth { get { return ModifyStatByAge(maxHealth); }
+            set { maxHealth = value; /* If maxHealth changes, currHealth changes the difference */ CurrHealth += MaxHealth - CurrHealth; } }
+        public float CurrHealth { get; private set; }
+        int damage;
+        public int Damage { get { /* Minimum damage is 1 */ return (int)Math.Ceiling(ModifyStatByAge(damage)); } set { damage = value; } }
+        int armor;
+        public int Armor { get { return (int)ModifyStatByAge(armor); } set { armor = value; } }
+        int perforation;
+        public int Perforation { get { return (int)ModifyStatByAge(perforation); } set { perforation = value; } }
+        float venom;
+        public float Venom { get { return ModifyStatByAge(venom); } set { venom = value; } }
+        float counter; // Puas
+        public float Counter { get { return ModifyStatByAge(counter); } set { counter = value; } }
 
         //Mobility related stats
-        public int aerialSpeed;
-        public int arborealSpeed;
-        public int groundSpeed;
+        public int AerialSpeed { get; set; }
+        public int ArborealSpeed { get; set; }
+        public int GroundSpeed { get; set; }
 
         //Reaches
-        public bool airReach;
-        public bool treeReach;
+        public bool AirReach { get; set; } // TODO: que afecte la edad?
+        public bool TreeReach { get; set; }
 
         //Energy related stats
-        public float maxEnergy;
-        public float currEnergy;
-        public float energyExpense;
+        float maxEnergy;
+        public float MaxEnergy { get { return maxEnergy; }
+            set { maxEnergy = value; } }
+        public float CurrEnergy { get; set; }
+        public float EnergyExpense { get; set; }
 
-        //Hydratation related stats
-        public float maxHydratation;
-        public float currHydratation;
-        public float hydratationExpense;
+        //Hydration related stats
+        public float MaxHydration { get; set; }
+        public float CurrHydration { get; set; }
+        public float HydrationExpense { get; set; }
 
         //Rest related stats
-        public float maxRest;
-        public float currRest;
-        public float restRecovery;
-        public float restExpense;
+        public float MaxRest { get; set; }
+        float currRest;
+        public float CurrRest { get { return currRest; } set { currRest = value; if (currRest < 0) currRest = 0; } }
+        public float RestRecovery { get; set; }
+        public float RestExpense { get; set; }
 
         //Environment related stats
-        public int camouflage;
-        public int aggressiveness;
-        public int intimidation;
-        public int perception;
-        public float nightDebuff;
+        public int Camouflage { get; set; }
+        int aggressiveness;
+        public int Aggressiveness { get { return (int)ModifyStatByAge(aggressiveness); } set { aggressiveness = value; } }
+        int intimidation;
+        public int Intimidation { get { return (int)ModifyStatByAge(intimidation); } set { intimidation = value; } }
+        public int Perception { get; set; }
+        public float NightDebuff { get; set; }
 
         //Physique related stats
-        public int size;
-        public int lifeSpan;
-        public int currAge;
-        public int members;
-        public int metabolism;
-        public float minTemperature;
-        public float maxTemperature;
-        public float idealTemperature;
+        int size;
+        public int Size { get { return (int)ModifyStatByAge(size); } set { size = value; } }
+        public int LifeSpan { get; set; }
+        int currAge;
+        public int CurrAge { get { return currAge; } 
+            set { float oldMaxH = MaxHealth; currAge = value; CurrHealth += MaxHealth - oldMaxH; } }
+        public int Members { get; set; }//limbs
+        public int Metabolism { get; set; }
+        public float MinTemperature { get; set; }
+        public float MaxTemperature { get; set; }
+        public float IdealTemperature { get; set; }
 
         //Behaviour related stats
-        public int knowledge;
-        public int paternity;
+        public int Knowledge { get; set; }
+        public int Paternity { get; set; }
 
         //Multipliers
-        public float healthRegeneration;
-        public float maxSpeed;
+        public float HealthRegeneration { get; set; }
+        public float MaxSpeed { get; set; }
     }
 }
