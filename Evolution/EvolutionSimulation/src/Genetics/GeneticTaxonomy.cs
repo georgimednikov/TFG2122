@@ -11,22 +11,34 @@ namespace EvolutionSimulation.Genetics
     {
         public string name;
         public string progenitor;
-        public CreatureChromosome chromosome;
+        public Creature original;
         public List<Creature> members;
 
         public Species(Creature creature)
         {
-            chromosome = creature.chromosome;
+            original = creature;
 
             if (creature.species == null)
                 progenitor = "None";
             else
                 progenitor = creature.species.name;
 
-            name = NameGenerator.GenerateName(chromosome);
+            name = NameGenerator.GenerateName(original.chromosome);
             members = new List<Creature>();
             members.Add(creature);
             creature.species = this;
+        }
+    }
+
+    public struct SpeciesExport
+    {
+        public string name { get; }
+        public CreatureStats stats { get; }
+
+        public SpeciesExport(string name, CreatureStats stats)
+        {
+            this.name = name;
+            this.stats = stats;
         }
     }
 
@@ -84,7 +96,7 @@ namespace EvolutionSimulation.Genetics
             //If the creature belongs to an existing species, it is added to its members
             foreach (Species sp in existingSpecies)
             {
-                if (GeneticSimilarity(creature.chromosome, sp.chromosome) > minGeneticSimilarity)
+                if (GeneticSimilarity(creature.chromosome, sp.original.chromosome) > minGeneticSimilarity)
                 {
                     sp.members.Add(creature);
                     return;
@@ -112,7 +124,7 @@ namespace EvolutionSimulation.Genetics
                 }
             }
             if (i == speciesRecord.Count)
-                throw new Exception("There is a discrepancy between the new species' progenitor name and the existing species' names");
+                throw new Exception("There is a discrepancy between the new  species' progenitor name and the existing species' names");
         }
 
         /// <summary>
@@ -187,6 +199,21 @@ namespace EvolutionSimulation.Genetics
         public void RenderSpeciesTree()
         {
 
+        }
+
+        /// <summary>
+        /// Exports the existing species as JSONs in the folder "ResultingSpecies" named "SpeciesN" being n the order of writing.
+        /// </summary>
+        public void ExportSpecies()
+        {
+            Directory.CreateDirectory("../../ResultingSpecies");
+            for (int i = 0; i < existingSpecies.Count; i++)
+            {
+                Species sp = existingSpecies[i];
+                SpeciesExport export = new SpeciesExport(sp.name, sp.original.stats);
+                string species = JsonConvert.SerializeObject(export, Formatting.Indented);
+                File.WriteAllText("../../ResultingSpecies/Species_" + i + ".json", species);
+            }
         }
     }
 }
