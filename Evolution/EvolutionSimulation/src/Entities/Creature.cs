@@ -13,8 +13,11 @@ namespace EvolutionSimulation.Entities
     /// </summary>
     public abstract class Creature : IEntity
     {
-        BooleanWrapper toMove, toIdle, toDie, toMunch,
-            toSleep, toWake, toFlee, toAttack;
+        /// <summary>
+        /// 
+        /// </summary>
+        // TODO: Puede ser que queramos aniadir mas de una interaccion
+        public Dictionary<Interactions, Action<Creature>> InteractionsDict { get; private set; }
 
         /// <summary>
         /// Constructor for factories
@@ -25,6 +28,7 @@ namespace EvolutionSimulation.Entities
             stats = new CreatureStats();
             seenCreatures = new List<Creature>();
             seenEntities = new List<StableEntity>();
+            InteractionsDict = new Dictionary<Interactions, Action<Creature>>();
             SetStats();
         }
 
@@ -38,6 +42,7 @@ namespace EvolutionSimulation.Entities
             this.x = x;
             this.y = y;
             ConfigureStateMachine();
+            InteractionsDict.Add(Interactions.attack, OnAttack);
         }
 
         /// <summary>
@@ -45,11 +50,11 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void Tick()
         {
-            toDie.value = (stats.currAge++ >= stats.lifeSpan);
+            //toDie.value = (stats.currAge++ >= stats.lifeSpan);
             stats.currRest -= stats.restExpense;
             if (stats.currRest < 0) stats.currRest = 0;
-            toSleep.value = (stats.currRest <= 0.1 * stats.maxRest);
-            toWake.value = (stats.currRest >= stats.maxRest);
+            //toSleep.value = (stats.currRest <= 0.1 * stats.maxRest);
+            //toWake.value = (stats.currRest >= stats.maxRest);
             mfsm.obtainActionPoints(stats.metabolism);
 
             seenCreatures.Clear();
@@ -60,8 +65,9 @@ namespace EvolutionSimulation.Entities
             // TomarDecision(); (Asignar Criatura Objetivo) -> Trigger Transicion -> Cambio de estado
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
             while (mfsm.Execute());// Maintains the evaluation - execution action
-            // Creatura 1 ->  Ataca -> Creatura 2       Desde Creatura1 : Creatura2.Interact(Creatura 1, attack);
-            //                                          Desde Creatura2 : Creatura1.Interact(Creatura2, attack);
+                                   // Creatura 1 ->  Ataca -> Creatura 2       Desde Creatura1 : Creatura2.Interact(Creatura 1, attack);
+                                   //                                          Desde Creatura2 : Creatura1.Interact(Creatura2, attack);
+            hasBeenHit = false; // TODO: Reset flags en general
         }
 
         /// <summary>
@@ -69,18 +75,12 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         void MakeDecision()
         {
-            if (seenCreatures.Count > 0)
-            {
+            if (seenCreatures.Count > 0 || hasBeenHit)    // TODO: hacer esto bien, 
+            {                                             // ahora para atacar, muy WIP
                 objective = seenCreatures[0];
                 objectivePos = new Vector2(objective.x, objective.y);
-                toAttack.value = true;
-                toIdle.value = false;
             }
-            else
-            {
-                toAttack.value = false;
-                toIdle.value = true;
-            }
+            else objective = null;
         }
 
         /// <summary>
@@ -107,13 +107,6 @@ namespace EvolutionSimulation.Entities
             IState attack = new Attacking(this);
 
             mfsm = new Fsm(idle);
-            toMove = new BooleanWrapper(false);
-            toIdle = new BooleanWrapper(false);
-            toDie = new BooleanWrapper(false);
-            toMunch = new BooleanWrapper(false);
-            toSleep = new BooleanWrapper(false);
-            toWake = new BooleanWrapper(false);
-            toAttack = new BooleanWrapper(false);
 
             // Substates
             mfsm.AddSubstate(alive, idle);
@@ -123,20 +116,28 @@ namespace EvolutionSimulation.Entities
             mfsm.AddSubstate(alive, attack);
 
             // Transitions
-            mfsm.AddTransition(idle, new BooleanTransition(toMove), moving);
-            mfsm.AddTransition(idle, new BooleanTransition(toMunch), eat);
-            mfsm.AddTransition(idle, new BooleanTransition(toSleep), sleep);
-            mfsm.AddTransition(idle, new BooleanTransition(toAttack), attack);
+            ITransition moveTransition = new MoveTransition(this);
+            ITransition hungerTransition = new HungerTransition(this);
+            ITransition sleepyTransition = new SleepyTransition(this);
+            ITransition attackTransition = new AttackTransition(this);
+            ITransition idleTransition = new IdleTransition(this);
+            ITransition wakeTransition = new WakeTransition(this);
+            ITransition dieTransition = new DieTransition(this);
 
-            mfsm.AddTransition(moving, new BooleanTransition(toIdle), idle);
-            mfsm.AddTransition(moving, new BooleanTransition(toSleep), sleep);
-            mfsm.AddTransition(moving, new BooleanTransition(toAttack), attack);
+            mfsm.AddTransition(idle, moveTransition, moving);
+            mfsm.AddTransition(idle, hungerTransition, eat);
+            mfsm.AddTransition(idle, sleepyTransition, sleep);
+            mfsm.AddTransition(idle, attackTransition, attack);
 
-            mfsm.AddTransition(attack, new BooleanTransition(toIdle), idle);
+            mfsm.AddTransition(moving, sleepyTransition, sleep);
+            mfsm.AddTransition(moving, attackTransition, attack);
+            mfsm.AddTransition(moving, idleTransition, idle);
 
-            mfsm.AddTransition(sleep, new BooleanTransition(toWake), idle);
+            mfsm.AddTransition(attack, idleTransition, idle);
 
-            mfsm.AddTransition(alive, new BooleanTransition(toDie), dead);
+            mfsm.AddTransition(sleep, wakeTransition, idle);
+
+            mfsm.AddTransition(alive, dieTransition, dead);
         }
 
         /// <summary>
@@ -180,17 +181,16 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void ReceiveInteraction(Creature interacter, Interactions type)
         {
-            switch (type)
-            {
-                case Interactions.attack:
-                    stats.currHealth -= computeDamage(interacter.stats.damage, interacter.stats.perforation);
-                    toFlee = new BooleanWrapper(interacter.stats.aggressiveness < 1 || interacter.stats.currHealth < interacter.stats.maxHealth * 0.2);
-                    toAttack = new BooleanWrapper(!toFlee.value);
-                    //hasBeenHit = true; O MEJOR INCLUSO forzar el cambio al igual que TomarDecision()
-                    break;
-                default:
-                    break;
-            }
+            if (InteractionsDict.ContainsKey(type))
+                InteractionsDict[type](interacter);
+        }
+
+        private void OnAttack(Creature interacter)
+        {
+            stats.currHealth -= computeDamage(interacter.stats.damage, interacter.stats.perforation);
+            objective = interacter;
+            objectivePos = new Vector2(interacter.x, interacter.y);
+            hasBeenHit = true; //O MEJOR INCLUSO forzar el cambio al igual que TomarDecision()
         }
 
         /// <summary>
@@ -240,8 +240,7 @@ namespace EvolutionSimulation.Entities
         public IEntity objective;
         Vector2 objectivePos;
 
-        List<Interactions> interactions;
-        //other.interactions.add(new Attack(this));
+        public bool hasBeenHit;
 
         #endregion
     }

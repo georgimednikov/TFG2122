@@ -79,6 +79,14 @@
     <Compile Include="src\FSM\Creature\States\Sleeping.cs" />
     <Compile Include="src\FSM\Creature\States\CreatureState.cs" />
     <Compile Include="src\FSM\Creature\Transitions\BooleanWrapper.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\CreatureTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\AttackTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\DieTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\WakeTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\IdleTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\SleepyTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\HungerTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\MoveTransition.cs" />
     <Compile Include="src\Genetics\GeneticTaxonomy.cs" />
     <Compile Include="src\Entities\Grass.cs" />
     <Compile Include="src\NameGenerator.cs" />
