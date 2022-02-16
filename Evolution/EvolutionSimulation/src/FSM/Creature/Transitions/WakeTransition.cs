@@ -15,7 +15,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            return creature.stats.currRest >= creature.stats.maxRest;
+            return creature.stats.CurrRest >= creature.stats.MaxRest;
         }
     
     }
