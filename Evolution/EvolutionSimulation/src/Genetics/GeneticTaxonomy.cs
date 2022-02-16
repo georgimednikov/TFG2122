@@ -93,9 +93,7 @@ namespace EvolutionSimulation.Genetics
             //Else a new species is created
             Species newSpecies = new Species(creature);
             existingSpecies.Add(newSpecies);
-            if (existingSpecies.Count == 9) newSpecies.progenitor = existingSpecies[existingSpecies.Count - 3].name;
-            else if (existingSpecies.Count % 2 == 0) newSpecies.progenitor = existingSpecies[existingSpecies.Count - 2].name;
-
+           
             //If the new species is made from scratch, it is simply added
             if (creature.species.progenitor == "None")
             {

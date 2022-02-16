@@ -104,22 +104,6 @@ namespace EvolutionSimulation
             Creatures.Add(ent);
             taxonomy.AddCreatureToSpecies(ent);
 
-            ent = CreateEntity<T>();
-            Creatures.Add(ent);
-            taxonomy.AddCreatureToSpecies(ent);
-
-
-            if(Creatures.Count == 8)
-            {
-                //taxonomy.RenderSpeciesTree("../../tree");
-
-                ent = CreateEntity<T>();
-                Creatures.Add(ent);
-                taxonomy.AddCreatureToSpecies(ent);
-                //taxonomy.RenderSpeciesTree("../../tree");
-            }
-            if (Creatures.Count == 11)
-                taxonomy.RenderSpeciesTree("../../tree.txt");
             return ent;
         }
 
