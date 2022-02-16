@@ -93,6 +93,8 @@ namespace EvolutionSimulation.Genetics
             //Else a new species is created
             Species newSpecies = new Species(creature);
             existingSpecies.Add(newSpecies);
+            if (existingSpecies.Count == 9) newSpecies.progenitor = existingSpecies[existingSpecies.Count - 3].name;
+            else if (existingSpecies.Count % 2 == 0) newSpecies.progenitor = existingSpecies[existingSpecies.Count - 2].name;
 
             //If the new species is made from scratch, it is simply added
             if (creature.species.progenitor == "None")
@@ -186,7 +188,65 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         public void RenderSpeciesTree()
         {
+            StreamWriter writer = new StreamWriter("../../tree.txt");
+            for (int i = 0; i < speciesRecord.Count; ++i)
+            {
+                //Console.WriteLine(speciesRecord[i].name);
 
+                i = RenderSpeciesTree( speciesRecord[i].name, 0, i, writer);                
+            }
+            writer.Close();
+            Console.WriteLine("\n"); 
+        }
+
+        
+
+        private int RenderSpeciesTree( string name, int lvl, int index, StreamWriter writer)
+        {
+            // Stop condition, end of the species
+            if (lvl != 0)
+            {
+                for (int i = 0; i < lvl; ++i)
+                {
+                    Console.Write("│" + "".PadLeft(4));
+                    writer.Write("│" + "".PadLeft(4));
+
+                }
+                Console.WriteLine( "└───" + name);
+                writer.WriteLine("└───" + name);
+
+            }
+            else
+            {
+                Console.WriteLine("├───" + name);
+                writer.WriteLine("├───" + name);
+
+            }
+            if (index >= speciesRecord.Count-1) return index;
+            
+
+            // child
+            if (speciesRecord[index + 1].progenitor == name)
+                index = RenderSpeciesTree( speciesRecord[index+1].name, ++lvl, ++index, writer);
+            // sibling without childs between them
+            else if (speciesRecord[index + 1].progenitor == speciesRecord[index].progenitor && speciesRecord[index].progenitor != "None")
+                index = RenderSpeciesTree( speciesRecord[index + 1].name, lvl, ++index, writer);
+            // sibling with childs between them
+            else if (speciesRecord[index + 1].progenitor != "None")
+            {
+                bool siblings = false;
+                int cont = index - 1;
+                while(!siblings && cont > 0 && speciesRecord[cont].progenitor != "None")
+                {
+                    if (speciesRecord[cont].progenitor == speciesRecord[index + 1].progenitor)
+                        siblings = true;
+                    else
+                        cont--;
+                }
+                if(siblings)
+                    index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl - (index-cont), ++index, writer);
+            }
+            return index;
         }
     }
 }
