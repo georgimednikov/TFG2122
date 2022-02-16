@@ -4,17 +4,15 @@ using EvolutionSimulation.FSM;
 using EvolutionSimulation.FSM.Creature.States;
 using EvolutionSimulation.FSM.Creature.Transitions;
 using EvolutionSimulation.Genetics;
+using System.Numerics;
 
 namespace EvolutionSimulation.Entities
 {
     /// <summary>
     /// A creature with attributes and behavior
     /// </summary>
-    public abstract class Creature : IEntity
+    public abstract class Creature : IEntity, IInteractable<Creature>
     {
-        BooleanWrapper toMove, toIdle, toDie, toMunch,
-            toSleep, toWake;
-
         /// <summary>
         /// Constructor for factories
         /// </summary>
@@ -22,6 +20,9 @@ namespace EvolutionSimulation.Entities
         {
             chromosome = new CreatureChromosome();
             stats = new CreatureStats();
+            seenCreatures = new List<Creature>();
+            seenEntities = new List<StableEntity>();
+            InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
             SetStats();
         }
 
@@ -35,6 +36,8 @@ namespace EvolutionSimulation.Entities
             this.x = x;
             this.y = y;
             ConfigureStateMachine();
+            AddInteraction(Interactions.attack, OnAttack);
+
         }
 
         /// <summary>
@@ -42,17 +45,36 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void Tick()
         {
-            toDie.value = (stats.CurrAge++ >= stats.LifeSpan);
+            //toDie.value = (stats.CurrAge++ >= stats.LifeSpan);
             stats.CurrRest -= stats.RestExpense;
-            toSleep.value = (stats.CurrRest <= 0.1 * stats.MaxRest);
-            toWake.value = (stats.CurrRest >= stats.MaxRest);
+            //toSleep.value = (stats.CurrRest <= 0.1 * stats.MaxRest);
+            //toWake.value = (stats.CurrRest >= stats.MaxRest);
             mfsm.obtainActionPoints(stats.Metabolism);
             
-            seenEntities = Percieve();
-            Console.WriteLine(stats.MaxEnergy);
-            Console.WriteLine(stats.CurrEnergy);
+            seenCreatures.Clear();
+            seenEntities.Clear();
+            Perceive();
+
+            MakeDecision();
+            // TomarDecision(); (Asignar Criatura Objetivo) -> Trigger Transicion -> Cambio de estado
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
             while (mfsm.Execute());// Maintains the evaluation - execution action
+                                   // Creatura 1 ->  Ataca -> Creatura 2       Desde Creatura1 : Creatura2.Interact(Creatura 1, attack);
+                                   //                                          Desde Creatura2 : Creatura1.Interact(Creatura2, attack);
+            hasBeenHit = false; // TODO: Reset flags en general
+        }
+
+        /// <summary>
+        /// Affects the transitions of the FSM based on perceived entities
+        /// </summary>
+        void MakeDecision()
+        {
+            if (seenCreatures.Count > 0 || hasBeenHit)    // TODO: hacer esto bien, 
+            {                                             // ahora para atacar, muy WIP
+                objective = seenCreatures[0];
+                objectivePos = new Vector2(objective.x, objective.y);
+            }
+            else objective = null;
         }
 
         /// <summary>
@@ -76,29 +98,40 @@ namespace EvolutionSimulation.Entities
             IState alive = new Alive(this);
             IState eat = new Eat(this);
             IState sleep = new Sleeping(this);
+            IState attack = new Attacking(this);
 
             mfsm = new Fsm(idle);
-            toMove = new BooleanWrapper(false);
-            toIdle = new BooleanWrapper(false);
-            toDie = new BooleanWrapper(false);
-            toMunch = new BooleanWrapper(false);
-            toSleep = new BooleanWrapper(false);
-            toWake = new BooleanWrapper(false);
 
             // Substates
             mfsm.AddSubstate(alive, idle);
             mfsm.AddSubstate(alive, moving);
             mfsm.AddSubstate(alive, eat);
             mfsm.AddSubstate(alive, sleep);
+            mfsm.AddSubstate(alive, attack);
 
             // Transitions
-            mfsm.AddTransition(idle, new BooleanTransition(toMove), moving);
-            mfsm.AddTransition(idle, new BooleanTransition(toMunch), eat);
-            mfsm.AddTransition(moving, new BooleanTransition(toIdle), idle);
-            mfsm.AddTransition(moving, new BooleanTransition(toSleep), sleep);
-            mfsm.AddTransition(idle, new BooleanTransition(toSleep), sleep);
-            mfsm.AddTransition(sleep, new BooleanTransition(toWake), idle);
-            mfsm.AddTransition(alive, new BooleanTransition(toDie), dead);
+            ITransition moveTransition = new MoveTransition(this);
+            ITransition hungerTransition = new HungerTransition(this);
+            ITransition sleepyTransition = new SleepyTransition(this);
+            ITransition attackTransition = new AttackTransition(this);
+            ITransition idleTransition = new IdleTransition(this);
+            ITransition wakeTransition = new WakeTransition(this);
+            ITransition dieTransition = new DieTransition(this);
+
+            mfsm.AddTransition(idle, moveTransition, moving);
+            mfsm.AddTransition(idle, hungerTransition, eat);
+            mfsm.AddTransition(idle, sleepyTransition, sleep);
+            mfsm.AddTransition(idle, attackTransition, attack);
+
+            mfsm.AddTransition(moving, sleepyTransition, sleep);
+            mfsm.AddTransition(moving, attackTransition, attack);
+            mfsm.AddTransition(moving, idleTransition, idle);
+
+            mfsm.AddTransition(attack, idleTransition, idle);
+
+            mfsm.AddTransition(sleep, wakeTransition, idle);
+
+            mfsm.AddTransition(alive, dieTransition, dead);
         }
 
         /// <summary>
@@ -122,22 +155,70 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Checks the perception area around this entity for other entities
         /// </summary>
-        /// <returns>A list of every other entity in the area</returns>
-        List<IEntity> Percieve()
+        void Perceive()
         {
             int perceptionRadius = 4; // TODO: calculate this using the Perception stat
-            List<IEntity> list = new List<IEntity>();
+            seenCreatures = world.PerceiveCreatures(this, x, y, perceptionRadius);
+            seenEntities = world.PerceiveEntities(this, x, y, perceptionRadius);
+        }
 
-            foreach (IEntity e in world.Creatures) // TODO: use this?
-            {
-                if (e == this) continue; // Reference comparison
-                if (Math.Abs(e.x - x) <= perceptionRadius && Math.Abs(e.y - y) <= perceptionRadius) // Square vision
-                {
-                    list.Add(e);
-                }
-            }
+        /// <summary>
+        /// Executes every response that this creature has to an interaction with other creature
+        /// </summary>
+        public void ReceiveInteraction(Creature interacter, Interactions type)
+        {
+            if (InteractionsDict.ContainsKey(type))
+                foreach(Action<Creature> response in InteractionsDict[type])
+                    response(interacter);
+        }
 
-            return list;
+        /// <summary>
+        /// Adds a response to a interaction type, given 
+        /// the creature that interacts with this.
+        /// </summary>
+        public void AddInteraction(Interactions type, Action<Creature> response)
+        {
+            if (!InteractionsDict.ContainsKey(type))
+                InteractionsDict[type] = new List<Action<Creature>>();
+            InteractionsDict[type].Add(response);
+        }
+        /// <summary>
+        /// Removes a response to an interaction type, given the
+        /// creature that interacts with this. 
+        /// If the interaction type or the response is not registered, it does nothing.
+        /// If no responses remain after the removal, it removes the interaction entry
+        /// </summary>
+        // TODO: Quitamos la entrada del diccionario si no quedan reacciones?
+        public void RemoveInteraction(Interactions type, Action<Creature> response)
+        {
+            if (!InteractionsDict.ContainsKey(type)) return;
+
+            InteractionsDict[type].Remove(response);
+            if (InteractionsDict[type].Count == 0)
+                InteractionsDict.Remove(type);
+        }
+
+        private void OnAttack(Creature interacter)
+        {
+            stats.CurrHealth -= computeDamage(interacter.stats.Damage, interacter.stats.Perforation);
+
+            objective = interacter;
+            objectivePos = new Vector2(interacter.x, interacter.y);
+            hasBeenHit = true; //O MEJOR INCLUSO forzar el cambio al igual que TomarDecision()
+        }
+
+        /// <summary>
+        /// Returns the taken damage
+        /// </summary>
+        /// <param name="dmg">Incoming damage</param>
+        /// <param name="pen">Damage penetratione</param>
+        public float computeDamage(float dmg, float pen)
+        {
+            float amount = 0;
+            amount = (dmg) - (stats.Armor - pen);
+            amount = Math.Max(0, amount);
+            amount = Math.Min(amount, stats.CurrHealth);
+            return amount;
         }
 
         /// <summary>
@@ -145,24 +226,38 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         abstract public void SetStats();
 
+        #region Attributes
         // World tile position
         public int x { get; private set; }
         public int y { get; private set; }
         // World in which the creature resides
-        public World world { get; private set; } 
+        public World world { get; private set; }
 
         // Genetic
+        public Species species;
         public CreatureChromosome chromosome { get; private set; }
         public CreatureStats stats { get; private set; }
-        
+
+        // List of creatures seen at this moment by this creature
+        public List<Creature> seenCreatures { get; private set; }
         // List of entities seen at this moment by this creature
-        public List<IEntity> seenEntities { get; private set; }
+        public List<StableEntity> seenEntities { get; private set; }
 
         public int actionPoints;
 
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         private Fsm mfsm;
+
+        public IEntity objective;
+        Vector2 objectivePos;
+
+        public bool hasBeenHit;
+
+        // Interactions that the creature can react to. Keys are the Interaction type
+        // and values are the actions that the creature performs when something interacts with it.
+        Dictionary<Interactions, List<Action<Creature>>> InteractionsDict;
+        #endregion
     }
 
     public class CreatureStats
@@ -188,7 +283,7 @@ namespace EvolutionSimulation.Entities
         float maxHealth;
         public float MaxHealth { get { return ModifyStatByAge(maxHealth); }
             set { maxHealth = value; /* If maxHealth changes, currHealth changes the difference */ CurrHealth += MaxHealth - CurrHealth; } }
-        public float CurrHealth { get; private set; }
+        public float CurrHealth { get; set; }
         int damage;
         public int Damage { get { /* Minimum damage is 1 */ return (int)Math.Ceiling(ModifyStatByAge(damage)); } set { damage = value; } }
         int armor;
@@ -258,4 +353,5 @@ namespace EvolutionSimulation.Entities
         public float HealthRegeneration { get; set; }
         public float MaxSpeed { get; set; }
     }
+
 }

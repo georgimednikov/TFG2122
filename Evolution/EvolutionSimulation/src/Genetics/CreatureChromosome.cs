@@ -107,6 +107,20 @@ namespace EvolutionSimulation.Genetics
         public int[] geneValues;
 
         /// <summary>
+        /// Sets the chromosome structure reading the values of the given JSON file.
+        /// </summary>
+        /// <param name="json">Address of the JSON file</param>
+        static public void SetChromosome(string json)
+        {
+            if (!File.Exists(json))
+                throw new Exception("Cannot find JSON with chromosome information");
+            string file = File.ReadAllText(json);
+            List<Gene> genes = JsonConvert.DeserializeObject<List<Gene>>(file);
+
+            SetStructure(genes);
+        }
+
+        /// <summary>
         /// Sets the internal extructure of the chromosome given the genes and their respectives max values.
         /// The genes MUST be given in such an order that there is no incomplete dependency between them.
         /// Example: Gene A depends on Gene B, therefore Gene B must be passed before Gene A
@@ -207,6 +221,8 @@ namespace EvolutionSimulation.Genetics
         /// <summary>
         /// Given the chromosome values, calculates the values of the features and sets them.
         /// Only call this function is the chromosome is modified
+        /// The relations are calculated so that 20% of a relation means that 100% of the gene is
+        /// related represents the 20% of the gene.
         /// </summary>
         public void SetFeatures()
         {
@@ -232,8 +248,6 @@ namespace EvolutionSimulation.Genetics
                 {
                     if (geneValues[(int)relation.feature] < 0)
                         throw new Exception("The genes must have been passed in order of dependency of relations");
-                    //total += percentage of usage of the related gene * the value of the gene
-                    //total += (int)(relation.percentage * geneValues[(int)relation.feature]);
 
                     //total += relationValue / (relationMaxValue / (relationPercentage * featureMaxValue))
                     int relationMaxValue = geneInfoOrdered[(int)relation.feature].maxValue;
@@ -242,6 +256,24 @@ namespace EvolutionSimulation.Genetics
                 }
                 geneValues[feature] = Math.Max(0, total);
             }
+        }
+
+        /// <summary>
+        /// Returns a BitArray with the bits in the chromosome about the feature given
+        /// The method doesn't count the bits of the relations that could have the feature
+        /// </summary>
+        public BitArray GetGeneBits(CreatureFeature feature)
+        {
+            int start = genePos[(int)feature].Item1;
+            int size = genePos[(int)feature].Item2;
+            BitArray bits = new BitArray(size);
+
+            for(int i = 0; i< size; ++i)
+            {
+                bits[i] = chromosome[i + start];
+            }
+
+            return bits;
         }
 
         /// <summary>
@@ -290,19 +322,6 @@ namespace EvolutionSimulation.Genetics
                 Console.Write(bit ? 1 : 0);
             }
             Console.WriteLine();
-        }
-
-        /// <summary>
-        /// Sets the chromosome structure reading the values of the given JSON file.
-        /// </summary>
-        /// <param name="json">Address of the JSON file</param>
-        static public void SetChromosome(string json)
-        {
-            if (!File.Exists(json))
-                throw new Exception("Cannot find JSON with chromosome information");
-            string file = File.ReadAllText(json);
-            List<Gene> genes = JsonConvert.DeserializeObject<List<Gene>>(file);
-            SetStructure(genes);
         }
     }
 }

@@ -1,0 +1,114 @@
+[
+  {
+    "Item1": "Strength",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Constitution",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Fortitude",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Mobility",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Resistence",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Perception",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Knowledge",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Camouflage",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Size",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Piercing",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Aggressiveness",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Metabolism",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "IdealTemperature",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "TemperatureRange",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Longevity",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Diet",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Members",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Arboreal",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Wings",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Venomous",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "NightVision",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Horns",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Mimic",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Upright",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Thorns",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Scavenger",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Hair",
+    "Item2": 0.0357
+  },
+  {
+    "Item1": "Paternity",
+    "Item2": 0.0357
+  }
+]
