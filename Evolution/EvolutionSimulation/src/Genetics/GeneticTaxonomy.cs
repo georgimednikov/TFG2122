@@ -16,14 +16,14 @@ namespace EvolutionSimulation.Genetics
 
         public Species(Creature creature)
         {
+            chromosome = creature.chromosome;
+
             if (creature.species == null)
+                progenitor = "None";
+            else
                 progenitor = creature.species.name;
 
-            else
-                progenitor = "None";
-
-            name = "Nombre";
-            chromosome = creature.chromosome;
+            name = NameGenerator.GenerateName(chromosome);
             members = new List<Creature>();
             members.Add(creature);
             creature.species = this;
@@ -68,6 +68,7 @@ namespace EvolutionSimulation.Genetics
                 speciesGeneWeights[(int)t.Item1] = t.Item2;
             }
             existingSpecies = new List<Species>();
+            speciesRecord = new List<Species>();
 
             file = File.ReadAllText(jsonSimilarity);
             minGeneticSimilarity = JsonConvert.DeserializeObject<float>(file);
@@ -146,17 +147,16 @@ namespace EvolutionSimulation.Genetics
         /// <returns> Value between 0-1. 1 has the same values and 0 different values</returns>
         private float GeneticSimilarity(CreatureChromosome creature1, CreatureChromosome creature2)
         {
-
-            if (speciesGeneWeights.Length != (int)CreatureFeature.Count - 1)
+            if (speciesGeneWeights.Length != (int)CreatureFeature.Count)
             {
-                throw new Exception("Weigths must have the same length as CreatureFeatures");
+                throw new Exception("Weights must have the same length as CreatureFeatures");
             }
             float sum = 0;
             foreach (float w in speciesGeneWeights)
                 sum += w;
-            if (sum != 1)
+            if (sum < 0.98 || sum > 1) //Wiggle room
             {
-                throw new Exception("Weigths sum must be 1");
+                throw new Exception("Weights sum must be 1");
             }
 
             float total = 0;
@@ -174,6 +174,8 @@ namespace EvolutionSimulation.Genetics
                 }
 
                 genEqual /= gen1.Length;
+                //The value is multiplied by its weight, and the added values of the weights is 1
+                //Therefore, the total value goes from 0 to 1
                 total += genEqual * speciesGeneWeights[i];
             }
             return total;

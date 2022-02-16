@@ -102,6 +102,7 @@ namespace EvolutionSimulation
         {
             T ent = CreateEntity<T>();
             Creatures.Add(ent);
+            taxonomy.AddCreatureToSpecies(ent);
             return ent;
         }
 

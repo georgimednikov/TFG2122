@@ -12,7 +12,7 @@ namespace EvolutionSimulation
 
         public int y => throw new NotImplementedException();
 
-        public virtual void Tick()
+        virtual public void Tick()
         {
             throw new NotImplementedException();
         }
