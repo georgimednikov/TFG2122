@@ -242,7 +242,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void AddStatus(Status.Status stat)
         {
-            stat.setOwner(this);
+            stat.SetOwner(this);
             activeStatus.Add(stat);
             stat.OnApply();
         }
@@ -306,6 +306,10 @@ namespace EvolutionSimulation.Entities
     {
         private float startMultiplier = 0.33f; //Starting multiplier of newborns
         private float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
+
+        public float tiredThreshold = 0.40f; //After which percentage of currRest the creature should sleep with low priority
+        //After which percentage of currRest the creature should sleep with high priority and some stats are dimished
+        public float exhaustThreshold = 0.20f; 
 
         /// <summary>
         /// Modifies the given stat based on age

@@ -4,14 +4,14 @@ using System;
 namespace EvolutionSimulation.Entities.Status
 {
     /// <summary>
-    /// Interface detailing methods a status effect must have
+    /// This status deal damage per second to the owner
     /// </summary>
     public class Poison : Status
     {
         // Damage the poison will do per tick
         int damage;
 
-        public Poison(int d, int dmg) : base(d)
+        public Poison(int duration, int dmg) : base(duration)
         {
             damage = dmg;
         } 

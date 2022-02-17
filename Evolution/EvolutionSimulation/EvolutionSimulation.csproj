@@ -74,6 +74,8 @@
     <Compile Include="src\Entities\Bush.cs" />
     <Compile Include="src\Entities\EdiblePlant.cs" />
     <Compile Include="src\Entities\EdibleTree.cs" />
+    <Compile Include="src\Entities\Status\Starving.cs" />
+    <Compile Include="src\Entities\Status\Exhausted.cs" />
     <Compile Include="src\Entities\Status\Poison.cs" />
     <Compile Include="src\Entities\Status\Status.cs" />
     <Compile Include="src\Entities\Status\IStatus.cs" />

@@ -4,7 +4,7 @@ using System;
 namespace EvolutionSimulation.Entities.Status
 {
     /// <summary>
-    /// Interface detailing methods a status effect must have
+    /// Abstract class with the owner of the Status that has a duration (Negative values means infinite)
     /// </summary>
     public abstract class Status : IStatus
     {
@@ -22,7 +22,7 @@ namespace EvolutionSimulation.Entities.Status
             span = 0;
         } 
 
-        public void setOwner(Creature c)
+        public void SetOwner(Creature c)
         {
             owner = c;
         }
