@@ -23,6 +23,8 @@ namespace EvolutionSimulation.Entities
             seenCreatures = new List<Creature>();
             seenEntities = new List<StableEntity>();
             InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
+            activeStatus = new List<Status.Status>();
+            removedStatus = new List<Status.Status>();
             SetStats();
         }
 
@@ -50,6 +52,9 @@ namespace EvolutionSimulation.Entities
             //toSleep.value = (stats.CurrRest <= 0.1 * stats.MaxRest);
             //toWake.value = (stats.CurrRest >= stats.MaxRest);
             mfsm.obtainActionPoints(stats.Metabolism);
+
+            foreach (Status.Status s in activeStatus)   // Activates each status effect
+                if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
             
             seenCreatures.Clear();
             seenEntities.Clear();
@@ -62,6 +67,11 @@ namespace EvolutionSimulation.Entities
                                    // Creatura 1 ->  Ataca -> Creatura 2       Desde Creatura1 : Creatura2.Interact(Creatura 1, attack);
                                    //                                          Desde Creatura2 : Creatura1.Interact(Creatura2, attack);
             hasBeenHit = false; // TODO: Reset flags en general
+            
+            // Clears the statuses marked for deletion
+            foreach (Status.Status s in removedStatus)
+                activeStatus.Remove(s);
+            removedStatus.Clear();
         }
 
         /// <summary>
@@ -226,6 +236,32 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         abstract public void SetStats();
 
+        #region Status Effects
+        /// <summary>
+        /// Adds a status to the list of active statuses
+        /// </summary>
+        public void AddStatus(Status.Status stat)
+        {
+            stat.setOwner(this);
+            activeStatus.Add(stat);
+            stat.OnApply();
+        }
+
+        /// <summary>
+        /// Removes a status from the list
+        /// </summary>
+        /// <param name="expired">If its timer ran out</param>
+        public void RemoveStatus(Status.Status stat, bool expired)
+        {
+            if (activeStatus.Contains(stat))
+            {
+                removedStatus.Add(stat);
+                if (expired) stat.OnExpire();
+                else stat.OnRemove();
+            }
+        }
+        #endregion
+
         #region Attributes
         // World tile position
         public int x { get; private set; }
@@ -257,6 +293,12 @@ namespace EvolutionSimulation.Entities
         // Interactions that the creature can react to. Keys are the Interaction type
         // and values are the actions that the creature performs when something interacts with it.
         Dictionary<Interactions, List<Action<Creature>>> InteractionsDict;
+
+        // List of active status effects
+        List<Status.Status> activeStatus;
+
+        // List of status effects to be removed
+        List<Status.Status> removedStatus;
         #endregion
     }
 

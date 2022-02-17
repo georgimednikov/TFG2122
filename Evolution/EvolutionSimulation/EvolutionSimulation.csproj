@@ -74,6 +74,9 @@
     <Compile Include="src\Entities\Bush.cs" />
     <Compile Include="src\Entities\EdiblePlant.cs" />
     <Compile Include="src\Entities\EdibleTree.cs" />
+    <Compile Include="src\Entities\Status\Poison.cs" />
+    <Compile Include="src\Entities\Status\Status.cs" />
+    <Compile Include="src\Entities\Status\IStatus.cs" />
     <Compile Include="src\Entities\Tree.cs" />
     <Compile Include="src\FSM\Creature\States\Attacking.cs" />
     <Compile Include="src\FSM\Creature\States\Sleeping.cs" />

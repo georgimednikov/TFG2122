@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Threading;
 using EvolutionSimulation;
 using EvolutionSimulation.Entities;
+using EvolutionSimulation.Entities.Status;
 
 namespace VisualizadorConsola
 {
@@ -21,10 +22,10 @@ namespace VisualizadorConsola
             
             Animal c = world.CreateCreature<Animal>();
             c.Init(world, 5, 5);
-            c = world.CreateCreature<Animal>();
-            c.Init(world, 4, 4);
-           
-            
+            //c = world.CreateCreature<Animal>();
+            //c.Init(world, 4, 4);
+
+            c.AddStatus(new Poison(2, 5));
             
             Corpse corpse = world.CreateStableEntity<Corpse>();
             corpse.Init(world, 5, 3, 3, 40, 70, 80);
