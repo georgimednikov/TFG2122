@@ -148,16 +148,31 @@ namespace EvolutionSimulation
                     map[xIndex, yIndex].height = evaluateHeight(heightMap[xIndex, yIndex]);
 
                     double evaluation = evaluateInfluence(map[xIndex, yIndex].height);
-                    if (evaluation > 0)
+                    if (evaluation >= 0)
                     {
                         map[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex] - evaluation;
                         map[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] + evaluation;
                         if (map[xIndex, yIndex].temperature < 0) map[xIndex, yIndex].temperature = 0; // So it does not excede the domain
                         if (map[xIndex, yIndex].humidity > 1f) map[xIndex, yIndex].humidity = 1f;
                     }
-                    else if (evaluation < 0)
+                    else
                     {
+                        map[xIndex, yIndex].humidity = humidityMap[xIndex, yIndex];
                         map[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex];
+                    }
+                    avgTemp += map[xIndex, yIndex].temperature;
+                    avgHumidity += map[xIndex, yIndex].humidity;
+                }
+            }
+
+            for (int yIndex = 0; yIndex < sizeY; yIndex++)
+            {
+                for (int xIndex = 0; xIndex < sizeX; xIndex++)
+                {
+                    double evaluation = evaluateInfluence(map[xIndex, yIndex].height);
+                    if (evaluation < 0)
+                    {
+                        map[xIndex, yIndex].temperature = SoftenTemperatureByHeight(evaluation, map[xIndex, yIndex].temperature, avgTemp / Math.Pow(mapSize, 2));
                         map[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] - evaluation;
                         for (int i = -(int)(mapScale / 5); i <= (int)(mapScale / 5); i++)
                         {
@@ -166,6 +181,7 @@ namespace EvolutionSimulation
                                 if (j == 0 && i == 0) continue;
                                 if (canMove(xIndex + i, yIndex + j))
                                 {
+                                    map[xIndex + i, yIndex + j].temperature = SoftenTemperatureByHeight(evaluation / (1 * (Math.Sqrt(i * i + j * j))), map[xIndex + i, yIndex + j].temperature, avgTemp / Math.Pow(mapSize, 2));
                                     map[xIndex + i, yIndex + j].humidity += (-evaluation) / (20 * (Math.Sqrt(i * i + j * j)));
                                     if (map[xIndex + i, yIndex + j].humidity > 1f) map[xIndex + i, yIndex + j].humidity = 1f;
                                 }
@@ -173,16 +189,11 @@ namespace EvolutionSimulation
                         }
 
                         if (map[xIndex, yIndex].humidity > 1f) map[xIndex, yIndex].humidity = 1f;
+
                     }
-                    else
-                    {
-                        map[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex];
-                        map[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex];
-                    }
-                    avgTemp += map[xIndex, yIndex].temperature;
-                    avgHumidity += map[xIndex, yIndex].humidity;
                 }
             }
+
             int trees = 0;
             int maxTrees = 0;
             int maxFlora = 0;
@@ -259,6 +270,12 @@ namespace EvolutionSimulation
             double data = ((a / c) * Math.Pow(c * map[xIndex, yIndex].humidity - map[xIndex, yIndex].temperature * p, e) - Math.Pow(2 * map[xIndex, yIndex].temperature - 1 - map[xIndex, yIndex].humidity * g, 2 * d));
             return Math.Min(Math.Max(data, 0), 1.0f);
             //return 2 * Math.Pow((0.5f * (-2 * (Math.Pow(Math.Sqrt(2) * ((mapData[xIndex, yIndex].temperature) - 0.5), 2)) + 1) + (0.5f * mapData[xIndex, yIndex].humidity)), 4);
+        }
+
+        double SoftenTemperatureByHeight(double height, double temp, double avg)
+        {
+            double avgTemp = avg, a = 1;
+            return Math.Pow((1 + height), a) * (temp - avgTemp) + avgTemp;
         }
 
         /// <summary>
