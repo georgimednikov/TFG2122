@@ -165,6 +165,7 @@ namespace EvolutionSimulation
                 }
             }
 
+            double currAvgTemp = avgTemp;
             for (int yIndex = 0; yIndex < sizeY; yIndex++)
             {
                 for (int xIndex = 0; xIndex < sizeX; xIndex++)
@@ -172,8 +173,10 @@ namespace EvolutionSimulation
                     double evaluation = evaluateInfluence(map[xIndex, yIndex].height);
                     if (evaluation < 0)
                     {
-                        map[xIndex, yIndex].temperature = SoftenTemperatureByHeight(evaluation, map[xIndex, yIndex].temperature, avgTemp / Math.Pow(mapSize, 2));
-                        map[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] - evaluation;
+                        avgTemp -= map[xIndex, yIndex].temperature;
+                        avgHumidity -= map[xIndex, yIndex].humidity;
+                        map[xIndex, yIndex].temperature = SoftenTemperatureByHeight(evaluation, map[xIndex, yIndex].temperature, currAvgTemp / Math.Pow(mapSize, 2));
+                        map[xIndex, yIndex].humidity += map[xIndex, yIndex].humidity - evaluation;
                         for (int i = -(int)(mapScale / 5); i <= (int)(mapScale / 5); i++)
                         {
                             for (int j = -(int)(mapScale / 5); j <= (int)(mapScale / 5); j++)
@@ -181,15 +184,25 @@ namespace EvolutionSimulation
                                 if (j == 0 && i == 0) continue;
                                 if (canMove(xIndex + i, yIndex + j))
                                 {
-                                    map[xIndex + i, yIndex + j].temperature = SoftenTemperatureByHeight(evaluation / (1 * (Math.Sqrt(i * i + j * j))), map[xIndex + i, yIndex + j].temperature, avgTemp / Math.Pow(mapSize, 2));
+                                    avgHumidity -= map[xIndex + i, yIndex + j].humidity;
+                                    avgTemp -= map[xIndex + i, yIndex + j].temperature;
+
+                                    map[xIndex + i, yIndex + j].temperature = SoftenTemperatureByHeight(evaluation / (1 * (Math.Sqrt(i * i + j * j))), map[xIndex + i, yIndex + j].temperature, currAvgTemp / Math.Pow(mapSize, 2));
                                     map[xIndex + i, yIndex + j].humidity += (-evaluation) / (20 * (Math.Sqrt(i * i + j * j)));
                                     if (map[xIndex + i, yIndex + j].humidity > 1f) map[xIndex + i, yIndex + j].humidity = 1f;
+                                    if (map[xIndex + i, yIndex + j].temperature > 1f) map[xIndex + i, yIndex + j].temperature = 1f;
+
+                                    avgHumidity += map[xIndex + i, yIndex + j].humidity;
+                                    avgTemp += map[xIndex + i, yIndex + j].temperature;
                                 }
                             }
                         }
 
                         if (map[xIndex, yIndex].humidity > 1f) map[xIndex, yIndex].humidity = 1f;
+                        if (map[xIndex, yIndex].temperature > 1f) map[xIndex, yIndex].temperature = 1f;
 
+                        avgHumidity += map[xIndex, yIndex].humidity;
+                        avgTemp += map[xIndex, yIndex].temperature;
                     }
                 }
             }
