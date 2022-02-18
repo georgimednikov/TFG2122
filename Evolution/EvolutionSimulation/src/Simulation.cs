@@ -30,13 +30,4 @@ namespace EvolutionSimulation
         }
         World world;
     }
-
-    // TODO: esto moverlo a otro sitio
-    public class SortByMetabolism : Comparer<Creature>
-    {
-        public override int Compare(Creature x, Creature y)
-        {
-            return -x.stats.Metabolism.CompareTo(y.stats.Metabolism);
-        }
-    }
 }

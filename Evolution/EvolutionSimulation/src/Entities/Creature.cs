@@ -21,7 +21,8 @@ namespace EvolutionSimulation.Entities
         {
             chromosome = new CreatureChromosome();
             stats = new CreatureStats();
-            seenCreatures = new List<Creature>();
+            seenSameSpeciesCreatures = new List<Creature>();
+            otherSeenCreatures = new List<Creature>();
             seenEntities = new List<StableEntity>();
             InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
             activeStatus = new List<Status.Status>();
@@ -50,9 +51,11 @@ namespace EvolutionSimulation.Entities
         public void Tick()
         {
             //toDie.value = (stats.CurrAge++ >= stats.LifeSpan);
-            stats.CurrRest -= stats.RestExpense;
             //toSleep.value = (stats.CurrRest <= 0.1 * stats.MaxRest);
             //toWake.value = (stats.CurrRest >= stats.MaxRest);
+            // TODO: Esto puede estar en el estado Alive, y en el Execute ejecutar
+            // el action del estado Padre.
+            stats.CurrRest -= stats.RestExpense;
             mfsm.ObtainActionPoints(stats.Metabolism);
             
             
@@ -70,20 +73,23 @@ namespace EvolutionSimulation.Entities
                     timeToBeInHeat--;
             }
 
+
+            Perceive();
             foreach (Status.Status s in activeStatus)   // Activates each status effect
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
-            
-            seenCreatures.Clear();
-            seenEntities.Clear();
-            Perceive();
 
             MakeDecision();
+
+
             // TomarDecision(); (Asignar Criatura Objetivo) -> Trigger Transicion -> Cambio de estado
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
             while (mfsm.Execute());// Maintains the evaluation - execution action
                                    // Creatura 1 ->  Ataca -> Creatura 2       Desde Creatura1 : Creatura2.Interact(Creatura 1, attack);
                                    //                                          Desde Creatura2 : Creatura1.Interact(Creatura2, attack);
             hasBeenHit = false; // TODO: Reset flags en general
+            seenSameSpeciesCreatures.Clear();
+            otherSeenCreatures.Clear();
+            seenEntities.Clear();
             
             // Clears the statuses marked for deletion
             foreach (Status.Status s in removedStatus)
@@ -94,14 +100,18 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Affects the transitions of the FSM based on perceived entities
         /// </summary>
+        // TODO: quitar este metodo, hacer las decisiones con la fsm
+        // clasifica lo visto
         void MakeDecision()
         {
-            if (seenCreatures.Count > 0 || hasBeenHit)    // TODO: hacer esto bien, 
-            {                                             // ahora para atacar, muy WIP
-                objective = seenCreatures[0];
-                objectivePos = new Vector2(objective.x, objective.y);
-            }
-            else objective = null;
+            //if (seenCreatures.Count > 0 || hasBeenHit)    // TODO: hacer esto bien, 
+            //{                                             // ahora para atacar, muy WIP
+            //    objective = seenCreatures[0];
+            //    objectivePos = new Vector2(objective.x, objective.y);
+            //}
+            //else objective = null;
+            // nearestAttackEnt, nearestMate, nearestPlant...
+            // obj =^
         }
 
         /// <summary>
@@ -185,8 +195,17 @@ namespace EvolutionSimulation.Entities
         void Perceive()
         {
             int perceptionRadius = 4; // TODO: calculate this using the Perception stat
-            seenCreatures = world.PerceiveCreatures(this, x, y, perceptionRadius);
+            List<Creature> seenCreatures = world.PerceiveCreatures(this, x, y, perceptionRadius);
             seenEntities = world.PerceiveEntities(this, x, y, perceptionRadius);
+            seenCreatures.Sort(new Utils.SortByDistance());   // TODO, no hacer new todo el rato
+            foreach(Creature c in seenCreatures)
+            {
+                if (c.species.name == species.name)
+                    seenSameSpeciesCreatures.Add(c);
+                else
+                    otherSeenCreatures.Add(c);
+            }
+
         }
 
         /// <summary>
@@ -293,7 +312,8 @@ namespace EvolutionSimulation.Entities
         public CreatureStats stats { get; private set; }
 
         // List of creatures seen at this moment by this creature
-        public List<Creature> seenCreatures { get; private set; }
+        public List<Creature> seenSameSpeciesCreatures { get; private set; }
+        public List<Creature> otherSeenCreatures { get; private set; }
         // List of entities seen at this moment by this creature
         public List<StableEntity> seenEntities { get; private set; }
 
@@ -305,6 +325,7 @@ namespace EvolutionSimulation.Entities
 
         public IEntity objective;
         Vector2 objectivePos;
+        public Action arrivalAction;
 
         public bool hasBeenHit;
 
@@ -340,7 +361,7 @@ namespace EvolutionSimulation.Entities
             return stat * Math.Min(1.0f, (1 - startMultiplier) / (LifeSpan * adulthoodThreshold) * currAge + startMultiplier);
         }
 
-        public bool IsNewBorn() { return LifeSpan * adulthoodThreshold > currAge; }
+        public bool IsNewBorn() { return LifeSpan * adulthoodThreshold < currAge; }
 
         public Gender Gender { get; set; }
 

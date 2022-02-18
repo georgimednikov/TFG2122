@@ -39,6 +39,15 @@ namespace EvolutionSimulation.FSM
         }
 
         /// <summary>
+        /// Adds a transition to the same state
+        /// </summary>
+        public void AddReentry(IState state, ITransition sub)
+        {
+            machine.Configure(state)
+                .PermitReentry(sub);
+        }
+
+        /// <summary>
         /// Returns a string representation of the state machine in the DOT graph language
         /// It can then be visualized by pasting the output in http://www.webgraphviz.com/
         /// </summary>

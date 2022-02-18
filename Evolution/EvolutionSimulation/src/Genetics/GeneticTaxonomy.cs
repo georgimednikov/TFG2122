@@ -9,6 +9,7 @@ namespace EvolutionSimulation.Genetics
 {
     public class Species
     {
+        //TODO que tengan un id
         public string name;
         public string progenitor;
         public Creature original;
