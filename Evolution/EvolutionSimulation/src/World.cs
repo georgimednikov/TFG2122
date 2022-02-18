@@ -427,9 +427,9 @@ namespace EvolutionSimulation
         /// <summary>
         /// Guiven a year, returns the number of ticks it equals
         /// </summary>
-        public int yearToTick(int year)
+        public int YearToTick(float year)
         {
-            return year * daysYear * hoursDay * ticksHour;
+            return (int)(year * daysYear * hoursDay * ticksHour);
         }
 
         public uint step;

@@ -18,16 +18,23 @@ namespace EvolutionSimulation.Entities
             int minEnergy = 50;
             int resourceAmount = 100; //Max amount of sleep/hydratation
             int sizeToEnergyRatio = 2; //The creature gains 1 point of max energy for every sizeToEnergyRatio of Size
+            float minLifeSpan = 0.5f; // Minimum yearsAlive
             float exhaustToSleepRatio = 3; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
             float nightPerceptionPenalty = 0.4f; //Percentage of the max Perception lost at night
             float mobilityPenalty = 0.7f; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
                                           //A ground creature moves fast on the ground, but cannot move throught the air/trees
                                           //An arboreal creature moves fast through trees, but arborealSpeed * mobilityPenalty on the ground
                                           //An aerial creature moves fast in the air, but arborealSpeed = aerialSpeed * mobilityPenalty and groundSpeed = arborealSpeed * mobilityPenalty
+            
+            //TODO: Poner esto en el cromosoma, tiempo de embarazo, tiempo entre celos, tiempo en celo
+            float timeBetweenHeats = 0.8f; //time in years between two heats or give birth and the next heat 
 
-            stats.LifeSpan = world.yearToTick(chromosome.GetFeature(CreatureFeature.Longevity));
+            stats.TimeBetweenHeats = world.YearToTick(timeBetweenHeats);
 
-            ////Multipliers
+            //Longevity is in years so we parse it to ticks and add a minimun value 
+            stats.LifeSpan = world.YearToTick(chromosome.GetFeature(CreatureFeature.Longevity) + minLifeSpan);
+
+            //Multipliers
             stats.HealthRegeneration = 0.1f;
             stats.MaxSpeed = 1.5f;
 
@@ -49,7 +56,7 @@ namespace EvolutionSimulation.Entities
             int speed = chromosome.GetFeature(CreatureFeature.Mobility);
             stats.AirReach = wings;
             stats.TreeReach = wings || arboreal || upright;
-
+            
             stats.AerialSpeed = stats.ArborealSpeed = -1;
             if (wings)
             {
@@ -101,7 +108,7 @@ namespace EvolutionSimulation.Entities
                 stats.NightDebuff *= 1 - (chromosome.GetFeature(CreatureFeature.NightVision) / chromosome.GetFeatureMax(CreatureFeature.NightVision));
 
 
-            ////Behaviour related stats
+            //Behaviour related stats
             stats.Knowledge = chromosome.GetFeature(CreatureFeature.Knowledge);
             stats.Paternity = chromosome.GetFeature(CreatureFeature.Paternity);
 

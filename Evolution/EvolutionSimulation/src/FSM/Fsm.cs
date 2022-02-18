@@ -81,7 +81,7 @@ namespace EvolutionSimulation.FSM
             }
         }
 
-        public void obtainActionPoints(int metabolism)
+        public void ObtainActionPoints(int metabolism)
         {
             actionPoints += metabolism * 10;
         }

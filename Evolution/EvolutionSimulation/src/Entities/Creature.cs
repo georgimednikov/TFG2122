@@ -13,6 +13,7 @@ namespace EvolutionSimulation.Entities
     /// </summary>
     public abstract class Creature : IEntity, IInteractable<Creature>
     {
+
         /// <summary>
         /// Constructor for factories
         /// </summary>
@@ -37,6 +38,7 @@ namespace EvolutionSimulation.Entities
             SetStats();
             this.x = x;
             this.y = y;
+            timeToBeInHeat = stats.TimeBetweenHeats;
             ConfigureStateMachine();
             AddInteraction(Interactions.attack, OnAttack);
             Console.WriteLine(mfsm.ExportToDotGraph());
@@ -51,7 +53,22 @@ namespace EvolutionSimulation.Entities
             stats.CurrRest -= stats.RestExpense;
             //toSleep.value = (stats.CurrRest <= 0.1 * stats.MaxRest);
             //toWake.value = (stats.CurrRest >= stats.MaxRest);
-            mfsm.obtainActionPoints(stats.Metabolism);
+            mfsm.ObtainActionPoints(stats.Metabolism);
+            
+            
+            if(stats.Gender == Gender.Female && !stats.IsNewBorn())
+            {
+                if (timeToBeInHeat == 0)//Can be pregnant
+                    stats.InHeat = true;
+                //TODO: cuando se quede embarazada, poner timeToBeInHeat a -1
+                else if (timeToBeInHeat <= -1)// Pregnant, reset timer
+                {
+                    timeToBeInHeat = stats.TimeBetweenHeats;
+                    stats.InHeat = false;
+                }
+                else
+                    timeToBeInHeat--;
+            }
 
             foreach (Status.Status s in activeStatus)   // Activates each status effect
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
@@ -192,6 +209,7 @@ namespace EvolutionSimulation.Entities
                 InteractionsDict[type] = new List<Action<Creature>>();
             InteractionsDict[type].Add(response);
         }
+        
         /// <summary>
         /// Removes a response to an interaction type, given the
         /// creature that interacts with this. 
@@ -210,7 +228,7 @@ namespace EvolutionSimulation.Entities
 
         private void OnAttack(Creature interacter)
         {
-            stats.CurrHealth -= computeDamage(interacter.stats.Damage, interacter.stats.Perforation);
+            stats.CurrHealth -= ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
 
             objective = interacter;
             objectivePos = new Vector2(interacter.x, interacter.y);
@@ -222,7 +240,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         /// <param name="dmg">Incoming damage</param>
         /// <param name="pen">Damage penetratione</param>
-        public float computeDamage(float dmg, float pen)
+        public float ComputeDamage(float dmg, float pen)
         {
             float amount = 0;
             amount = (dmg) - (stats.Armor - pen);
@@ -290,6 +308,9 @@ namespace EvolutionSimulation.Entities
 
         public bool hasBeenHit;
 
+        protected int timeToBeInHeat;
+
+
         // Interactions that the creature can react to. Keys are the Interaction type
         // and values are the actions that the creature performs when something interacts with it.
         Dictionary<Interactions, List<Action<Creature>>> InteractionsDict;
@@ -318,6 +339,8 @@ namespace EvolutionSimulation.Entities
         {
             return stat * Math.Min(1.0f, (1 - startMultiplier) / (LifeSpan * adulthoodThreshold) * currAge + startMultiplier);
         }
+
+        public bool IsNewBorn() { return LifeSpan * adulthoodThreshold > currAge; }
 
         public Gender Gender { get; set; }
 
@@ -398,6 +421,10 @@ namespace EvolutionSimulation.Entities
         //Multipliers
         public float HealthRegeneration { get; set; }
         public float MaxSpeed { get; set; }
+
+        //Reproduction stats
+        public int TimeBetweenHeats { get; set; }
+        public bool InHeat { get; set; }
     }
 
 }
