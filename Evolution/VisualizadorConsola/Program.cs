@@ -1,4 +1,7 @@
 ﻿using EvolutionSimulation;
+using System;
+using EvolutionSimulation.Genetics;
+using System.Collections.Generic;
 
 namespace VisualizadorConsola
 {
@@ -6,8 +9,7 @@ namespace VisualizadorConsola
     {
         static void Main(string[] args)
         {
-            WorkingDirectories.SetDirectories();
-            EvolutionSimulation.Genetics.CreatureChromosome.SetChromosome();
+            CreatureChromosome.SetChromosome("../../Chromosome.json");
             ISimulation s = new ConsoleSimulation();
             s.Init();
             s.Run();

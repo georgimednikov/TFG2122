@@ -14,22 +14,21 @@ namespace Visualizador
         [STAThread]
         static void Main()
         {
-            EvolutionSimulation.WorkingDirectories.AskDirectories();
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            EvolutionSimulation.Genetics.CreatureChromosome.SetChromosome("../../Chromosome.json");
 
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
-            //EvolutionSimulation.Genetics.CreatureChromosome.SetChromosome("../../Chromosome.json");
+            EvolutionSimulation.Entities.Animal c = new EvolutionSimulation.Entities.Animal();
+            EvolutionSimulation.World w = new EvolutionSimulation.World();
+            c.Init(w, 0, 0);
+            int a = 20;
+            while (a > 0)
+            {
+                --a;
+                c.Tick();
+            }
 
-            //EvolutionSimulation.Entities.Animal c = new EvolutionSimulation.Entities.Animal();
-            //EvolutionSimulation.World w = new EvolutionSimulation.World();
-            //c.Init(w, 0, 0);
-            //int a = 20;
-            //while (a > 0)
-            //{
-            //    --a;
-            //    c.Tick();
-            //}
-
+            // TODO: ?????
             //AlgoritmoEvolutivo.TestFSM testFSM = new AlgoritmoEvolutivo.TestFSM();
 
             //var result = MessageBox.Show("State: " + testFSM.GetState().ToString() + "\nKill?", "TestFSM",

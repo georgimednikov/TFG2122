@@ -2,6 +2,9 @@
 using EvolutionSimulation.Genetics;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace EvolutionSimulation
 {
@@ -31,8 +34,7 @@ namespace EvolutionSimulation
         /// <param name="influenceFunc">Function that defines the influence of height on the other parameters</param>
         public void Init(int size, Func<double, double> heightFunc = default(Func<double, double>), Func<double, double> influenceFunc = default(Func<double, double>), Func<int, int, double> floraFunc = default(Func<int, int, double>), Func<double, int> floraSelectorFunc = default(Func<double, int>))
         {
-            taxonomy = new GeneticTaxonomy();
-            taxonomy.Init();
+            taxonomy = new GeneticTaxonomy("../../SimilarityGeneWeight.json", "../../SimilaritySpecies.json");
             Creatures = new List<Creature>();
             StableEntities = new List<StableEntity>();
             CreaturesToDelete = new List<IEntity>();

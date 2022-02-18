@@ -56,25 +56,17 @@ namespace EvolutionSimulation.Genetics
 
 
         /// <summary>
-        /// Create the GeneticTaxonomy. Has to be initialized calling Init().
+        /// Create the GeneticTaxonomy using both json
         /// </summary>
-        public GeneticTaxonomy() { }
-
-        /// <summary>
-        /// Initialized GeneticTaxonomy reading the weights and the genetic similarity threshold from the files named
-        /// SimilarityGeneWeight.json and SimilaritySpecies.json that are supposed to be found in the given Data Directory.
-        /// </summary>
-        public void Init()
+        /// <param name="jsonWeigths">Path with gene weights to calculate genetic similarities </param>
+        /// <param name="jsonSimilarity">Path with species similarity</param>
+        public GeneticTaxonomy(string jsonWeigths, string jsonSimilarity)
         {
-            //TODO: Actualizar directorios con el nuevo sistema
-            string jsonWeigths = WorkingDirectories.DataDirectory + "SimilarityGeneWeight.json";
-            string jsonSimilarity = WorkingDirectories.DataDirectory + "SimilaritySpecies.json";
-
             //The different weights for each gene when calculating the similarities
             //between two creatures is read from the designated json file
             if (!File.Exists(jsonWeigths))
                 throw new Exception("Cannot find JSON with gene weights to calculate genetic similarities");
-            if (!File.Exists(jsonSimilarity))
+           if (!File.Exists(jsonSimilarity))
                 throw new Exception("Cannot find JSON with species similarity");
             string file = File.ReadAllText(jsonWeigths);
             //In tuples to facilitate the modification of the file
@@ -101,29 +93,19 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         public void AddCreatureToSpecies(Creature creature)
         {
-            //The most similar valid species is saved to add the creature to its members, if there is one.
-            Species mostSimilarYet = null;
-            float bestSimilarityYet = 0;
+            //If the creature belongs to an existing species, it is added to its members
             foreach (Species sp in existingSpecies)
             {
-                float similarity = GeneticSimilarity(creature.chromosome, sp.original.chromosome);
-                if (similarity > minGeneticSimilarity && similarity > bestSimilarityYet)
+                if (GeneticSimilarity(creature.chromosome, sp.original.chromosome) > minGeneticSimilarity)
                 {
-                    mostSimilarYet = sp;
-                    bestSimilarityYet = similarity;
+                    sp.members.Add(creature);
+                    return;
                 }
             }
-            //If the creature belongs to an existing species, it is added to its members
-            if (mostSimilarYet != null)
-            {
-                mostSimilarYet.members.Add(creature);
-                return;
-            }
-
             //Else a new species is created
             Species newSpecies = new Species(creature);
             existingSpecies.Add(newSpecies);
-
+           
             //If the new species is made from scratch, it is simply added
             if (creature.species.progenitor == "None")
             {
@@ -223,7 +205,7 @@ namespace EvolutionSimulation.Genetics
             //runs through all species 
             for (int i = 0; i < speciesRecord.Count; ++i)
             {
-                i = RenderSpeciesTree(speciesRecord[i].name, 0, i, writer);
+                i = RenderSpeciesTree( speciesRecord[i].name, 0, i, writer);                
             }
             writer.Close();
         }
@@ -265,30 +247,30 @@ namespace EvolutionSimulation.Genetics
             SaveTree(name, lvl, writer);
 
             // Stop condition, end of the species
-            if (index >= speciesRecord.Count - 1) return index;
-
+            if (index >= speciesRecord.Count-1) return index;
+            
 
             // child
             if (speciesRecord[index + 1].progenitor == name)
-                index = RenderSpeciesTree(speciesRecord[index + 1].name, ++lvl, ++index, writer);
+                index = RenderSpeciesTree( speciesRecord[index+1].name, ++lvl, ++index, writer);
             // sibling without childs between them
             else if (speciesRecord[index + 1].progenitor == speciesRecord[index].progenitor && speciesRecord[index].progenitor != "None")
-                index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl, ++index, writer);
+                index = RenderSpeciesTree( speciesRecord[index + 1].name, lvl, ++index, writer);
             // sibling with childs between them
             else if (speciesRecord[index + 1].progenitor != "None")
             {
                 bool siblings = false;
                 int cont = index - 1;
                 //find the lvl of the progenitor
-                while (!siblings && cont > 0 && speciesRecord[cont].progenitor != "None")
+                while(!siblings && cont > 0 && speciesRecord[cont].progenitor != "None")
                 {
                     if (speciesRecord[cont].progenitor == speciesRecord[index + 1].progenitor)
                         siblings = true;
                     else
                         cont--;
                 }
-                if (siblings)
-                    index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl - (index - cont), ++index, writer);
+                if(siblings)
+                    index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl - (index-cont), ++index, writer);
             }
             return index;
         }
@@ -320,12 +302,13 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         public void ExportSpecies()
         {
+            Directory.CreateDirectory("../../ResultingSpecies");
             for (int i = 0; i < existingSpecies.Count; i++)
             {
                 Species sp = existingSpecies[i];
                 SpeciesExport export = new SpeciesExport(sp.name, sp.original.stats);
                 string species = JsonConvert.SerializeObject(export, Formatting.Indented);
-                File.WriteAllText(WorkingDirectories.ExportDirectory + "Species_" + i + ".json", species);
+                File.WriteAllText("../../ResultingSpecies/Species_" + i + ".json", species);
             }
         }
     }

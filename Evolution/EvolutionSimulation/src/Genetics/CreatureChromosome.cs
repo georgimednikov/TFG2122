@@ -104,11 +104,8 @@ namespace EvolutionSimulation.Genetics
         /// Sets the chromosome structure reading the values of the given JSON file.
         /// </summary>
         /// <param name="json">Address of the JSON file</param>
-        static public void SetChromosome()
+        static public void SetChromosome(string json)
         {
-            //TODO: Actualizar directorios con el nuevo sistema
-            string json = WorkingDirectories.DataDirectory + "Chromosome.json";
-
             if (!File.Exists(json))
                 throw new Exception("Cannot find JSON with chromosome information");
             string file = File.ReadAllText(json);
