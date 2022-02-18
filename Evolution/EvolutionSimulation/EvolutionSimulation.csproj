@@ -112,6 +112,7 @@
     <Compile Include="src\Perlin.cs" />
     <Compile Include="src\Entities\Creature.cs" />
     <Compile Include="src\ISimulation.cs" />
+    <Compile Include="src\WorkingDirectories.cs" />
     <Compile Include="src\World.cs" />
     <Compile Include="src\Simulation.cs" />
     <Compile Include="src\Entities\IEntity.cs" />
@@ -124,8 +125,10 @@
     <Reference Include="stateless, Version=4.0.0.0, Culture=neutral, PublicKeyToken=93038f0927583c9a, processorArchitecture=MSIL">
       <HintPath>..\packages\stateless.5.11.0\lib\net472\stateless.dll</HintPath>
     </Reference>
+    <Reference Include="System" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
