@@ -13,6 +13,7 @@ namespace EvolutionSimulation.Entities
     /// </summary>
     public abstract class Creature : IEntity, IInteractable<Creature>
     {
+
         /// <summary>
         /// Constructor for factories
         /// </summary>
@@ -20,7 +21,8 @@ namespace EvolutionSimulation.Entities
         {
             chromosome = new CreatureChromosome();
             stats = new CreatureStats();
-            seenCreatures = new List<Creature>();
+            seenSameSpeciesCreatures = new List<Creature>();
+            otherSeenCreatures = new List<Creature>();
             seenEntities = new List<StableEntity>();
             InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
             activeStatus = new List<Status.Status>();
@@ -38,6 +40,7 @@ namespace EvolutionSimulation.Entities
             SetStats();
             this.x = x;
             this.y = y;
+            timeToBeInHeat = stats.TimeBetweenHeats;
             ConfigureStateMachine();
             AddInteraction(Interactions.attack, OnAttack);
             Console.WriteLine(mfsm.ExportToDotGraph());
@@ -49,25 +52,45 @@ namespace EvolutionSimulation.Entities
         public void Tick()
         {
             //toDie.value = (stats.CurrAge++ >= stats.LifeSpan);
-            stats.CurrRest -= stats.RestExpense;
             //toSleep.value = (stats.CurrRest <= 0.1 * stats.MaxRest);
             //toWake.value = (stats.CurrRest >= stats.MaxRest);
-            mfsm.obtainActionPoints(stats.Metabolism);
+            // TODO: Esto puede estar en el estado Alive, y en el Execute ejecutar
+            // el action del estado Padre.
+            stats.CurrRest -= stats.RestExpense;
+            mfsm.ObtainActionPoints(stats.Metabolism);
+            
+            
+            if(stats.Gender == Gender.Female && !stats.IsNewBorn())
+            {
+                if (timeToBeInHeat == 0)//Can be pregnant
+                    stats.InHeat = true;
+                //TODO: cuando se quede embarazada, poner timeToBeInHeat a -1
+                else if (timeToBeInHeat <= -1)// Pregnant, reset timer
+                {
+                    timeToBeInHeat = stats.TimeBetweenHeats;
+                    stats.InHeat = false;
+                }
+                else
+                    timeToBeInHeat--;
+            }
 
+
+            Perceive();
             foreach (Status.Status s in activeStatus)   // Activates each status effect
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
-            
-            seenCreatures.Clear();
-            seenEntities.Clear();
-            Perceive();
 
             MakeDecision();
+
+
             // TomarDecision(); (Asignar Criatura Objetivo) -> Trigger Transicion -> Cambio de estado
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
             while (mfsm.Execute());// Maintains the evaluation - execution action
                                    // Creatura 1 ->  Ataca -> Creatura 2       Desde Creatura1 : Creatura2.Interact(Creatura 1, attack);
                                    //                                          Desde Creatura2 : Creatura1.Interact(Creatura2, attack);
             hasBeenHit = false; // TODO: Reset flags en general
+            seenSameSpeciesCreatures.Clear();
+            otherSeenCreatures.Clear();
+            seenEntities.Clear();
             
             // Clears the statuses marked for deletion
             foreach (Status.Status s in removedStatus)
@@ -78,14 +101,18 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Affects the transitions of the FSM based on perceived entities
         /// </summary>
+        // TODO: quitar este metodo, hacer las decisiones con la fsm
+        // clasifica lo visto
         void MakeDecision()
         {
-            if (seenCreatures.Count > 0 || hasBeenHit)    // TODO: hacer esto bien, 
-            {                                             // ahora para atacar, muy WIP
-                objective = seenCreatures[0];
-                objectivePos = new Vector2(objective.x, objective.y);
-            }
-            else objective = null;
+            //if (seenCreatures.Count > 0 || hasBeenHit)    // TODO: hacer esto bien, 
+            //{                                             // ahora para atacar, muy WIP
+            //    objective = seenCreatures[0];
+            //    objectivePos = new Vector2(objective.x, objective.y);
+            //}
+            //else objective = null;
+            // nearestAttackEnt, nearestMate, nearestPlant...
+            // obj =^
         }
 
         /// <summary>
@@ -169,8 +196,17 @@ namespace EvolutionSimulation.Entities
         void Perceive()
         {
             int perceptionRadius = 4; // TODO: calculate this using the Perception stat
-            seenCreatures = world.PerceiveCreatures(this, x, y, perceptionRadius);
+            List<Creature> seenCreatures = world.PerceiveCreatures(this, x, y, perceptionRadius);
             seenEntities = world.PerceiveEntities(this, x, y, perceptionRadius);
+            seenCreatures.Sort(new Utils.SortByDistance());   // TODO, no hacer new todo el rato
+            foreach(Creature c in seenCreatures)
+            {
+                if (c.species.name == species.name)
+                    seenSameSpeciesCreatures.Add(c);
+                else
+                    otherSeenCreatures.Add(c);
+            }
+
         }
 
         /// <summary>
@@ -193,6 +229,7 @@ namespace EvolutionSimulation.Entities
                 InteractionsDict[type] = new List<Action<Creature>>();
             InteractionsDict[type].Add(response);
         }
+        
         /// <summary>
         /// Removes a response to an interaction type, given the
         /// creature that interacts with this. 
@@ -211,7 +248,7 @@ namespace EvolutionSimulation.Entities
 
         private void OnAttack(Creature interacter)
         {
-            stats.CurrHealth -= computeDamage(interacter.stats.Damage, interacter.stats.Perforation);
+            stats.CurrHealth -= ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
 
             objective = interacter;
             objectivePos = new Vector2(interacter.x, interacter.y);
@@ -223,7 +260,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         /// <param name="dmg">Incoming damage</param>
         /// <param name="pen">Damage penetratione</param>
-        public float computeDamage(float dmg, float pen)
+        public float ComputeDamage(float dmg, float pen)
         {
             float amount = 0;
             amount = (dmg) - (stats.Armor - pen);
@@ -276,7 +313,8 @@ namespace EvolutionSimulation.Entities
         public CreatureStats stats { get; private set; }
 
         // List of creatures seen at this moment by this creature
-        public List<Creature> seenCreatures { get; private set; }
+        public List<Creature> seenSameSpeciesCreatures { get; private set; }
+        public List<Creature> otherSeenCreatures { get; private set; }
         // List of entities seen at this moment by this creature
         public List<StableEntity> seenEntities { get; private set; }
 
@@ -288,8 +326,12 @@ namespace EvolutionSimulation.Entities
 
         public IEntity objective;
         Vector2 objectivePos;
+        public Action arrivalAction;
 
         public bool hasBeenHit;
+
+        protected int timeToBeInHeat;
+
 
         // Interactions that the creature can react to. Keys are the Interaction type
         // and values are the actions that the creature performs when something interacts with it.
@@ -319,6 +361,8 @@ namespace EvolutionSimulation.Entities
         {
             return stat * Math.Min(1.0f, (1 - startMultiplier) / (LifeSpan * adulthoodThreshold) * currAge + startMultiplier);
         }
+
+        public bool IsNewBorn() { return LifeSpan * adulthoodThreshold < currAge; }
 
         public Gender Gender { get; set; }
 
@@ -399,6 +443,10 @@ namespace EvolutionSimulation.Entities
         //Multipliers
         public float HealthRegeneration { get; set; }
         public float MaxSpeed { get; set; }
+
+        //Reproduction stats
+        public int TimeBetweenHeats { get; set; }
+        public bool InHeat { get; set; }
     }
 
 }

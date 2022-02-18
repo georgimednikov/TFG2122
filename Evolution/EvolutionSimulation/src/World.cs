@@ -140,7 +140,7 @@ namespace EvolutionSimulation
         private void EntitiesTick()
         {
             // Tick for every entity
-            Creatures.Sort(new SortByMetabolism()); // TODO: priority queue
+            Creatures.Sort(new Utils.SortByMetabolism()); // TODO: priority queue
             Creatures.ForEach(delegate (Creature e) { e.Tick(); });
             StableEntities.ForEach(delegate (StableEntity e) { e.Tick(); });
 
@@ -427,9 +427,9 @@ namespace EvolutionSimulation
         /// <summary>
         /// Guiven a year, returns the number of ticks it equals
         /// </summary>
-        public int yearToTick(int year)
+        public int YearToTick(float year)
         {
-            return year * daysYear * hoursDay * ticksHour;
+            return (int)(year * daysYear * hoursDay * ticksHour);
         }
 
         public uint step;
