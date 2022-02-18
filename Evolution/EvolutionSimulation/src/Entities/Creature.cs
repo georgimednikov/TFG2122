@@ -27,6 +27,7 @@ namespace EvolutionSimulation.Entities
             InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
             activeStatus = new List<Status.Status>();
             removedStatus = new List<Status.Status>();
+            speciesName = "None";
         }
 
         /// <summary>
@@ -307,7 +308,7 @@ namespace EvolutionSimulation.Entities
         public World world { get; private set; }
 
         // Genetic
-        public Species species;
+        public string speciesName;
         public CreatureChromosome chromosome { get; private set; }
         public CreatureStats stats { get; private set; }
 
