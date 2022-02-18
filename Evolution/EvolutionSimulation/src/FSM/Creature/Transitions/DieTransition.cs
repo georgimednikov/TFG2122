@@ -16,9 +16,9 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         public override bool Evaluate()
         {
             return  creature.stats.CurrHealth <= 0
-                || creature.stats.CurrAge++ >= creature.stats.LifeSpan;
-        }
-
+                || creature.stats.CurrAge++ >= (creature.world.yearToTick(creature.stats.LifeSpan));    // Adjustment needed since LifeSpan is apparently measured in years
+        }                                                                                               // TODO: No va a ser years ya te digo yo, es una burrada                                                                                             // TODO: ninguna practicamente llegue
+                                                                                                        // TODO: No creo que ninguna llegue a tantisimo
         public override string ToString()
         {
             return "DieTransition";

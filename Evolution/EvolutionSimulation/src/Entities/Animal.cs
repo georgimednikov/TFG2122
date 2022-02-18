@@ -25,7 +25,7 @@ namespace EvolutionSimulation.Entities
                                           //An arboreal creature moves fast through trees, but arborealSpeed * mobilityPenalty on the ground
                                           //An aerial creature moves fast in the air, but arborealSpeed = aerialSpeed * mobilityPenalty and groundSpeed = arborealSpeed * mobilityPenalty
 
-            stats.LifeSpan = chromosome.GetFeature(CreatureFeature.Longevity);
+            stats.LifeSpan = world.yearToTick(chromosome.GetFeature(CreatureFeature.Longevity));
 
             ////Multipliers
             stats.HealthRegeneration = 0.1f;
@@ -69,8 +69,7 @@ namespace EvolutionSimulation.Entities
 
             //Physique related stats
             stats.Size = chromosome.GetFeature(CreatureFeature.Size);
-
-            
+         
             stats.Members = SetStatInRange(CreatureFeature.Members, maxMembers);
 
             stats.Metabolism = chromosome.GetFeature(CreatureFeature.Metabolism);

@@ -65,12 +65,6 @@ namespace EvolutionSimulation.Genetics
         
     }
 
-
-
-
-
-
-
     public class CreatureChromosome
     {
         /// <summary>

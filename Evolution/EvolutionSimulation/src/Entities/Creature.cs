@@ -25,7 +25,6 @@ namespace EvolutionSimulation.Entities
             InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
             activeStatus = new List<Status.Status>();
             removedStatus = new List<Status.Status>();
-            SetStats();
         }
 
         /// <summary>
@@ -35,6 +34,7 @@ namespace EvolutionSimulation.Entities
         public void Init(World w, int x, int y)
         {
             world = w;
+            SetStats();
             this.x = x;
             this.y = y;
             ConfigureStateMachine();

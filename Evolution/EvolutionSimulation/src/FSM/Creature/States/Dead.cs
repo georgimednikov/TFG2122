@@ -16,12 +16,16 @@ namespace EvolutionSimulation.FSM.Creature.States
             return actionPoints > 0;
         }
 
-        /// If the creature dies, it consumes all its action points to avoid
-        /// doing actions while dead
+        /// <summary>
+        /// If the creature dies, it consumes all its action points to avoid doing actions while dead. 
+        /// Creates a corpse in the death position.
+        /// </summary>
         public override int Action()
         {
             Console.WriteLine("Dead");
             creature.world.Destroy(creature);
+            Corpse corpse = creature.world.CreateStableEntity<Corpse>();
+            corpse.Init(creature.world, 5, creature.x, creature.y, 40, 70, 80); // TODO: stats to be derived from creacher
             return creature.actionPoints;
         }
 
