@@ -37,6 +37,7 @@ namespace EvolutionSimulation
             this.nutritionPoints = maxNutritionPoints;
             // Corpse starts putrefying when the corpse consumed putridStart% of its duration
             putridTime = (int)(lifeTime * putridStart);
+            Console.WriteLine("Delicious corpse created at " + x + ", " + y + ".");
         }
 
         public void ReceiveInteraction(Creature other, Interactions type)
@@ -60,6 +61,8 @@ namespace EvolutionSimulation
 
             if (state == CorpseState.Putrid)
                 nutritionPoints -= putridTime / (float)lifeTime;
+
+            Console.WriteLine("Corpsin' around at the speed of sound, " + lifeTime + " ticks remaining until obliteration");
 
             if (lifeTime <= 0)
             {

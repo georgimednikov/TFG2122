@@ -426,14 +426,22 @@ namespace EvolutionSimulation
         }
         #endregion
 
+        /// <summary>
+        /// Guiven a year, returns the number of ticks it equals
+        /// </summary>
+        public int yearToTick(int year)
+        {
+            return year * daysYear * hoursDay * ticksHour;
+        }
+
         public uint step;
 
         // Map with physical properties
         public MapData[,] map { get; private set; }
         int mapSize;
         bool day;
-        // 50 steps equals and hour, and 24 hours equal a day.
-        int ticksHour = 50, hoursDay = 24;
+        // 50 steps equals and hour, and 24 hours equal a day. 365 days equal a year
+        int ticksHour = 50, hoursDay = 24, daysYear = 365;  // TODO: Quitar lo de year, es necesario?
         // The day begins 6:30 and ends at 20:00.
         float morning = 6.5f, night = 20;
         // Perlin noise generator

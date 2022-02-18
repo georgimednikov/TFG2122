@@ -19,6 +19,7 @@ namespace EvolutionSimulation.Entities.Status
         public override bool OnTick()
         {
             owner.stats.CurrHealth -= damage;
+            Console.WriteLine("Posion dealt " + damage + " damage, " + owner.stats.CurrHealth + " hp remaining");
             return base.OnTick();   // TODO: Había alguna manera de que esto lo hiciera automáticamente pero no me acuerdo y me tengo que duchar en 5 minutos
         }
 
