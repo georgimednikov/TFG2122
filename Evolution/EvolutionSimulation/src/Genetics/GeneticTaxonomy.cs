@@ -16,17 +16,19 @@ namespace EvolutionSimulation.Genetics
 
         public Species(Creature creature)
         {
-            original = creature;
+            //TODO:
+            //Si algo peta con los nombres de las especies creo que es porque cuando
+            //spawnea un hijo hay que ponerle el nombre de la especie de sus padres xd
 
-            if (creature.species == null)
-                progenitor = "None";
-            else
-                progenitor = creature.species.name;
+            original = creature;
+            //The species by default is the parents', so that's the progenitor.
+            progenitor = creature.speciesName;
 
             name = NameGenerator.GenerateName(original.chromosome);
+            //The name of the species the creature creates is assigned.
+            creature.speciesName = name;
             members = new List<Creature>();
             members.Add(creature);
-            creature.species = this;
         }
     }
 
@@ -46,8 +48,9 @@ namespace EvolutionSimulation.Genetics
     {
         // The different weights of each gene when calculating the genetic similarity between two creatures
         float[] speciesGeneWeights;
+        // List containing the information of every species that is alive
         List<Species> existingSpecies;
-        // List containing the information of every species that has spawned, as well as the forming tree.
+        // List containing the information of every species that has spawned, dead AND alive, as well as the forming tree.
         // A new species is inserted right after its progenitor, so the order to create the tree is mantained.
         // See RenderSpeciesTree for details about the tree structure
         List<Species> speciesRecord;
@@ -124,13 +127,14 @@ namespace EvolutionSimulation.Genetics
             Species newSpecies = new Species(creature);
             existingSpecies.Add(newSpecies);
 
-            //If the new species is made from scratch, it is simply added
-            if (creature.species.progenitor == "None")
+            //Now the new species is added to the record based on if it has a progenitor species or not
+
+            //If the new species is made from scratch, it is simply added to the record
+            if (newSpecies.progenitor == "None")
             {
                 speciesRecord.Add(newSpecies);
                 return;
             }
-
             //If not, it is added after its progenitor, following the tree structure of speciesRecord
             int i = 0;
             for (; i < speciesRecord.Count; ++i)

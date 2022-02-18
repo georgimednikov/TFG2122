@@ -449,6 +449,8 @@ namespace EvolutionSimulation
         public List<Creature> Creatures { get; private set; }
         public List<StableEntity> StableEntities { get; private set; }
         GeneticTaxonomy taxonomy;
+        //TODO: Quitar este método
+        //public void ExportSpecies() { taxonomy.ExportSpecies(); }
 
         // TODO: podemos dejar esto asi o comparar los tipos en una sola lista
         List<IEntity> CreaturesToDelete;
