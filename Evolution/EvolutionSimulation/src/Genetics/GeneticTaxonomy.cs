@@ -17,10 +17,6 @@ namespace EvolutionSimulation.Genetics
 
         public Species(Creature creature)
         {
-            //TODO:
-            //Si algo peta con los nombres de las especies creo que es porque cuando
-            //spawnea un hijo hay que ponerle el nombre de la especie de sus padres xd
-
             original = creature;
             //The species by default is the parents', so that's the progenitor.
             progenitor = creature.speciesName;
@@ -28,6 +24,7 @@ namespace EvolutionSimulation.Genetics
             name = NameGenerator.GenerateName(original.chromosome);
             //The name of the species the creature creates is assigned.
             creature.speciesName = name;
+            creature.progenitorSpeciesName = progenitor;
             members = new List<Creature>();
             members.Add(creature);
         }
@@ -120,6 +117,8 @@ namespace EvolutionSimulation.Genetics
             if (mostSimilarYet != null)
             {
                 mostSimilarYet.members.Add(creature);
+                creature.speciesName = mostSimilarYet.name;
+                creature.progenitorSpeciesName = mostSimilarYet.progenitor;
                 return;
             }
 
