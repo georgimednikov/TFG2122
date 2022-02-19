@@ -70,7 +70,6 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         public void Init()
         {
-            //TODO: Actualizar directorios con el nuevo sistema
             string jsonWeigths = WorkingDirectories.DataDirectory + "SimilarityGeneWeight.json";
             string jsonSimilarity = WorkingDirectories.DataDirectory + "SimilaritySpecies.json";
 
@@ -201,7 +200,7 @@ namespace EvolutionSimulation.Genetics
                 float genEqual = 0;
                 BitArray gen1 = creature1.GetGeneBits((CreatureFeature)i);
                 BitArray gen2 = creature2.GetGeneBits((CreatureFeature)i);
-                //Comparate bit a bit
+                //Compare bit by bit
                 for (int j = 0; j < gen1.Length; ++j)
                 {
                     if (gen1[j] == gen2[j])

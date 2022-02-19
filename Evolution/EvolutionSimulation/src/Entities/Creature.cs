@@ -201,10 +201,10 @@ namespace EvolutionSimulation.Entities
             seenCreatures.Sort(new Utils.SortByDistance());   // TODO, no hacer new todo el rato
             foreach(Creature c in seenCreatures)
             {
-                if (c.species.name == species.name)
-                    seenSameSpeciesCreatures.Add(c);
-                else
-                    otherSeenCreatures.Add(c);
+                //if (c.species.name == species.name)
+                //    seenSameSpeciesCreatures.Add(c);
+                //else
+                //    otherSeenCreatures.Add(c);
             }
 
         }
@@ -415,7 +415,7 @@ namespace EvolutionSimulation.Entities
         public float RestExpense { get; set; }
 
         //Environment related stats
-        public int Camouflage { get; set; }
+        public int Camouflage { get; set; }// TODO: que dependa de la edad pero al reves
         int aggressiveness;
         public int Aggressiveness { get { return (int)ModifyStatByAge(aggressiveness); } set { aggressiveness = value; } }
         int intimidation;
