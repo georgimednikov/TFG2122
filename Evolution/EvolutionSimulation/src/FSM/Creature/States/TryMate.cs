@@ -1,8 +1,11 @@
 ﻿namespace EvolutionSimulation.FSM.Creature.States
 {
-    class Mate : CreatureState
+    /// <summary>
+    /// State going to reproduce, a male go to a female
+    /// </summary>
+    class TryMate : CreatureState
     {
-        public Mate(Entities.Creature c) : base(c) { creature = c; }
+        public TryMate(Entities.Creature c) : base(c) { creature = c; }
 
         // This move is energy netural, costing the same nergy that is obtained in a tick
         public override bool canPerformAction(int actionPoints)
@@ -21,7 +24,7 @@
 
         public override string ToString()
         {
-            return "AttackingState";
+            return "TryingToMateState";
         }
     }
 }

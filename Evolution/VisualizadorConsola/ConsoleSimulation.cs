@@ -19,9 +19,12 @@ namespace VisualizadorConsola
             world.Init(16);
             Console.WriteLine("\n");
             
-            Animal c = world.CreateCreature<Animal>();
-            c.Init(world, 5, 5);
+            Animal c = world.CreateCreature<Animal>(5, 5);
+            //Animal c2 = world.CreateCreature<Animal>(5, 4, c.chromosome);
 
+            //EvolutionSimulation.Genetics.CreatureChromosome cc = EvolutionSimulation.Genetics.GeneticFunctions.UniformCrossover(c.chromosome, c2.chromosome);
+            //EvolutionSimulation.Genetics.GeneticFunctions.UniformMutation(ref cc, 0.95f);
+            //Animal c3 = world.CreateCreature<Animal>(4, 4, cc, c.speciesName);
             c.AddStatus(new Poison(20, 5));
 
             //for (int i = 0; i < 4; i++)

@@ -96,10 +96,11 @@ namespace EvolutionSimulation
         /// Creatures are entities with abilities and  'complex' behaviours.
         /// T: Any subclass of Creature i.e. Animal
         /// </summary>
-        public T CreateCreature<T>() where T : Creature, new()
+        public T CreateCreature<T>(int x, int y, CreatureChromosome chromosome = null, string name = "None") where T : Creature, new()
         {
             T ent = CreateEntity<T>();
             Creatures.Add(ent);
+            ent.Init(this, x, y, chromosome, name);
             taxonomy.AddCreatureToSpecies(ent);
 
             return ent;

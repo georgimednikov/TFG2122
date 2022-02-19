@@ -19,24 +19,36 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public Creature()
         {
-            chromosome = new CreatureChromosome();
-            stats = new CreatureStats();
+            
             seenSameSpeciesCreatures = new List<Creature>();
             otherSeenCreatures = new List<Creature>();
             seenEntities = new List<StableEntity>();
             InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
             activeStatus = new List<Status.Status>();
             removedStatus = new List<Status.Status>();
-            speciesName = "None";
+            
         }
 
         /// <summary>
         /// Initializes a creature in a world and position
         /// </summary>
         /// <param name="w">World in which it'll reside</param>
-        public void Init(World w, int x, int y)
+        public void Init(World w, int x, int y, CreatureChromosome chromosome = default(CreatureChromosome), string name = "None")
         {
             world = w;
+
+            if(chromosome == null)
+            {
+                this.chromosome = new CreatureChromosome();
+            }
+            else
+            {
+                this.chromosome = chromosome;
+            }
+            speciesName = name;
+            stats = new CreatureStats();
+            //TODO igual este nombre hay que pasarlo por parametro si eres un hijo
+            //speciesName = "None";
             SetStats();
             this.x = x;
             this.y = y;
@@ -137,6 +149,8 @@ namespace EvolutionSimulation.Entities
             IState eat = new Eat(this);
             IState sleep = new Sleeping(this);
             IState attack = new Attacking(this);
+            //IState tryMate = new TryMate(this);
+            //IState mating = new Mating(this, 10);//TODO que 100 lo coja del cromosoma, es el tiempo que tardan en reproducirse
 
             mfsm = new Fsm(idle);
 
@@ -146,6 +160,8 @@ namespace EvolutionSimulation.Entities
             mfsm.AddSubstate(alive, eat);
             mfsm.AddSubstate(alive, sleep);
             mfsm.AddSubstate(alive, attack);
+            //mfsm.AddSubstate(alive, tryMate);
+            //mfsm.AddSubstate(alive, mating);
 
             // Transitions
             ITransition moveTransition = new MoveTransition(this);
@@ -155,6 +171,7 @@ namespace EvolutionSimulation.Entities
             ITransition idleTransition = new IdleTransition(this);
             ITransition wakeTransition = new WakeTransition(this);
             ITransition dieTransition = new DieTransition(this);
+            //ITransition mateTransition = new MateTransition(this);
 
             mfsm.AddTransition(idle, moveTransition, moving);
             mfsm.AddTransition(idle, hungerTransition, eat);
@@ -198,13 +215,13 @@ namespace EvolutionSimulation.Entities
             int perceptionRadius = 4; // TODO: calculate this using the Perception stat
             List<Creature> seenCreatures = world.PerceiveCreatures(this, x, y, perceptionRadius);
             seenEntities = world.PerceiveEntities(this, x, y, perceptionRadius);
-            seenCreatures.Sort(new Utils.SortByDistance());   // TODO, no hacer new todo el rato
+            seenCreatures.Sort(new Utils.SortByDistance(this));   // TODO, no hacer new todo el rato
             foreach(Creature c in seenCreatures)
-            {
-                //if (c.species.name == species.name)
-                //    seenSameSpeciesCreatures.Add(c);
-                //else
-                //    otherSeenCreatures.Add(c);
+            {                
+                if (c.speciesName == speciesName || c.progenitorSpeciesName == speciesName || c.speciesName == progenitorSpeciesName)
+                    seenSameSpeciesCreatures.Add(c);
+                else
+                    otherSeenCreatures.Add(c);
             }
 
         }
@@ -218,6 +235,8 @@ namespace EvolutionSimulation.Entities
                 foreach(Action<Creature> response in InteractionsDict[type])
                     response(interacter);
         }
+
+        
 
         /// <summary>
         /// Adds a response to a interaction type, given 
@@ -253,6 +272,17 @@ namespace EvolutionSimulation.Entities
             objective = interacter;
             objectivePos = new Vector2(interacter.x, interacter.y);
             hasBeenHit = true; //O MEJOR INCLUSO forzar el cambio al igual que TomarDecision()
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="interacter"> male </param>
+        private void OnMate(Creature interacter)
+        {
+            if (!stats.InHeat && !mating) return;  // TODO: consentir o no, si tienes hambre no copular por ejemplo
+            mating = true;
+            interacter.mating = true;
         }
 
         /// <summary>
@@ -309,6 +339,7 @@ namespace EvolutionSimulation.Entities
 
         // Genetic
         public string speciesName;
+        public string progenitorSpeciesName;
         public CreatureChromosome chromosome { get; private set; }
         public CreatureStats stats { get; private set; }
 
@@ -331,7 +362,7 @@ namespace EvolutionSimulation.Entities
         public bool hasBeenHit;
 
         protected int timeToBeInHeat;
-
+        public bool mating;
 
         // Interactions that the creature can react to. Keys are the Interaction type
         // and values are the actions that the creature performs when something interacts with it.

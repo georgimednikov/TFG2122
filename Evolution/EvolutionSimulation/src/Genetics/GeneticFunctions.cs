@@ -11,7 +11,7 @@ namespace EvolutionSimulation.Genetics
         /// if you want that all the bits in both chromosomes have the same
         /// probability to be selected, prob has to be 0.5
         /// </summary>
-        static public CreatureChromosome UniformCrossover(CreatureChromosome male, CreatureChromosome female, float prob)
+        static public CreatureChromosome UniformCrossover(CreatureChromosome male, CreatureChromosome female, float prob = 0.5f)
         {
             BitArray mc = male.GetChromosome();
             BitArray fc = female.GetChromosome();
@@ -29,7 +29,7 @@ namespace EvolutionSimulation.Genetics
         /// Function that receives a chromosome and randomly flips bits given a probability
         /// startIndex is the start index to mutate in the chromosome and endIndex the end of it
         /// </summary>
-        static public void FlipBitMutation(CreatureChromosome creature, float prob, int startIndex = 0, int endIndex = -1)
+        static public void FlipBitMutation(ref CreatureChromosome creature, float prob, int startIndex = 0, int endIndex = -1)
         {
             BitArray chromosome = creature.GetChromosome();
 
@@ -46,7 +46,7 @@ namespace EvolutionSimulation.Genetics
         /// Function that receives a chromosome and randomly modify bits given a probability
         /// startIndex is the start index to mutate in the chromosome and endIndex the end of it
         /// </summary>
-        static public void UniformMutation(CreatureChromosome creature, float prob, int startIndex = 0, int endIndex = -1)
+        static public void UniformMutation(ref CreatureChromosome creature, float prob, int startIndex = 0, int endIndex = -1)
         {
             BitArray chromosome = creature.GetChromosome();
             if (endIndex == -1 || endIndex > chromosome.Length) endIndex = chromosome.Length;
@@ -71,7 +71,7 @@ namespace EvolutionSimulation.Genetics
         /// probToIncrease may be more than 0.5
         /// startIndex is the start index to mutate in the chromosome and endIndex the end of it
         /// </summary>
-        static public void NotUniformMutation(CreatureChromosome creature, float prob, int startIndex = 0, int endIndex = -1)
+        static public void NotUniformMutation(ref CreatureChromosome creature, float prob, int startIndex = 0, int endIndex = -1)
         {
             Random rnd = new Random();
             BitArray chromosome = creature.GetChromosome();

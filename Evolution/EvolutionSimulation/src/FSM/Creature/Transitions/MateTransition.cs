@@ -18,9 +18,9 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             Entities.Creature obj = creature.objective as Entities.Creature;
             bool result = creature.stats.InHeat
                 //&& creature.nearestMate != null               // 
-                                                                // TODO: Comprobar si es de la misma especie
-                && !obj.stats.IsNewBorn()                       // it has to be adult
-                && creature.stats.Gender != obj.stats.Gender;   // and with different gender
+                                                                    // TODO: Comprobar si es de la misma especie
+                && !obj.stats.IsNewBorn()                           // it has to be adult
+                && creature.stats.Gender == Genetics.Gender.Male;   // and the male is the one that goes to the female
 
             if (result)
             {

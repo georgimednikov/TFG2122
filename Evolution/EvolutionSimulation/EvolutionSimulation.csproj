@@ -81,7 +81,8 @@
     <Compile Include="src\Entities\Status\Status.cs" />
     <Compile Include="src\Entities\Status\IStatus.cs" />
     <Compile Include="src\Entities\Tree.cs" />
-    <Compile Include="src\FSM\Creature\States\Mate.cs" />
+    <Compile Include="src\FSM\Creature\States\Mating.cs" />
+    <Compile Include="src\FSM\Creature\States\TryMate.cs" />
     <Compile Include="src\FSM\Creature\States\Attacking.cs" />
     <Compile Include="src\FSM\Creature\States\GoToObjective.cs" />
     <Compile Include="src\FSM\Creature\States\Sleeping.cs" />
