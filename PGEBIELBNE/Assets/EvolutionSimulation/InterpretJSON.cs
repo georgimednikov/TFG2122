@@ -1,20 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace EvolutionSimulation.Unity
 {
     public class InterpretJSON : MonoBehaviour
     {
-        //[HideInInspector]
-        public TextAsset json;
         public GameObject body;
         public GameObject leg;
         public GameObject[] mouths;
         public GameObject armour;
 
         // Start is called before the first frame update
-        void Awake()
+        public void CreateCreature(TextAsset json)
         {
             SpeciesExport creature = JsonUtility.FromJson<SpeciesExport>(json.text);
 
@@ -31,29 +27,29 @@ namespace EvolutionSimulation.Unity
         {
             GameObject go = Instantiate(mouths[(int)creature.stats.Diet], transform);
             go.transform.localScale = Vector3.one * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
-            go.transform.position = Vector3.up * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f * 1.5f;
+            go.transform.localPosition = Vector3.up * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f * 1.5f;
         }
 
         private void InstantiateArmour(SpeciesExport creature)
         {
             GameObject go = Instantiate(armour, transform);
             go.transform.localScale = Vector3.one * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
-            go.transform.position = Vector3.up * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
+            go.transform.localPosition = Vector3.up * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
         }
 
         private void InstantiateBody(SpeciesExport creature)
         {
             GameObject go = Instantiate(body, transform);
             go.transform.localScale = Vector3.one * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
-            go.transform.position = Vector3.up * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
+            go.transform.localPosition = Vector3.up * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
         }
 
         private void InstantiateLegs(SpeciesExport creature)
         {
             GameObject go;
             GameObject legParent = new GameObject("Leg Cluster");
-            legParent.transform.localPosition = Vector3.up * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
             legParent.transform.parent = transform;
+            legParent.transform.localPosition = Vector3.up * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
             legParent.transform.localScale = Vector3.one * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
 
             float deltaAngle = 2 * Mathf.PI / creature.stats.Members;
