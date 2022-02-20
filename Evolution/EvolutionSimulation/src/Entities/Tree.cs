@@ -14,6 +14,10 @@ namespace EvolutionSimulation
         {
             movementPenalty = RandomGenerator.Next(50, 100);
         }
+        public Tree(float movementPenalty)
+        {
+            this.movementPenalty = movementPenalty;
+        }
 
         public new void Tick()
         {
