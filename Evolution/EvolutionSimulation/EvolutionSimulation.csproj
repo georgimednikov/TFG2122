@@ -96,6 +96,7 @@
     <Compile Include="src\Perlin.cs" />
     <Compile Include="src\Entities\Creature.cs" />
     <Compile Include="src\ISimulation.cs" />
+    <Compile Include="src\Validator.cs" />
     <Compile Include="src\World.cs" />
     <Compile Include="src\Simulation.cs" />
     <Compile Include="src\Entities\IEntity.cs" />

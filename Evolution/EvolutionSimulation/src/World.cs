@@ -24,17 +24,17 @@ namespace EvolutionSimulation
         /// </summary>
         public World.Wave[] temperatureWaves;
         /// <summary>
-        /// Already generated heightmap. It must be with values on an interval between [0, 1]
+        /// Already generated heightmap. It must be with values on an interval between [0, 1].
         /// </summary>
-        public double[] heightMap;
+        public float[,] heightMap;
         /// <summary>
         /// Already generated humidity map. It must be with values on an interval between [0, 1]. Beware that it will be modified by the heightmap unless specified.
         /// </summary>
-        public double[] humidityMap;
+        public float[,] humidityMap;
         /// <summary>
         /// Already generated temperature map. It must be with values on an interval between [0, 1]. Beware that it will be modified by the heightmap unless specified.
         /// </summary>
-        public double[] temperatureMap;
+        public float[,] temperatureMap;
         /// <summary>
         /// Should the provided heightmap or the generated be modified by the EvaluateHeight function.
         /// </summary>
@@ -67,7 +67,6 @@ namespace EvolutionSimulation
     /// </summary>
     public class World
     {
-
         /// <summary>
         /// Properties of each map tile
         /// </summary>
@@ -77,20 +76,14 @@ namespace EvolutionSimulation
             public Plant plant;
         }
 
-        bool modifiedHeight = true;
-        Func<double, double> evaluateHeight;
-        Func<double, double> evaluateInfluence;
-        Func<double, double, double> evaluateFlora;
-        Func<double, double, double, double> temperatureSoftener;
-        Func<double, int> floraSelector;
-
         public void Init(int size)
         {
             Init(size, new WorldGenConfig());
         }
+
         /// <summary>
-         /// Initializes the map with a matrix of provided size.
-         /// </summary>
+        /// Initializes the map with a matrix of provided size.
+        /// </summary>
         public void Init(int size, WorldGenConfig config)
         {
             if (config == null) throw new NullReferenceException("World generation config is null");
@@ -106,46 +99,50 @@ namespace EvolutionSimulation
             modifiedHeight = config.heightModifiedByFunction;
             p = new Perlin();
             mapSize = size;
-            if (config.heightMap == null)
+            if (config.heightMap != null) heightMap = config.heightMap;
+
+            if (config.heightWaves != null) heightWaves = config.heightWaves;
+            else
             {
-                if (config.heightWaves != null) heightWaves = config.heightWaves;
-                else
-                {
-                    heightWaves = new Wave[2];
-                    heightWaves[0] = new Wave();
-                    heightWaves[0].seed = RandomGenerator.Next(0, 10000);
-                    heightWaves[0].frequency = 0.5f;
-                    heightWaves[0].amplitude = 1f;
-                    heightWaves[1] = new Wave();
-                    heightWaves[1].seed = RandomGenerator.Next(0, 10000);
-                    heightWaves[1].frequency = 1f;
-                    heightWaves[1].amplitude = 0;
-                }
+                heightWaves = new Wave[2];
+                heightWaves[0] = new Wave();
+                heightWaves[0].seed = RandomGenerator.Next(0, 10000);
+                heightWaves[0].frequency = 0.5f;
+                heightWaves[0].amplitude = 1f;
+                heightWaves[1] = new Wave();
+                heightWaves[1].seed = RandomGenerator.Next(0, 10000);
+                heightWaves[1].frequency = 1f;
+                heightWaves[1].amplitude = 0;
             }
-            if (config.humidityMap == null)
+
+
+            if (config.humidityMap != null) humidityMap = config.humidityMap;
+
+            if (config.humidityWaves != null) humidityWaves = config.humidityWaves;
+            else
             {
-                if (config.humidityWaves != null) humidityWaves = config.humidityWaves;
-                else
-                {
-                    humidityWaves = new Wave[1];
-                    humidityWaves[0] = new Wave();
-                    humidityWaves[0].seed = RandomGenerator.Next(0, 10000);
-                    humidityWaves[0].frequency = 0.5f;
-                    humidityWaves[0].amplitude = 1f;
-                }
+                humidityWaves = new Wave[1];
+                humidityWaves[0] = new Wave();
+                humidityWaves[0].seed = RandomGenerator.Next(0, 10000);
+                humidityWaves[0].frequency = 0.5f;
+                humidityWaves[0].amplitude = 1f;
             }
-            if (config.temperatureMap == null)
+
+
+            if (config.temperatureMap != null) temperatureMap = config.temperatureMap;
+
+            if (config.temperatureWaves != null) temperatureWaves = config.temperatureWaves;
+            else
             {
-                if (config.temperatureWaves != null) temperatureWaves = config.temperatureWaves;
-                else
-                {
-                    temperatureWaves = new Wave[1];
-                    temperatureWaves[0] = new Wave();
-                    temperatureWaves[0].seed = RandomGenerator.Next(0, 10000);
-                    temperatureWaves[0].frequency = 0.25f;
-                    temperatureWaves[0].amplitude = 1f;
-                }
+                temperatureWaves = new Wave[1];
+                temperatureWaves[0] = new Wave();
+                temperatureWaves[0].seed = RandomGenerator.Next(0, 10000);
+                temperatureWaves[0].frequency = 0.25f;
+                temperatureWaves[0].amplitude = 1f;
             }
+
+
+
             InitMap();
         }
 
@@ -173,6 +170,13 @@ namespace EvolutionSimulation
         public Wave[] heightWaves;      // Passes performed by the Perlin noise and added to the height
         public Wave[] humidityWaves;    // Passes performed by the Perlin noise and added to the humidity
         public Wave[] temperatureWaves; // Passes performed by the Perlin noise and added to the temperature
+        bool modifiedHeight = true;
+        Func<double, double> evaluateHeight;
+        Func<double, double> evaluateInfluence;
+        Func<double, double, double> evaluateFlora;
+        Func<double, double, double, double> temperatureSoftener;
+        Func<double, int> floraSelector;
+        float[,] heightMap, humidityMap, temperatureMap;
 
         /// <summary>
         /// Function used to insert further noise into the Perlin noise
@@ -361,9 +365,9 @@ namespace EvolutionSimulation
             float offsetX = 0;
             float offsetZ = 0;
 
-            float[,] heightMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, heightWaves);
-            float[,] humidityMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, humidityWaves);
-            float[,] temperatureMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, temperatureWaves);
+            if (heightMap == null) heightMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, heightWaves);
+            if (humidityMap == null) humidityMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, humidityWaves);
+            if (temperatureMap == null) temperatureMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, temperatureWaves);
 
             ProcessMapValues(heightMap, humidityMap, temperatureMap, mapScale);
         }
