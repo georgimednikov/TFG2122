@@ -393,7 +393,7 @@ namespace EvolutionSimulation
                                     avgHumidity -= map[xIndex + i, yIndex + j].humidity;
                                     avgTemp -= map[xIndex + i, yIndex + j].temperature;
 
-                                    map[xIndex + i, yIndex + j].temperature = temperatureSoftener(evaluation / (1 * (Math.Sqrt(i * i + j * j))), map[xIndex + i, yIndex + j].temperature, currAvgTemp / Math.Pow(mapSize, 2));
+                                    map[xIndex + i, yIndex + j].temperature = temperatureSoftener(evaluation / (1 * (Math.Sqrt(i * i + j * j))), map[xIndex + i, yIndex + j].temperature, currAvgTemp);
                                     map[xIndex + i, yIndex + j].humidity += (-evaluation) / (20 * (Math.Sqrt(i * i + j * j)));
                                     if (map[xIndex + i, yIndex + j].humidity > 1f) map[xIndex + i, yIndex + j].humidity = 1f;
                                     if (map[xIndex + i, yIndex + j].temperature > 1f) map[xIndex + i, yIndex + j].temperature = 1f;
