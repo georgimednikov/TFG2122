@@ -390,7 +390,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   creature: {fileID: 7305408888903237956, guid: a715dea8e9efb7d4da42974b682f6dab, type: 3}
   creatureDistribution:
-  - species: {fileID: 4900000, guid: e6721f3caec42b24a849ee09108a1384, type: 3}
+  - species: {fileID: 4900000, guid: 5ae4da7b61b81a04ebcd550adf3ffad6, type: 3}
     amount: 10
     positionX: 500
     positionZ: 500

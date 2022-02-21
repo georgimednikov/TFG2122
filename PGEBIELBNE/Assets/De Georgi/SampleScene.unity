@@ -424,14 +424,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e89c9d7d9b73e41448c8820513e7edc3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  json: {fileID: 4900000, guid: e6721f3caec42b24a849ee09108a1384, type: 3}
   body: {fileID: 6557958379208530541, guid: 96dd862405c5cdd42b367b0aa9a90bd9, type: 3}
   leg: {fileID: 4047340661425566842, guid: adf3b427e50d97a4cb0006cbec315bab, type: 3}
   mouths:
   - {fileID: 4949928162050150732, guid: 64f38cf46ec0aca49bcc8e59e2477767, type: 3}
   - {fileID: 5694046460202487370, guid: f3747dce009a2d54d88a587514dbcf3e, type: 3}
   - {fileID: 8567773834730218664, guid: a1b18223752232d4a971a45160d73e15, type: 3}
-  armour: {fileID: 7194399430569527812, guid: 4d5c2b8ed02c9cd4f909ce90212194ec, type: 3}
+  armours: []
 --- !u!4 &1560945918
 Transform:
   m_ObjectHideFlags: 0
