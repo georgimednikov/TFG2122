@@ -9,9 +9,9 @@ namespace EvolutionSimulation.Entities.Status
     public class Poison : Status
     {
         // Damage the poison will do per tick
-        int damage;
+        float damage;
 
-        public Poison(int duration, int dmg) : base(duration)
+        public Poison(int duration, float dmg) : base(duration)
         {
             damage = dmg;
         } 
@@ -19,23 +19,23 @@ namespace EvolutionSimulation.Entities.Status
         public override bool OnTick()
         {
             owner.stats.CurrHealth -= damage;
-            Console.WriteLine("Posion dealt " + damage + " damage, " + owner.stats.CurrHealth + " hp remaining");
+            Console.WriteLine("Poison dealt " + damage.ToString() + " damage, " + owner.stats.CurrHealth + " hp remaining");
             return base.OnTick();
         }
 
         public override void OnApply()
         {
-            Console.WriteLine("Posion applied for " + damage + " damage per turn.");
+            Console.WriteLine("Poison applied for " + damage.ToString() + " damage per turn.");
         }
 
         public override void OnRemove()
         {
-            Console.WriteLine("Posion removed.");
+            Console.WriteLine("Poison removed.");
         }
 
         public override void OnExpire()
         {
-            Console.WriteLine("Posion expired.");
+            Console.WriteLine("Poison expired.");
         }
     }
 }

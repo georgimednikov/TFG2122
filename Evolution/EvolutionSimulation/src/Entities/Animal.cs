@@ -177,11 +177,5 @@ namespace EvolutionSimulation.Entities
             int stat = (int)(statCh / (maxstat / ((float)max)));
             return stat;
         }
-
-
-        private bool HasAbility(CreatureFeature feat, float unlock)
-        {
-            return unlock >= chromosome.GetFeature(feat) / chromosome.GetFeatureMax(feat);
-        }
     }
 }
