@@ -43,7 +43,7 @@ namespace EvolutionSimulation.Unity
         {
             GameObject go = Instantiate(mouths[(int)creature.stats.Diet], transform);
             go.transform.localScale = Vector3.one * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
-            go.transform.localPosition = Vector3.up * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f * 1.5f;
+            go.transform.localPosition = Vector3.up * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f + Vector3.forward * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
         }
 
         private void InstantiateArmour(SpeciesExport creature)
@@ -88,7 +88,7 @@ namespace EvolutionSimulation.Unity
                 go.transform.position = new Vector3(legParent.transform.position.x + Mathf.Cos(i * deltaAngle) * legParent.transform.localScale.x * 0.5f,
                     0.5f * legParent.transform.localScale.y,
                     legParent.transform.position.z + Mathf.Sin(i * deltaAngle) * legParent.transform.localScale.z * 0.5f);
-                go.transform.rotation = Quaternion.Euler(0, -i * deltaAngle / Mathf.PI * 180, -45);
+                go.transform.rotation = Quaternion.Euler(-90, -i * deltaAngle / Mathf.PI * 180, -90);
             }
             if (creature.stats.Members % 2 == 1) legParent.transform.Rotate(new Vector3(0, 90, 0));
         }
@@ -121,6 +121,11 @@ namespace EvolutionSimulation.Unity
             if (creature.stats.AerialSpeed <= 0) return;
             GameObject go = Instantiate(wings, transform);
             go.transform.localScale = Vector3.one * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
+            go.transform.localPosition = go.transform.forward * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f + go.transform.right * creature.stats.ModifyStatByAge(creature.stats.Size) / 300f;
+            go = Instantiate(wings, transform);
+            go.transform.localScale = Vector3.one * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
+            go.transform.localPosition = go.transform.forward * creature.stats.ModifyStatByAge(creature.stats.Size) / 100f - go.transform.right * creature.stats.ModifyStatByAge(creature.stats.Size) / 300f;
+
         }
 
         private void InstantiateStatusBar(SpeciesExport creature)

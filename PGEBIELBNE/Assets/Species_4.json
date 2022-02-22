@@ -13,7 +13,7 @@
     "Perforation": 3,
     "Venom": -0.33,
     "Counter": -0.33,
-    "AerialSpeed": -1,
+    "AerialSpeed": 1,
     "ArborealSpeed": -1,
     "GroundSpeed": 104,
     "AirReach": false,
