@@ -1,16 +1,9 @@
 ﻿using System;
-using EvolutionSimulation.Entities;
 
-namespace EvolutionSimulation
+namespace EvolutionSimulation.Entities
 {
     public class Corpse : StableEntity, IInteractable<Creature>
     {
-        public enum CorpseState
-        {
-            Edible,
-            Putrid
-        }
-
         /// <summary>
         /// Initializes the Corpse
         /// </summary>
@@ -19,23 +12,24 @@ namespace EvolutionSimulation
         /// <param name="x"> X World position </param>
         /// <param name="y"> Y World position </param>
         /// <param name="putridStart">
-        /// The % of the corpse duration when the corpse starts putrefying
+        /// A value from 0 to 1 that tells when the corpse starts putrefying. 
+        /// 1 means the corpse starts putrefying inmediatly, and 0 that it will never putrefy
         /// </param>
         /// <param name="poisonProb">
         /// The probability of being poisoned when interacting with the putrid corpse. 
-        /// A value between 0 and 100 (%), higher or lower values will be clamped.
+        /// A value between 0 and 1, higher or lower values will be clamped.
         /// </param>
-        /// <param name="maxNutritionPoints">
-        /// Nutrition points acquired when consuming the corpse.
-        /// They get lower the more putrid the corpse gets
-        /// TODO: Hacer que sea menos puntos de nutricion cuando se este pudriendo
-        /// </param>
-        public void Init(World w, int lifeTime, int x, int y,  float putridStart, int poisonProb, int maxNutritionPoints)
+        public void Init(World w, int lifeTime, int x, int y,  float putridStart, float poisonProb, int poisonDuration, float poisonTickDamage, int maxNutritionPoints)
         {
             base.Init(w, lifeTime, x, y);
-            this.poisonProb = poisonProb;
-            this.nutritionPoints = maxNutritionPoints;
-            // Corpse starts putrefying when the corpse consumed putridStart% of its duration
+
+            // Clamp
+            this.poisonProb = Math.Min(1.0f, Math.Max(0.0f, poisonProb));
+            this.poisonDuration = poisonDuration;
+            this.poisonTickDamage = poisonTickDamage;
+
+            this.maxNutritionPoints = maxNutritionPoints;
+            // Corpse starts putrefying when the corpse reaches the 'putridStart' part of its duration
             putridTime = (int)(lifeTime * putridStart);
             Console.WriteLine("Delicious corpse created at " + x + ", " + y + ".");
         }
@@ -43,41 +37,52 @@ namespace EvolutionSimulation
         public void ReceiveInteraction(Creature other, Interactions type)
         {
             if (type != Interactions.eat) return;
-            int prob = RandomGenerator.Next(0, 100);
-            if(state == CorpseState.Putrid)
+
+            if(Edible)
+                other.stats.CurrEnergy += maxNutritionPoints;
+            // Corpse putrefaction cause penalties on the creature eating it
+            else
             {
+                float remains = lifeTime / (float)putridTime;
+                float prob = (float)RandomGenerator.NextDouble();
                 // Putrid corpse, probability to be poisoned gets higher the more time it passes 
-                int actualPoisonProb = (int)(poisonProb + (putridTime / (float)lifeTime));
+                // The scavenger stat reduces the probability of being poisoned
+                float actualPoisonProb = Math.Min(1.0f, Math.Max(0.0f, poisonProb + 1.0f - remains));
+                float actualNutritionPoints = maxNutritionPoints * remains;
+                // Having the ability 'Scavenger' reduces the penalties of eating the corpse            
+                if (other.HasAbility(Genetics.CreatureFeature.Scavenger, 0.4f)) // TODO: ahora está puesto el % de unlock a pelo, cambiarlo
+                {
+                    actualPoisonProb -= other.stats.Scavenger;
+                    actualNutritionPoints += (maxNutritionPoints - actualNutritionPoints) * other.stats.Scavenger;
+                }
+                // Eating the corpse increases the energy of the creature 
+                other.stats.CurrEnergy += actualNutritionPoints;
+                // The creature can be poisoned when eating the corpse
                 if (prob < actualPoisonProb)
-                    Console.WriteLine("The creature is poisoned");
-            }
-            // TODO: Considerar la habilidad carroniero
-            // TODO: Aniadir puntos de nutricion a la creatura
+                    other.AddStatus(new Status.Poison(poisonDuration, poisonTickDamage));
+            }                      
         }
 
         override protected void Update()
         {
-            state = lifeTime > putridTime ? CorpseState.Edible : CorpseState.Putrid;
-
-            if (state == CorpseState.Putrid)
-                nutritionPoints -= putridTime / (float)lifeTime;
+            Edible = lifeTime > putridTime;
 
             Console.WriteLine("Corpsin' around at the speed of sound, " + lifeTime + " ticks remaining until obliteration");
 
             if (lifeTime <= 0)
-            {
-                Console.WriteLine("Desaparece");
                 world.Destroy(this);
-            }
         }
 
+        // Copse state: it is edible until it starts putrefying
+        public bool Edible { get; private set; }
         // Probability of being poisoned when interacting
         float poisonProb;
         // Nutrition points added to creatures that eat the corpse
-        float nutritionPoints;
-
-        // Current Corpse State
-        CorpseState state;
+        float maxNutritionPoints;
+        // Duration (in Ticks) of the poison that it can be applied to the creature
+        int poisonDuration;
+        // Poison damage applied to the creature every tick
+        float poisonTickDamage;
         // Time when the corpse starts putrefying
         int putridTime;
     }

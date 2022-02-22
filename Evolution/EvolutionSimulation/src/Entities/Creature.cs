@@ -188,7 +188,7 @@ namespace EvolutionSimulation.Entities
 
             mfsm.AddTransition(alive, dieTransition, dead);
         }
-
+        
         /// <summary>
         /// Moves a creature a specified amount
         /// </summary>
