@@ -15,5 +15,12 @@ namespace EvolutionSimulation
             regrowhtTime = RandomGenerator.Next(50, 101);
             nutritionalValue = RandomGenerator.Next(5, 11);
         }
+
+        public EdibleTree(float movementPenalty, int regrowhtTime, float nutritionalValue)
+        {
+            this.movementPenalty = movementPenalty;
+            this.regrowhtTime = regrowhtTime;
+            this.nutritionalValue = nutritionalValue;
+        }
     }
 }

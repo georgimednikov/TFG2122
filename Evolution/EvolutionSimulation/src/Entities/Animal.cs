@@ -73,10 +73,17 @@ namespace EvolutionSimulation.Entities
             {
                 stats.GroundSpeed = speed;
             }
-
+            
             //Physique related stats
             stats.Size = chromosome.GetFeature(CreatureFeature.Size);
-         
+
+            if (!HasAbility(CreatureFeature.Scavenger, abilityUnlock)) stats.Scavenger = 0;
+            else stats.Scavenger = chromosome.GetFeature(CreatureFeature.Scavenger) / chromosome.GetFeatureMax(CreatureFeature.Scavenger);
+            if (!HasAbility(CreatureFeature.Venomous, abilityUnlock)) stats.Venom = 0;
+            else stats.Venom = chromosome.GetFeature(CreatureFeature.Venomous);
+            if (!HasAbility(CreatureFeature.Thorns, abilityUnlock)) stats.Counter = 0;
+            else stats.Counter = chromosome.GetFeature(CreatureFeature.Thorns);
+
             stats.Members = SetStatInRange(CreatureFeature.Members, maxMembers);
 
             stats.Metabolism = chromosome.GetFeature(CreatureFeature.Metabolism);
@@ -112,14 +119,47 @@ namespace EvolutionSimulation.Entities
             stats.Knowledge = chromosome.GetFeature(CreatureFeature.Knowledge);
             stats.Paternity = chromosome.GetFeature(CreatureFeature.Paternity);
 
-            if (!HasAbility(CreatureFeature.Scavenger, abilityUnlock)) stats.Scavenger = -1;
-            else stats.Scavenger = chromosome.GetFeature(CreatureFeature.Scavenger) / chromosome.GetFeatureMax(CreatureFeature.Scavenger);
-            if (!HasAbility(CreatureFeature.Venomous, abilityUnlock)) stats.Venom = -1;
-            else stats.Venom = chromosome.GetFeature(CreatureFeature.Venomous);
-            if (!HasAbility(CreatureFeature.Thorns, abilityUnlock)) stats.Counter = -1;
-            else stats.Counter = chromosome.GetFeature(CreatureFeature.Thorns);
-            if (!HasAbility(CreatureFeature.Mimic, abilityUnlock)) stats.Intimidation = -1;
-            else stats.Intimidation = chromosome.GetFeature(CreatureFeature.Mimic);
+            ModifyStatsByHabilities(abilityUnlock);
+        }
+
+        private void ModifyStatsByHabilities(float abilityUnlock)
+        {
+            //Hair
+            if (HasAbility(CreatureFeature.Hair, abilityUnlock))
+            {
+                int hairValue = chromosome.GetFeature(CreatureFeature.Hair);
+                stats.MinTemperature -= hairValue * 2;
+                stats.MaxTemperature += hairValue;
+            }
+
+            //UpRight increase the perception at most 1.5
+            if (HasAbility(CreatureFeature.Upright, abilityUnlock))
+            {
+                float increase = 1.0f + chromosome.GetFeature(CreatureFeature.Upright)
+                                         / (float)chromosome.GetFeatureMax(CreatureFeature.Upright) / 2;
+
+                stats.Perception = (int)(stats.Perception * increase);
+            }
+
+            //Horns
+            if (HasAbility(CreatureFeature.Horns, abilityUnlock)) { 
+
+                int hornsValue = chromosome.GetFeature(CreatureFeature.Horns);
+                stats.Damage += 2 * hornsValue;
+                stats.Intimidation += hornsValue;
+            }
+            
+            //Mimic increase the intimidation at most twice
+            if (HasAbility(CreatureFeature.Mimic, abilityUnlock))
+            {
+                float increase = 1.0f + chromosome.GetFeature(CreatureFeature.Mimic)
+                                          / (float)chromosome.GetFeatureMax(CreatureFeature.Mimic);
+
+                //Intimidation has to be calculed here because of modifyStatByAge
+                int intimidation = stats.Size / 2 * ((int)stats.Diet + 1);
+                stats.Intimidation = (int)(intimidation * increase);
+            }
+
         }
 
         /// <summary>
@@ -136,12 +176,6 @@ namespace EvolutionSimulation.Entities
             int statCh = chromosome.GetFeature(feature);
             int stat = (int)(statCh / (maxstat / ((float)max)));
             return stat;
-        }
-
-
-        private bool HasAbility(CreatureFeature feat, float unlock)
-        {
-            return unlock < chromosome.GetFeature(feat) / chromosome.GetFeatureMax(feat);
         }
     }
 }

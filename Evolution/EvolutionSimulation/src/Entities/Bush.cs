@@ -13,5 +13,11 @@ namespace EvolutionSimulation
             regrowhtTime = RandomGenerator.Next(1, 101);
             nutritionalValue = RandomGenerator.Next(5, 11);
         }
+
+        public Bush(int regrowhtTime, float nutritionalValue)
+        {
+            this.regrowhtTime = regrowhtTime;
+            this.nutritionalValue = nutritionalValue;
+        }
     }
 }

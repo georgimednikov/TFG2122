@@ -5,6 +5,7 @@ using EvolutionSimulation.FSM.Creature.States;
 using EvolutionSimulation.FSM.Creature.Transitions;
 using EvolutionSimulation.Genetics;
 using System.Numerics;
+using EvolutionSimulation.Entities.Status;
 
 namespace EvolutionSimulation.Entities
 {
@@ -18,15 +19,13 @@ namespace EvolutionSimulation.Entities
         /// Constructor for factories
         /// </summary>
         public Creature()
-        {
-            
+        {         
             seenSameSpeciesCreatures = new List<Creature>();
             otherSeenCreatures = new List<Creature>();
             seenEntities = new List<StableEntity>();
             InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
             activeStatus = new List<Status.Status>();
-            removedStatus = new List<Status.Status>();
-            
+            removedStatus = new List<Status.Status>();          
         }
 
         /// <summary>
@@ -47,14 +46,18 @@ namespace EvolutionSimulation.Entities
             }
             speciesName = name;
             stats = new CreatureStats();
-            //TODO igual este nombre hay que pasarlo por parametro si eres un hijo
             //speciesName = "None";
             SetStats();
             this.x = x;
             this.y = y;
             timeToBeInHeat = stats.TimeBetweenHeats;
             ConfigureStateMachine();
-            AddInteraction(Interactions.attack, OnAttack);
+            // Attack
+            AddInteraction(Interactions.attack, ReceiveDamage);
+            if (HasAbility(CreatureFeature.Thorns, 0.65f))
+                AddInteraction(Interactions.attack, RetalliateDamage);
+            // Poison
+            AddInteraction(Interactions.poison, Poison);
             Console.WriteLine(mfsm.ExportToDotGraph());
         }
 
@@ -69,8 +72,7 @@ namespace EvolutionSimulation.Entities
             // TODO: Esto puede estar en el estado Alive, y en el Execute ejecutar
             // el action del estado Padre.
             stats.CurrRest -= stats.RestExpense;
-            mfsm.ObtainActionPoints(stats.Metabolism);
-            
+            mfsm.ObtainActionPoints(stats.Metabolism);         
             
             if(stats.Gender == Gender.Female && !stats.IsNewBorn())
             {
@@ -86,13 +88,11 @@ namespace EvolutionSimulation.Entities
                     timeToBeInHeat--;
             }
 
-
             Perceive();
             foreach (Status.Status s in activeStatus)   // Activates each status effect
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
 
             MakeDecision();
-
 
             // TomarDecision(); (Asignar Criatura Objetivo) -> Trigger Transicion -> Cambio de estado
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
@@ -117,9 +117,9 @@ namespace EvolutionSimulation.Entities
         // clasifica lo visto
         void MakeDecision()
         {
-            //if (seenCreatures.Count > 0 || hasBeenHit)    // TODO: hacer esto bien, 
+            //if (otherSeenCreatures.Count > 0 || (otherSeenCreatures.Count > 0 && hasBeenHit))    // TODO: hacer esto bien, 
             //{                                             // ahora para atacar, muy WIP
-            //    objective = seenCreatures[0];
+            //    objective = otherSeenCreatures[0];
             //    objectivePos = new Vector2(objective.x, objective.y);
             //}
             //else objective = null;
@@ -236,8 +236,6 @@ namespace EvolutionSimulation.Entities
                     response(interacter);
         }
 
-        
-
         /// <summary>
         /// Adds a response to a interaction type, given 
         /// the creature that interacts with this.
@@ -265,13 +263,34 @@ namespace EvolutionSimulation.Entities
                 InteractionsDict.Remove(type);
         }
 
-        private void OnAttack(Creature interacter)
+        /// <summary>
+        /// Action the creature will do upon being attacked
+        /// </summary>
+        private void ReceiveDamage(Creature interacter)
         {
             stats.CurrHealth -= ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
 
             objective = interacter;
             objectivePos = new Vector2(interacter.x, interacter.y);
-            hasBeenHit = true; //O MEJOR INCLUSO forzar el cambio al igual que TomarDecision()
+            hasBeenHit = true;             
+        }
+
+        /// <summary>
+        /// Action the creature will do if it can reflect damage back to the attacker
+        /// </summary>
+        private void RetalliateDamage(Creature interacter)
+        {
+            interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
+            Console.WriteLine("Criatura de " + x + ", " + y + " devuelve " + stats.Counter + " de daño!");
+        }
+
+        /// <summary>
+        /// Action the creature will do when becoming poisoned
+        /// </summary>
+        private void Poison(Creature interacter)
+        {
+            if(interacter.stats.Perforation >= stats.Armor)
+                AddStatus(new Poison(5 + (int)interacter.stats.Venom, interacter.stats.Venom));
         }
 
         /// <summary>
@@ -297,6 +316,17 @@ namespace EvolutionSimulation.Entities
             amount = Math.Max(0, amount);
             amount = Math.Min(amount, stats.CurrHealth);
             return amount;
+        }
+
+        /// <summary>
+        /// Returns if an ability is unlocked
+        /// </summary>
+        /// <param name="unlock">Skill percentage when skill is unlocked</param>
+        public bool HasAbility(CreatureFeature feat, float unlock)
+        {
+            float f = chromosome.GetFeature(feat);
+            float mF = chromosome.GetFeatureMax(feat);
+            return unlock <= f / mF;
         }
 
         /// <summary>

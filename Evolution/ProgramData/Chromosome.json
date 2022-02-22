@@ -225,7 +225,7 @@
     },
     {
         "feature":"Thorns",
-        "maxValue":50,
+        "maxValue":10,
         "relations":
         [
             {

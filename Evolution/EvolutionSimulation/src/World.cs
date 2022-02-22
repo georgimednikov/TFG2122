@@ -6,6 +6,62 @@ using System.Collections.Generic;
 namespace EvolutionSimulation
 {
     /// <summary>
+    /// Object used to configurate the world generation.
+    /// </summary>
+    public class WorldGenConfig
+    {
+        /// <summary>
+        /// Array of waves used to generate the heightmap
+        /// </summary>
+        public World.Wave[] heightWaves;
+        /// <summary>
+        /// Array of waves used to generate the humidity map
+        /// </summary>
+        public World.Wave[] humidityWaves;
+        /// <summary>
+        /// Array of waves used to generate the temperature map
+        /// </summary>
+        public World.Wave[] temperatureWaves;
+        /// <summary>
+        /// Already generated heightmap. It must be with values on an interval between [0, 1].
+        /// </summary>
+        public float[,] heightMap;
+        /// <summary>
+        /// Already generated humidity map. It must be with values on an interval between [0, 1]. Beware that it will be modified by the heightmap unless specified.
+        /// </summary>
+        public float[,] humidityMap;
+        /// <summary>
+        /// Already generated temperature map. It must be with values on an interval between [0, 1]. Beware that it will be modified by the heightmap unless specified.
+        /// </summary>
+        public float[,] temperatureMap;
+        /// <summary>
+        /// Should the provided heightmap or the generated be modified by the EvaluateHeight function.
+        /// </summary>
+        public bool heightModifiedByFunction = true;
+        /// <summary>
+        /// Function used to modify the heightmap. It won't  be modified if heightNotModifiedByFunction is true. It must be defined for all input values between [0,1] and must output values between [0,1]
+        /// </summary>
+        public Func<double, double> evaluateHeight;
+        /// <summary>
+        /// Function defining how the heightmap modifies the other two maps. It must be defined for all input values between [0, 1] and must output values between [-1, 1]
+        /// </summary>
+        public Func<double, double> evaluateInfluence;
+        /// <summary>
+        /// Function defining how flora density is created using the temperatura and humidity maps. Inputs values will be humidity and temperature on each point, each between [0, 1]. It must output values between [0,1]
+        /// </summary>
+        public Func<double, double, double> evaluateFlora;
+        /// <summary>
+        /// Function defining how, by default, water softens temperature. Input values will be height on a point, temperature on the same point and average temperature pre-modification. Must output values between [0,1]
+        /// </summary>
+        public Func<double, double, double, double> temperatureSoftener;
+        /// <summary>
+        /// Function defining which flora is generated using the flora density. Input values will be between (0,1] and must output integer values between [0,3].
+        /// Being 0 = Grass, 1 = Bush, 2 = Tree and 3 = Edible Tree
+        /// </summary>
+        public Func<double, int> floraSelector;
+    }
+
+    /// <summary>
     /// Definition of the simulated world
     /// </summary>
     public class World
@@ -19,53 +75,79 @@ namespace EvolutionSimulation
             public Plant plant;
         }
 
-        Func<double, double> evaluateHeight;
-        Func<double, double> evaluateInfluence;
-        Func<int, int, double> evaluateFlora;
-        Func<double, int> selectFlora;
+        public void Init(int size)
+        {
+            Init(size, new WorldGenConfig());
+        }
 
         /// <summary>
-        /// Initializes the map with a square matrix, optionally you can pass additional function to change how the Perlin Noise is interpreted and how much the height influences the rest.
+        /// Initializes the map with a matrix of provided size.
         /// </summary>
-        /// <param name="heightFunc">Function to interpret the results from the Perlin Noise function</param>
-        /// <param name="influenceFunc">Function that defines the influence of height on the other parameters</param>
-        public void Init(int size, Func<double, double> heightFunc = default(Func<double, double>), Func<double, double> influenceFunc = default(Func<double, double>), Func<int, int, double> floraFunc = default(Func<int, int, double>), Func<double, int> floraSelectorFunc = default(Func<double, int>))
+        public void Init(int size, WorldGenConfig config)
         {
+            if (config == null) throw new NullReferenceException("World generation config is null");
+
+            Validator.ValidatorResult result;
+            if ((result = Validator.Validate(config)) != Validator.ValidatorResult.NoError) Validator.ExceptionThrow(result); //TODO: Preguntar a Cleon si hay una manera mejor
+
+            evaluateHeight = (config.evaluateHeight != null) ? config.evaluateHeight : EvaluateHeightCurve;
+            evaluateInfluence = (config.evaluateInfluence != null) ? config.evaluateInfluence : EvaluateInfluenceCurve;
+            evaluateFlora = (config.evaluateFlora != null) ? config.evaluateFlora : EvaluateFloraCurve;
+            temperatureSoftener = (config.temperatureSoftener != null) ? config.temperatureSoftener : SoftenTemperatureByHeight;
+            floraSelector = (config.floraSelector != null) ? config.floraSelector : ChoosePlant;
+            modifiedHeight = config.heightModifiedByFunction;
             taxonomy = new GeneticTaxonomy();
             taxonomy.Init();
             Creatures = new List<Creature>();
             StableEntities = new List<StableEntity>();
             CreaturesToDelete = new List<IEntity>();
             SEntitiesToDelete = new List<IEntity>();
-            evaluateHeight = (heightFunc != null) ? heightFunc : EvaluateHeightCurve;
-            evaluateInfluence = (influenceFunc != null) ? influenceFunc : EvaluateInfluenceCurve;
-            evaluateFlora = (floraFunc != null) ? floraFunc : EvaluateFloraCurve;
-            selectFlora = (floraSelectorFunc != null) ? floraSelectorFunc : ChoosePlant;
             p = new Perlin();
             mapSize = size;
-            heightWaves = new Wave[2];
-            heightWaves[0] = new Wave();
-            heightWaves[0].seed = RandomGenerator.Next(0, 10000); //1641;
-            heightWaves[0].frequency = 0.5f;
-            heightWaves[0].amplitude = 1f;
-            heightWaves[1] = new Wave();
-            heightWaves[1].seed = RandomGenerator.Next(0, 10000); //1641;
-            heightWaves[1].frequency = 1f;
-            heightWaves[1].amplitude = 0;
-            //heightWaves[2] = new Wave();
-            //heightWaves[2].seed = rnd.Next(0, 10000); //1641;
-            //heightWaves[2].frequency = 0.5f;
-            //heightWaves[2].amplitude = 1f;
-            humidityWaves = new Wave[1];
-            humidityWaves[0] = new Wave();
-            humidityWaves[0].seed = RandomGenerator.Next(0, 10000);//4534;
-            humidityWaves[0].frequency = 0.5f;
-            humidityWaves[0].amplitude = 1f;
-            temperatureWaves = new Wave[1];
-            temperatureWaves[0] = new Wave();
-            temperatureWaves[0].seed = RandomGenerator.Next(0, 10000);// 453;
-            temperatureWaves[0].frequency = 0.25f;
-            temperatureWaves[0].amplitude = 1f;
+            if (config.heightMap != null) heightMap = config.heightMap;
+
+            if (config.heightWaves != null) heightWaves = config.heightWaves;
+            else
+            {
+                heightWaves = new Wave[2];
+                heightWaves[0] = new Wave();
+                heightWaves[0].seed = RandomGenerator.Next(0, 10000);
+                heightWaves[0].frequency = 0.5f;
+                heightWaves[0].amplitude = 1f;
+                heightWaves[1] = new Wave();
+                heightWaves[1].seed = RandomGenerator.Next(0, 10000);
+                heightWaves[1].frequency = 1f;
+                heightWaves[1].amplitude = 0;
+            }
+
+
+            if (config.humidityMap != null) humidityMap = config.humidityMap;
+
+            if (config.humidityWaves != null) humidityWaves = config.humidityWaves;
+            else
+            {
+                humidityWaves = new Wave[1];
+                humidityWaves[0] = new Wave();
+                humidityWaves[0].seed = RandomGenerator.Next(0, 10000);
+                humidityWaves[0].frequency = 0.5f;
+                humidityWaves[0].amplitude = 1f;
+            }
+
+
+            if (config.temperatureMap != null) temperatureMap = config.temperatureMap;
+
+            if (config.temperatureWaves != null) temperatureWaves = config.temperatureWaves;
+            else
+            {
+                temperatureWaves = new Wave[1];
+                temperatureWaves[0] = new Wave();
+                temperatureWaves[0].seed = RandomGenerator.Next(0, 10000);
+                temperatureWaves[0].frequency = 0.25f;
+                temperatureWaves[0].amplitude = 1f;
+            }
+
+
+
             InitMap();
         }
 
@@ -146,8 +228,16 @@ namespace EvolutionSimulation
             StableEntities.ForEach(delegate (StableEntity e) { e.Tick(); });
 
             // Entity deletion
-            CreaturesToDelete.ForEach(delegate (IEntity e) { Creatures.Remove(e as Creature); });
-            SEntitiesToDelete.ForEach(delegate (IEntity e) { StableEntities.Remove(e as StableEntity); });
+            CreaturesToDelete.ForEach(delegate (IEntity e) { 
+                Creatures.Remove(e as Creature); 
+                foreach(Creature c in Creatures)
+                    if (c.objective == e) c.objective = null;   // TODO URGENTE: Esto no deberia hacerse, pero ni poniendolo en null se quita la referencia al objetivo de la criatura
+            });
+            SEntitiesToDelete.ForEach(delegate (IEntity e) { 
+                StableEntities.Remove(e as StableEntity);
+                foreach (Creature c in Creatures)
+                    if (c.objective == e) c.objective = null;
+            });
             CreaturesToDelete.Clear();
             SEntitiesToDelete.Clear();
         }
@@ -200,6 +290,13 @@ namespace EvolutionSimulation
         public Wave[] heightWaves;      // Passes performed by the Perlin noise and added to the height
         public Wave[] humidityWaves;    // Passes performed by the Perlin noise and added to the humidity
         public Wave[] temperatureWaves; // Passes performed by the Perlin noise and added to the temperature
+        bool modifiedHeight = true;
+        Func<double, double> evaluateHeight;
+        Func<double, double> evaluateInfluence;
+        Func<double, double, double> evaluateFlora;
+        Func<double, double, double, double> temperatureSoftener;
+        Func<double, int> floraSelector;
+        float[,] heightMap, humidityMap, temperatureMap;
 
         /// <summary>
         /// Function used to insert further noise into the Perlin noise
@@ -261,20 +358,39 @@ namespace EvolutionSimulation
             {
                 for (int xIndex = 0; xIndex < sizeX; xIndex++)
                 {
-                    map[xIndex, yIndex].height = evaluateHeight(heightMap[xIndex, yIndex]);
+                    map[xIndex, yIndex].height = modifiedHeight ? evaluateHeight(heightMap[xIndex, yIndex]) : heightMap[xIndex, yIndex];
 
                     double evaluation = evaluateInfluence(map[xIndex, yIndex].height);
-                    if (evaluation > 0)
+                    if (evaluation >= 0)
                     {
                         map[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex] - evaluation;
+                        avgTemp -= evaluation;
                         map[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] + evaluation;
                         if (map[xIndex, yIndex].temperature < 0) map[xIndex, yIndex].temperature = 0; // So it does not excede the domain
                         if (map[xIndex, yIndex].humidity > 1f) map[xIndex, yIndex].humidity = 1f;
                     }
-                    else if (evaluation < 0)
+                    else
                     {
+                        map[xIndex, yIndex].humidity = humidityMap[xIndex, yIndex];
                         map[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex];
-                        map[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex] - evaluation;
+                    }
+                    avgTemp += map[xIndex, yIndex].temperature;
+                    avgHumidity += map[xIndex, yIndex].humidity;
+                }
+            }
+
+            double currAvgTemp = avgTemp / Math.Pow(mapSize, 2);
+            for (int yIndex = 0; yIndex < sizeY; yIndex++)
+            {
+                for (int xIndex = 0; xIndex < sizeX; xIndex++)
+                {
+                    double evaluation = evaluateInfluence(map[xIndex, yIndex].height);
+                    if (evaluation < 0)
+                    {
+                        avgTemp -= map[xIndex, yIndex].temperature;
+                        avgHumidity -= map[xIndex, yIndex].humidity;
+                        map[xIndex, yIndex].temperature = temperatureSoftener(evaluation, map[xIndex, yIndex].temperature, currAvgTemp);
+                        map[xIndex, yIndex].humidity += map[xIndex, yIndex].humidity - evaluation;
                         for (int i = -(int)(mapScale / 5); i <= (int)(mapScale / 5); i++)
                         {
                             for (int j = -(int)(mapScale / 5); j <= (int)(mapScale / 5); j++)
@@ -282,23 +398,29 @@ namespace EvolutionSimulation
                                 if (j == 0 && i == 0) continue;
                                 if (canMove(xIndex + i, yIndex + j))
                                 {
+                                    avgHumidity -= map[xIndex + i, yIndex + j].humidity;
+                                    avgTemp -= map[xIndex + i, yIndex + j].temperature;
+
+                                    map[xIndex + i, yIndex + j].temperature = temperatureSoftener(evaluation / (1 * (Math.Sqrt(i * i + j * j))), map[xIndex + i, yIndex + j].temperature, currAvgTemp);
                                     map[xIndex + i, yIndex + j].humidity += (-evaluation) / (20 * (Math.Sqrt(i * i + j * j)));
                                     if (map[xIndex + i, yIndex + j].humidity > 1f) map[xIndex + i, yIndex + j].humidity = 1f;
+                                    if (map[xIndex + i, yIndex + j].temperature > 1f) map[xIndex + i, yIndex + j].temperature = 1f;
+
+                                    avgHumidity += map[xIndex + i, yIndex + j].humidity;
+                                    avgTemp += map[xIndex + i, yIndex + j].temperature;
                                 }
                             }
                         }
 
                         if (map[xIndex, yIndex].humidity > 1f) map[xIndex, yIndex].humidity = 1f;
+                        if (map[xIndex, yIndex].temperature > 1f) map[xIndex, yIndex].temperature = 1f;
+
+                        avgHumidity += map[xIndex, yIndex].humidity;
+                        avgTemp += map[xIndex, yIndex].temperature;
                     }
-                    else
-                    {
-                        map[xIndex, yIndex].temperature = temperatureMap[xIndex, yIndex];
-                        map[xIndex, yIndex].humidity += humidityMap[xIndex, yIndex];
-                    }
-                    avgTemp += map[xIndex, yIndex].temperature;
-                    avgHumidity += map[xIndex, yIndex].humidity;
                 }
             }
+
             int trees = 0;
             int maxTrees = 0;
             int maxFlora = 0;
@@ -308,14 +430,15 @@ namespace EvolutionSimulation
                 {
 
                     if (map[xIndex, yIndex].height >= 0.5f)
-                        map[xIndex, yIndex].flora = evaluateFlora(xIndex, yIndex);
+                        map[xIndex, yIndex].flora = evaluateFlora(map[xIndex, yIndex].humidity, map[xIndex, yIndex].temperature);
                     else
                         map[xIndex, yIndex].flora = 0;
+
                     double val = map[xIndex, yIndex].flora;
                     avgFlora += val;
                     if (val >= 0 && RandomGenerator.NextDouble() <= val)
                     {
-                        int plantType = selectFlora(val);
+                        int plantType = floraSelector(val);
                         maxFlora++;
                         switch (plantType)
                         {
@@ -362,19 +485,25 @@ namespace EvolutionSimulation
             float offsetX = 0;
             float offsetZ = 0;
 
-            float[,] heightMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, heightWaves);
-            float[,] humidityMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, humidityWaves);
-            float[,] temperatureMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, temperatureWaves);
+            if (heightMap == null) heightMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, heightWaves);
+            if (humidityMap == null) humidityMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, humidityWaves);
+            if (temperatureMap == null) temperatureMap = GenerateNoiseMap(tileDepth, tileWidth, mapScale, offsetX, offsetZ, temperatureWaves);
 
             ProcessMapValues(heightMap, humidityMap, temperatureMap, mapScale);
         }
 
-        double EvaluateFloraCurve(int xIndex, int yIndex)
+        double EvaluateFloraCurve(double humidity, double temperature)
         {
             double a = 1, c = 1, d = 1, e = 1.75, g = 0, p = 0;
-            double data = ((a / c) * Math.Pow(c * map[xIndex, yIndex].humidity - map[xIndex, yIndex].temperature * p, e) - Math.Pow(2 * map[xIndex, yIndex].temperature - 1 - map[xIndex, yIndex].humidity * g, 2 * d));
+            double data = ((a / c) * Math.Pow(c * humidity - temperature * p, e) - Math.Pow(2 * temperature - 1 - humidity * g, 2 * d));
             return Math.Min(Math.Max(data, 0), 1.0f);
             //return 2 * Math.Pow((0.5f * (-2 * (Math.Pow(Math.Sqrt(2) * ((mapData[xIndex, yIndex].temperature) - 0.5), 2)) + 1) + (0.5f * mapData[xIndex, yIndex].humidity)), 4);
+        }
+
+        double SoftenTemperatureByHeight(double height, double temp, double avg)
+        {
+            double avgTemp = avg, a = 1;
+            return Math.Pow((1 + height), a) * (temp - avgTemp) + avgTemp;
         }
 
         /// <summary>
@@ -406,10 +535,9 @@ namespace EvolutionSimulation
 
         int ChoosePlant(double floraProb)
         {
-            double treeThreshold = 0.4;
+            double treeThreshold = 0.4, bushThreshold = 0.2;
             if (floraProb <= treeThreshold)
             {
-                double bushThreshold = 0.2;
                 if (RandomGenerator.NextDouble() <= ((1 / (treeThreshold - bushThreshold)) * (floraProb - bushThreshold)))
                     return 1;
                 else
