@@ -47,6 +47,35 @@ namespace EvolutionSimulation.FSM
                 .PermitReentry(sub);
         }
 
+
+        /// <summary>
+        /// Specify an action that will execute when transitioning to the state
+        /// </summary>
+        public void OnEntry(IState state, Action action)
+        {
+            machine.Configure(state)
+                .OnEntry(action);
+        }
+
+        /// <summary>
+        /// Specify an action that will execute when activating the state
+        /// </summary>
+        public void OnActivate(IState state, Action action)
+        {
+            machine.Configure(state)
+                .OnActivate(action);
+        }
+
+        /// <summary>
+        /// Sets an initial transition to trigger when entering a
+        /// super state to one of its substates.
+        /// </summary>
+        public void InitalTransition(IState superState, IState subState)
+        {
+            machine.Configure(superState)
+                .InitialTransition(subState);
+        }
+
         /// <summary>
         /// Returns a string representation of the state machine in the DOT graph language
         /// It can then be visualized by pasting the output in http://www.webgraphviz.com/

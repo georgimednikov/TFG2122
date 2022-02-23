@@ -19,7 +19,7 @@ namespace EvolutionSimulation.Entities
         /// The probability of being poisoned when interacting with the putrid corpse. 
         /// A value between 0 and 1, higher or lower values will be clamped.
         /// </param>
-        public void Init(World w, int lifeTime, int x, int y,  float putridStart, float poisonProb, int poisonDuration, float poisonTickDamage, int maxNutritionPoints)
+        public void Init(World w, int lifeTime, int x, int y,  float putridStart, float poisonProb, int poisonDuration, float poisonTickDamage, float maxNutritionPoints)
         {
             base.Init(w, lifeTime, x, y);
 

@@ -24,8 +24,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             Console.WriteLine("Dead");
             creature.world.Destroy(creature);
-            Corpse corpse = creature.world.CreateStableEntity<Corpse>();
-            corpse.Init(creature.world, 5, creature.x, creature.y, 40, 70, 80); // TODO: stats to be derived from creacher
+            Entities.Corpse corpse = creature.world.CreateStableEntity<Entities.Corpse>();
+            corpse.Init(creature.world, 5, creature.x, creature.y, 0.4f, 0.7f, 5, 5, 80f); // TODO: stats to be derived from creacher
             return creature.actionPoints;
         }
 
