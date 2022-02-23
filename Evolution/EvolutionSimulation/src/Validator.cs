@@ -14,6 +14,7 @@ namespace EvolutionSimulation
         public enum ValidatorResult
         { 
             #region WorldGenConfig
+            NonPositiveSizeMap,
             NoSameSizeMaps,
             HeightFunctionOutOfBounds,
             HeightFunctionNotWhollyDefined,
@@ -32,6 +33,8 @@ namespace EvolutionSimulation
             switch (result)
             {
                 #region WorldGenConfig
+                case ValidatorResult.NonPositiveSizeMap:
+                    throw new ApplicationException("The provided size is equal or less than 0");
                 case ValidatorResult.NoSameSizeMaps:
                     throw new ApplicationException("The provided maps aren't of the same size");
                 case ValidatorResult.HeightFunctionOutOfBounds:
@@ -61,6 +64,7 @@ namespace EvolutionSimulation
         static public ValidatorResult Validate(WorldGenConfig configuration)
         {
             ValidatorResult result = ValidatorResult.NoError;
+            if ((result = NonZeroSize(configuration)) != ValidatorResult.NoError) return result;
             if ((result = SameSizeMaps(configuration)) != ValidatorResult.NoError) return result;
             if ((result = HeightFunc(configuration)) != ValidatorResult.NoError) return result;
             if ((result = InfluenceFunc(configuration)) != ValidatorResult.NoError) return result;
@@ -68,6 +72,14 @@ namespace EvolutionSimulation
             if ((result = TemperatureSoftenerFunc(configuration)) != ValidatorResult.NoError) return result;
             if ((result = FloraSelectorFunc(configuration)) != ValidatorResult.NoError) return result;
             return result;
+        }
+
+        static ValidatorResult NonZeroSize(WorldGenConfig config)
+        {
+            if (config.humidityMap != null || config.temperatureMap != null || config.heightMap != null) return ValidatorResult.NoError;
+            if (config.mapSize <= 0) return ValidatorResult.NonPositiveSizeMap;
+
+            return ValidatorResult.NoError;
         }
 
         static ValidatorResult SameSizeMaps(WorldGenConfig config)

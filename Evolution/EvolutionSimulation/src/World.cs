@@ -11,6 +11,10 @@ namespace EvolutionSimulation
     public class WorldGenConfig
     {
         /// <summary>
+        /// Size of the map. If a heightMap/humidityMap/temperatureMap is provided then this parameter will be ignored.
+        /// </summary>
+        public int mapSize;
+        /// <summary>
         /// Array of waves used to generate the heightmap
         /// </summary>
         public World.Wave[] heightWaves;
@@ -77,13 +81,15 @@ namespace EvolutionSimulation
 
         public void Init(int size)
         {
-            Init(size, new WorldGenConfig());
+            WorldGenConfig c = new WorldGenConfig();
+            c.mapSize = size;
+            Init(c);
         }
 
         /// <summary>
         /// Initializes the map with a matrix of provided size.
         /// </summary>
-        public void Init(int size, WorldGenConfig config)
+        public void Init(WorldGenConfig config)
         {
             if (config == null) throw new NullReferenceException("World generation config is null");
 
@@ -103,8 +109,8 @@ namespace EvolutionSimulation
             CreaturesToDelete = new List<IEntity>();
             SEntitiesToDelete = new List<IEntity>();
             p = new Perlin();
-            mapSize = size;
-            if (config.heightMap != null) heightMap = config.heightMap;
+            if (config.heightMap != null) { heightMap = config.heightMap; mapSize = heightMap.GetLength(0); }
+            else mapSize = config.mapSize;
 
             if (config.heightWaves != null) heightWaves = config.heightWaves;
             else
@@ -121,7 +127,8 @@ namespace EvolutionSimulation
             }
 
 
-            if (config.humidityMap != null) humidityMap = config.humidityMap;
+            if (config.humidityMap != null) { humidityMap = config.humidityMap; mapSize = humidityMap.GetLength(0); }
+            else mapSize = config.mapSize;
 
             if (config.humidityWaves != null) humidityWaves = config.humidityWaves;
             else
@@ -134,7 +141,8 @@ namespace EvolutionSimulation
             }
 
 
-            if (config.temperatureMap != null) temperatureMap = config.temperatureMap;
+            if (config.temperatureMap != null) { temperatureMap = config.temperatureMap; mapSize = temperatureMap.GetLength(0); }
+            else mapSize = config.mapSize;
 
             if (config.temperatureWaves != null) temperatureWaves = config.temperatureWaves;
             else
@@ -145,8 +153,6 @@ namespace EvolutionSimulation
                 temperatureWaves[0].frequency = 0.25f;
                 temperatureWaves[0].amplitude = 1f;
             }
-
-
 
             InitMap();
         }
