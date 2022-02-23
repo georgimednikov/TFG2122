@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EvolutionSimulation.FSM.Creature.Transitions
 {
-    class AttackTransition : CreatureTransition
+    class CombatTransition : CreatureTransition
     {
-        public AttackTransition(Entities.Creature creature)
+        public CombatTransition(Entities.Creature creature)
         {
             this.creature = creature;
         }
@@ -22,7 +18,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override string ToString()
         {
-            return "AttackTransition";
+            return "CombatTransition";
         }
 
     }

@@ -161,8 +161,6 @@ namespace EvolutionSimulation.Entities
             IState eat = new Eating(this);
             IState goToSafePlace = new GoToSafePlace(this);
             IState sleep = new Sleeping(this);
-            
-
 
             //Escape
             IState fleeing = new Fleeing(this);
@@ -202,20 +200,69 @@ namespace EvolutionSimulation.Entities
            
 
             // Transitions
-            ITransition moveTransition = new MoveTransition(this);
-            ITransition hungerTransition = new HungerTransition(this);
-            ITransition sleepyTransition = new SleepyTransition(this);
-            ITransition attackTransition = new AttackTransition(this);
-            ITransition idleTransition = new IdleTransition(this);
-            ITransition wakeTransition = new WakeTransition(this);
             ITransition dieTransition = new DieTransition(this);
+            ITransition escapeTransition = new EscapeTransition(this);
+            ITransition safeTransition = new SafeTransition(this);
+            ITransition combatTransition = new CombatTransition(this);
+
+            ITransition thirstyTransition = new ThirstyTransition(this);
+            ITransition drinkingTransition = new DrinkingTransition(this);
+            ITransition stopDrinkingTransition = new StopDrinkingTransition(this);
+
+            ITransition mateTransition = new MateTransition(this);
+            ITransition tryMateTransition = new TryMateTransition(this);
+            ITransition matingTransition = new MatingTransition(this);
+            ITransition stopMatingTransition = new StopMatingTransition(this);
+
+            ITransition hungerTransition = new HungerTransition(this);
+            ITransition eatingTransition = new EatingTransition(this);
+            ITransition stopEatingTransition = new StopEatingTransition(this);
+
+            ITransition goToSafePlaceTransition = new GoToSafePlaceTransition(this);
+            ITransition sleepySafeTransition = new SleepySafeTransition(this);
+            ITransition sleepyTransition = new SleepyTransition(this);
+            ITransition wakeTransition = new WakeTransition(this);
             //ITransition mateTransition = new MateTransition(this);
+
+            mfsm.AddTransition(alive, dieTransition, dead);
+
+            mfsm.AddTransition(safe, escapeTransition, escape);
+            mfsm.AddTransition(safe, combatTransition, combat);
+
+            mfsm.AddTransition(combat, safeTransition, safe);
+            mfsm.AddTransition(combat, escapeTransition, escape);
+
+            mfsm.AddTransition(escape, safeTransition, safe);
+            mfsm.AddTransition(escape, combatTransition, combat);
+            
+
+            mfsm.AddTransition(wander, thirstyTransition, goToDrink);
+            mfsm.AddTransition(goToDrink, drinkingTransition, drink);
+            //mfsm.AddTransition(goToDrink, ?, wander);
+            mfsm.AddTransition(drink, stopDrinkingTransition, wander);
+
+            mfsm.AddTransition(wander, mateTransition, goToMate);
+            //mfsm.AddTransition(goToMate, ?, wander);
+            mfsm.AddTransition(goToMate, tryMateTransition, tryMate);
+            //mfsm.AddTransition(tryMate, ?, wander);
+            mfsm.AddTransition(tryMate, matingTransition, mating);
+            mfsm.AddTransition(mating, stopMatingTransition, wander);
+
+            mfsm.AddTransition(wander, hungerTransition, goToEat);
+            //mfsm.AddTransition(goToEat, ?, wander);
+            mfsm.AddTransition(goToEat, eatingTransition, eat);
+            mfsm.AddTransition(eat, stopEatingTransition, wander);
+
+            mfsm.AddTransition(wander, thirstyTransition, goToDrink);
+            mfsm.AddTransition(goToDrink, drinkingTransition, drink);
+
+            mfsm.AddTransition(wander, goToSafePlaceTransition, goToSafePlace);
+            //mfsm.AddTransition(goToSafePlace, ?, wander);
+            mfsm.AddTransition(goToSafePlace, sleepySafeTransition, sleep);
 
 
             mfsm.AddTransition(wander, sleepyTransition, sleep);
-            mfsm.AddTransition(wander, attackTransition, attack);
-
-            mfsm.AddTransition(alive, dieTransition, dead);
+            mfsm.AddTransition(sleep, wakeTransition, wander);
         }
         
         /// <summary>

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EvolutionSimulation.FSM.Creature.Transitions
+﻿namespace EvolutionSimulation.FSM.Creature.Transitions
 {
+    /// <summary>
+    /// Checks if the creature has rest enough
+    /// </summary>
     class WakeTransition : CreatureTransition
     {
         public WakeTransition(Entities.Creature creature)

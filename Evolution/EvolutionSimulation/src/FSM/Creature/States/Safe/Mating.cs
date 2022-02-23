@@ -23,13 +23,13 @@
             time--;
             if (time == 0)
             {
-                if(creature.stats.Gender == Genetics.Gender.Female)
+                if (creature.stats.Gender == Genetics.Gender.Female)
                 {
                     Entities.Creature obj = creature.objective as Entities.Creature;
                     if (obj == null) return 1000;
                     // Create a random number of childs
                     int numberChilds = RandomGenerator.Next(1, 5);//TODO: que el numero de hijos dependa de algo del cromosoma?
-                    for(int i = 0; i < numberChilds; ++i)
+                    for (int i = 0; i < numberChilds; ++i)
                     {
                         //TODO: cuidado con el problema del diamante
                         // Crossover with male and female chromosomes
@@ -39,11 +39,11 @@
                         // The new creature's pos (near to the parents)
                         int nx = creature.x + RandomGenerator.Next(-1, 2);
                         int ny = creature.y + RandomGenerator.Next(-1, 2);
-                        creature.world.CreateCreature<Entities.Animal>(nx , ny, childC, creature.speciesName);
+                        creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName);
                     }
                 }
             }
-            
+
             //obj.ReceiveInteraction(creature, Entities.Interactions.mate);
             return 1000; // Cost of the action performed
         }

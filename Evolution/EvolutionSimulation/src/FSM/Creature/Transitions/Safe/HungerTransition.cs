@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EvolutionSimulation.FSM.Creature.Transitions
 {
@@ -15,8 +11,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            return false;
-            //TODO: return creature.energy < 5;
+            return creature.stats.CurrEnergy < 0.1 * creature.stats.MaxEnergy ;
         }
 
         public override string ToString()

@@ -6,22 +6,25 @@ using System.Threading.Tasks;
 
 namespace EvolutionSimulation.FSM.Creature.Transitions
 {
-    class MoveTransition : CreatureTransition
+    /// <summary>
+    /// Checks if the creature has drunk enough
+    /// </summary>
+    class StopDrinkingTransition : CreatureTransition
     {
-        public MoveTransition(Entities.Creature creature)
+        public StopDrinkingTransition(Entities.Creature creature)
         {
             this.creature = creature;
         }
 
         public override bool Evaluate()
         {
-            return false;
-            //TODO: return creature.speed > 0;
+            return creature.stats.CurrHydration >= creature.stats.MaxHydration;
         }
 
         public override string ToString()
         {
-            return "MoveTransition";
+            return "StopDrinkingTransition";
         }
+
     }
 }

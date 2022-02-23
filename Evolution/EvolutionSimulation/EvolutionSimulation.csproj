@@ -96,18 +96,20 @@
     <Compile Include="src\FSM\Creature\States\Safe\Sleeping.cs" />
     <Compile Include="src\FSM\Creature\States\CreatureState.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\Explore.cs" />
-    <Compile Include="src\FSM\Creature\States\Scape\Hide.cs" />
-    <Compile Include="src\FSM\Creature\States\Scape\Fleeing.cs" />
+    <Compile Include="src\FSM\Creature\States\Escape\Hide.cs" />
+    <Compile Include="src\FSM\Creature\States\Escape\Fleeing.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\SafeTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\EscapeTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\CreatureTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\AttackTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\CombatTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\DieTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\ArriveTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\MateTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\WakeTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\IdleTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\SleepyTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\HungerTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\MoveTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\EatTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\DrinkingTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\ThirstyTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\WakeTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\SleepyTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\HungerTransition.cs" />
     <Compile Include="src\Genetics\GeneticTaxonomy.cs" />
     <Compile Include="src\Entities\Grass.cs" />
     <Compile Include="src\NameGenerator.cs" />
@@ -148,7 +150,10 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="src\FSM\Creature\Transitions\Combat\" />
+    <Folder Include="src\FSM\Creature\Transitions\Escape\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
