@@ -7,7 +7,7 @@
     {
         public TryMate(Entities.Creature c) : base(c) { creature = c; }
 
-        // This move is energy netural, costing the same nergy that is obtained in a tick
+        // This move is energy netural, costing the same energy that is obtained in a tick
         public override bool canPerformAction(int actionPoints)
         {
             return actionPoints >= 1000;

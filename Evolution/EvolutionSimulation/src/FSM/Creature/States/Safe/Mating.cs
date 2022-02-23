@@ -11,7 +11,7 @@
 
         public Mating(Entities.Creature c, int time) : base(c){ this.time = time;}
 
-        // This move is energy netural, costing the same nergy that is obtained in a tick
+        // This move is energy netural, costing the same energy that is obtained in a tick
         public override bool canPerformAction(int actionPoints)
         {
             return actionPoints >= 1000;
@@ -35,7 +35,7 @@
                         // Crossover with male and female chromosomes
                         Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(obj.chromosome, creature.chromosome);
                         // Mutate the chromosome
-                        Genetics.GeneticFunctions.UniformMutation(ref childC, 0.1f);// Todo que la probabilidad la coja de algun sitio
+                        Genetics.GeneticFunctions.UniformMutation(ref childC, 0.1f);// TODO que la probabilidad la coja de algun sitio
                         // The new creature's pos (near to the parents)
                         int nx = creature.x + RandomGenerator.Next(-1, 2);
                         int ny = creature.y + RandomGenerator.Next(-1, 2);

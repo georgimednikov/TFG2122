@@ -4,9 +4,9 @@ namespace EvolutionSimulation.FSM.Creature.States
 {
     // TODO: Estado para testear, hacer el estado correctamente
 
-    class Alive : CreatureState
+    class Safe : CreatureState
     {
-        public Alive(Entities.Creature c) : base(c) { creature = c; }
+        public Safe(Entities.Creature c) : base(c) { creature = c; }
 
         public override bool canPerformAction(int actionPoints)
         {
@@ -15,13 +15,13 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override int Action()
         {
-            Console.WriteLine("Alive");
+            Console.WriteLine("Safe Action");
             return 1000;
         }
 
         public override string ToString()
         {
-            return "AliveState";
+            return "SafeState";
         }
     }
 }

@@ -92,7 +92,7 @@ namespace EvolutionSimulation.Entities
             foreach (Status.Status s in activeStatus)   // Activates each status effect
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
 
-            MakeDecision();
+            ProcessInput();
 
             // TomarDecision(); (Asignar Criatura Objetivo) -> Trigger Transicion -> Cambio de estado
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
@@ -111,11 +111,11 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
-        /// Affects the transitions of the FSM based on perceived entities
+        /// With all the entities that the creature has perceive, 
+        /// select the most important (the nearest enemy, ally, food...)
+        /// The transitions will use this information to change a different state
         /// </summary>
-        // TODO: quitar este metodo, hacer las decisiones con la fsm
-        // clasifica lo visto
-        void MakeDecision()
+        void ProcessInput()
         {
             //if (otherSeenCreatures.Count > 0 || (otherSeenCreatures.Count > 0 && hasBeenHit))    // TODO: hacer esto bien, 
             //{                                             // ahora para atacar, muy WIP
@@ -142,26 +142,64 @@ namespace EvolutionSimulation.Entities
         void ConfigureStateMachine()
         {
             // States
-            IState idle = new Idle(this);
-            IState moving = new Moving(this);
             IState dead = new Dead(this);
             IState alive = new Alive(this);
-            IState eat = new Eat(this);
-            IState sleep = new Sleeping(this);
-            IState attack = new Attacking(this);
-            //IState tryMate = new TryMate(this);
-            //IState mating = new Mating(this, 10);//TODO que 100 lo coja del cromosoma, es el tiempo que tardan en reproducirse
 
-            mfsm = new Fsm(idle);
+            IState safe = new Safe(this);
+            IState combat = new Combat(this);
+            IState escape = new Escape(this);
+
+            //Safe
+            IState wander = new Wander(this);
+            IState explore = new Explore(this);
+            IState goToDrink = new GoToDrink(this);
+            IState drink = new Drinking(this);
+            IState goToMate = new GoToMate(this);
+            IState tryMate = new TryMate(this);
+            IState mating = new Mating(this,100);//TODO que 100 lo coja del cromosoma, es el tiempo que tardan en reproducirse
+            IState goToEat = new GoToEat(this);
+            IState eat = new Eating(this);
+            IState goToSafePlace = new GoToSafePlace(this);
+            IState sleep = new Sleeping(this);
+            
+
+
+            //Escape
+            IState fleeing = new Fleeing(this);
+            IState hide = new Hide(this);
+
+            //Attack
+            IState attack = new Attacking(this);
+            IState chaseEnemy = new ChaseEnemy(this);
+
+            mfsm = new Fsm(safe);
 
             // Substates
-            mfsm.AddSubstate(alive, idle);
-            mfsm.AddSubstate(alive, moving);
-            mfsm.AddSubstate(alive, eat);
-            mfsm.AddSubstate(alive, sleep);
-            mfsm.AddSubstate(alive, attack);
-            //mfsm.AddSubstate(alive, tryMate);
-            //mfsm.AddSubstate(alive, mating);
+            mfsm.AddSubstate(alive, safe);
+            mfsm.AddSubstate(alive, combat);
+            mfsm.AddSubstate(alive, escape);
+            
+            // Safe substates
+            mfsm.AddSubstate(safe, wander);
+            mfsm.AddSubstate(safe, explore);
+            mfsm.AddSubstate(safe, goToDrink);
+            mfsm.AddSubstate(safe, drink);
+            mfsm.AddSubstate(safe, goToMate);
+            mfsm.AddSubstate(safe, tryMate);
+            mfsm.AddSubstate(safe, mating);
+            mfsm.AddSubstate(safe, goToEat);
+            mfsm.AddSubstate(safe, eat);
+            mfsm.AddSubstate(safe, goToSafePlace);
+            mfsm.AddSubstate(safe, sleep);
+
+            // Combat substates
+            mfsm.AddSubstate(combat, attack);
+            mfsm.AddSubstate(combat, chaseEnemy);
+
+            // Escape substates
+            mfsm.AddSubstate(escape, fleeing);
+            mfsm.AddSubstate(escape, hide);
+           
 
             // Transitions
             ITransition moveTransition = new MoveTransition(this);
@@ -173,18 +211,9 @@ namespace EvolutionSimulation.Entities
             ITransition dieTransition = new DieTransition(this);
             //ITransition mateTransition = new MateTransition(this);
 
-            mfsm.AddTransition(idle, moveTransition, moving);
-            mfsm.AddTransition(idle, hungerTransition, eat);
-            mfsm.AddTransition(idle, sleepyTransition, sleep);
-            mfsm.AddTransition(idle, attackTransition, attack);
 
-            mfsm.AddTransition(moving, sleepyTransition, sleep);
-            mfsm.AddTransition(moving, attackTransition, attack);
-            mfsm.AddTransition(moving, idleTransition, idle);
-
-            mfsm.AddTransition(attack, idleTransition, idle);
-
-            mfsm.AddTransition(sleep, wakeTransition, idle);
+            mfsm.AddTransition(wander, sleepyTransition, sleep);
+            mfsm.AddTransition(wander, attackTransition, attack);
 
             mfsm.AddTransition(alive, dieTransition, dead);
         }

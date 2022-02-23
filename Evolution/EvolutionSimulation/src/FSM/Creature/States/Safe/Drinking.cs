@@ -2,11 +2,9 @@
 
 namespace EvolutionSimulation.FSM.Creature.States
 {
-    // TODO: Estado para testear, hacer el estado correctamente
-
-    class Alive : CreatureState
+    class Drinking : CreatureState
     {
-        public Alive(Entities.Creature c) : base(c) { creature = c; }
+        public Drinking(Entities.Creature c) : base(c) { creature = c; }
 
         public override bool canPerformAction(int actionPoints)
         {
@@ -15,13 +13,13 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override int Action()
         {
-            Console.WriteLine("Alive");
-            return 1000;
+            Console.WriteLine("Drinking action");
+            return 10 * creature.stats.Metabolism; // Cost of the action performed
         }
 
         public override string ToString()
         {
-            return "AliveState";
+            return "DrinkingState";
         }
     }
 }

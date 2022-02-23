@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EvolutionSimulation.FSM.Creature.States
 {
     // TODO: Estado para testear, hacer el estado correctamente
-    class Eat : CreatureState
+
+    class Escape : CreatureState
     {
-        public Eat(Entities.Creature c) : base(c) { creature = c; }
+        public Escape(Entities.Creature c) : base(c) { creature = c; }
 
         public override bool canPerformAction(int actionPoints)
         {
@@ -18,13 +15,13 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override int Action()
         {
-            Console.WriteLine("Eat");
+            Console.WriteLine("Escape Action");
             return 1000;
         }
 
         public override string ToString()
         {
-            return "EatState";
+            return "EscapeState";
         }
     }
 }

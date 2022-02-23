@@ -122,14 +122,19 @@ namespace EvolutionSimulation.Entities
             ModifyStatsByHabilities(abilityUnlock);
         }
 
+
+        /// <summary>
+        /// Modify differents stats depending on the habilities
+        /// </summary>
+        /// <param name="abilityUnlock"></param>
         private void ModifyStatsByHabilities(float abilityUnlock)
         {
-            //Hair
+            //Hair. Better with low temperatures and worse with high temperatures
             if (HasAbility(CreatureFeature.Hair, abilityUnlock))
             {
                 int hairValue = chromosome.GetFeature(CreatureFeature.Hair);
                 stats.MinTemperature -= hairValue * 2;
-                stats.MaxTemperature += hairValue;
+                stats.MaxTemperature -= hairValue;
             }
 
             //UpRight increase the perception at most 1.5
@@ -141,25 +146,27 @@ namespace EvolutionSimulation.Entities
                 stats.Perception = (int)(stats.Perception * increase);
             }
 
-            //Horns
+            //Intimidation has to be calculed here because of modifyStatByAge
+            float intimidation = stats.Size / 2 * ((int)stats.Diet + 1);
+
+            //Horns. Increase damage and intimidation
             if (HasAbility(CreatureFeature.Horns, abilityUnlock)) { 
 
                 int hornsValue = chromosome.GetFeature(CreatureFeature.Horns);
-                stats.Damage += 2 * hornsValue;
-                stats.Intimidation += hornsValue;
+                stats.Damage += hornsValue;
+                intimidation += hornsValue * 1.5f;
             }
-            
+
+
+            float increaseIntimidation = 0;
             //Mimic increase the intimidation at most twice
             if (HasAbility(CreatureFeature.Mimic, abilityUnlock))
             {
-                float increase = 1.0f + chromosome.GetFeature(CreatureFeature.Mimic)
+                increaseIntimidation = 1.0f + chromosome.GetFeature(CreatureFeature.Mimic)
                                           / (float)chromosome.GetFeatureMax(CreatureFeature.Mimic);
-
-                //Intimidation has to be calculed here because of modifyStatByAge
-                int intimidation = stats.Size / 2 * ((int)stats.Diet + 1);
-                stats.Intimidation = (int)(intimidation * increase);
             }
 
+            stats.Intimidation = (int)(intimidation * increaseIntimidation);
         }
 
         /// <summary>

@@ -1,9 +1,11 @@
 ﻿namespace EvolutionSimulation.FSM.Creature.States
 {
-    // TODO: Estado para testear, hacer el estado correctamente
-    class Moving : CreatureState
+    /// <summary>
+    /// Move randomly until the creature has something to do
+    /// </summary>
+    class Wander : CreatureState
     {
-        public Moving(Entities.Creature c) : base(c) { creature = c; }
+        public Wander(Entities.Creature c) : base(c) { creature = c; }
 
         public override bool canPerformAction(int actionPoints)
         {
@@ -29,7 +31,7 @@
 
         public override string ToString()
         {
-            return "MovingState";
+            return "WanderState";
         }
     }
 }
