@@ -259,8 +259,6 @@ namespace EvolutionSimulation.Entities
             mfsm.AddTransition(wander, goToSafePlaceTransition, goToSafePlace);
             //mfsm.AddTransition(goToSafePlace, ?, wander);
             mfsm.AddTransition(goToSafePlace, sleepySafeTransition, sleep);
-
-
             mfsm.AddTransition(wander, sleepyTransition, sleep);
             mfsm.AddTransition(sleep, wakeTransition, wander);
         }
