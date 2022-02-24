@@ -204,7 +204,7 @@ namespace EvolutionSimulation.Entities
             IState attack = new Attacking(this);
             IState chaseEnemy = new ChaseEnemy(this);
 
-            mfsm = new Fsm(safe);
+            mfsm = new StatelessFsm(safe);
 
             // Substates
             mfsm.AddSubstate(alive, safe);
@@ -491,7 +491,7 @@ namespace EvolutionSimulation.Entities
 
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
-        private Fsm mfsm;
+        private StatelessFsm mfsm;
 
 
         public Creature nearestEnemy; 

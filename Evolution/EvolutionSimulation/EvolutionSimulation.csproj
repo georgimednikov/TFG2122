@@ -81,6 +81,7 @@
     <Compile Include="src\Entities\Status\Status.cs" />
     <Compile Include="src\Entities\Status\IStatus.cs" />
     <Compile Include="src\Entities\Tree.cs" />
+    <Compile Include="src\FSM\CompoundState.cs" />
     <Compile Include="src\FSM\Creature\States\Combat.cs" />
     <Compile Include="src\FSM\Creature\States\Escape.cs" />
     <Compile Include="src\FSM\Creature\States\Safe.cs" />
@@ -117,6 +118,7 @@
     <Compile Include="src\FSM\Creature\Transitions\Safe\WakeTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\SleepyTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\HungerTransition.cs" />
+    <Compile Include="src\FSM\Fsm.cs" />
     <Compile Include="src\Genetics\GeneticTaxonomy.cs" />
     <Compile Include="src\Entities\Grass.cs" />
     <Compile Include="src\NameGenerator.cs" />
@@ -130,7 +132,7 @@
     <Compile Include="src\FSM\Creature\States\Dead.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\Eating.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\Wander.cs" />
-    <Compile Include="src\FSM\Fsm.cs" />
+    <Compile Include="src\FSM\StatelessFsm.cs" />
     <Compile Include="src\FSM\Interfaces.cs" />
     <Compile Include="src\Entities\IInteractable.cs" />
     <Compile Include="src\Perlin.cs" />

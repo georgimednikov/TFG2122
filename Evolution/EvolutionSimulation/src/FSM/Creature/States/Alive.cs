@@ -10,7 +10,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override bool canPerformAction(int actionPoints)
         {
-            return actionPoints < 1000;
+            return actionPoints >= 1000;
         }
 
         public override int Action()
