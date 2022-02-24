@@ -10,8 +10,12 @@ namespace EvolutionSimulation.Unity
         {
             public TextAsset species;
             public int amount;
+
+            //Position in X for the center of the spawning radius in percentage of total terrain size
             public float positionX;
+            //Position in Z for the center of the spawning radius in percentage of total terrain size
             public float positionZ;
+            //Radius for the center of the spawning radius in percentage of total terrain size
             public float positionRadius;
         }
 
@@ -27,22 +31,26 @@ namespace EvolutionSimulation.Unity
 
             foreach (CreatureSpawn spawn in creatureDistribution)
             {
+                if (spawn.positionRadius < 0 || spawn.positionRadius > 1)
+                    throw new Exception("The radius for the spawn of creatures cannot surpass the size of the world in neither the axis X or Z");
+
+                if (spawn.positionX < 0 || spawn.positionX > 1 ||
+                    spawn.positionZ < 0 || spawn.positionZ > 1)
+                    throw new Exception("The position given to spawn any species must be within the logical confines of the world given the radius of spawn");
+
+                // From percentage of terrain size to tangible values
+                float worldRadius = spawn.positionRadius * terrain.terrainData.size.x;
+
                 for (int i = 0; i < spawn.amount; ++i)
                 {
-                    if (spawn.positionRadius > terrain.terrainData.size.x / 2 || spawn.positionRadius > terrain.terrainData.size.z / 2)
-                        throw new Exception("The radius for the spawn of creatures cannot surpass the size of the world in neither the axis X or Z");
-
-                    if (spawn.positionX < transform.position.x + spawn.positionRadius || spawn.positionX > transform.position.x + terrain.terrainData.size.x - spawn.positionRadius ||
-                        spawn.positionZ < transform.position.z + spawn.positionRadius || spawn.positionZ > transform.position.z + terrain.terrainData.size.z - spawn.positionRadius)
-                        throw new Exception("The position given to spawn any species must be within the logical confines of the world given the radius of spawn");
-
                     // Calculates a random point within a circle to get the offset of the position.
-                    float xPos = (float)((spawn.positionRadius * Math.Sqrt(rnd.NextDouble())) * Math.Cos(rnd.NextDouble() * 2 * Math.PI));
-                    float zPos = (float)((spawn.positionRadius * Math.Sqrt(rnd.NextDouble())) * Math.Sin(rnd.NextDouble() * 2 * Math.PI));
+                    float xPos = (float)(worldRadius * Math.Sqrt(rnd.NextDouble()) * Math.Cos(rnd.NextDouble() * 2 * Math.PI));
+                    float zPos = (float)(worldRadius * Math.Sqrt(rnd.NextDouble()) * Math.Sin(rnd.NextDouble() * 2 * Math.PI));
 
                     // Adds the center of the circle to offset the position to the final value.
-                    xPos += spawn.positionX;
-                    zPos += spawn.positionZ;
+                    // Like with the radius, positions fo from percentage of terrain size to tangible values
+                    xPos += spawn.positionX * terrain.terrainData.size.x;
+                    zPos += spawn.positionZ * terrain.terrainData.size.z;
 
                     RaycastHit hit;
                     // Position in Y axis + 10 (no specific reason for that number) => No point in the world will be higher.  

@@ -2,16 +2,17 @@ using System;
 
 namespace EvolutionSimulation.Unity
 {
-    public interface IEntity
-    {
-        void Tick();
+    //public interface IEntity
+    //{
+    //    void Tick();
 
-        int x { get; }
+    //    int x { get; }
 
-        int y { get; }
-    }
+    //    int y { get; }
+    //}
 
-    public abstract class Plant : IEntity
+    //public abstract class Plant : IEntity
+    public class Plant
     {
         public int x { get; private set; }
         public int y { get; private set; }

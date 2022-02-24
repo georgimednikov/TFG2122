@@ -310,6 +310,7 @@ GameObject:
   - component: {fileID: 1277125821}
   - component: {fileID: 1277125820}
   - component: {fileID: 1277125819}
+  - component: {fileID: 1277125823}
   - component: {fileID: 1277125822}
   m_Layer: 3
   m_Name: World
@@ -392,6 +393,19 @@ MonoBehaviour:
   creatureDistribution:
   - species: {fileID: 4900000, guid: 43c69811ce0339e4ea6591ec257b9167, type: 3}
     amount: 10
-    positionX: 500
-    positionZ: 500
-    positionRadius: 500
+    positionX: 0.5
+    positionZ: 0.5
+    positionRadius: 0.2
+--- !u!114 &1277125823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1277125818}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef74d56d6159b614c83eede224432772, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  world: {fileID: 4900000, guid: ef4ab2b25eb388d499670e30d64ab320, type: 3}

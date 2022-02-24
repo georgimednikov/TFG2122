@@ -24,7 +24,8 @@ namespace EvolutionSimulation.Unity
         
         public void CreateCreature(TextAsset json)
         {
-            SpeciesExport creature = JsonUtility.FromJson<SpeciesExport>(json.text);
+            SpeciesExport creature = Newtonsoft.Json.JsonConvert.DeserializeObject<SpeciesExport>(json.text);
+            //SpeciesExport creature = JsonUtility.FromJson<SpeciesExport>(json.text);
             sizeScale = creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
             baseHeight = sizeScale / 1.25f;
             bodyEmpty = new GameObject("BodyEmpty").transform;
