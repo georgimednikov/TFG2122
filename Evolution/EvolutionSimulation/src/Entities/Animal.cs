@@ -21,6 +21,7 @@ namespace EvolutionSimulation.Entities
             float minLifeSpan = 0.5f; // Minimum yearsAlive
             float exhaustToSleepRatio = 3; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
             float nightPerceptionPenalty = 0.4f; //Percentage of the max Perception lost at night
+            float minMobilityMedium = 0.6f; //When moving through a special medium the slowest speed possible is its mobility * (0.6 - 1.0) depending on proficiency
             float mobilityPenalty = 0.7f; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
                                           //A ground creature moves fast on the ground, but cannot move throught the air/trees
                                           //An arboreal creature moves fast through trees, but arborealSpeed * mobilityPenalty on the ground
@@ -60,13 +61,13 @@ namespace EvolutionSimulation.Entities
             stats.AerialSpeed = stats.ArborealSpeed = -1;
             if (wings)
             {
-                stats.AerialSpeed = speed * (chromosome.GetFeature(CreatureFeature.Wings) * chromosome.GetFeatureMax(CreatureFeature.Wings));
+                stats.AerialSpeed = (int)(speed * (minMobilityMedium + (1 - minMobilityMedium) * ((float)chromosome.GetFeature(CreatureFeature.Wings) / chromosome.GetFeatureMax(CreatureFeature.Wings))));
                 stats.ArborealSpeed = (int)(stats.AerialSpeed * mobilityPenalty);
                 stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
             }
             if (arboreal)
             {
-                stats.ArborealSpeed = speed * (chromosome.GetFeature(CreatureFeature.Arboreal) * chromosome.GetFeatureMax(CreatureFeature.Arboreal));
+                stats.ArborealSpeed = (int)(speed * (minMobilityMedium + (1 - minMobilityMedium) * ((float)chromosome.GetFeature(CreatureFeature.Arboreal) / chromosome.GetFeatureMax(CreatureFeature.Arboreal))));
                 stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
             }
             if (!wings && !arboreal)
@@ -78,7 +79,7 @@ namespace EvolutionSimulation.Entities
             stats.Size = chromosome.GetFeature(CreatureFeature.Size);
 
             if (!HasAbility(CreatureFeature.Scavenger, abilityUnlock)) stats.Scavenger = 0;
-            else stats.Scavenger = chromosome.GetFeature(CreatureFeature.Scavenger) / chromosome.GetFeatureMax(CreatureFeature.Scavenger);
+            else stats.Scavenger = (float)chromosome.GetFeature(CreatureFeature.Scavenger) / chromosome.GetFeatureMax(CreatureFeature.Scavenger);
             if (!HasAbility(CreatureFeature.Venomous, abilityUnlock)) stats.Venom = 0;
             else stats.Venom = chromosome.GetFeature(CreatureFeature.Venomous);
             if (!HasAbility(CreatureFeature.Thorns, abilityUnlock)) stats.Counter = 0;
@@ -93,14 +94,14 @@ namespace EvolutionSimulation.Entities
 
             stats.MaxEnergy = minEnergy + stats.Size / sizeToEnergyRatio;
             stats.CurrEnergy = stats.MaxEnergy;
-            stats.EnergyExpense = 1 + stats.Metabolism / chromosome.GetFeatureMax(CreatureFeature.Metabolism);
+            stats.EnergyExpense = 1 + stats.Metabolism / (float)chromosome.GetFeatureMax(CreatureFeature.Metabolism);
             stats.MaxHydration = resourceAmount;
             stats.CurrHydration = stats.MaxHydration;
             stats.HydrationExpense = stats.EnergyExpense;
 
             stats.MaxRest = resourceAmount;
             stats.CurrRest = stats.MaxRest;
-            stats.RestExpense = minRestExpense + (maxRestExpense - minRestExpense) * (1 - chromosome.GetFeature(CreatureFeature.Resistence) / chromosome.GetFeatureMax(CreatureFeature.Resistence));
+            stats.RestExpense = minRestExpense + (maxRestExpense - minRestExpense) * (1 - (float)chromosome.GetFeature(CreatureFeature.Resistence) / chromosome.GetFeatureMax(CreatureFeature.Resistence));
             stats.RestRecovery = stats.RestExpense * exhaustToSleepRatio;
 
             //Environment related stats
@@ -112,7 +113,7 @@ namespace EvolutionSimulation.Entities
             stats.NightDebuff = chromosome.GetFeatureMax(CreatureFeature.Perception) * nightPerceptionPenalty;
             //If the creature can see in the dark, that penalty is reduced the better sight it has
             if (HasAbility(CreatureFeature.NightVision, abilityUnlock))
-                stats.NightDebuff *= 1 - (chromosome.GetFeature(CreatureFeature.NightVision) / chromosome.GetFeatureMax(CreatureFeature.NightVision));
+                stats.NightDebuff *= 1 - ((float)chromosome.GetFeature(CreatureFeature.NightVision) / chromosome.GetFeatureMax(CreatureFeature.NightVision));
 
 
             //Behaviour related stats

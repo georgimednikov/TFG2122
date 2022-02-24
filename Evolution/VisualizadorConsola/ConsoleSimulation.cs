@@ -27,12 +27,11 @@ namespace VisualizadorConsola
             //Animal c3 = world.CreateCreature<Animal>(4, 4, cc, c.speciesName);
             //c.AddStatus(new Poison(20, 5));
 
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    c = world.CreateCreature<Animal>();
-            //    c.Init(world, 5, 5);
-            //}
-            //world.ExportSpecies();
+            for (int i = 0; i < 4; i++)
+            {
+                c = world.CreateCreature<Animal>(5, 5);
+            }
+            world.ExportSpecies();
         }
 
 
