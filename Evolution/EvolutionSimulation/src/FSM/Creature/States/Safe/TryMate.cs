@@ -16,9 +16,8 @@
         // Increases current rest
         public override int Action()
         {
-            Entities.Creature obj = creature.objective as Entities.Creature;
-            if (obj == null) return 1000;    
-            obj.ReceiveInteraction(creature, Entities.Interactions.mate);
+            if (creature.nearestMate == null) return 1000;
+            creature.nearestMate.ReceiveInteraction(creature, Entities.Interactions.mate);
             return 1000; // Cost of the action performed
         }
 

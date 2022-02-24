@@ -11,8 +11,8 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            return (creature.objective != null || creature.hasBeenHit) 
-                && creature.stats.Aggressiveness > 0;
+            return (creature.nearestEnemy == null && !creature.hasBeenHit) ||
+                (creature.nearestEnemy != null && creature.nearestEnemy.stats.Aggressiveness < 1);
             //TODO: revisar entidades vistas y considerar agresividad
         }
 

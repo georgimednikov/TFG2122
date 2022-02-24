@@ -99,11 +99,26 @@ namespace EvolutionSimulation.Entities
             while (mfsm.Execute());// Maintains the evaluation - execution action
                                    // Creatura 1 ->  Ataca -> Creatura 2       Desde Creatura1 : Creatura2.Interact(Creatura 1, attack);
                                    //                                          Desde Creatura2 : Creatura1.Interact(Creatura2, attack);
+            Clear();
+        }
+
+        /// <summary>
+        /// Clear the lists and the objectives
+        /// </summary>
+        void Clear()
+        {
+            nearestEnemy = null;
+            nearestAlly = null;
+            nearestMate = null;
+            nearestCorpse = null;
+            nearestPlant = null;
+
+
             hasBeenHit = false; // TODO: Reset flags en general
             seenSameSpeciesCreatures.Clear();
             otherSeenCreatures.Clear();
             seenEntities.Clear();
-            
+
             // Clears the statuses marked for deletion
             foreach (Status.Status s in removedStatus)
                 activeStatus.Remove(s);
@@ -117,14 +132,33 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         void ProcessInput()
         {
-            //if (otherSeenCreatures.Count > 0 || (otherSeenCreatures.Count > 0 && hasBeenHit))    // TODO: hacer esto bien, 
-            //{                                             // ahora para atacar, muy WIP
-            //    objective = otherSeenCreatures[0];
-            //    objectivePos = new Vector2(objective.x, objective.y);
-            //}
-            //else objective = null;
-            // nearestAttackEnt, nearestMate, nearestPlant...
-            // obj =^
+            // Find the nearest ally and mate
+            if (seenSameSpeciesCreatures.Count != 0)
+                nearestAlly = seenSameSpeciesCreatures[0];
+            foreach (Creature c in seenSameSpeciesCreatures)
+            {
+                if (c.stats.InHeat)
+                {
+                    nearestMate = c;
+                    break;
+                }
+            }
+
+            //Find the nearest plant and corpse
+            foreach (StableEntity c in seenEntities)
+            {
+                if (nearestPlant == null && c as Plant != null)
+                {
+                    nearestPlant = (Plant)c;
+                }
+                else if (nearestCorpse == null && c as Corpse != null)
+                {
+                    nearestCorpse = (Corpse)c;
+                }
+                if (nearestCorpse != null && nearestPlant != null)
+                    break;
+                
+            }
         }
 
         /// <summary>
@@ -290,6 +324,7 @@ namespace EvolutionSimulation.Entities
             List<Creature> seenCreatures = world.PerceiveCreatures(this, x, y, perceptionRadius);
             seenEntities = world.PerceiveEntities(this, x, y, perceptionRadius);
             seenCreatures.Sort(new Utils.SortByDistance(this));   // TODO, no hacer new todo el rato
+            seenEntities.Sort(new Utils.SortByDistanceSEntities(this));   // TODO, no hacer new todo el rato
             foreach(Creature c in seenCreatures)
             {                
                 if (c.speciesName == speciesName || c.progenitorSpeciesName == speciesName || c.speciesName == progenitorSpeciesName)
@@ -297,7 +332,6 @@ namespace EvolutionSimulation.Entities
                 else
                     otherSeenCreatures.Add(c);
             }
-
         }
 
         /// <summary>
@@ -344,8 +378,8 @@ namespace EvolutionSimulation.Entities
         {
             stats.CurrHealth -= ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
 
-            objective = interacter;
-            objectivePos = new Vector2(interacter.x, interacter.y);
+            nearestEnemy = interacter;
+            //objectivePos = new Vector2(interacter.x, interacter.y);
             hasBeenHit = true;             
         }
 
@@ -459,8 +493,15 @@ namespace EvolutionSimulation.Entities
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         private Fsm mfsm;
 
-        public IEntity objective;
-        Vector2 objectivePos;
+
+        public Creature nearestEnemy; 
+        public Creature nearestAlly; 
+        public Creature nearestMate; 
+        public Corpse nearestCorpse; 
+        public Plant nearestPlant; 
+        //water place
+        //safe place
+
         public Action arrivalAction;
 
         public bool hasBeenHit;

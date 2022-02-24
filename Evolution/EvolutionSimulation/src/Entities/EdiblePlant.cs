@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EvolutionSimulation
+namespace EvolutionSimulation.Entities
 {
     public class EdiblePlant : Plant
     {
@@ -17,6 +17,7 @@ namespace EvolutionSimulation
         {
             if (eaten)
                 eaten = startRegrowthTime >= regrowhtTime;
+            
         }
 
         public float Eat()
@@ -25,5 +26,10 @@ namespace EvolutionSimulation
             eaten = false;
             return nutritionalValue;
         }
+
+        //protected override void Update()
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

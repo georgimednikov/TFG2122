@@ -236,13 +236,13 @@ namespace EvolutionSimulation
             // Entity deletion
             CreaturesToDelete.ForEach(delegate (IEntity e) { 
                 Creatures.Remove(e as Creature); 
-                foreach(Creature c in Creatures)
-                    if (c.objective == e) c.objective = null;   // TODO URGENTE: Esto no deberia hacerse, pero ni poniendolo en null se quita la referencia al objetivo de la criatura
+                //foreach(Creature c in Creatures)
+                //    if (c.objective == e) c.objective = null;   // TODO URGENTE: Esto no deberia hacerse, pero ni poniendolo en null se quita la referencia al objetivo de la criatura
             });
             SEntitiesToDelete.ForEach(delegate (IEntity e) { 
                 StableEntities.Remove(e as StableEntity);
-                foreach (Creature c in Creatures)
-                    if (c.objective == e) c.objective = null;
+                //foreach (Creature c in Creatures)
+                //    if (c.objective == e) c.objective = null;
             });
             CreaturesToDelete.Clear();
             SEntitiesToDelete.Clear();

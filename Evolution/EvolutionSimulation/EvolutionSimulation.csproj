@@ -136,6 +136,7 @@
     <Compile Include="src\Perlin.cs" />
     <Compile Include="src\Entities\Creature.cs" />
     <Compile Include="src\ISimulation.cs" />
+    <Compile Include="src\Utils\SortByDistanceSEntities.cs" />
     <Compile Include="src\Validator.cs" />
     <Compile Include="src\Utils\SortByDistance.cs" />
     <Compile Include="src\Utils\SortByMetabolism.cs" />

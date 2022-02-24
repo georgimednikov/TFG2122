@@ -63,7 +63,7 @@ namespace EvolutionSimulation.Entities
             }                      
         }
 
-        override protected void Update()
+        public void Tick()
         {
             Edible = lifeTime > putridTime;
 

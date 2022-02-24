@@ -33,12 +33,7 @@ namespace EvolutionSimulation.Entities
         public void Tick()
         {
             lifeTime--;
-            Update();
         }
-
-        // Abstract Update function called every tick
-        // LifeTime its reduced every Updated call
-        protected abstract void Update();
 
         // World tile position
         public int x { get; protected set; }

@@ -24,14 +24,13 @@ namespace EvolutionSimulation.FSM.Creature.States
         // Increases current rest
         public override int Action()
         {
-            if (creature.objective == null) return 1000 + (int)attackMod;   // TODO: esto va asi?
+            if (creature.nearestEnemy == null) return 1000 + (int)attackMod;   // TODO: esto va asi?
             // TODO: ahora mismo si matas a la criatura que ataques te quedas atacando a la nada, 
             // Poner transicion de attacking a idle bien
-            Entities.Creature obj = (creature.objective as Entities.Creature);
             if(poison)
-                obj.ReceiveInteraction(creature, Entities.Interactions.poison);
-            obj.ReceiveInteraction(creature, Entities.Interactions.attack);
-            Console.WriteLine("Criatura de " + creature.x + ", " + creature.y + " atacando a criatura de " + creature.objective.x + ", " + creature.objective.y + "!");
+                creature.nearestEnemy.ReceiveInteraction(creature, Entities.Interactions.poison);
+            creature.nearestEnemy.ReceiveInteraction(creature, Entities.Interactions.attack);
+            Console.WriteLine("Criatura de " + creature.x + ", " + creature.y + " atacando a criatura de " + creature.nearestEnemy.x + ", " + creature.nearestEnemy.y + "!");
             return 1000 + (int)attackMod; // Cost of the action performed
         }
 
