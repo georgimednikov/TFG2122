@@ -111,7 +111,7 @@ namespace EvolutionSimulation.Entities
             nearestAlly = null;
             nearestMate = null;
             nearestCorpse = null;
-            nearestPlant = null;
+            nearestEdiblePlant = null;
 
 
             hasBeenHit = false; // TODO: Reset flags en general
@@ -147,18 +147,19 @@ namespace EvolutionSimulation.Entities
             if (otherSeenCreatures.Count != 0)
                 nearestEnemy = otherSeenCreatures[0];
 
-            //Find the nearest plant and corpse
+            //Find the nearest edible plant and corpse
             foreach (StableEntity c in seenEntities)
             {
-                if (nearestPlant == null && c as Plant != null)
+                if (nearestEdiblePlant == null && c as EdiblePlant != null )
                 {
-                    nearestPlant = (Plant)c;
+                    nearestEdiblePlant = (EdiblePlant)c;
+                    if (nearestEdiblePlant.eaten) nearestEdiblePlant = null;
                 }
                 else if (nearestCorpse == null && c as Corpse != null)
                 {
                     nearestCorpse = (Corpse)c;
                 }
-                if (nearestCorpse != null && nearestPlant != null)
+                if (nearestCorpse != null && nearestEdiblePlant != null)
                     break;
                 
             }
@@ -501,7 +502,7 @@ namespace EvolutionSimulation.Entities
         public Creature nearestAlly; 
         public Creature nearestMate; 
         public Corpse nearestCorpse; 
-        public Plant nearestPlant; 
+        public EdiblePlant nearestEdiblePlant; 
         //water place
         //safe place
 
@@ -526,12 +527,21 @@ namespace EvolutionSimulation.Entities
 
     public class CreatureStats
     {
+        //TODO valores pls dejad de ser randoms
         private float startMultiplier = 0.33f; //Starting multiplier of newborns
         private float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
 
         public float tiredThreshold = 0.40f; //After which percentage of currRest the creature should sleep with low priority
         //After which percentage of currRest the creature should sleep with high priority and some stats are dimished
-        public float exhaustThreshold = 0.20f; 
+        public float exhaustThreshold = 0.15f;
+
+        public float hungerThreshold = 0.40f; //After which percentage of currEnergy the creature should eat with low priority
+        //After which percentage of currEnergy the creature should eat with high priority
+        public float veryHungerThreshold = 0.15f;
+
+        public float thirstyThreshold = 0.40f; //After which percentage of currHydration the creature should eat with low priority
+        //After which percentage of currHydration the creature should eat with high priority
+        public float veryThirstyThreshold = 0.15f;
 
         /// <summary>
         /// Modifies the given stat based on age
@@ -614,6 +624,7 @@ namespace EvolutionSimulation.Entities
         public float MinTemperature { get; set; }
         public float MaxTemperature { get; set; }
         public float IdealTemperature { get; set; }
+        public float Hair { get; set; }
 
         //Behaviour related stats
         public int Knowledge { get; set; }

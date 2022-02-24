@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EvolutionSimulation.FSM.Creature.Transitions
+﻿namespace EvolutionSimulation.FSM.Creature.Transitions
 {
     class SleepyTransition : CreatureTransition
     {
@@ -15,7 +9,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            return creature.stats.CurrRest <= 0.1 * creature.stats.MaxRest;
+            return creature.stats.CurrRest <= creature.stats.exhaustThreshold * creature.stats.MaxRest;
         }
 
         public override string ToString()

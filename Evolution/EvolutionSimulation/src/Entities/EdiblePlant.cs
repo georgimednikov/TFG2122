@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EvolutionSimulation.Entities
+﻿namespace EvolutionSimulation.Entities
 {
     public class EdiblePlant : Plant
     {
@@ -16,20 +10,15 @@ namespace EvolutionSimulation.Entities
         override public void Tick()
         {
             if (eaten)
-                eaten = startRegrowthTime >= regrowhtTime;
-            
+                eaten = startRegrowthTime++ >= regrowhtTime;            
         }
 
         public float Eat()
         {
             startRegrowthTime = 0;
-            eaten = false;
+            eaten = true;
             return nutritionalValue;
         }
 
-        //protected override void Update()
-        //{
-        //    throw new NotImplementedException();
-        //}
     }
 }
