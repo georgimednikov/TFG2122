@@ -42,7 +42,7 @@ namespace EvolutionSimulation
         static public void SetDirectories()
         {
             DataDirectory = "../../ProgramData/";
-            ExportDirectory = "../../ResultingSpecies/";
+            ExportDirectory = "../../ResultingData/";
         }
     }
 }

@@ -106,6 +106,9 @@ namespace EvolutionSimulation.Unity
         //Reproduction stats
         public int TimeBetweenHeats;
         public bool InHeat;
+
+        public bool Upright;
+        public bool Hair;
     }
 
     [System.Serializable]

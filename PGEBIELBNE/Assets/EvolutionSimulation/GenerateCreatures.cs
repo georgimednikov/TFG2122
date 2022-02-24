@@ -47,8 +47,7 @@ namespace EvolutionSimulation.Unity
                     RaycastHit hit;
                     // Position in Y axis + 10 (no specific reason for that number) => No point in the world will be higher.  
                     Physics.Raycast(new Vector3(xPos, terrain.terrainData.size.y + 10, zPos), Vector3.down, out hit, Mathf.Infinity, LayerMask.GetMask("World"));
-                    InterpretJSON json = Instantiate(creature, new Vector3(hit.point.x, hit.point.y, hit.point.z), Quaternion.identity).GetComponent<InterpretJSON>();
-                    json.CreateCreature(spawn.species);
+                    Instantiate(creature, new Vector3(hit.point.x, hit.point.y, hit.point.z), Quaternion.identity).GetComponent<InterpretJSON>().CreateCreature(spawn.species);
                 }
             }
         }

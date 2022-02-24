@@ -2,6 +2,7 @@
 using EvolutionSimulation.Genetics;
 using System;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 namespace EvolutionSimulation
 {
@@ -567,12 +568,18 @@ namespace EvolutionSimulation
             return (int)(year * daysYear * hoursDay * ticksHour);
         }
 
-        public uint step;
+        public void ExportContent()
+        {
+            taxonomy.ExportSpecies();
+            string word = JsonConvert.SerializeObject(map, Formatting.Indented);
+            System.IO.File.WriteAllText(WorkingDirectories.ExportDirectory + "World.json", word);
+        }
 
         // Map with physical properties
         public MapData[,] map { get; private set; }
         int mapSize;
         bool day;
+        public uint step;
         // 50 steps equals and hour, and 24 hours equal a day. 365 days equal a year
         int ticksHour = 50, hoursDay = 24, daysYear = 365;  // TODO: Quitar lo de year, es necesario?
         // The day begins 6:30 and ends at 20:00.
@@ -584,8 +591,7 @@ namespace EvolutionSimulation
         public List<Creature> Creatures { get; private set; }
         public List<StableEntity> StableEntities { get; private set; }
         GeneticTaxonomy taxonomy;
-        //TODO: Quitar este método
-        public void ExportSpecies() { taxonomy.ExportSpecies(); }
+
 
         // TODO: podemos dejar esto asi o comparar los tipos en una sola lista
         List<IEntity> CreaturesToDelete;

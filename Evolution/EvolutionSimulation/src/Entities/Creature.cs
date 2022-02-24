@@ -582,6 +582,9 @@ namespace EvolutionSimulation.Entities
         //Reproduction stats
         public int TimeBetweenHeats { get; set; }
         public bool InHeat { get; set; }
+
+        public bool Upright { get; set; }
+        public bool Hair { get; set; }
     }
 
 }

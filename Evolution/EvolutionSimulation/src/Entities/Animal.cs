@@ -53,10 +53,10 @@ namespace EvolutionSimulation.Entities
             //See mobilityPenalty commentary
             bool wings = HasAbility(CreatureFeature.Wings, abilityUnlock);
             bool arboreal = HasAbility(CreatureFeature.Arboreal, abilityUnlock);
-            bool upright = HasAbility(CreatureFeature.Upright, abilityUnlock);
+            stats.Upright = HasAbility(CreatureFeature.Upright, abilityUnlock);
             int speed = chromosome.GetFeature(CreatureFeature.Mobility);
             stats.AirReach = wings;
-            stats.TreeReach = wings || arboreal || upright;
+            stats.TreeReach = wings || arboreal || stats.Upright;
             
             stats.AerialSpeed = stats.ArborealSpeed = -1;
             if (wings)
@@ -131,7 +131,8 @@ namespace EvolutionSimulation.Entities
         private void ModifyStatsByHabilities(float abilityUnlock)
         {
             //Hair. Better with low temperatures and worse with high temperatures
-            if (HasAbility(CreatureFeature.Hair, abilityUnlock))
+            stats.Hair = HasAbility(CreatureFeature.Hair, abilityUnlock);
+            if (stats.Hair)
             {
                 int hairValue = chromosome.GetFeature(CreatureFeature.Hair);
                 stats.MinTemperature -= hairValue * 2;

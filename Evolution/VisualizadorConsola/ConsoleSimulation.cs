@@ -31,7 +31,7 @@ namespace VisualizadorConsola
             {
                 c = world.CreateCreature<Animal>(5, 5);
             }
-            world.ExportSpecies();
+            world.ExportContent();
         }
 
 

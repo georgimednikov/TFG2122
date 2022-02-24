@@ -8,9 +8,8 @@ namespace EvolutionSimulation
     /// </summary>
     public abstract class Plant : IEntity
     {
-        public int x => throw new NotImplementedException();
-
-        public int y => throw new NotImplementedException();
+        public int x { get; private set; }
+        public int y { get; private set; }
 
         virtual public void Tick()
         {
