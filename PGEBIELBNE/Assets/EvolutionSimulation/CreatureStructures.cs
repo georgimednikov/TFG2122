@@ -21,10 +21,10 @@ namespace EvolutionSimulation.Unity
         /// </summary>
         public float ModifyStatByAge(float stat)
         {
-            return stat * Math.Min(1.0f, (1 - startMultiplier) / (LifeSpan * adulthoodThreshold) * currAge + startMultiplier);
+            return stat * Math.Min(1.0f, (1 - startMultiplier) / (LifeSpan * adulthoodThreshold) * CurrAge + startMultiplier);
         }
 
-        public bool IsNewBorn() { return LifeSpan * adulthoodThreshold < currAge; }
+        public bool IsNewBorn() { return LifeSpan * adulthoodThreshold < CurrAge; }
 
         public Gender Gender;
 
@@ -33,19 +33,13 @@ namespace EvolutionSimulation.Unity
         public float Scavenger; //From 0 (normal chance of getting poisoned) to 1 (cannot get poisoned)
 
         //Health and damage related stats
-        float maxHealth;
         public float MaxHealth;
         public float CurrHealth;
-        int damage;
         public int Damage;
-        int armor;
         public int Armor;
-        int perforation;
         public int Perforation;
-        float venom;
         public float Venom;
-        float counter; // Puas
-        public float Counter;
+        public float Counter; // Puas
 
         //Mobility related stats
         public int AerialSpeed;
@@ -57,7 +51,6 @@ namespace EvolutionSimulation.Unity
         public bool TreeReach;
 
         //Energy related stats
-        float maxEnergy;
         public float MaxEnergy;
         public float CurrEnergy;
         public float EnergyExpense;
@@ -69,25 +62,20 @@ namespace EvolutionSimulation.Unity
 
         //Rest related stats
         public float MaxRest;
-        float currRest;
         public float CurrRest;
         public float RestRecovery;
         public float RestExpense;
 
         //Environment related stats
         public int Camouflage;
-        int aggressiveness;
         public int Aggressiveness;
-        int intimidation;
         public int Intimidation;
         public int Perception;
         public float NightDebuff;
 
         //Physique related stats
-        int size;
         public int Size;
         public int LifeSpan;
-        int currAge;
         public int CurrAge;
         public int Members;//limbs
         public int Metabolism;

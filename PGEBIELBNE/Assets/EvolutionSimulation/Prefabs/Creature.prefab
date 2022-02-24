@@ -44,7 +44,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   body: {fileID: 7887754594758098477, guid: d72611e8dd38e8f4c920d190d6db3bdf, type: 3}
-  leg: {fileID: 919132149155446097, guid: dbcd1670b667cb94ca3ecee1d8934f34, type: 3}
+  legs:
+  - {fileID: 919132149155446097, guid: dbcd1670b667cb94ca3ecee1d8934f34, type: 3}
+  - {fileID: 919132149155446097, guid: b888f2836c9ad3744ad5b866daa577d4, type: 3}
+  - {fileID: 919132149155446097, guid: fc7205d6997f6e047bb092c35a5c73f3, type: 3}
   mouths:
   - {fileID: 919132149155446097, guid: 9b741b14d19f8534ea81b31067a9ebce, type: 3}
   - {fileID: 919132149155446097, guid: 9e1164c7bd2eec440868c02e34a7cfe0, type: 3}
@@ -55,5 +58,7 @@ MonoBehaviour:
   spikes: {fileID: 8342748688082198565, guid: 55069544037c2c944b699154be3012f9, type: 3}
   hair: {fileID: 4354358121804663688, guid: 858707ce473a4b6438b28f74d134c077, type: 3}
   beard: {fileID: 6577129675267456884, guid: 9f429a6907020fd459fc2b2d0eb95892, type: 3}
-  wings: {fileID: 919132149155446097, guid: 006ccce929ded2e4eb6990eb1741f982, type: 3}
+  wings:
+  - {fileID: 919132149155446097, guid: 006ccce929ded2e4eb6990eb1741f982, type: 3}
+  - {fileID: 919132149155446097, guid: b09d50f9d22f9684995b98a240684fad, type: 3}
   statusBar: {fileID: 2920285481244534034, guid: 5b6243761181c9c41a9899416a962b7a, type: 3}
