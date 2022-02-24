@@ -42,7 +42,7 @@ namespace EvolutionSimulation.FSM
         public void AddTransition(IState og, ITransition t, IState dest)
         {
             if (!machine.ContainsKey(og))   machine.Add(og, new List<Connection>());
-            if (!machine.ContainsKey(dest)) machine.Add(og, new List<Connection>());
+            if (!machine.ContainsKey(dest)) machine.Add(dest, new List<Connection>());
             machine[og].Add(new Connection(t, dest));
         }
 
@@ -79,7 +79,11 @@ namespace EvolutionSimulation.FSM
             ActionPoints += metabolism * 10;
         }
 
-        // Action points of the creature the fsm belongs to
+        public string ExportToDotGraph()
+        {
+            return "Fsm DOT Graph export not implemented yet";
+        }
+
         public int ActionPoints { get; private set; }
         public IState CurrentState { get; private set; }
         Dictionary<IState, List<Connection>> machine; 

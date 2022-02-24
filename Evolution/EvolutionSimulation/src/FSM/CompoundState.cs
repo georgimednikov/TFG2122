@@ -8,10 +8,10 @@ namespace EvolutionSimulation.FSM
 {
     class CompoundState : IState
     {
-        public CompoundState(string name, IState initialState)
+        public CompoundState(string name, Fsm fsm)
         {
             this.name = name;
-            stateMachine = new Fsm(initialState);
+            stateMachine = fsm;
         }
         public int Action()
         {
