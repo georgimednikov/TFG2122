@@ -25,15 +25,15 @@
             {
                 if (creature.stats.Gender == Genetics.Gender.Female)
                 {
-                    Entities.Creature obj = creature.objective as Entities.Creature;
-                    if (obj == null) return 1000;
+                   
+                    if (creature.nearestMate == null) return 1000;
                     // Create a random number of childs
                     int numberChilds = RandomGenerator.Next(1, 5);//TODO: que el numero de hijos dependa de algo del cromosoma?
                     for (int i = 0; i < numberChilds; ++i)
                     {
                         //TODO: cuidado con el problema del diamante
                         // Crossover with male and female chromosomes
-                        Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(obj.chromosome, creature.chromosome);
+                        Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(creature.nearestMate.chromosome, creature.chromosome);
                         // Mutate the chromosome
                         Genetics.GeneticFunctions.UniformMutation(ref childC, 0.1f);// TODO que la probabilidad la coja de algun sitio
                         // The new creature's pos (near to the parents)
@@ -42,6 +42,8 @@
                         creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName);
                     }
                 }
+                //Ends the reproducing's action
+                creature.mating = false;
             }
 
             //obj.ReceiveInteraction(creature, Entities.Interactions.mate);

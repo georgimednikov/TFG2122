@@ -20,8 +20,8 @@ namespace VisualizadorConsola
             Console.WriteLine("\n");
             
             Animal c = world.CreateCreature<Animal>(5, 5);
-            //Animal c2 = world.CreateCreature<Animal>(5, 4);
-
+            c.stats.CurrEnergy = c.stats.MaxEnergy * 0.2f;
+            world.CreateStableEntity<Corpse>();
             //EvolutionSimulation.Genetics.CreatureChromosome cc = EvolutionSimulation.Genetics.GeneticFunctions.UniformCrossover(c.chromosome, c2.chromosome);
             //EvolutionSimulation.Genetics.GeneticFunctions.UniformMutation(ref cc, 0.95f);
             //Animal c3 = world.CreateCreature<Animal>(4, 4, cc, c.speciesName);
@@ -235,13 +235,13 @@ namespace VisualizadorConsola
                     //*/
 
                     Plant plant = world.map[j / scale, i / scale].plant;
-                    if (plant as EvolutionSimulation.Grass != null)
+                    if (plant as Grass != null)
                         SetPixel(j, i, Color.DarkOliveGreen, treeMap, scale);
-                    else if (plant as EvolutionSimulation.Bush != null)
+                    else if (plant as Bush != null)
                         SetPixel(j, i, Color.ForestGreen, treeMap, scale);
-                    else if (plant as EvolutionSimulation.Tree != null)
+                    else if (plant as Tree != null)
                         SetPixel(j, i, Color.LawnGreen, treeMap, scale);
-                    else if (plant as EvolutionSimulation.EdibleTree != null)
+                    else if (plant as EdibleTree != null)
                         SetPixel(j, i, Color.Red, treeMap, scale);
                 }
             }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EvolutionSimulation.FSM.Creature.Transitions
 {
@@ -18,10 +14,28 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            //TODO que el objetivo sea el de comer
-            return creature.objective != null
-               && Math.Abs(creature.objective.x - creature.x) < 1
-               && Math.Abs(creature.objective.y - creature.y) < 1;
+            if(creature.stats.Diet == Genetics.Diet.Herbivore )
+            {
+                return creature.nearestEdiblePlant != null
+                  && Math.Abs(creature.nearestEdiblePlant.x - creature.x) < 1
+                  && Math.Abs(creature.nearestEdiblePlant.y - creature.y) < 1;
+            }
+
+            if (creature.stats.Diet == Genetics.Diet.Carnivore )
+            {
+                return creature.nearestCorpse != null
+                  && Math.Abs(creature.nearestCorpse.x - creature.x) < 1
+                  && Math.Abs(creature.nearestCorpse.y - creature.y) < 1;
+            }
+
+            //Omnivore
+            return (creature.nearestCorpse != null
+                && Math.Abs(creature.nearestCorpse.x - creature.x) < 1
+                && Math.Abs(creature.nearestCorpse.y - creature.y) < 1) 
+                || creature.nearestEdiblePlant != null
+                && Math.Abs(creature.nearestEdiblePlant.x - creature.x) < 1
+                && Math.Abs(creature.nearestEdiblePlant.y - creature.y) < 1; ;
+            
         }
 
         public override string ToString()

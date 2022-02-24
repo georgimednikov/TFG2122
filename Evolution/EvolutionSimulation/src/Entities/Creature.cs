@@ -69,8 +69,7 @@ namespace EvolutionSimulation.Entities
             //toDie.value = (stats.CurrAge++ >= stats.LifeSpan);
             //toSleep.value = (stats.CurrRest <= 0.1 * stats.MaxRest);
             //toWake.value = (stats.CurrRest >= stats.MaxRest);
-            // TODO: Esto puede estar en el estado Alive, y en el Execute ejecutar
-            // el action del estado Padre.
+
             stats.CurrRest -= stats.RestExpense;
             mfsm.ObtainActionPoints(stats.Metabolism);         
             
@@ -91,19 +90,32 @@ namespace EvolutionSimulation.Entities
             Perceive();
             foreach (Status.Status s in activeStatus)   // Activates each status effect
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
-
             ProcessInput();
 
-            // TomarDecision(); (Asignar Criatura Objetivo) -> Trigger Transicion -> Cambio de estado
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
             while (mfsm.Execute());// Maintains the evaluation - execution action
-                                   // Creatura 1 ->  Ataca -> Creatura 2       Desde Creatura1 : Creatura2.Interact(Creatura 1, attack);
-                                   //                                          Desde Creatura2 : Creatura1.Interact(Creatura2, attack);
+
+
+            Clear();
+        }
+
+        /// <summary>
+        /// Clear the lists and the objectives
+        /// </summary>
+        void Clear()
+        {
+            nearestEnemy = null;
+            nearestAlly = null;
+            nearestMate = null;
+            nearestCorpse = null;
+            nearestEdiblePlant = null;
+
+
             hasBeenHit = false; // TODO: Reset flags en general
             seenSameSpeciesCreatures.Clear();
             otherSeenCreatures.Clear();
             seenEntities.Clear();
-            
+
             // Clears the statuses marked for deletion
             foreach (Status.Status s in removedStatus)
                 activeStatus.Remove(s);
@@ -117,14 +129,37 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         void ProcessInput()
         {
-            //if (otherSeenCreatures.Count > 0 || (otherSeenCreatures.Count > 0 && hasBeenHit))    // TODO: hacer esto bien, 
-            //{                                             // ahora para atacar, muy WIP
-            //    objective = otherSeenCreatures[0];
-            //    objectivePos = new Vector2(objective.x, objective.y);
-            //}
-            //else objective = null;
-            // nearestAttackEnt, nearestMate, nearestPlant...
-            // obj =^
+            // Find the nearest ally and mate
+            if (seenSameSpeciesCreatures.Count != 0)
+                nearestAlly = seenSameSpeciesCreatures[0];
+            foreach (Creature c in seenSameSpeciesCreatures)
+            {
+                if (c.stats.InHeat)
+                {
+                    nearestMate = c;
+                    break;
+                }
+            }
+
+            if (otherSeenCreatures.Count != 0)
+                nearestEnemy = otherSeenCreatures[0];
+
+            //Find the nearest edible plant and corpse
+            foreach (StableEntity c in seenEntities)
+            {
+                if (nearestEdiblePlant == null && c as EdiblePlant != null )
+                {
+                    nearestEdiblePlant = (EdiblePlant)c;
+                    if (nearestEdiblePlant.eaten) nearestEdiblePlant = null;
+                }
+                else if (nearestCorpse == null && c as Corpse != null)
+                {
+                    nearestCorpse = (Corpse)c;
+                }
+                if (nearestCorpse != null && nearestEdiblePlant != null)
+                    break;
+                
+            }
         }
 
         /// <summary>
@@ -132,7 +167,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public string GetState()
         {
-            return mfsm.GetState().ToString();
+            return mfsm.CurrentState.ToString();
         }
 
         /// <summary>
@@ -140,18 +175,13 @@ namespace EvolutionSimulation.Entities
         /// TODO: We are forcefully cramming these states down the FSM's throat
         /// </summary>
         void ConfigureStateMachine()
-        {
+        {       
+            // Alive state configuration
             // States
-            IState dead = new Dead(this);
-            IState alive = new Alive(this);
-
-            IState safe = new Safe(this);
-            IState combat = new Combat(this);
-            IState escape = new Escape(this);
-
-            //Safe
+            // Safe-state configuration
+            // States
             IState wander = new Wander(this);
-            IState explore = new Explore(this);
+            IState explore = new Explore(this); // TODO: este estado
             IState goToDrink = new GoToDrink(this);
             IState drink = new Drinking(this);
             IState goToMate = new GoToMate(this);
@@ -161,106 +191,90 @@ namespace EvolutionSimulation.Entities
             IState eat = new Eating(this);
             IState goToSafePlace = new GoToSafePlace(this);
             IState sleep = new Sleeping(this);
+            Fsm safeFSM = new Fsm(wander);
+            IState safe = new CompoundState("Safe", safeFSM);
 
-            //Escape
-            IState fleeing = new Fleeing(this);
-            IState hide = new Hide(this);
-
-            //Attack
-            IState attack = new Attacking(this);
-            IState chaseEnemy = new ChaseEnemy(this);
-
-            mfsm = new Fsm(safe);
-
-            // Substates
-            mfsm.AddSubstate(alive, safe);
-            mfsm.AddSubstate(alive, combat);
-            mfsm.AddSubstate(alive, escape);
-            
-            // Safe substates
-            mfsm.AddSubstate(safe, wander);
-            mfsm.AddSubstate(safe, explore);
-            mfsm.AddSubstate(safe, goToDrink);
-            mfsm.AddSubstate(safe, drink);
-            mfsm.AddSubstate(safe, goToMate);
-            mfsm.AddSubstate(safe, tryMate);
-            mfsm.AddSubstate(safe, mating);
-            mfsm.AddSubstate(safe, goToEat);
-            mfsm.AddSubstate(safe, eat);
-            mfsm.AddSubstate(safe, goToSafePlace);
-            mfsm.AddSubstate(safe, sleep);
-
-            // Combat substates
-            mfsm.AddSubstate(combat, attack);
-            mfsm.AddSubstate(combat, chaseEnemy);
-
-            // Escape substates
-            mfsm.AddSubstate(escape, fleeing);
-            mfsm.AddSubstate(escape, hide);
-           
-
-            // Transitions
-            ITransition dieTransition = new DieTransition(this);
-            ITransition escapeTransition = new EscapeTransition(this);
-            ITransition safeTransition = new SafeTransition(this);
-            ITransition combatTransition = new CombatTransition(this);
-
+            // Drinking
             ITransition thirstyTransition = new ThirstyTransition(this);
             ITransition drinkingTransition = new DrinkingTransition(this);
             ITransition stopDrinkingTransition = new StopDrinkingTransition(this);
+            safeFSM.AddTransition(wander, thirstyTransition, goToDrink);
+            safeFSM.AddTransition(goToDrink, drinkingTransition, drink);
+            //safeFSM.AddTransition(goToDrink, ?, wander);
+            safeFSM.AddTransition(drink, stopDrinkingTransition, wander);
 
+            // Mating
             ITransition mateTransition = new MateTransition(this);
             ITransition tryMateTransition = new TryMateTransition(this);
             ITransition matingTransition = new MatingTransition(this);
             ITransition stopMatingTransition = new StopMatingTransition(this);
+            safeFSM.AddTransition(wander, mateTransition, goToMate);
+            //safeFSM.AddTransition(goToMate, ?, wander);
+            safeFSM.AddTransition(goToMate, tryMateTransition, tryMate);
+            //safeFSM.AddTransition(tryMate, ?, wander);
+            safeFSM.AddTransition(tryMate, matingTransition, mating);
+            safeFSM.AddTransition(mating, stopMatingTransition, wander);
 
+            // Eating
             ITransition hungerTransition = new HungerTransition(this);
             ITransition eatingTransition = new EatingTransition(this);
             ITransition stopEatingTransition = new StopEatingTransition(this);
+            safeFSM.AddTransition(wander, hungerTransition, goToEat);
+            //safeFSM.AddTransition(goToEat, ?, wander);
+            safeFSM.AddTransition(goToEat, eatingTransition, eat);
+            safeFSM.AddTransition(eat, stopEatingTransition, wander);
 
+            // Sleeping
             ITransition goToSafePlaceTransition = new GoToSafePlaceTransition(this);
             ITransition sleepySafeTransition = new SleepySafeTransition(this);
             ITransition sleepyTransition = new SleepyTransition(this);
             ITransition wakeTransition = new WakeTransition(this);
-            //ITransition mateTransition = new MateTransition(this);
-
-            mfsm.AddTransition(alive, dieTransition, dead);
-
-            mfsm.AddTransition(safe, escapeTransition, escape);
-            mfsm.AddTransition(safe, combatTransition, combat);
-
-            mfsm.AddTransition(combat, safeTransition, safe);
-            mfsm.AddTransition(combat, escapeTransition, escape);
-
-            mfsm.AddTransition(escape, safeTransition, safe);
-            mfsm.AddTransition(escape, combatTransition, combat);
+            safeFSM.AddTransition(wander, goToSafePlaceTransition, goToSafePlace);
+            //safeFSM.AddTransition(goToSafePlace, ?, wander);
+            safeFSM.AddTransition(goToSafePlace, sleepySafeTransition, sleep);
+            safeFSM.AddTransition(wander, sleepyTransition, sleep);
+            safeFSM.AddTransition(sleep, wakeTransition, wander);
             
-
-            mfsm.AddTransition(wander, thirstyTransition, goToDrink);
-            mfsm.AddTransition(goToDrink, drinkingTransition, drink);
-            //mfsm.AddTransition(goToDrink, ?, wander);
-            mfsm.AddTransition(drink, stopDrinkingTransition, wander);
-
-            mfsm.AddTransition(wander, mateTransition, goToMate);
-            //mfsm.AddTransition(goToMate, ?, wander);
-            mfsm.AddTransition(goToMate, tryMateTransition, tryMate);
-            //mfsm.AddTransition(tryMate, ?, wander);
-            mfsm.AddTransition(tryMate, matingTransition, mating);
-            mfsm.AddTransition(mating, stopMatingTransition, wander);
-
-            mfsm.AddTransition(wander, hungerTransition, goToEat);
-            //mfsm.AddTransition(goToEat, ?, wander);
-            mfsm.AddTransition(goToEat, eatingTransition, eat);
-            mfsm.AddTransition(eat, stopEatingTransition, wander);
-
-            mfsm.AddTransition(wander, thirstyTransition, goToDrink);
-            mfsm.AddTransition(goToDrink, drinkingTransition, drink);
-
-            mfsm.AddTransition(wander, goToSafePlaceTransition, goToSafePlace);
-            //mfsm.AddTransition(goToSafePlace, ?, wander);
-            mfsm.AddTransition(goToSafePlace, sleepySafeTransition, sleep);
-            mfsm.AddTransition(wander, sleepyTransition, sleep);
-            mfsm.AddTransition(sleep, wakeTransition, wander);
+            //
+            // Escape-state Configuration
+            // States
+            IState fleeing = new Fleeing(this);
+            IState hide = new Hide(this);
+            Fsm escapeFSM = new Fsm(fleeing);
+            // Transitions
+            //mfsm.AddTransition(fleeing, ? , hide);
+            //mfsm.AddTransition(hide, ? , fleeing);
+            IState escape = new CompoundState("Escape", escapeFSM);
+            //
+            // Combat-state Configuration
+            // States
+            IState attack = new Attacking(this);
+            IState chaseEnemy = new ChaseEnemy(this);
+            Fsm combatFSM = new Fsm(chaseEnemy);
+            // Transitions
+            //mfsm.AddTransition(chaseEnemy, ? , attack);
+            //mfsm.AddTransition(attack, ? , chaseEnemy);
+            IState combat = new CompoundState("Combat", combatFSM);
+            //
+            Fsm aliveFSM = new Fsm(safe);
+            // Transitions
+            ITransition escapeTransition = new EscapeTransition(this);
+            ITransition safeTransition = new SafeTransition(this);
+            ITransition combatTransition = new CombatTransition(this);
+            aliveFSM.AddTransition(safe, escapeTransition, escape);
+            aliveFSM.AddTransition(safe, combatTransition, combat);            
+            aliveFSM.AddTransition(combat, safeTransition, safe);
+            aliveFSM.AddTransition(combat, escapeTransition, escape);           
+            aliveFSM.AddTransition(escape, safeTransition, safe);
+            aliveFSM.AddTransition(escape, combatTransition, combat);
+            //
+            IState alive = new CompoundState("Alive", aliveFSM);
+            IState dead = new Dead(this);
+            //
+            mfsm = new Fsm(alive);
+            // Transitions
+            ITransition dieTransition = new DieTransition(this);
+            mfsm.AddTransition(alive, dieTransition, dead);   
         }
         
         /// <summary>
@@ -290,6 +304,7 @@ namespace EvolutionSimulation.Entities
             List<Creature> seenCreatures = world.PerceiveCreatures(this, x, y, perceptionRadius);
             seenEntities = world.PerceiveEntities(this, x, y, perceptionRadius);
             seenCreatures.Sort(new Utils.SortByDistance(this));   // TODO, no hacer new todo el rato
+            seenEntities.Sort(new Utils.SortByDistanceSEntities(this));   // TODO, no hacer new todo el rato
             foreach(Creature c in seenCreatures)
             {                
                 if (c.speciesName == speciesName || c.progenitorSpeciesName == speciesName || c.speciesName == progenitorSpeciesName)
@@ -297,7 +312,6 @@ namespace EvolutionSimulation.Entities
                 else
                     otherSeenCreatures.Add(c);
             }
-
         }
 
         /// <summary>
@@ -344,8 +358,8 @@ namespace EvolutionSimulation.Entities
         {
             stats.CurrHealth -= ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
 
-            objective = interacter;
-            objectivePos = new Vector2(interacter.x, interacter.y);
+            nearestEnemy = interacter;
+            //objectivePos = new Vector2(interacter.x, interacter.y);
             hasBeenHit = true;             
         }
 
@@ -459,8 +473,15 @@ namespace EvolutionSimulation.Entities
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         private Fsm mfsm;
 
-        public IEntity objective;
-        Vector2 objectivePos;
+
+        public Creature nearestEnemy; 
+        public Creature nearestAlly; 
+        public Creature nearestMate; 
+        public Corpse nearestCorpse; 
+        public EdiblePlant nearestEdiblePlant; 
+        //water place
+        //safe place
+
         public Action arrivalAction;
 
         public bool hasBeenHit;
@@ -482,12 +503,21 @@ namespace EvolutionSimulation.Entities
 
     public class CreatureStats
     {
+        //TODO valores pls dejad de ser randoms
         private float startMultiplier = 0.33f; //Starting multiplier of newborns
         private float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
 
         public float tiredThreshold = 0.40f; //After which percentage of currRest the creature should sleep with low priority
         //After which percentage of currRest the creature should sleep with high priority and some stats are dimished
-        public float exhaustThreshold = 0.20f; 
+        public float exhaustThreshold = 0.15f;
+
+        public float hungerThreshold = 0.40f; //After which percentage of currEnergy the creature should eat with low priority
+        //After which percentage of currEnergy the creature should eat with high priority
+        public float veryHungerThreshold = 0.15f;
+
+        public float thirstyThreshold = 0.40f; //After which percentage of currHydration the creature should eat with low priority
+        //After which percentage of currHydration the creature should eat with high priority
+        public float veryThirstyThreshold = 0.15f;
 
         /// <summary>
         /// Modifies the given stat based on age
@@ -570,6 +600,7 @@ namespace EvolutionSimulation.Entities
         public float MinTemperature { get; set; }
         public float MaxTemperature { get; set; }
         public float IdealTemperature { get; set; }
+        public float Hair { get; set; }
 
         //Behaviour related stats
         public int Knowledge { get; set; }

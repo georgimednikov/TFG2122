@@ -3,15 +3,15 @@ using System.Collections.Generic;
 
 namespace EvolutionSimulation.Utils
 {
-    public class SortByDistance : Comparer<Entities.Creature>
+    public class SortByDistanceSEntities : Comparer<Entities.StableEntity>
     {
         Entities.Creature origin;
-        public SortByDistance(Entities.Creature creature)
+        public SortByDistanceSEntities(Entities.Creature creature)
         {
             origin = creature;
         }
 
-        public override int Compare(Entities.Creature c1, Entities.Creature c2)
+        public override int Compare(Entities.StableEntity c1, Entities.StableEntity c2)
         {
             int x1, y1, x2, y2;
             x1 = Math.Abs(origin.x - c1.x);

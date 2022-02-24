@@ -1,7 +1,8 @@
-﻿using System;
-
-namespace EvolutionSimulation.FSM.Creature.Transitions
+﻿namespace EvolutionSimulation.FSM.Creature.Transitions
 {
+    /// <summary>
+    /// Checks if a creature need to drink
+    /// </summary>
     class ThirstyTransition : CreatureTransition
     {
         public ThirstyTransition(Entities.Creature creature)
@@ -11,7 +12,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            return creature.stats.CurrHydration < 0.1 * creature.stats.MaxHydration;
+            return creature.stats.CurrHydration < creature.stats.thirstyThreshold * creature.stats.MaxHydration;
         }
 
         public override string ToString()

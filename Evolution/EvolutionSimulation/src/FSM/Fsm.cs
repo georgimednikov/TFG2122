@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Stateless;
 using Stateless.Graph;
 
@@ -10,79 +11,39 @@ namespace EvolutionSimulation.FSM
     /// </summary>
     public class Fsm
     {
+        /// <summary>
+        /// Auxiliary structure to represent connections between states,
+        /// it consists of a transition and the state that the machine goes to
+        /// when it triggers.
+        /// </summary>
+        struct Connection
+        {
+            public ITransition Transition;
+            public IState OutState;
+
+            public Connection(ITransition t, IState os)
+            {
+                Transition = t;
+                OutState = os;
+            }
+        }
+
         public Fsm(IState initalState)
         {
-            machine = new StateMachine<IState, ITransition>(initalState, FiringMode.Queued);
+            machine = new Dictionary<IState, List<Connection>>();
+            machine.Add(initalState, new List<Connection>());
+            CurrentState = initalState;
         }
 
         /// <summary>
         /// Adds a transition from the original state to the destiny state
+        /// If a states has no transitions
         /// </summary>
         public void AddTransition(IState og, ITransition t, IState dest)
         {
-            machine.Configure(og)
-                .Permit(t, dest);
-        }
-
-        public IState GetState()
-        {
-            return machine.State;
-        }
-
-        /// <summary>
-        /// Adds the state sub inside of super
-        /// </summary>
-        public void AddSubstate(IState super, IState sub)
-        {
-            machine.Configure(sub)
-                .SubstateOf(super);
-        }
-
-        /// <summary>
-        /// Adds a transition to the same state
-        /// </summary>
-        public void AddReentry(IState state, ITransition sub)
-        {
-            machine.Configure(state)
-                .PermitReentry(sub);
-        }
-
-
-        /// <summary>
-        /// Specify an action that will execute when transitioning to the state
-        /// </summary>
-        public void OnEntry(IState state, Action action)
-        {
-            machine.Configure(state)
-                .OnEntry(action);
-        }
-
-        /// <summary>
-        /// Specify an action that will execute when activating the state
-        /// </summary>
-        public void OnActivate(IState state, Action action)
-        {
-            machine.Configure(state)
-                .OnActivate(action);
-        }
-
-        /// <summary>
-        /// Sets an initial transition to trigger when entering a
-        /// super state to one of its substates.
-        /// </summary>
-        public void InitalTransition(IState superState, IState subState)
-        {
-            machine.Configure(superState)
-                .InitialTransition(subState);
-        }
-
-        /// <summary>
-        /// Returns a string representation of the state machine in the DOT graph language
-        /// It can then be visualized by pasting the output in http://www.webgraphviz.com/
-        /// </summary>
-        public string ExportToDotGraph()
-        {
-            return UmlDotGraph.Format(machine.GetInfo());
+            if (!machine.ContainsKey(og))   machine.Add(og, new List<Connection>());
+            if (!machine.ContainsKey(dest)) machine.Add(dest, new List<Connection>());
+            machine[og].Add(new Connection(t, dest));
         }
 
         /// <summary>
@@ -91,42 +52,40 @@ namespace EvolutionSimulation.FSM
         /// </summary>
         public bool Execute()
         {
+            int prevActionPoints = ActionPoints;
             int cost = 0;
-            if(machine.State.canPerformAction(actionPoints))
-                cost = machine.State.Action();
-            if (cost > 0)   //TODO: Ver si hay que hacer esta comprobacion de si se hace o no accion porque ya esta canPerform
-            {
-                actionPoints -= cost;
-                return true;
-            }
-            else return false;
+            if(CurrentState.canPerformAction(ActionPoints))
+                cost = CurrentState.Action();
+            ActionPoints -= cost;
+            return prevActionPoints != ActionPoints;
         }
 
         /// <summary>
         /// Triggers whichever transitions return true on its Evaluate, if there is an available transition
+        /// All transitions all evaluated, only the first one that triggers results in a transition.
         /// </summary>
         public void Evaluate()
         {
-            foreach (ITransition t in machine.GetPermittedTriggers())
+            bool firstTrigger = false;
+            foreach (Connection c in machine[CurrentState])
             {
-                if (machine.CanFire(t) && t.Evaluate())
-                {
-                    //TODO: Quitar esto, esta pa debugear 
-                    Console.WriteLine("Transition: " + t.GetType().Name);
-                    
-                    machine.Fire(t);
-                }
+                if (c.Transition.Evaluate() && !firstTrigger)                
+                    CurrentState = c.OutState;                
             }
         }
 
         public void ObtainActionPoints(int metabolism)
         {
-            actionPoints += metabolism * 10;
+            ActionPoints += metabolism * 10;
         }
 
-        // action points of the creature the fsm belongs to
-        public int actionPoints;
+        public string ExportToDotGraph()
+        {
+            return "Fsm DOT Graph export not implemented yet";
+        }
 
-        StateMachine<IState, ITransition> machine;
+        public int ActionPoints { get; private set; }
+        public IState CurrentState { get; private set; }
+        Dictionary<IState, List<Connection>> machine; 
     }
 }

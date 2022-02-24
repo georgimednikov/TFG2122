@@ -12,7 +12,7 @@
 
         public override bool Evaluate()
         {
-            return creature.stats.CurrEnergy >= creature.stats.MaxEnergy;
+            return creature.stats.CurrEnergy >= 0.85 * creature.stats.MaxEnergy;
         }
 
         public override string ToString()
