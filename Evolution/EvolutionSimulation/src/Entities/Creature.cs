@@ -144,6 +144,9 @@ namespace EvolutionSimulation.Entities
                 }
             }
 
+            if (otherSeenCreatures.Count != 0)
+                nearestEnemy = otherSeenCreatures[0];
+
             //Find the nearest plant and corpse
             foreach (StableEntity c in seenEntities)
             {

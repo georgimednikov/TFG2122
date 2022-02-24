@@ -20,7 +20,7 @@ namespace VisualizadorConsola
             Console.WriteLine("\n");
             
             Animal c = world.CreateCreature<Animal>(5, 5);
-            //Animal c2 = world.CreateCreature<Animal>(5, 4);
+            Animal c2 = world.CreateCreature<Animal>(5, 4);
 
             //EvolutionSimulation.Genetics.CreatureChromosome cc = EvolutionSimulation.Genetics.GeneticFunctions.UniformCrossover(c.chromosome, c2.chromosome);
             //EvolutionSimulation.Genetics.GeneticFunctions.UniformMutation(ref cc, 0.95f);
