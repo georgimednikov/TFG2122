@@ -121,45 +121,7 @@ namespace EvolutionSimulation.Entities
             removedStatus.Clear();
         }
 
-        /// <summary>
-        /// With all the entities that the creature has perceive, 
-        /// select the most important (the nearest enemy, ally, food...)
-        /// The transitions will use this information to change a different state
-        /// </summary>
-        void ProcessInput()
-        {
-            // Find the nearest ally and mate
-            if (seenSameSpeciesCreatures.Count != 0)
-                nearestAlly = seenSameSpeciesCreatures[0];
-            foreach (Creature c in seenSameSpeciesCreatures)
-            {
-                if (c.stats.InHeat)
-                {
-                    nearestMate = c;
-                    break;
-                }
-            }
-
-            if (otherSeenCreatures.Count != 0)
-                nearestEnemy = otherSeenCreatures[0];
-
-            //Find the nearest edible plant and corpse
-            foreach (StableEntity c in seenEntities)
-            {
-                if (nearestEdiblePlant == null && c as EdiblePlant != null )
-                {
-                    nearestEdiblePlant = (EdiblePlant)c;
-                    if (nearestEdiblePlant.eaten) nearestEdiblePlant = null;
-                }
-                else if (nearestCorpse == null && c as Corpse != null)
-                {
-                    nearestCorpse = (Corpse)c;
-                }
-                if (nearestCorpse != null && nearestEdiblePlant != null)
-                    break;
-                
-            }
-        }
+        
 
         /// <summary>
         /// Returns the creature's current state
@@ -216,10 +178,13 @@ namespace EvolutionSimulation.Entities
 
             // Eating
             ITransition hungerTransition = new HungerTransition(this);
+            ITransition hungerExploreTransition = new HungerExploreTransition(this);
             ITransition eatingTransition = new EatingTransition(this);
             ITransition stopEatingTransition = new StopEatingTransition(this);
+            ITransition stopGoToEatTransition = new StopGoToEatTransition(this);
             safeFSM.AddTransition(wander, hungerTransition, goToEat);
-            //safeFSM.AddTransition(goToEat, ?, wander);
+            safeFSM.AddTransition(wander, hungerExploreTransition, explore);
+            safeFSM.AddTransition(goToEat, stopGoToEatTransition, wander);
             safeFSM.AddTransition(goToEat, eatingTransition, eat);
             safeFSM.AddTransition(eat, stopEatingTransition, wander);
 
@@ -274,7 +239,7 @@ namespace EvolutionSimulation.Entities
             mfsm = new Fsm(alive);
             // Transitions
             ITransition dieTransition = new DieTransition(this);
-            mfsm.AddTransition(alive, dieTransition, dead);   
+            mfsm.AddTransition(alive, dieTransition, dead); 
         }
         
         /// <summary>
@@ -315,6 +280,47 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
+        /// With all the entities that the creature has perceive, 
+        /// select the most important (the nearest enemy, ally, food...)
+        /// The transitions will use this information to change a different state
+        /// </summary>
+        void ProcessInput()
+        {
+            // Find the nearest ally and mate
+            if (seenSameSpeciesCreatures.Count != 0)
+                nearestAlly = seenSameSpeciesCreatures[0];
+            foreach (Creature c in seenSameSpeciesCreatures)
+            {
+                if (c.stats.InHeat)
+                {
+                    nearestMate = c;
+                    break;
+                }
+            }
+
+            if (otherSeenCreatures.Count != 0)
+                nearestEnemy = otherSeenCreatures[0];
+
+            //Find the nearest edible plant and corpse
+            foreach (StableEntity c in seenEntities)
+            {
+                if (nearestEdiblePlant == null && c as EdiblePlant != null)
+                {
+                    nearestEdiblePlant = (EdiblePlant)c;
+                    //Check if the plant has not been eaten
+                    if (nearestEdiblePlant.eaten) nearestEdiblePlant = null;
+                }
+                else if (nearestCorpse == null && c as Corpse != null)
+                {
+                    nearestCorpse = (Corpse)c;
+                }
+                if (nearestCorpse != null && nearestEdiblePlant != null)
+                    break;
+
+            }
+        }
+
+        /// <summary>
         /// Executes every response that this creature has to an interaction with other creature
         /// </summary>
         public void ReceiveInteraction(Creature interacter, Interactions type)
@@ -349,6 +355,40 @@ namespace EvolutionSimulation.Entities
             InteractionsDict[type].Remove(response);
             if (InteractionsDict[type].Count == 0)
                 InteractionsDict.Remove(type);
+        }
+
+        /// <summary>
+        /// Check if the eating objective is not null
+        /// </summary>
+        /// <returns>True if the creature knows where to eat </returns>
+        public bool HasEatingObjective()
+        {
+            // Hervibore and not plant objective
+            if (stats.Diet == Diet.Herbivore && nearestEdiblePlant == null)
+                return true;
+            // Carnivore and not corpse objective
+            if (stats.Diet == Diet.Carnivore && nearestCorpse == null)
+                return true;
+            // Omnivore and not plant and corpse objective
+            if (stats.Diet == Diet.Omnivore && nearestCorpse == null && nearestEdiblePlant == null)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Calculate the distance between the creature and the given entity
+        /// </summary>
+        /// <returns> Distance between creature and entity. intMaxValue if entity is null </returns>
+        public int DistanceToObjective(IEntity entity)
+        {
+            if (entity == null) return int.MaxValue;
+
+            int x1, y1;
+            x1 = Math.Abs(x - entity.x);
+            y1 = Math.Abs(y - entity.y);
+
+            return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
         }
 
         /// <summary>
@@ -600,7 +640,7 @@ namespace EvolutionSimulation.Entities
         public float MinTemperature { get; set; }
         public float MaxTemperature { get; set; }
         public float IdealTemperature { get; set; }
-        public float Hair { get; set; }
+        //public float Hair { get; set; }
 
         //Behaviour related stats
         public int Knowledge { get; set; }

@@ -13,8 +13,14 @@
                 eaten = startRegrowthTime++ >= regrowhtTime;            
         }
 
+        /// <summary>
+        /// if the plant has been eaten, it doesn't give nutritional value
+        /// </summary>
+        /// <returns> Return the nutritional value</returns>
         public float Eat()
         {
+            if (eaten) return 0;
+
             startRegrowthTime = 0;
             eaten = true;
             return nutritionalValue;

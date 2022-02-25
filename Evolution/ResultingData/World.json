@@ -5,2086 +5,2468 @@
       "humidity": 0.5,
       "temperature": 0.5,
       "flora": 0.29730177875068026,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.5,
+      "temperature": 0.50244140625,
+      "flora": 0.2972779368927701,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.5,
+      "temperature": 0.5050048232078552,
+      "flora": 0.2972015857293127,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.5,
+      "temperature": 0.5074460506439209,
+      "flora": 0.2970800040699129,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4949951767921448,
-      "temperature": 0.5,
-      "flora": 0.2921135432491335,
+      "humidity": 0.5,
+      "temperature": 0.5100089907646179,
+      "flora": 0.29690105916617543,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.5,
+      "temperature": 0.512449324131012,
+      "flora": 0.29668183606540427,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.5,
+      "temperature": 0.5150107741355896,
+      "flora": 0.2964004853900815,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.5,
+      "temperature": 0.5174490213394165,
+      "flora": 0.2960839053678666,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.5,
+      "temperature": 0.5200074315071106,
+      "flora": 0.29570058948863337,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4899910092353821,
-      "temperature": 0.5,
-      "flora": 0.2869651744532209,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4849892258644104,
-      "temperature": 0.5,
-      "flora": 0.28185851459095884,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4799925684928894,
-      "temperature": 0.5,
-      "flora": 0.2767963752176202,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.475004643201828,
-      "temperature": 0.5,
-      "flora": 0.2717823478580712,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4700300395488739,
-      "temperature": 0.5,
-      "flora": 0.2668208881264724,
+      "humidity": 0.5,
+      "temperature": 0.5224419236183167,
+      "flora": 0.2952872190079188,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.46513432264328003,
-      "temperature": 0.5,
-      "flora": 0.26197640510810205,
-      "plant": null
+      "humidity": 0.5,
+      "temperature": 0.5249953269958496,
+      "flora": 0.29480271326416246,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4602026045322418,
-      "temperature": 0.5,
-      "flora": 0.25713481151276235,
-      "plant": null
+      "humidity": 0.5,
+      "temperature": 0.5274239778518677,
+      "flora": 0.29429348050580134,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.45530202984809875,
-      "temperature": 0.5,
-      "flora": 0.2523621835047841,
+      "humidity": 0.5,
+      "temperature": 0.5299699902534485,
+      "flora": 0.29370897748751307,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.45043981075286865,
-      "temperature": 0.5,
-      "flora": 0.24766483255860874,
-      "plant": null
+      "humidity": 0.5,
+      "temperature": 0.5323902368545532,
+      "flora": 0.293105268976704,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.44562357664108276,
-      "temperature": 0.5,
-      "flora": 0.2430492470759423,
-      "plant": null
+      "humidity": 0.5,
+      "temperature": 0.5349259972572327,
+      "flora": 0.29242247761303136,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.44086143374443054,
-      "temperature": 0.5,
-      "flora": 0.23852213620478763,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4361617863178253,
-      "temperature": 0.5,
-      "flora": 0.23409024838477147,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4315333068370819,
-      "temperature": 0.5,
-      "flora": 0.22976033843187785,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.42698490619659424,
-      "temperature": 0.5,
-      "flora": 0.22553913757412247,
-      "plant": null
+      "humidity": 0.5,
+      "temperature": 0.5373349785804749,
+      "flora": 0.2917261762482622,
+      "plant": null,
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.4999951124191284,
-      "temperature": 0.5024420022964478,
-      "flora": 0.2972728394657556,
-      "plant": null
+      "humidity": 0.49511268734931946,
+      "temperature": 0.5024408102035522,
+      "flora": 0.29221108106609306,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4949902892112732,
-      "temperature": 0.502441942691803,
-      "flora": 0.292084643356966,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4899858236312866,
-      "temperature": 0.502441942691803,
-      "flora": 0.28693600744112796,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4849832057952881,
-      "temperature": 0.5024418234825134,
-      "flora": 0.2818285419736102,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.479984849691391,
-      "temperature": 0.5024415850639343,
-      "flora": 0.2767647403383241,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4749942123889923,
-      "temperature": 0.5024412274360657,
-      "flora": 0.27174806527237433,
+      "humidity": 0.49511274695396423,
+      "temperature": 0.5048822164535522,
+      "flora": 0.2921396287006427,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.47001558542251587,
-      "temperature": 0.5024406909942627,
-      "flora": 0.2667827014048804,
+      "humidity": 0.4951127767562866,
+      "temperature": 0.5074456334114075,
+      "flora": 0.29201325380642784,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4951128363609314,
+      "temperature": 0.5098868608474731,
+      "flora": 0.29184406513110317,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4951128661632538,
+      "temperature": 0.5124498009681702,
+      "flora": 0.29161510580756433,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.49511292576789856,
+      "temperature": 0.5148901343345642,
+      "flora": 0.2913482931489117,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.49511295557022095,
+      "temperature": 0.5174515843391418,
+      "flora": 0.2910169571505168,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.49511298537254333,
+      "temperature": 0.5198898315429688,
+      "flora": 0.2906527975224566,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4951130449771881,
+      "temperature": 0.5224482417106628,
+      "flora": 0.29021958646086166,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4951130747795105,
+      "temperature": 0.5248827338218689,
+      "flora": 0.28975870969805306,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4951131045818329,
+      "temperature": 0.5274361968040466,
+      "flora": 0.28922436267096274,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.46511444449424744,
-      "temperature": 0.5024399757385254,
-      "flora": 0.2619329986380973,
-      "plant": null
+      "humidity": 0.4951131343841553,
+      "temperature": 0.5298647880554199,
+      "flora": 0.28866775077225637,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4601755440235138,
-      "temperature": 0.502439022064209,
-      "flora": 0.2570845570272328,
+      "humidity": 0.49511316418647766,
+      "temperature": 0.5324108004570007,
+      "flora": 0.288033563872977,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.45526593923568726,
-      "temperature": 0.5024378299713135,
-      "flora": 0.25230340531659745,
-      "plant": null
+      "humidity": 0.49511319398880005,
+      "temperature": 0.5348310470581055,
+      "flora": 0.28738262724477076,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4503926634788513,
-      "temperature": 0.5024362802505493,
-      "flora": 0.24759572735798346,
-      "plant": {
-        "eaten": false,
-        "x": 0,
-        "y": 0
-      }
+      "humidity": 0.49511322379112244,
+      "temperature": 0.5373668074607849,
+      "flora": 0.286650352185578,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.44556325674057007,
-      "temperature": 0.502434492111206,
-      "flora": 0.24296796920559802,
-      "plant": {
-        "eaten": false,
-        "x": 0,
-        "y": 0
-      }
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.44078561663627625,
-      "temperature": 0.5024322867393494,
-      "flora": 0.23842669206645817,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.436068058013916,
-      "temperature": 0.5024298429489136,
-      "flora": 0.23397860613177626,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.43141916394233704,
-      "temperature": 0.5024268627166748,
-      "flora": 0.2296304378382163,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.42684775590896606,
-      "temperature": 0.5024236440658569,
-      "flora": 0.22538887856493134,
-      "plant": null
+      "humidity": 0.4951132535934448,
+      "temperature": 0.5397758483886719,
+      "flora": 0.2859070237080673,
+      "plant": null,
+      "isWater": false
     }
   ],
   [
-    {
-      "height": 0.5,
-      "humidity": 0.49996185302734375,
-      "temperature": 0.5050097107887268,
-      "flora": 0.2971616970077109,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4949573278427124,
-      "temperature": 0.5050097107887268,
-      "flora": 0.29197406763734923,
-      "plant": null
-    },
     {
       "height": 0.5,
       "humidity": 0.48995286226272583,
-      "temperature": 0.5050095915794373,
-      "flora": 0.28682569494373655,
+      "temperature": 0.5049999356269836,
+      "flora": 0.2868260815498117,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.48494967818260193,
-      "temperature": 0.5050093531608582,
-      "flora": 0.2817179198551711,
-      "plant": null
+      "humidity": 0.48995324969291687,
+      "temperature": 0.5074413418769836,
+      "flora": 0.28670498175116377,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4799499809741974,
-      "temperature": 0.5050088167190552,
-      "flora": 0.2766530456610256,
-      "plant": null
+      "humidity": 0.4899536371231079,
+      "temperature": 0.5100047588348389,
+      "flora": 0.28652649228172344,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4749569296836853,
-      "temperature": 0.5050081014633179,
-      "flora": 0.2716342500963221,
-      "plant": null
+      "humidity": 0.48995402455329895,
+      "temperature": 0.5124459862709045,
+      "flora": 0.2863076598345221,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4699746072292328,
-      "temperature": 0.5050069689750671,
-      "flora": 0.26666554411471316,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.46506837010383606,
-      "temperature": 0.5050055384635925,
-      "flora": 0.2618111809156499,
+      "humidity": 0.48995441198349,
+      "temperature": 0.5150089263916016,
+      "flora": 0.28602659569851335,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.460122674703598,
-      "temperature": 0.5050034523010254,
-      "flora": 0.2569565231094522,
-      "plant": null
+      "humidity": 0.48995476961135864,
+      "temperature": 0.5174492597579956,
+      "flora": 0.2857101270301975,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.45520445704460144,
-      "temperature": 0.5050010085105896,
-      "flora": 0.25216750710736907,
-      "plant": null
+      "humidity": 0.4899551272392273,
+      "temperature": 0.5200107097625732,
+      "flora": 0.28532668618437645,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4503205418586731,
-      "temperature": 0.5049978494644165,
-      "flora": 0.247450169355019,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4454783797264099,
-      "temperature": 0.5049942135810852,
-      "flora": 0.24281090863153174,
+      "humidity": 0.48995545506477356,
+      "temperature": 0.5224489569664001,
+      "flora": 0.28491291349787384,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4406856894493103,
-      "temperature": 0.5049896240234375,
-      "flora": 0.23825617854521697,
+      "humidity": 0.4899558126926422,
+      "temperature": 0.5250073671340942,
+      "flora": 0.2844276290404368,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.43595072627067566,
-      "temperature": 0.5049845576286316,
-      "flora": 0.2337926663488418,
-      "plant": null
+      "humidity": 0.4899561107158661,
+      "temperature": 0.5274418592453003,
+      "flora": 0.2839171855549548,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4312818944454193,
-      "temperature": 0.5049784779548645,
-      "flora": 0.2294269954761049,
-      "plant": null
+      "humidity": 0.48995643854141235,
+      "temperature": 0.529995322227478,
+      "flora": 0.2833308666569019,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.42668798565864563,
-      "temperature": 0.5049718022346497,
-      "flora": 0.22516586843293437,
-      "plant": null
+      "humidity": 0.48995670676231384,
+      "temperature": 0.5324239134788513,
+      "flora": 0.28272477830150416,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.48995697498321533,
+      "temperature": 0.5349699258804321,
+      "flora": 0.28203871098203903,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4899572432041168,
+      "temperature": 0.5373901724815369,
+      "flora": 0.2813384687374176,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.48995745182037354,
+      "temperature": 0.5399259328842163,
+      "flora": 0.28055446206213686,
+      "plant": {
+        "eaten": false,
+        "x": 0,
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.48995766043663025,
+      "temperature": 0.5423349738121033,
+      "flora": 0.2797619962968418,
+      "plant": null,
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.4998745024204254,
-      "temperature": 0.5074619650840759,
-      "flora": 0.2969484800628374,
+      "humidity": 0.48498865962028503,
+      "temperature": 0.5074301362037659,
+      "flora": 0.28163711100347594,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4948708415031433,
-      "temperature": 0.5074618458747864,
-      "flora": 0.29176243340029406,
-      "plant": null
+      "humidity": 0.48498988151550293,
+      "temperature": 0.5098715424537659,
+      "flora": 0.2814693920116097,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4898669719696045,
-      "temperature": 0.507461667060852,
-      "flora": 0.2866153555173276,
-      "plant": null
+      "humidity": 0.4849911630153656,
+      "temperature": 0.5124349594116211,
+      "flora": 0.2812419718874817,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.484863817691803,
-      "temperature": 0.5074612498283386,
-      "flora": 0.2815083011043977,
-      "plant": null
+      "humidity": 0.4849923849105835,
+      "temperature": 0.5148761868476868,
+      "flora": 0.28097652372783183,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.47986334562301636,
-      "temperature": 0.5074604749679565,
-      "flora": 0.2764433459123556,
-      "plant": null
+      "humidity": 0.4849936366081238,
+      "temperature": 0.5174391269683838,
+      "flora": 0.2806465079018922,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4748684763908386,
-      "temperature": 0.5074593424797058,
-      "flora": 0.2714234523979981,
+      "humidity": 0.4849947988986969,
+      "temperature": 0.5198794603347778,
+      "flora": 0.280283410829395,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.46988314390182495,
-      "temperature": 0.5074576139450073,
-      "flora": 0.266452512347477,
-      "plant": null
+      "humidity": 0.4849959909915924,
+      "temperature": 0.5224409103393555,
+      "flora": 0.2798510171899313,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.46497249603271484,
-      "temperature": 0.5074553489685059,
-      "flora": 0.26159459293286147,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4600207209587097,
-      "temperature": 0.5074523091316223,
-      "flora": 0.25673484454199036,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4550946056842804,
-      "temperature": 0.5074486136436462,
-      "flora": 0.2519390932265107,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4502008855342865,
-      "temperature": 0.5074438452720642,
-      "flora": 0.24721334096998976,
+      "humidity": 0.48499709367752075,
+      "temperature": 0.5248791575431824,
+      "flora": 0.2793906265831501,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.44534677267074585,
-      "temperature": 0.5074383616447449,
-      "flora": 0.24256378949237165,
+      "humidity": 0.4849981963634491,
+      "temperature": 0.5274375677108765,
+      "flora": 0.2788563575037575,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4849992096424103,
+      "temperature": 0.5298720598220825,
+      "flora": 0.27829930871741837,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.48500022292137146,
+      "temperature": 0.5324255228042603,
+      "flora": 0.27766404099273256,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4850011169910431,
+      "temperature": 0.5348541140556335,
+      "flora": 0.27701137136162923,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4850020110607147,
+      "temperature": 0.5374001264572144,
+      "flora": 0.27627643991202705,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4850028157234192,
+      "temperature": 0.5398203730583191,
+      "flora": 0.27552968769519276,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4405399262905121,
-      "temperature": 0.5074315071105957,
-      "flora": 0.2379969025365979,
-      "plant": null
+      "humidity": 0.4850035607814789,
+      "temperature": 0.5423561334609985,
+      "flora": 0.27469692573875376,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.43578845262527466,
-      "temperature": 0.5074239373207092,
-      "flora": 0.233519253903796,
-      "plant": {
-        "eaten": false,
-        "x": 0,
-        "y": 0
-      }
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4311007261276245,
-      "temperature": 0.5074147582054138,
-      "flora": 0.22913751889233439,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4264853596687317,
-      "temperature": 0.5074048042297363,
-      "flora": 0.2248582481572927,
-      "plant": null
+      "humidity": 0.4850042462348938,
+      "temperature": 0.5447651743888855,
+      "flora": 0.27385810770144026,
+      "plant": null,
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.4997101128101349,
-      "temperature": 0.5100471377372742,
-      "flora": 0.29659642050888985,
-      "plant": null
+      "humidity": 0.4797026813030243,
+      "temperature": 0.5099708437919617,
+      "flora": 0.276106225384854,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4947081208229065,
-      "temperature": 0.5100468993186951,
-      "flora": 0.2914133943144269,
-      "plant": null
+      "humidity": 0.4797056317329407,
+      "temperature": 0.5124122500419617,
+      "flora": 0.27589061662485803,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4897056519985199,
-      "temperature": 0.5100465416908264,
-      "flora": 0.2862690452848617,
+      "humidity": 0.4797087013721466,
+      "temperature": 0.5149756669998169,
+      "flora": 0.27561288642432497,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4797115921974182,
+      "temperature": 0.5174168944358826,
+      "flora": 0.27529949202950077,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.48470339179039,
-      "temperature": 0.5100458860397339,
-      "flora": 0.28116419546483323,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.47970303893089294,
-      "temperature": 0.5100448131561279,
-      "flora": 0.276100663946782,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.47470730543136597,
-      "temperature": 0.510043203830719,
-      "flora": 0.27108123156943725,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.46971985697746277,
-      "temperature": 0.5100407600402832,
-      "flora": 0.2661095558214029,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.46480581164360046,
-      "temperature": 0.5100376605987549,
-      "flora": 0.2612496761443077,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.45984897017478943,
-      "temperature": 0.5100334882736206,
-      "flora": 0.2563864440817018,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4549160897731781,
-      "temperature": 0.5100284218788147,
-      "flora": 0.25158567140971255,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.450013667345047,
-      "temperature": 0.5100218653678894,
-      "flora": 0.2468531914542253,
+      "humidity": 0.479714572429657,
+      "temperature": 0.5199798345565796,
+      "flora": 0.27491911596573565,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4451488256454468,
-      "temperature": 0.5100144147872925,
-      "flora": 0.24219513656070338,
-      "plant": null
+      "humidity": 0.4797173738479614,
+      "temperature": 0.5224201679229736,
+      "flora": 0.27450806128538635,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4403291344642639,
-      "temperature": 0.5100051760673523,
-      "flora": 0.23761796186654194,
-      "plant": null
+      "humidity": 0.47972020506858826,
+      "temperature": 0.5249816179275513,
+      "flora": 0.2740252480250039,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.43556249141693115,
-      "temperature": 0.5099948644638062,
-      "flora": 0.23312807109674208,
-      "plant": null
+      "humidity": 0.4797228276729584,
+      "temperature": 0.5274198651313782,
+      "flora": 0.27351682247704895,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.43085724115371704,
-      "temperature": 0.5099824666976929,
-      "flora": 0.2287321866798138,
+      "humidity": 0.4797254800796509,
+      "temperature": 0.529978334903717,
+      "flora": 0.2729320918420438,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4262218773365021,
-      "temperature": 0.5099689960479736,
-      "flora": 0.22443676319096822,
-      "plant": null
+      "humidity": 0.4797278940677643,
+      "temperature": 0.5324128270149231,
+      "flora": 0.27232696378604937,
+      "plant": {
+        "eaten": false,
+        "x": 0,
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4797303080558777,
+      "temperature": 0.534966230392456,
+      "flora": 0.2716412152542087,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.479732483625412,
+      "temperature": 0.5373948812484741,
+      "flora": 0.27094045037276127,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4797345995903015,
+      "temperature": 0.5399408936500549,
+      "flora": 0.2701549935068653,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4797365069389343,
+      "temperature": 0.5423611402511597,
+      "flora": 0.26936015269981617,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4797383248806,
+      "temperature": 0.5448969006538391,
+      "flora": 0.2684769246390823,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4797399342060089,
+      "temperature": 0.5473060011863708,
+      "flora": 0.26759004383763463,
+      "plant": null,
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.49944835901260376,
-      "temperature": 0.5125218033790588,
-      "flora": 0.2961008205563362,
+      "humidity": 0.4745821952819824,
+      "temperature": 0.5123767852783203,
+      "flora": 0.2707467552872821,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4745877981185913,
+      "temperature": 0.5148181915283203,
+      "flora": 0.27048678570872287,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.49444907903671265,
-      "temperature": 0.5125214457511902,
-      "flora": 0.29092265607257867,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4894491136074066,
-      "temperature": 0.5125208497047424,
-      "flora": 0.28578293228692775,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4844488501548767,
-      "temperature": 0.512519896030426,
-      "flora": 0.2806821705045524,
+      "humidity": 0.4745936095714569,
+      "temperature": 0.5173816680908203,
+      "flora": 0.2701624265338912,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.47944971919059753,
-      "temperature": 0.5125184059143066,
-      "flora": 0.27562193890188086,
-      "plant": null
+      "humidity": 0.47459912300109863,
+      "temperature": 0.5198228359222412,
+      "flora": 0.26980465378301205,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.47445428371429443,
-      "temperature": 0.5125162601470947,
-      "flora": 0.27060488881195466,
-      "plant": null
+      "humidity": 0.4746047854423523,
+      "temperature": 0.522385835647583,
+      "flora": 0.26937759668930794,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.469465970993042,
-      "temperature": 0.5125131607055664,
-      "flora": 0.2656344674036464,
-      "plant": null
+      "humidity": 0.4746100604534149,
+      "temperature": 0.524826169013977,
+      "flora": 0.2689220230900127,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4645497500896454,
-      "temperature": 0.5125091671943665,
-      "flora": 0.2607745768711407,
-      "plant": {
-        "eaten": false,
-        "x": 0,
-        "y": 0
-      }
+      "humidity": 0.4746154546737671,
+      "temperature": 0.5273876190185547,
+      "flora": 0.26839244891554903,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4595892131328583,
-      "temperature": 0.5125037431716919,
-      "flora": 0.2559099630944927,
-      "plant": null
+      "humidity": 0.47462043166160583,
+      "temperature": 0.5298258662223816,
+      "flora": 0.2678394268169195,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4546509385108948,
-      "temperature": 0.5124973654747009,
-      "flora": 0.2511062401256015,
-      "plant": {
-        "eaten": false,
-        "x": 0,
-        "y": 0
-      }
+      "humidity": 0.47462543845176697,
+      "temperature": 0.5323842763900757,
+      "flora": 0.26720780081653056,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.44974133372306824,
-      "temperature": 0.5124890804290771,
-      "flora": 0.24636923987970863,
-      "plant": null
+      "humidity": 0.4746300280094147,
+      "temperature": 0.5348187685012817,
+      "flora": 0.26655797244555746,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.444867342710495,
-      "temperature": 0.5124797224998474,
-      "flora": 0.24170492685743272,
-      "plant": null
+      "humidity": 0.47463458776474,
+      "temperature": 0.5373722314834595,
+      "flora": 0.2658251872305732,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.440036416053772,
-      "temperature": 0.5124680399894714,
-      "flora": 0.23711973815551982,
-      "plant": null
+      "humidity": 0.4746387004852295,
+      "temperature": 0.5398008823394775,
+      "flora": 0.26507959668248254,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.43525636196136475,
-      "temperature": 0.5124551057815552,
-      "flora": 0.23261998661743277,
-      "plant": null
+      "humidity": 0.4746427536010742,
+      "temperature": 0.5423468947410583,
+      "flora": 0.2642470556724449,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.43053537607192993,
-      "temperature": 0.512439489364624,
-      "flora": 0.22821236066107414,
-      "plant": null
+      "humidity": 0.47464632987976074,
+      "temperature": 0.5447672009468079,
+      "flora": 0.2634072633955872,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.425881952047348,
-      "temperature": 0.5124226212501526,
-      "flora": 0.22390329783178564,
-      "plant": null
+      "humidity": 0.4746497869491577,
+      "temperature": 0.5473030209541321,
+      "flora": 0.26247682894483426,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.47465279698371887,
+      "temperature": 0.549712061882019,
+      "flora": 0.2615449879707948,
+      "plant": null,
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.4990713894367218,
-      "temperature": 0.5151362419128418,
-      "flora": 0.2954197570425595,
-      "plant": null
+      "humidity": 0.4691014289855957,
+      "temperature": 0.5148853063583374,
+      "flora": 0.2650127833578368,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4940761923789978,
-      "temperature": 0.5151355862617493,
-      "flora": 0.29024879311070434,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.489080011844635,
-      "temperature": 0.5151346325874329,
-      "flora": 0.2851159209532926,
+      "humidity": 0.4691110849380493,
+      "temperature": 0.5173266530036926,
+      "flora": 0.2647077993813453,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.48408302664756775,
-      "temperature": 0.5151333212852478,
-      "flora": 0.28002145191267935,
+      "humidity": 0.46912112832069397,
+      "temperature": 0.5198901295661926,
+      "flora": 0.2643361447109262,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.46913060545921326,
+      "temperature": 0.5223313570022583,
+      "flora": 0.2639332568841052,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4790865182876587,
-      "temperature": 0.5151312947273254,
-      "flora": 0.27496684039075,
-      "plant": null
+      "humidity": 0.4691404104232788,
+      "temperature": 0.5248942971229553,
+      "flora": 0.26345883731608283,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4740927815437317,
-      "temperature": 0.5151285529136658,
-      "flora": 0.2699544715523247,
-      "plant": null
+      "humidity": 0.46914950013160706,
+      "temperature": 0.5273346304893494,
+      "flora": 0.26295803046614463,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4691050946712494,
-      "temperature": 0.5151245594024658,
-      "flora": 0.2649876997244776,
-      "plant": null
+      "humidity": 0.4691588282585144,
+      "temperature": 0.529896080493927,
+      "flora": 0.2623809098266297,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.46418821811676025,
-      "temperature": 0.5151195526123047,
-      "flora": 0.26013018702186685,
-      "plant": null
+      "humidity": 0.46916741132736206,
+      "temperature": 0.5323343276977539,
+      "flora": 0.26178249213377214,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4592256247997284,
-      "temperature": 0.5151128768920898,
-      "flora": 0.2552666855760811,
-      "plant": null
+      "humidity": 0.4691760540008545,
+      "temperature": 0.5348927974700928,
+      "flora": 0.26110307189396864,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4542836844921112,
-      "temperature": 0.5151049494743347,
-      "flora": 0.25046259961475853,
+      "humidity": 0.46918395161628723,
+      "temperature": 0.5373272895812988,
+      "flora": 0.26040762995887196,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.46919184923171997,
+      "temperature": 0.5398807525634766,
+      "flora": 0.25962687354130526,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4493686556816101,
-      "temperature": 0.5150947570800781,
-      "flora": 0.24572367902582662,
-      "plant": null
+      "humidity": 0.46919894218444824,
+      "temperature": 0.5423094034194946,
+      "flora": 0.2588354656550292,
+      "plant": {
+        "eaten": false,
+        "x": 0,
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.44448739290237427,
-      "temperature": 0.5150831937789917,
-      "flora": 0.24105581522561498,
-      "plant": null
+      "humidity": 0.46920591592788696,
+      "temperature": 0.5448554754257202,
+      "flora": 0.2579546721184928,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.43964719772338867,
-      "temperature": 0.5150689482688904,
-      "flora": 0.23646537552181152,
-      "plant": null
+      "humidity": 0.4692121148109436,
+      "temperature": 0.5472757816314697,
+      "flora": 0.25706887872180206,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4348558187484741,
-      "temperature": 0.5150531530380249,
-      "flora": 0.2319586273323919,
-      "plant": null
+      "humidity": 0.46921810507774353,
+      "temperature": 0.549811601638794,
+      "flora": 0.25609003730828533,
+      "plant": {
+        "eaten": false,
+        "x": 0,
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4301213324069977,
-      "temperature": 0.5150341391563416,
-      "flora": 0.22754224643459714,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4254521131515503,
-      "temperature": 0.5150135159492493,
-      "flora": 0.2232225497400812,
-      "plant": null
+      "height": 0.5000245625868384,
+      "humidity": 0.4692724158555157,
+      "temperature": 0.552171576997649,
+      "flora": 0.25518121191134535,
+      "plant": {
+        "eaten": false,
+        "x": 0,
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.49857091903686523,
-      "temperature": 0.5176437497138977,
-      "flora": 0.29457112624609955,
+      "humidity": 0.46377256512641907,
+      "temperature": 0.5172542929649353,
+      "flora": 0.25944482299128746,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4637874960899353,
+      "temperature": 0.5196956992149353,
+      "flora": 0.2590986677493675,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4935811460018158,
-      "temperature": 0.5176427364349365,
-      "flora": 0.28940972470747073,
-      "plant": null
+      "humidity": 0.4638030529022217,
+      "temperature": 0.5222591161727905,
+      "flora": 0.258683777430115,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.48859021067619324,
-      "temperature": 0.5176413655281067,
-      "flora": 0.28428617219510466,
+      "humidity": 0.4638177156448364,
+      "temperature": 0.5247003436088562,
+      "flora": 0.25823964398315363,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4638328552246094,
+      "temperature": 0.5272632837295532,
+      "flora": 0.2577218161100048,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.46384695172309875,
+      "temperature": 0.5297036170959473,
+      "flora": 0.25717960837028503,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.483597993850708,
-      "temperature": 0.5176395773887634,
-      "flora": 0.27920048264719644,
-      "plant": null
+      "humidity": 0.4638613760471344,
+      "temperature": 0.5322650671005249,
+      "flora": 0.25655887757343554,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.47860562801361084,
-      "temperature": 0.5176369547843933,
-      "flora": 0.2741539860639676,
-      "plant": null
+      "humidity": 0.4638746380805969,
+      "temperature": 0.5347033739089966,
+      "flora": 0.25591876414776243,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.47361519932746887,
-      "temperature": 0.5176334977149963,
-      "flora": 0.26914887208461463,
-      "plant": null
+      "humidity": 0.4638880491256714,
+      "temperature": 0.5372618436813354,
+      "flora": 0.2551954726667449,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4686298072338104,
-      "temperature": 0.5176286101341248,
-      "flora": 0.26418835414751884,
+      "humidity": 0.46390026807785034,
+      "temperature": 0.5396963357925415,
+      "flora": 0.25445807583764285,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4639124870300293,
+      "temperature": 0.542249858379364,
+      "flora": 0.2536330897383841,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.46392345428466797,
+      "temperature": 0.5446785092353821,
+      "flora": 0.25279940376495613,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.46371403336524963,
-      "temperature": 0.5176225304603577,
-      "flora": 0.2593358889096586,
+      "humidity": 0.4639342427253723,
+      "temperature": 0.5472246408462524,
+      "flora": 0.2518740266317867,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.46394383907318115,
+      "temperature": 0.549644947052002,
+      "flora": 0.2509456507581125,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.45875120162963867,
-      "temperature": 0.517614483833313,
-      "flora": 0.2544762290702083,
-      "plant": null
+      "height": 0.5000192157567719,
+      "humidity": 0.4639915093066651,
+      "temperature": 0.5521423951504272,
+      "flora": 0.24997571399541196,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4538075625896454,
-      "temperature": 0.5176050066947937,
-      "flora": 0.24967462003357332,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.44888922572135925,
-      "temperature": 0.5175929069519043,
-      "flora": 0.2449367437390761,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4440029263496399,
-      "temperature": 0.517579197883606,
-      "flora": 0.24026837574965032,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.43915584683418274,
-      "temperature": 0.5175623297691345,
-      "flora": 0.2356758646739395,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.43435561656951904,
-      "temperature": 0.5175436735153198,
-      "flora": 0.23116534587690368,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4296102523803711,
-      "temperature": 0.5175212621688843,
-      "flora": 0.22674355189217937,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.42492803931236267,
-      "temperature": 0.5174970626831055,
-      "flora": 0.22241667172252333,
-      "plant": null
+      "height": 0.5002782103502645,
+      "humidity": 0.4645175451206951,
+      "temperature": 0.5540335661006184,
+      "flora": 0.24969027685114964,
+      "plant": null,
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.49792155623435974,
-      "temperature": 0.5202973484992981,
-      "flora": 0.29349448424205893,
+      "humidity": 0.4580553472042084,
+      "temperature": 0.5197175741195679,
+      "flora": 0.2534837683525518,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4929389953613281,
-      "temperature": 0.5202957987785339,
-      "flora": 0.2883456844889396,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4879550337791443,
-      "temperature": 0.5202938914299011,
-      "flora": 0.2832343989390056,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.48296940326690674,
-      "temperature": 0.5202915072441101,
-      "flora": 0.2781605068145251,
+      "humidity": 0.45807749032974243,
+      "temperature": 0.5221589803695679,
+      "flora": 0.25309639374327114,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4779829978942871,
-      "temperature": 0.5202881097793579,
-      "flora": 0.2731251341901673,
-      "plant": null
+      "humidity": 0.4581005871295929,
+      "temperature": 0.5247223973274231,
+      "flora": 0.2526381938746233,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4729977548122406,
-      "temperature": 0.5202838182449341,
-      "flora": 0.26813031511877117,
-      "plant": null
+      "humidity": 0.4581223428249359,
+      "temperature": 0.5271636247634888,
+      "flora": 0.25215273172408204,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4680165946483612,
-      "temperature": 0.5202777981758118,
-      "flora": 0.2631791524416637,
+      "humidity": 0.45814481377601624,
+      "temperature": 0.5297265648841858,
+      "flora": 0.25159140508285804,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.46310389041900635,
-      "temperature": 0.5202705264091492,
-      "flora": 0.2583348139616377,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4581429362297058,
-      "temperature": 0.5202608704566956,
-      "flora": 0.25348223853448326,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4531997740268707,
-      "temperature": 0.5202496647834778,
-      "flora": 0.2486863739997891,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4482804238796234,
-      "temperature": 0.5202354192733765,
-      "flora": 0.24395291719318798,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.44339144229888916,
-      "temperature": 0.5202193260192871,
-      "flora": 0.23928745156785355,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.43853992223739624,
-      "temperature": 0.5201995968818665,
-      "flora": 0.23469634432322564,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.43373343348503113,
-      "temperature": 0.5201778411865234,
-      "flora": 0.23018564010947526,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.42897987365722656,
-      "temperature": 0.5201517939567566,
-      "flora": 0.22576208298604175,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.42428746819496155,
-      "temperature": 0.5201236009597778,
-      "flora": 0.2214317705121858,
+      "humidity": 0.4581657648086548,
+      "temperature": 0.5321668982505798,
+      "flora": 0.25100765987084717,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.45818713307380676,
+      "temperature": 0.5347284078598022,
+      "flora": 0.25034307284330337,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.45820683240890503,
+      "temperature": 0.5371667146682739,
+      "flora": 0.2496610623840907,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.45822674036026,
+      "temperature": 0.5397251844406128,
+      "flora": 0.24889356294018916,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4582448899745941,
+      "temperature": 0.5421597361564636,
+      "flora": 0.24811384041588774,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.45826297998428345,
+      "temperature": 0.5447132587432861,
+      "flora": 0.2472441439971192,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4582792818546295,
+      "temperature": 0.547141969203949,
+      "flora": 0.24636767474593602,
+      "plant": {
+        "eaten": false,
+        "x": 0,
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4582953155040741,
+      "temperature": 0.5496881008148193,
+      "flora": 0.2453971350712682,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5000090333816372,
+      "humidity": 0.45832756817280496,
+      "temperature": 0.5520903998619393,
+      "flora": 0.24445056488905553,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.500259876821953,
+      "humidity": 0.45884302372637986,
+      "temperature": 0.5541246521979213,
+      "flora": 0.24408897520701192,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5008065383105198,
+      "humidity": 0.45994826763246843,
+      "temperature": 0.5554405489626091,
+      "flora": 0.24459155466130064,
+      "plant": null,
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.4971177279949188,
-      "temperature": 0.5228461623191833,
-      "flora": 0.29222131057037287,
-      "plant": null
+      "humidity": 0.45249009132385254,
+      "temperature": 0.52203768491745,
+      "flora": 0.24769834159435838,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.49214422702789307,
-      "temperature": 0.5228440761566162,
-      "flora": 0.2870882234024148,
+      "humidity": 0.45252087712287903,
+      "temperature": 0.52447909116745,
+      "flora": 0.24727380014207792,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.45255300402641296,
+      "temperature": 0.5270425081253052,
+      "flora": 0.2467765351804732,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4871691167354584,
-      "temperature": 0.5228415131568909,
-      "flora": 0.28199234268037626,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4821919798851013,
-      "temperature": 0.5228384137153625,
-      "flora": 0.2769333930987139,
+      "humidity": 0.4525832533836365,
+      "temperature": 0.5294837355613708,
+      "flora": 0.2462537705453318,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4772135317325592,
-      "temperature": 0.5228341817855835,
-      "flora": 0.27191234981732276,
+      "humidity": 0.45261451601982117,
+      "temperature": 0.5320466756820679,
+      "flora": 0.24565316450876304,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.45264360308647156,
+      "temperature": 0.5344870686531067,
+      "flora": 0.24503178013185675,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4722355008125305,
-      "temperature": 0.5228288769721985,
-      "flora": 0.26693105733797823,
-      "plant": null
+      "humidity": 0.4526733458042145,
+      "temperature": 0.5370485186576843,
+      "flora": 0.24432756492726904,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4672606885433197,
-      "temperature": 0.5228217244148254,
-      "flora": 0.261992520536095,
-      "plant": null
+      "humidity": 0.45270073413848877,
+      "temperature": 0.539486825466156,
+      "flora": 0.24360754994090833,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.46235328912734985,
-      "temperature": 0.5228131413459778,
-      "flora": 0.2571596763398663,
-      "plant": {
-        "eaten": false,
-        "x": 0,
-        "y": 0
-      }
+      "humidity": 0.45272842049598694,
+      "temperature": 0.5420453548431396,
+      "flora": 0.24279988069360395,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.457396537065506,
-      "temperature": 0.5228018760681152,
-      "flora": 0.25231761463164964,
-      "plant": null
+      "humidity": 0.45275363326072693,
+      "temperature": 0.5444799661636353,
+      "flora": 0.2419816112216262,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4524562954902649,
-      "temperature": 0.5227888226509094,
-      "flora": 0.24753102966355942,
-      "plant": null
+      "humidity": 0.45277881622314453,
+      "temperature": 0.5470334887504578,
+      "flora": 0.24107120938699986,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.44753843545913696,
-      "temperature": 0.5227724313735962,
-      "flora": 0.24280553983865952,
-      "plant": null
+      "humidity": 0.4528014659881592,
+      "temperature": 0.5494622588157654,
+      "flora": 0.24015562430352613,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4426494538784027,
-      "temperature": 0.5227539539337158,
-      "flora": 0.23814666276440088,
-      "plant": null
+      "height": 0.500000883286702,
+      "humidity": 0.4528255246987092,
+      "temperature": 0.5520066834578765,
+      "flora": 0.23914614473313622,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.43779635429382324,
-      "temperature": 0.5227313041687012,
-      "flora": 0.23356079816887068,
-      "plant": null
+      "height": 0.5001847314804182,
+      "humidity": 0.4532129502235622,
+      "temperature": 0.5540594124854832,
+      "flora": 0.23864962588254107,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4329865872859955,
-      "temperature": 0.5227065086364746,
-      "flora": 0.229053798038262,
-      "plant": null
+      "height": 0.5007119608563135,
+      "humidity": 0.4542865420663258,
+      "temperature": 0.5555409525549511,
+      "flora": 0.23903881511158737,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4282279312610626,
-      "temperature": 0.5226767659187317,
-      "flora": 0.22463246809963353,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4235285818576813,
-      "temperature": 0.5226446986198425,
-      "flora": 0.22030277862954056,
-      "plant": {
-        "eaten": false,
-        "x": 0,
-        "y": 0
-      }
+      "height": 0.5015162584244055,
+      "humidity": 0.4559117370960797,
+      "temperature": 0.5563416367652332,
+      "flora": 0.2402563641053558,
+      "plant": null,
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.49615055322647095,
-      "temperature": 0.5255470275878906,
-      "flora": 0.2906971823175742,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4911881387233734,
-      "temperature": 0.5255441069602966,
-      "flora": 0.2855832240641172,
+      "humidity": 0.44651851058006287,
+      "temperature": 0.5244436860084534,
+      "flora": 0.24151410642562804,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4862239360809326,
-      "temperature": 0.5255407094955444,
-      "flora": 0.2805061488513977,
-      "plant": null
+      "humidity": 0.4465603828430176,
+      "temperature": 0.5268850922584534,
+      "flora": 0.24105287640716772,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4812573790550232,
-      "temperature": 0.5255367159843445,
-      "flora": 0.2754655484740205,
+      "humidity": 0.4466041028499603,
+      "temperature": 0.5294485092163086,
+      "flora": 0.24051704729748494,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.44664525985717773,
+      "temperature": 0.5318897366523743,
+      "flora": 0.23995743433161473,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4466877579689026,
+      "temperature": 0.5344527363777161,
+      "flora": 0.23931792589953896,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.44672736525535583,
+      "temperature": 0.5368931293487549,
+      "flora": 0.23865935118180948,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.47628897428512573,
-      "temperature": 0.5255314707756042,
-      "flora": 0.2704622199710863,
-      "plant": null
+      "humidity": 0.44676780700683594,
+      "temperature": 0.5394545793533325,
+      "flora": 0.23791578143234873,
+      "plant": {
+        "eaten": false,
+        "x": 0,
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.47132042050361633,
-      "temperature": 0.5255250334739685,
-      "flora": 0.2654979865453238,
-      "plant": null
+      "humidity": 0.44680505990982056,
+      "temperature": 0.541892945766449,
+      "flora": 0.23715798763972198,
+      "plant": {
+        "eaten": false,
+        "x": 0,
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.46635425090789795,
-      "temperature": 0.5255165100097656,
-      "flora": 0.26057563817099244,
-      "plant": null
+      "humidity": 0.4468427300453186,
+      "temperature": 0.5444514751434326,
+      "flora": 0.23631035647175147,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.46145448088645935,
-      "temperature": 0.525506317615509,
-      "flora": 0.25575785515919974,
-      "plant": null
+      "humidity": 0.44687703251838684,
+      "temperature": 0.5468860864639282,
+      "flora": 0.23545367955117297,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4565044641494751,
-      "temperature": 0.5254932641983032,
-      "flora": 0.2509300493796379,
-      "plant": null
+      "humidity": 0.4469112753868103,
+      "temperature": 0.5494396686553955,
+      "flora": 0.23450253041961533,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4515697658061981,
-      "temperature": 0.5254781246185303,
-      "flora": 0.2461565592215231,
-      "plant": null
+      "humidity": 0.4469420909881592,
+      "temperature": 0.5518684983253479,
+      "flora": 0.23354776647088252,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4466562271118164,
-      "temperature": 0.5254592895507812,
-      "flora": 0.2414430399012776,
-      "plant": null
+      "height": 0.5001297356774627,
+      "humidity": 0.4472318713049528,
+      "temperature": 0.5541552777905825,
+      "flora": 0.2328552232596264,
+      "plant": {
+        "eaten": false,
+        "x": 0,
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.44177019596099854,
-      "temperature": 0.525438129901886,
-      "flora": 0.23679483609884255,
-      "plant": null
+      "height": 0.5005764403672077,
+      "humidity": 0.4481521623792366,
+      "temperature": 0.5556823534307762,
+      "flora": 0.23306575192739556,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.43691855669021606,
-      "temperature": 0.5254123210906982,
-      "flora": 0.2322183509239647,
-      "plant": null
+      "height": 0.5013739849856063,
+      "humidity": 0.44977323924115575,
+      "temperature": 0.5566233822245272,
+      "flora": 0.2341989833556407,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.43210867047309875,
-      "temperature": 0.5253841280937195,
-      "flora": 0.22771928491907092,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4273483157157898,
-      "temperature": 0.5253503918647766,
-      "flora": 0.22330460140545547,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.42264553904533386,
-      "temperature": 0.5253140926361084,
-      "flora": 0.21898002872197378,
-      "plant": null
+      "height": 0.502429950657332,
+      "humidity": 0.45190776074497707,
+      "temperature": 0.5569207898321866,
+      "flora": 0.2361191153619769,
+      "plant": null,
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.49501311779022217,
-      "temperature": 0.528144121170044,
-      "flora": 0.28896370556668766,
+      "humidity": 0.44071006774902344,
+      "temperature": 0.5267038345336914,
+      "flora": 0.23552646011227496,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.44076454639434814,
+      "temperature": 0.5291452407836914,
+      "flora": 0.23503262923280335,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.49006393551826477,
-      "temperature": 0.5281403064727783,
-      "flora": 0.283872412972129,
-      "plant": null
+      "humidity": 0.44082143902778625,
+      "temperature": 0.5317086577415466,
+      "flora": 0.2344625140358706,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.48511284589767456,
-      "temperature": 0.5281358957290649,
-      "flora": 0.2788177383473926,
-      "plant": null
+      "humidity": 0.44087502360343933,
+      "temperature": 0.5341498851776123,
+      "flora": 0.2338701447905095,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.48015910387039185,
-      "temperature": 0.5281309485435486,
-      "flora": 0.2737990583723336,
-      "plant": null
+      "humidity": 0.4409303367137909,
+      "temperature": 0.5367128849029541,
+      "flora": 0.2331960346466329,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4752030670642853,
-      "temperature": 0.5281245112419128,
-      "flora": 0.2688171069930629,
+      "humidity": 0.4409818649291992,
+      "temperature": 0.5391532778739929,
+      "flora": 0.23250425713326078,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4410344958305359,
+      "temperature": 0.5417147874832153,
+      "flora": 0.2317255239366669,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.44108298420906067,
+      "temperature": 0.5441531538963318,
+      "flora": 0.23093393880021315,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4702463150024414,
-      "temperature": 0.5281168818473816,
-      "flora": 0.2638735410629814,
+      "humidity": 0.4411320090293884,
+      "temperature": 0.5467117428779602,
+      "flora": 0.23005043191650282,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4411766529083252,
+      "temperature": 0.5491463541984558,
+      "flora": 0.22915921358922783,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4412212073802948,
+      "temperature": 0.5516999959945679,
+      "flora": 0.22817132078198196,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5000528068611105,
+      "humidity": 0.4413669350284497,
+      "temperature": 0.554023271546944,
+      "flora": 0.22732690215506096,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.465291291475296,
-      "temperature": 0.5281068086624146,
-      "flora": 0.25897116992765407,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.460401713848114,
-      "temperature": 0.5280950665473938,
-      "flora": 0.254172201050252,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4554610848426819,
-      "temperature": 0.5280800461769104,
-      "flora": 0.24936252789111463,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.45053479075431824,
-      "temperature": 0.5280628204345703,
-      "flora": 0.24460614203650413,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.44562849402427673,
-      "temperature": 0.5280414819717407,
-      "flora": 0.23990864176579907,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4407484829425812,
-      "temperature": 0.5280176401138306,
-      "flora": 0.23527525045912556,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.43590158224105835,
-      "temperature": 0.527988612651825,
-      "flora": 0.23071246082012517,
+      "height": 0.5004258965481908,
+      "humidity": 0.44215257267745156,
+      "temperature": 0.5558234025975881,
+      "flora": 0.22728093764881416,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.43109503388404846,
-      "temperature": 0.527957022190094,
-      "flora": 0.22622575336408457,
-      "plant": null
+      "height": 0.5011033805037441,
+      "humidity": 0.4435425285150414,
+      "temperature": 0.5568890389154548,
+      "flora": 0.22812096930169173,
+      "plant": {
+        "eaten": false,
+        "x": 0,
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.42633652687072754,
-      "temperature": 0.5279192924499512,
-      "flora": 0.2218221867405831,
-      "plant": null
+      "height": 0.5021378549622197,
+      "humidity": 0.4456453030679026,
+      "temperature": 0.5573562676336965,
+      "flora": 0.22991101902027813,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.42163407802581787,
-      "temperature": 0.5278788208961487,
-      "flora": 0.2175073279372853,
-      "plant": null
+      "height": 0.5034141225201862,
+      "humidity": 0.4482272232737099,
+      "temperature": 0.5572132502828087,
+      "flora": 0.23244637871018972,
+      "plant": null,
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.4937003552913666,
-      "temperature": 0.5308985710144043,
-      "flora": 0.2869587613775726,
-      "plant": null
+      "humidity": 0.434486985206604,
+      "temperature": 0.5290413498878479,
+      "flora": 0.22914588420314655,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.48876672983169556,
-      "temperature": 0.5308936834335327,
-      "flora": 0.28189391451871054,
+      "humidity": 0.4345570504665375,
+      "temperature": 0.5314827561378479,
+      "flora": 0.22862045050507454,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4346301555633545,
+      "temperature": 0.5340462327003479,
+      "flora": 0.2280169999450713,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.43469899892807007,
+      "temperature": 0.5364874601364136,
+      "flora": 0.22739273828237763,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4347701072692871,
+      "temperature": 0.5390504002571106,
+      "flora": 0.2266849656185468,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.43483632802963257,
+      "temperature": 0.5414908528327942,
+      "flora": 0.22596078861136049,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4838310480117798,
-      "temperature": 0.5308880805969238,
-      "flora": 0.2768653648341918,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4788924753665924,
-      "temperature": 0.5308818817138672,
-      "flora": 0.27187238712036277,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4739512801170349,
-      "temperature": 0.5308740139007568,
-      "flora": 0.26691568047252673,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.46900883316993713,
-      "temperature": 0.5308648943901062,
-      "flora": 0.2619966626485089,
+      "humidity": 0.43490397930145264,
+      "temperature": 0.5440523624420166,
+      "flora": 0.22514770873056028,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4640675485134125,
-      "temperature": 0.5308531522750854,
-      "flora": 0.25711817780067653,
+      "humidity": 0.4349663257598877,
+      "temperature": 0.5464907884597778,
+      "flora": 0.22432301198128682,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.45919087529182434,
-      "temperature": 0.5308395028114319,
-      "flora": 0.25234205905541757,
-      "plant": null
+      "humidity": 0.4350292980670929,
+      "temperature": 0.5490493774414062,
+      "flora": 0.22340424722361288,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.45426249504089355,
-      "temperature": 0.5308222770690918,
-      "flora": 0.24755466805873022,
+      "humidity": 0.4350866973400116,
+      "temperature": 0.5514841079711914,
+      "flora": 0.22247896842472425,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4493475556373596,
-      "temperature": 0.5308026671409607,
-      "flora": 0.2428196026811909,
+      "height": 0.500011813239088,
+      "humidity": 0.43516760388181686,
+      "temperature": 0.5540141828937721,
+      "flora": 0.22148714903649083,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5002638503801782,
+      "humidity": 0.4357232063794054,
+      "temperature": 0.5559390574908338,
+      "flora": 0.22116176197069767,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5008737170408136,
+      "humidity": 0.43699369305570257,
+      "temperature": 0.5572657538036572,
+      "flora": 0.22175469593401093,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.44445163011550903,
-      "temperature": 0.5307784676551819,
-      "flora": 0.23814250154600206,
-      "plant": null
+      "height": 0.5017715340639726,
+      "humidity": 0.4388342690041811,
+      "temperature": 0.5578907835909575,
+      "flora": 0.22320072797175136,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4395809471607208,
-      "temperature": 0.5307515859603882,
-      "flora": 0.23352843437445378,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4347422122955322,
-      "temperature": 0.5307191014289856,
-      "flora": 0.22898391133588916,
+      "height": 0.5030318064400343,
+      "humidity": 0.44139829534466823,
+      "temperature": 0.5579065356833164,
+      "flora": 0.22561800883649388,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.42994260787963867,
-      "temperature": 0.530683696269989,
-      "flora": 0.22451429929202066,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4251897633075714,
-      "temperature": 0.5306415557861328,
-      "flora": 0.22012675254637973,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.42049160599708557,
-      "temperature": 0.5305964946746826,
-      "flora": 0.2158265944437666,
-      "plant": null
+      "height": 0.5045177595068568,
+      "humidity": 0.4444079610207785,
+      "temperature": 0.557344266524006,
+      "flora": 0.2287367009687877,
+      "plant": {
+        "eaten": false,
+        "x": 0,
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.49220898747444153,
-      "temperature": 0.5335491895675659,
-      "flora": 0.28474003271952,
+      "humidity": 0.4284469485282898,
+      "temperature": 0.5312312245368958,
+      "flora": 0.22299078792661753,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4285340905189514,
+      "temperature": 0.5336726307868958,
+      "flora": 0.2224377258873405,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.42862504720687866,
+      "temperature": 0.536236047744751,
+      "flora": 0.2218052188572197,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4287107288837433,
+      "temperature": 0.5386773347854614,
+      "flora": 0.22115311445896288,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4287991523742676,
+      "temperature": 0.5412402749061584,
+      "flora": 0.22041580858132626,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4872933030128479,
-      "temperature": 0.533543050289154,
-      "flora": 0.2797054764723961,
-      "plant": null
+      "humidity": 0.42888155579566956,
+      "temperature": 0.543680727481842,
+      "flora": 0.21966324551226102,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.48237550258636475,
-      "temperature": 0.5335361361503601,
-      "flora": 0.27470694402884455,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4774545729160309,
-      "temperature": 0.5335286259651184,
-      "flora": 0.2697435143538569,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.472530722618103,
-      "temperature": 0.5335192680358887,
-      "flora": 0.2648159018031464,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.46760526299476624,
-      "temperature": 0.5335085391998291,
-      "flora": 0.2599254433100365,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4626804292201996,
-      "temperature": 0.5334948897361755,
-      "flora": 0.25507488659395144,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.45781946182250977,
-      "temperature": 0.5334793329238892,
-      "flora": 0.25032563970246574,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4529063403606415,
-      "temperature": 0.5334597826004028,
-      "flora": 0.24556477181305986,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.44800588488578796,
-      "temperature": 0.5334377288818359,
-      "flora": 0.24085532833566126,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.44312363862991333,
-      "temperature": 0.5334106087684631,
-      "flora": 0.23620306790989548,
+      "humidity": 0.4289657175540924,
+      "temperature": 0.5462422966957092,
+      "flora": 0.21881993098012692,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.43826571106910706,
-      "temperature": 0.5333806872367859,
-      "flora": 0.23161281779418771,
-      "plant": null
+      "humidity": 0.4290432929992676,
+      "temperature": 0.5486807227134705,
+      "flora": 0.2179660428489572,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4334387183189392,
-      "temperature": 0.5333446264266968,
-      "flora": 0.22709118518713617,
-      "plant": null
+      "humidity": 0.42912164330482483,
+      "temperature": 0.5512393712997437,
+      "flora": 0.21701609283529394,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4286498427391052,
-      "temperature": 0.5333054661750793,
-      "flora": 0.22264339400224395,
-      "plant": null
+      "humidity": 0.42919304966926575,
+      "temperature": 0.5536741614341736,
+      "flora": 0.21606058095426367,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4239065945148468,
-      "temperature": 0.5332589745521545,
-      "flora": 0.21827668813134082,
-      "plant": null
+      "height": 0.5001269907906909,
+      "humidity": 0.4295183184057989,
+      "temperature": 0.5559739408581934,
+      "flora": 0.21535383612881803,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4192168414592743,
-      "temperature": 0.5332093238830566,
-      "flora": 0.2139961713050744,
-      "plant": null
+      "height": 0.5005766230694578,
+      "humidity": 0.4304816877587887,
+      "temperature": 0.557503744389191,
+      "flora": 0.21555466687488387,
+      "plant": {
+        "eaten": false,
+        "x": 0,
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
+    },
+    {
+      "height": 0.5013888019307332,
+      "humidity": 0.4321691668001566,
+      "temperature": 0.5584258759053793,
+      "flora": 0.21669879554634391,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5024743776970426,
+      "humidity": 0.43439622748957474,
+      "temperature": 0.558675567020313,
+      "flora": 0.21866320509777226,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5039266975411724,
+      "humidity": 0.4373549881952903,
+      "temperature": 0.5583073433858254,
+      "flora": 0.22161310830433592,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.50559077160407,
+      "humidity": 0.4407301047811685,
+      "temperature": 0.5573889514436545,
+      "flora": 0.2252238390149728,
+      "plant": null,
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.49053728580474854,
-      "temperature": 0.5363620519638062,
-      "flora": 0.28223648902257975,
+      "humidity": 0.4219931364059448,
+      "temperature": 0.5334898829460144,
+      "flora": 0.21645883812750377,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4221007525920868,
+      "temperature": 0.5359312891960144,
+      "flora": 0.21587951045754852,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.422213077545166,
+      "temperature": 0.5384947061538696,
+      "flora": 0.21521931945252082,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.42231887578964233,
+      "temperature": 0.5409359335899353,
+      "flora": 0.2145406717611525,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.42242810130119324,
+      "temperature": 0.5434989929199219,
+      "flora": 0.21377517109083916,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.42252984642982483,
+      "temperature": 0.5459393858909607,
+      "flora": 0.21299541705173994,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4226337671279907,
+      "temperature": 0.5485010147094727,
+      "flora": 0.21212304966694537,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4227295517921448,
+      "temperature": 0.5509395003318787,
+      "flora": 0.21124098330130062,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.4228263199329376,
+      "temperature": 0.5534982085227966,
+      "flora": 0.2102608689003049,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.500027557331691,
+      "humidity": 0.42296961966826485,
+      "temperature": 0.5558779435984893,
+      "flora": 0.20935123424923094,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5003477577883313,
+      "humidity": 0.42369802683955626,
+      "temperature": 0.5577914228998999,
+      "flora": 0.20915021580347565,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5009807095695792,
+      "humidity": 0.42504311517263615,
+      "temperature": 0.5589546470305804,
+      "flora": 0.2098446581883922,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5019798699347213,
+      "humidity": 0.42711936897596425,
+      "temperature": 0.5595029347483247,
+      "flora": 0.21150104909413917,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5032384553129677,
+      "humidity": 0.42970559171342937,
+      "temperature": 0.5594067258486739,
+      "flora": 0.2139434367009673,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.48564210534095764,
-      "temperature": 0.5363544821739197,
-      "flora": 0.27723625939600394,
-      "plant": null
+      "height": 0.5048673147774341,
+      "humidity": 0.43303012744915526,
+      "temperature": 0.5586856613920923,
+      "flora": 0.21738078521172358,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.48074471950531006,
-      "temperature": 0.536345899105072,
-      "flora": 0.27227177121116747,
-      "plant": {
-        "eaten": false,
-        "x": 0,
-        "y": 0
-      }
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.47584405541419983,
-      "temperature": 0.5363367795944214,
-      "flora": 0.26734195663358323,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4709402322769165,
-      "temperature": 0.5363256335258484,
-      "flora": 0.2624475403502968,
-      "plant": {
-        "eaten": false,
-        "x": 0,
-        "y": 0
-      }
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.466034471988678,
-      "temperature": 0.536312997341156,
-      "flora": 0.25758974416970004,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.46112897992134094,
-      "temperature": 0.5362972617149353,
-      "flora": 0.25277133980977573,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4562866687774658,
-      "temperature": 0.5362793803215027,
-      "flora": 0.2480532641457554,
-      "plant": {
-        "eaten": false,
-        "x": 0,
-        "y": 0
-      }
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.45139187574386597,
-      "temperature": 0.5362572073936462,
-      "flora": 0.2433232956809234,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.44650915265083313,
-      "temperature": 0.5362324118614197,
-      "flora": 0.2386439856100653,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.44164398312568665,
-      "temperature": 0.536202073097229,
-      "flora": 0.2340211975795036,
-      "plant": {
-        "eaten": false,
-        "x": 0,
-        "y": 0
-      }
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.43680235743522644,
-      "temperature": 0.5361686944961548,
-      "flora": 0.229459527959408,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4319908916950226,
-      "temperature": 0.5361286401748657,
-      "flora": 0.22496574747903134,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.42721664905548096,
-      "temperature": 0.536085307598114,
-      "flora": 0.22054480040866903,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4224870800971985,
-      "temperature": 0.5360340476036072,
-      "flora": 0.2162040945937647,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4178100526332855,
-      "temperature": 0.5359793901443481,
-      "flora": 0.21194854244855937,
-      "plant": null
+      "height": 0.5066949056889302,
+      "humidity": 0.4367433343938363,
+      "temperature": 0.5574404145666587,
+      "flora": 0.2214391262226986,
+      "plant": null,
+      "isWater": false
     }
   ],
   [
     {
       "height": 0.5,
-      "humidity": 0.4886852204799652,
-      "temperature": 0.5390700697898865,
-      "flora": 0.2795223351379384,
-      "plant": null
+      "humidity": 0.4157487452030182,
+      "temperature": 0.535599946975708,
+      "flora": 0.21018602579715678,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.4838131368160248,
-      "temperature": 0.5390608310699463,
-      "flora": 0.27456048135483674,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4789387881755829,
-      "temperature": 0.5390505790710449,
-      "flora": 0.26963401747557,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4740610718727112,
-      "temperature": 0.539039671421051,
-      "flora": 0.2647418760559104,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.46918001770973206,
-      "temperature": 0.5390265583992004,
-      "flora": 0.25988474438066855,
+      "humidity": 0.4158783257007599,
+      "temperature": 0.538041353225708,
+      "flora": 0.20958429506581075,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.464296817779541,
-      "temperature": 0.5390120148658752,
-      "flora": 0.2550637283703507,
-      "plant": null
+      "humidity": 0.41601359844207764,
+      "temperature": 0.5406047701835632,
+      "flora": 0.20890049387726553,
+      "plant": null,
+      "isWater": false
     },
     {
       "height": 0.5,
-      "humidity": 0.45941361784935,
-      "temperature": 0.5389939546585083,
-      "flora": 0.2502817227136,
+      "humidity": 0.41614100337028503,
+      "temperature": 0.5430460572242737,
+      "flora": 0.20819913721992664,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.41627252101898193,
+      "temperature": 0.5456090569496155,
+      "flora": 0.2074095075934994,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.41639503836631775,
+      "temperature": 0.5480495095252991,
+      "flora": 0.2066063567384308,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.41652020812034607,
+      "temperature": 0.550611138343811,
+      "flora": 0.2057089863341971,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.41663554310798645,
+      "temperature": 0.5530496835708618,
+      "flora": 0.20480251764493382,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5,
+      "humidity": 0.41675207018852234,
+      "temperature": 0.5556084513664246,
+      "flora": 0.20379615542285953,
+      "plant": null,
+      "isWater": false
+    },
+    {
+      "height": 0.5001330820169482,
+      "humidity": 0.41712441989708604,
+      "temperature": 0.5577771966762477,
+      "flora": 0.20315063525807037,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4545929729938507,
-      "temperature": 0.5389737486839294,
-      "flora": 0.24559900196671192,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.44971972703933716,
-      "temperature": 0.5389488339424133,
-      "flora": 0.24090433633094296,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.4448581039905548,
-      "temperature": 0.5389211773872375,
-      "flora": 0.23625966173036192,
-      "plant": null
-    },
-    {
-      "height": 0.5,
-      "humidity": 0.44001349806785583,
-      "temperature": 0.5388875007629395,
-      "flora": 0.23167092719568347,
+      "height": 0.5006171752417516,
+      "humidity": 0.41819858340510363,
+      "temperature": 0.5593630096506215,
+      "flora": 0.2033842079874232,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4351918697357178,
-      "temperature": 0.538850724697113,
-      "flora": 0.2271425144277522,
-      "plant": null
+      "height": 0.5014009377105465,
+      "humidity": 0.4198614459720116,
+      "temperature": 0.5602247316154976,
+      "flora": 0.2044875801356925,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4303997755050659,
-      "temperature": 0.5388066172599792,
-      "flora": 0.22268139851426416,
+      "height": 0.5025531761228239,
+      "humidity": 0.42225980011208764,
+      "temperature": 0.5604670420529057,
+      "flora": 0.20656446472952433,
       "plant": {
         "eaten": false,
         "x": 0,
-        "y": 0
-      }
+        "y": 0,
+        "world": null,
+        "lifeTime": 0
+      },
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.425644189119339,
-      "temperature": 0.5387591123580933,
-      "flora": 0.2182921988722527,
-      "plant": {
-        "eaten": false,
-        "x": 0,
-        "y": 0
-      }
+      "height": 0.5039528149829626,
+      "humidity": 0.42514222631182674,
+      "temperature": 0.5600888453987598,
+      "flora": 0.2093958934763653,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4209325313568115,
-      "temperature": 0.5387030243873596,
-      "flora": 0.21398256056002304,
-      "plant": {
-        "eaten": false,
-        "x": 0,
-        "y": 0
-      }
+      "height": 0.505725204945129,
+      "humidity": 0.4287674725066062,
+      "temperature": 0.5590808391560678,
+      "flora": 0.2132272909732162,
+      "plant": null,
+      "isWater": false
     },
     {
-      "height": 0.5,
-      "humidity": 0.4162726104259491,
-      "temperature": 0.5386434197425842,
-      "flora": 0.20975707742464322,
-      "plant": null
+      "height": 0.5076855298442322,
+      "humidity": 0.43275797894848944,
+      "temperature": 0.557570362773999,
+      "flora": 0.21764525247982988,
+      "plant": null,
+      "isWater": false
     }
   ]
 ]
