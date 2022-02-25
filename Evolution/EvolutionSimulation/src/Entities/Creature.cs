@@ -95,7 +95,6 @@ namespace EvolutionSimulation.Entities
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
             while (mfsm.Execute());// Maintains the evaluation - execution action
 
-
             Clear();
         }
 
@@ -235,7 +234,6 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(wander, sleepyTransition, sleep);
             safeFSM.AddTransition(sleep, wakeTransition, wander);
             
-            //
             // Escape-state Configuration
             // States
             IState fleeing = new Fleeing(this);
@@ -245,17 +243,19 @@ namespace EvolutionSimulation.Entities
             //mfsm.AddTransition(fleeing, ? , hide);
             //mfsm.AddTransition(hide, ? , fleeing);
             IState escape = new CompoundState("Escape", escapeFSM);
-            //
+
             // Combat-state Configuration
             // States
             IState attack = new Attacking(this);
             IState chaseEnemy = new ChaseEnemy(this);
             Fsm combatFSM = new Fsm(chaseEnemy);
             // Transitions
-            //mfsm.AddTransition(chaseEnemy, ? , attack);
-            //mfsm.AddTransition(attack, ? , chaseEnemy);
+            ITransition attackTransition = new AttackTransition(this);
+            ITransition chaseEnemyTransition = new ChaseEnemyTransition(this);
+            combatFSM.AddTransition(chaseEnemy, attackTransition, attack);
+            combatFSM.AddTransition(attack, chaseEnemyTransition, chaseEnemy);  
             IState combat = new CompoundState("Combat", combatFSM);
-            //
+
             Fsm aliveFSM = new Fsm(safe);
             // Transitions
             ITransition escapeTransition = new EscapeTransition(this);
@@ -615,7 +615,6 @@ namespace EvolutionSimulation.Entities
         public bool InHeat { get; set; }
 
         public bool Upright { get; set; }
-        public bool Hair { get; set; }
     }
 
 }

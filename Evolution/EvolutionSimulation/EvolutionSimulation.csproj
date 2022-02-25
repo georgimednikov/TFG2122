@@ -99,6 +99,8 @@
     <Compile Include="src\FSM\Creature\States\Safe\Explore.cs" />
     <Compile Include="src\FSM\Creature\States\Escape\Hide.cs" />
     <Compile Include="src\FSM\Creature\States\Escape\Fleeing.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Combat\AttackTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Combat\ChaseEnemyTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\SafeTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\EscapeTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\CreatureTransition.cs" />
@@ -161,7 +163,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="src\FSM\Creature\Transitions\Combat\" />
     <Folder Include="src\FSM\Creature\Transitions\Escape\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
