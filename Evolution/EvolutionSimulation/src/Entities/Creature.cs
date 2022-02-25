@@ -205,8 +205,10 @@ namespace EvolutionSimulation.Entities
             IState hide = new Hide(this);
             Fsm escapeFSM = new Fsm(fleeing);
             // Transitions
-            //mfsm.AddTransition(fleeing, ? , hide);
-            //mfsm.AddTransition(hide, ? , fleeing);
+            ITransition fleeTransition = new FleeTransition(this);
+            ITransition hideTranistion = new HideTransition(this);
+            escapeFSM.AddTransition(fleeing, hideTranistion , hide);
+            escapeFSM.AddTransition(hide, fleeTransition , fleeing);
             IState escape = new CompoundState("Escape", escapeFSM);
 
             // Combat-state Configuration
@@ -223,7 +225,7 @@ namespace EvolutionSimulation.Entities
 
             Fsm aliveFSM = new Fsm(safe);
             // Transitions
-            ITransition escapeTransition = new EscapeTransition(this);
+            ITransition escapeTransition = new EscapeTransition(this);   
             ITransition safeTransition = new SafeTransition(this);
             ITransition combatTransition = new CombatTransition(this);
             aliveFSM.AddTransition(safe, escapeTransition, escape);
