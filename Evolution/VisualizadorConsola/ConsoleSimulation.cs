@@ -214,7 +214,7 @@ namespace VisualizadorConsola
                     int aux = 0;
                     //*
                     if (val == 0)
-                        if (world.map[j / scale, i / scale].height < 0.5)
+                        if (world.map[j / scale, i / scale].isWater)
                         {
                             SetPixel(j, i, Color.DarkBlue, treeMap, scale);
                             SetPixel(j, i, Color.DarkBlue, floraMap, scale);

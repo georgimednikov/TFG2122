@@ -78,6 +78,7 @@ namespace EvolutionSimulation
         {
             public double height, humidity, temperature, flora;
             public Plant plant;
+            public bool isWater;
         }
 
         public void Init(int size)
@@ -400,6 +401,7 @@ namespace EvolutionSimulation
                         avgHumidity -= map[xIndex, yIndex].humidity;
                         map[xIndex, yIndex].temperature = temperatureSoftener(evaluation, map[xIndex, yIndex].temperature, currAvgTemp);
                         map[xIndex, yIndex].humidity += map[xIndex, yIndex].humidity - evaluation;
+                        map[xIndex, yIndex].isWater = true;
                         for (int i = -(int)(mapScale / 5); i <= (int)(mapScale / 5); i++)
                         {
                             for (int j = -(int)(mapScale / 5); j <= (int)(mapScale / 5); j++)
