@@ -1,7 +1,8 @@
 ﻿namespace EvolutionSimulation.FSM.Creature.Transitions
 {
     /// <summary>
-    /// Checks if a creature need to eat
+    /// Checks if a creature need to eat and know where to go
+    /// Wander -> Go to eat
     /// </summary>
     class HungerTransition : CreatureTransition
     {
@@ -13,7 +14,9 @@
 
         public override bool Evaluate()
         {
-            return creature.stats.CurrEnergy < creature.stats.hungerThreshold * creature.stats.MaxEnergy;
+            if(creature.stats.CurrEnergy > creature.stats.hungerThreshold * creature.stats.MaxEnergy) return false;
+
+            return creature.HasEatingObjective(); 
         }
 
         public override string ToString()

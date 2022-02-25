@@ -137,7 +137,7 @@ namespace EvolutionSimulation.Entities
                 int hairValue = chromosome.GetFeature(CreatureFeature.Hair);
                 stats.MinTemperature -= hairValue * 2;
                 stats.MaxTemperature -= hairValue;
-                stats.Hair = hairValue;
+                //stats.Hair = hairValue;
             }
 
             //UpRight increase the perception at most 1.5

@@ -3,7 +3,7 @@
 namespace EvolutionSimulation.FSM.Creature.States
 {
     /// <summary>
-    /// Action that eat a edible plant or a corpse depending on the creature's diet
+    /// Action that eat an edible plant or a corpse depending on the creature's diet
     /// gaining some energy
     /// </summary>
     class Eating : CreatureState
@@ -20,15 +20,13 @@ namespace EvolutionSimulation.FSM.Creature.States
             Console.WriteLine("Eating action");
             if(creature.stats.Diet == Genetics.Diet.Carnivore )
             {
-                //if (creature.nearestCorpse != null)//TODO hace falta esto? creo que no por las transiciones
                 EatCorpse();
             }
             else if(creature.stats.Diet == Genetics.Diet.Herbivore)
             {
-                //if (creature.nearestEdiblePlant != null)//TODO hace falta esto? creo que no por las transiciones
                 EatPlant();
             }
-            else
+            else//Omnivore
             {
                 if (creature.nearestCorpse == null)
                     EatPlant();
@@ -37,14 +35,9 @@ namespace EvolutionSimulation.FSM.Creature.States
                 else
                 {
                     //Eat the nearest food (nearestEdiblePlant or Corpse)
-                    int x1, y1, x2, y2;
-                    x1 = Math.Abs(creature.x - creature.nearestEdiblePlant.x);
-                    y1 = Math.Abs(creature.y - creature.nearestEdiblePlant.y);
-                    x2 = Math.Abs(creature.x - creature.nearestCorpse.x);
-                    y2 = Math.Abs(creature.y - creature.nearestCorpse.y);
-                    int dist1 = (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2)),
-                        dist2 = (int)Math.Sqrt(Math.Pow(x2, 2) + Math.Pow(y2, 2));
-                    if (dist1 < dist2)
+                    int distPlant = creature.DistanceToObjective(creature.nearestEdiblePlant),
+                        distCorpse = creature.DistanceToObjective(creature.nearestCorpse);
+                    if (distPlant < distCorpse)
                         EatPlant();
                     else
                         EatCorpse();
@@ -73,8 +66,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         protected void EatCorpse()
         {
-            //TODO
-            //creature.AddInteraction(Entities.Interactions.eat, creature.nearestCorpse);
+            creature.nearestCorpse.ReceiveInteraction(creature, Entities.Interactions.eat);
         }
     }
 }

@@ -4,6 +4,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 {
     /// <summary>
     /// Checks if the creature is close to the eating objective
+    /// Go to eat -> Eating
     /// </summary>
     class EatingTransition : CreatureTransition
     {
