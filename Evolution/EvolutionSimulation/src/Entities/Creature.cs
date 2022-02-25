@@ -655,6 +655,7 @@ namespace EvolutionSimulation.Entities
         public bool InHeat { get; set; }
 
         public bool Upright { get; set; }
+        public bool Hair { get; set; }
     }
 
 }

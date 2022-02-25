@@ -21,6 +21,7 @@ namespace VisualizadorConsola
             
             Animal c = world.CreateCreature<Animal>(5, 5);
             c.stats.CurrEnergy = c.stats.MaxEnergy * 0.2f;
+            c = world.CreateCreature<Animal>(5, 4); // Enemy?
             Corpse c1 = world.CreateStableEntity<Corpse>();
             c1.Init(c.world, 5, c.x, c.y+1, 0.4f, 0.7f, 5, 5, 80f); // TODO: stats to be derived from creacher
 
