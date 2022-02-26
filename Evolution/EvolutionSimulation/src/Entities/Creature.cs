@@ -58,6 +58,10 @@ namespace EvolutionSimulation.Entities
                 AddInteraction(Interactions.attack, RetalliateDamage);
             // Poison
             AddInteraction(Interactions.poison, Poison);
+            // Mate
+            AddInteraction(Interactions.mate, OnMate);
+            AddInteraction(Interactions.stopMate, StopMating);
+
             Console.WriteLine(mfsm.ExportToDotGraph());
         }
 
@@ -77,7 +81,6 @@ namespace EvolutionSimulation.Entities
             {
                 if (timeToBeInHeat == 0)//Can be pregnant
                     stats.InHeat = true;
-                //TODO: cuando se quede embarazada, poner timeToBeInHeat a -1
                 else if (timeToBeInHeat <= -1)// Pregnant, reset timer
                 {
                     timeToBeInHeat = stats.TimeBetweenHeats;
@@ -85,6 +88,16 @@ namespace EvolutionSimulation.Entities
                 }
                 else
                     timeToBeInHeat--;
+
+                //if the female has to do something, she doesn't want to mate
+                if (stats.CurrEnergy < stats.veryHungerThreshold * stats.MaxEnergy
+                    || stats.CurrRest < stats.exhaustThreshold * stats.MaxRest
+                    || stats.CurrHydration < stats.veryThirstyThreshold * stats.MaxHydration
+                    || mating || !stats.InHeat)
+                {
+                    wantMate = false;
+                }
+                else wantMate = true;
             }
 
             Perceive();
@@ -168,15 +181,17 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(drink, stopDrinkingTransition, wander);
 
             // Mating
-            ITransition mateTransition = new MateTransition(this);
+            ITransition mateTransition = new GoToMateTransition(this);
             ITransition tryMateTransition = new TryMateTransition(this);
             ITransition matingTransition = new MatingTransition(this);
             ITransition stopMatingTransition = new StopMatingTransition(this);
+            ITransition stopGoToMateTransition = new StopGoToMateTransition(this);
+            ITransition stopTryMateTransition = new StopTryMateTransition(this);
             safeFSM.AddTransition(wander, mateTransition, goToMate);
-            //safeFSM.AddTransition(goToMate, ?, wander);
             safeFSM.AddTransition(goToMate, tryMateTransition, tryMate);
-            //safeFSM.AddTransition(tryMate, ?, wander);
+            safeFSM.AddTransition(goToMate, stopGoToMateTransition, wander);
             safeFSM.AddTransition(tryMate, matingTransition, mating);
+            safeFSM.AddTransition(tryMate, stopTryMateTransition, wander);
             safeFSM.AddTransition(mating, stopMatingTransition, wander);
 
             // Eating
@@ -291,12 +306,18 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         void ProcessInput()
         {
-            // Find the nearest ally and mate
+            // Nearest ally
             if (seenSameSpeciesCreatures.Count != 0)
                 nearestAlly = seenSameSpeciesCreatures[0];
+            // Find the nearest mate
             foreach (Creature c in seenSameSpeciesCreatures)
             {
-                if (c.stats.InHeat)
+                if (stats.Gender == Gender.Male && c.wantMate)
+                {
+                    nearestMate = c;
+                    break;
+                }
+                else if(stats.Gender == Gender.Female && c.stats.Gender == Gender.Male)
                 {
                     nearestMate = c;
                     break;
@@ -362,6 +383,33 @@ namespace EvolutionSimulation.Entities
                 InteractionsDict.Remove(type);
         }
 
+
+        /// <summary>
+        /// Returns the taken damage
+        /// </summary>
+        /// <param name="dmg">Incoming damage</param>
+        /// <param name="pen">Damage penetratione</param>
+        public float ComputeDamage(float dmg, float pen)
+        {
+            float amount = 0;
+            amount = (dmg) - (stats.Armor - pen);
+            amount = Math.Max(0, amount);
+            amount = Math.Min(amount, stats.CurrHealth);
+            return amount;
+        }
+
+        /// <summary>
+        /// Returns if an ability is unlocked
+        /// </summary>
+        /// <param name="unlock">Skill percentage when skill is unlocked</param>
+        public bool HasAbility(CreatureFeature feat, float unlock)
+        {
+            float f = chromosome.GetFeature(feat);
+            float mF = chromosome.GetFeatureMax(feat);
+            return unlock <= f / mF;
+        }
+
+
         /// <summary>
         /// Check if the eating objective is not null
         /// </summary>
@@ -397,6 +445,62 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
+        /// Check if the creature is hunger (need to eat)
+        /// </summary>
+        /// <returns> True if the creature is hunger </returns>
+        public bool IsHunger()
+        {
+            return stats.CurrEnergy > stats.hungerThreshold * stats.MaxEnergy;
+        }
+
+        /// <summary>
+        /// Check if the creature is very hunger (need to eat)
+        /// </summary>
+        /// <returns> True if the creature is very hunger </returns>
+        public bool IsVeryHunger()
+        {
+            return stats.CurrEnergy > stats.veryHungerThreshold * stats.MaxEnergy;
+        }
+
+
+        /// <summary>
+        /// Check if the creature is thirsty (need to drink)
+        /// </summary>
+        /// <returns> True if the creature is thirsty </returns>
+        public bool IsThirsty()
+        {
+            return stats.CurrHydration > stats.thirstyThreshold * stats.MaxHydration;
+        }
+
+        /// <summary>
+        /// Check if the creature is very thirsty (need to drink)
+        /// </summary>
+        /// <returns> True if the creature is very thirsty </returns>
+        public bool IsVeryThirsty()
+        {
+            return stats.CurrHydration > stats.veryThirstyThreshold * stats.MaxHydration;
+        }
+
+
+        /// <summary>
+        /// Check if the creature is tired (need to sleep)
+        /// </summary>
+        /// <returns> True if the creature is tired </returns>
+        public bool IsTired()
+        {
+            return stats.CurrRest <= stats.tiredThreshold * stats.MaxRest;
+        }
+
+        /// <summary>
+        /// Check if the creature is exhausted (need to sleep)
+        /// </summary>
+        /// <returns> True if the creature is exhausted </returns>
+        public bool IsExhausted()
+        {
+            return stats.CurrRest <= stats.exhaustThreshold * stats.MaxRest;
+        }        
+
+        /// <summary>
         /// Action the creature will do upon being attacked
         /// </summary>
         private void ReceiveDamage(Creature interacter)
@@ -427,41 +531,41 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
-        /// 
+        /// If a female receive this interaction, check if she want to mate
+        /// and send a interaction to the male
         /// </summary>
-        /// <param name="interacter"> male </param>
+        /// <param name="interacter"> The creature that sends the interaction </param>
         private void OnMate(Creature interacter)
         {
-            if (!stats.InHeat && !mating) return;  // TODO: consentir o no, si tienes hambre no copular por ejemplo
-            mating = true;
-            interacter.mating = true;
+            if(wantMate && stats.Gender == Gender.Female)
+            {
+                wantMate = false;
+                mating = true;
+                matingCreature = interacter;
+                interacter.ReceiveInteraction(this, Interactions.mate);
+            }
+            else if (stats.Gender == Gender.Male)
+            {
+                mating = true;
+                matingCreature = interacter;
+            }
         }
 
         /// <summary>
-        /// Returns the taken damage
+        /// If the creature was mating and has stopped, tell the mating creature to stop as well
         /// </summary>
-        /// <param name="dmg">Incoming damage</param>
-        /// <param name="pen">Damage penetratione</param>
-        public float ComputeDamage(float dmg, float pen)
+        /// <param name="interacter"> Creature who has sent the interaction </param>
+        private void StopMating(Creature interacter)
         {
-            float amount = 0;
-            amount = (dmg) - (stats.Armor - pen);
-            amount = Math.Max(0, amount);
-            amount = Math.Min(amount, stats.CurrHealth);
-            return amount;
+            if(matingCreature != null)
+            {
+                matingCreature.ReceiveInteraction(this, Interactions.stopMate);
+                matingCreature = null;
+                mating = false;
+            }
         }
 
-        /// <summary>
-        /// Returns if an ability is unlocked
-        /// </summary>
-        /// <param name="unlock">Skill percentage when skill is unlocked</param>
-        public bool HasAbility(CreatureFeature feat, float unlock)
-        {
-            float f = chromosome.GetFeature(feat);
-            float mF = chromosome.GetFeatureMax(feat);
-            return unlock <= f / mF;
-        }
-
+        
         /// <summary>
         /// Sets the stats of the creature.
         /// </summary>
@@ -521,7 +625,8 @@ namespace EvolutionSimulation.Entities
 
         public Creature nearestEnemy; 
         public Creature nearestAlly; 
-        public Creature nearestMate; 
+        public Creature nearestMate;
+        public Creature matingCreature;
         public Corpse nearestCorpse; 
         public EdiblePlant nearestEdiblePlant; 
         //water place
@@ -531,7 +636,19 @@ namespace EvolutionSimulation.Entities
 
         public bool hasBeenHit;
 
-        protected int timeToBeInHeat;
+        /// <summary>
+        /// Time in ticks to be in heat (a female)
+        /// </summary>
+        public int timeToBeInHeat;
+        /// <summary>
+        /// If a female want to mate, its false if she has needs like
+        /// sleep or eat or is mating
+        /// </summary>
+        //TODO igual si estas en el estado mating y te atacan o muere la criatura con la que estas relacionandote esto hay que ponerlo a false
+        public bool wantMate = false;
+        /// <summary>
+        /// If a creatures is mating
+        /// </summary>
         public bool mating;
 
         // Interactions that the creature can react to. Keys are the Interaction type

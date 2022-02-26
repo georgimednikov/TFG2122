@@ -9,7 +9,7 @@
 
         public override bool Evaluate()
         {
-            return creature.stats.CurrRest <= creature.stats.exhaustThreshold * creature.stats.MaxRest;
+            return creature.IsExhausted();
         }
 
         public override string ToString()

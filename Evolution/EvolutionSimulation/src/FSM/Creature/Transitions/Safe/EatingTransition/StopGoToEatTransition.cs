@@ -17,15 +17,15 @@
             if (!creature.HasEatingObjective()) return true;
 
             // Max priority to sleep
-            if (creature.stats.CurrRest < creature.stats.exhaustThreshold * creature.stats.MaxRest)
+            if (creature.IsExhausted())
                 return true;
 
             // If the creature is really hunger continue going to eating objective
-            if (creature.stats.CurrEnergy < creature.stats.veryHungerThreshold * creature.stats.MaxEnergy)
+            if (creature.IsVeryHunger())
                 return false;
 
             // If the creature is really thirsty stop going to eating objective
-            if (creature.stats.CurrHydration < creature.stats.veryThirstyThreshold * creature.stats.MaxHydration)
+            if (creature.IsVeryThirsty())
                 return true;
 
             return false;

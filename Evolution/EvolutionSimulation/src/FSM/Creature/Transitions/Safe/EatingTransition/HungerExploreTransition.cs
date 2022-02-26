@@ -14,9 +14,8 @@
 
         public override bool Evaluate()
         {
-            if(creature.stats.CurrEnergy > creature.stats.hungerThreshold * creature.stats.MaxEnergy) return false;
 
-            return !creature.HasEatingObjective(); 
+            return creature.IsHunger() && !creature.HasEatingObjective(); 
         }
 
         public override string ToString()
