@@ -93,10 +93,14 @@ namespace EvolutionSimulation.Entities
 
             // Action points added every tick 
             ActionPoints += stats.Metabolism * 10;
-
+            
             // Executes the state action if the creature has enough Action Points
-            if (mfsm.EvaluateCost() >= ActionPoints)
+            int cost = 0;
+            while ((cost = mfsm.EvaluateCost()) >= ActionPoints)
+            {
                 mfsm.CurrentState.Action();
+                ActionPoints -= cost; 
+            }
 
             Clear();
         }
