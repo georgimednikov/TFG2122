@@ -4,11 +4,11 @@ namespace EvolutionSimulation.FSM.Creature.States
 {
     /// <summary>
     /// When the creature has to do something but doesn't know 
-    /// where he can do it, i.e. the creature wants to drink but he 
-    /// doesn't know where is a lake to drink. 
+    /// where it can do it, i.e. the creature wants to drink but it 
+    /// doesn't know where there is a mass of water. 
     /// 
-    /// It moves around the world improving his knowledge about it 
-    /// (uploading his mental map of the world)
+    /// It moves around the world improving its knowledge about it,
+    /// updating its mental map of the world
     /// </summary>
     class Explore : CreatureState
     {
@@ -22,6 +22,9 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override int Action()
         {
             Console.WriteLine("Explore action");
+
+            //creature.
+
             return 0;
         }
 
