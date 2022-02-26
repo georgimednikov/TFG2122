@@ -8,6 +8,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 {
     /// <summary>
     /// Checks if the creature is close to the drink objective
+    /// Go to drink -> drinking
     /// </summary>
     class DrinkingTransition : CreatureTransition
     {

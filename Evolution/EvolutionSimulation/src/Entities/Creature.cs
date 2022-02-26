@@ -158,10 +158,13 @@ namespace EvolutionSimulation.Entities
             // Drinking
             ITransition thirstyTransition = new ThirstyTransition(this);
             ITransition drinkingTransition = new DrinkingTransition(this);
+            ITransition drinkingExploreTransition = new DrinkingExploreTransition(this);
             ITransition stopDrinkingTransition = new StopDrinkingTransition(this);
+            ITransition stopGoToDrinkTransition = new StopGoToDrinkTransition(this);
             safeFSM.AddTransition(wander, thirstyTransition, goToDrink);
+            safeFSM.AddTransition(wander, drinkingExploreTransition, explore);
             safeFSM.AddTransition(goToDrink, drinkingTransition, drink);
-            //safeFSM.AddTransition(goToDrink, ?, wander);
+            safeFSM.AddTransition(goToDrink, stopGoToDrinkTransition, wander);
             safeFSM.AddTransition(drink, stopDrinkingTransition, wander);
 
             // Mating
