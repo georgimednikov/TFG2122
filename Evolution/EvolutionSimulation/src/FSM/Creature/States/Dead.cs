@@ -13,7 +13,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override int GetCost()
         {
-            return 1000000; // TODO: Controlar este coste para que no se muera varias veces
+            return Math.Max(creature.ActionPoints, 1); // This allows for one death and prevents subsequent ones
         }
 
         /// <summary>

@@ -96,7 +96,7 @@ namespace EvolutionSimulation.Entities
             
             // Executes the state action if the creature has enough Action Points
             int cost = 0;
-            while ((cost = mfsm.EvaluateCost()) >= ActionPoints)
+            while ((cost = mfsm.EvaluateCost()) <= ActionPoints)
             {
                 mfsm.CurrentState.Action();
                 ActionPoints -= cost; 
@@ -127,8 +127,6 @@ namespace EvolutionSimulation.Entities
                 activeStatus.Remove(s);
             removedStatus.Clear();
         }
-
-        
 
         /// <summary>
         /// Returns the creature's current state

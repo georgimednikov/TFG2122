@@ -8,9 +8,13 @@ namespace EvolutionSimulation.FSM.Creature.States
     class Fleeing : CreatureState
     {
         // How costly it is to move compared to regular safe movement
-        private float modifier = 1.25f;
+        private float modifier;
 
-        public Fleeing(Entities.Creature c) : base(c) { creature = c; }
+        public Fleeing(Entities.Creature c) : base(c) 
+        { 
+            creature = c;
+            modifier = 1.1f - (creature.stats.GroundSpeed / 150f);  // TODO: Que dependa bien de stats
+        }
 
         public override int GetCost()
         {

@@ -6,9 +6,13 @@ namespace EvolutionSimulation.FSM.Creature.States
     class ChaseEnemy : CreatureState
     {
         // How costly it is to move compared to regular safe movement
-        private float modifier = 1.25f;
+        private float modifier; 
 
-        public ChaseEnemy(Entities.Creature c) : base(c) { creature = c; }
+        public ChaseEnemy(Entities.Creature c) : base(c) 
+        { 
+            creature = c;
+            modifier = 1.1f - (c.stats.Aggressiveness / 10f); // TODO: Modificador que dependa bien, ahora mimso a mas gresividad mejor persigue
+        }
 
         public override int GetCost()
         {
