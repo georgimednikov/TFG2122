@@ -215,8 +215,11 @@ namespace EvolutionSimulation.Entities
             {
                 if (closestCreature == null) closestCreature = map[x, y].creatures[0];
                 if (closestCreatureReachable == null)
-                    foreach (Creature creature in map[x, y].creatures) ;
-                        //if (creature.stats.InHeat) closestPossibleMate = creature;
+                    foreach (Creature creature in map[x, y].creatures)
+                        if ((creature.creatureLayer == Creature.HeightLayer.Air && thisCreature.stats.AirReach) ||
+                            creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach ||
+                            creature.creatureLayer == Creature.HeightLayer.Ground)
+                            closestCreatureReachable = creature;
             }
                 
             if (map[x, y].allies.Count > 0)

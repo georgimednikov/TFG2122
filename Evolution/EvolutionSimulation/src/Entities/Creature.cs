@@ -613,12 +613,6 @@ namespace EvolutionSimulation.Entities
 
         #region Attributes
         Memory memory;
-        public Creature GetClosestAlly() { return memory.closestAlly; }
-        public Creature GetClosestPossibleMate() { return memory.closestPossibleMate; }
-        public Creature GetClosestCreature() { return memory.closestCreature; }
-        public Corpse GetClosestCorpse() { return memory.closestCorpse; }
-        public Tuple<int, int> GetClosestFruit() { return memory.closestFruit; }
-        public Tuple<int, int> GetClosestWater() { return memory.closestWater; }
 
         // World tile position
         public int x { get; private set; }
@@ -670,6 +664,13 @@ namespace EvolutionSimulation.Entities
         List<Status.Status> removedStatus;
         #endregion
 
+        public Creature GetClosestAlly() { return memory.closestAlly; }
+        public Creature GetClosestPossibleMate() { return memory.closestPossibleMate; }
+        public Creature GetClosestCreature() { return memory.closestCreature; }
+        public Creature GetClosestCreatureReachable() { return memory.closestCreatureReachable; }
+        public Corpse GetClosestCorpse() { return memory.closestCorpse; }
+        public Tuple<int, int> GetClosestFruit() { return memory.closestFruit; }
+        public Tuple<int, int> GetClosestWater() { return memory.closestWater; }
     }
 
 
