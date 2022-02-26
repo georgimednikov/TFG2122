@@ -287,13 +287,13 @@ namespace EvolutionSimulation
         /// Returns the creatures in an area with a determined radius.
         /// </summary>
         /// <param name="c">The creature that is perceiving</param>
-        public List<Creature> PerceiveCreatures(Creature c, int x, int y, int radius)
+        public List<Creature> PerceiveCreatures(Creature c, int radius)
         {
             List<Creature> results = new List<Creature>();
             foreach (Creature e in Creatures) // TODO: use this?
             {
                 if (e == c) continue; // Reference comparison
-                if (Math.Abs(e.x - x) <= radius && Math.Abs(e.y - y) <= radius) // Square vision
+                if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius) // Square vision
                     results.Add(e);
             }
             return results;
@@ -303,12 +303,12 @@ namespace EvolutionSimulation
         /// Returns the entities in an area with a determined radius.
         /// </summary>
         /// <param name="c">The creature that is perceiving</param>
-        public List<StableEntity> PerceiveEntities(Creature c, int x, int y, int radius)
+        public List<StableEntity> PerceiveEntities(Creature c, int radius)
         {
             List<StableEntity> results = new List<StableEntity>();
             foreach (StableEntity e in StableEntities) // TODO: use this?
             {
-                if (Math.Abs(e.x - x) <= radius && Math.Abs(e.y - y) <= radius) // Square vision
+                if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius) // Square vision
                     results.Add(e);
             }
             return results;
