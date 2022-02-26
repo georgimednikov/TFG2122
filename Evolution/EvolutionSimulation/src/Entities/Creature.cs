@@ -19,13 +19,13 @@ namespace EvolutionSimulation.Entities
         /// Constructor for factories
         /// </summary>
         public Creature()
-        {         
+        {
             seenSameSpeciesCreatures = new List<Creature>();
             otherSeenCreatures = new List<Creature>();
             seenEntities = new List<StableEntity>();
             InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
             activeStatus = new List<Status.Status>();
-            removedStatus = new List<Status.Status>();          
+            removedStatus = new List<Status.Status>();
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace EvolutionSimulation.Entities
         {
             world = w;
 
-            if(chromosome == null)
+            if (chromosome == null)
             {
                 this.chromosome = new CreatureChromosome();
             }
@@ -71,9 +71,9 @@ namespace EvolutionSimulation.Entities
             //toWake.value = (stats.CurrRest >= stats.MaxRest);
 
             stats.CurrRest -= stats.RestExpense;
-            mfsm.ObtainActionPoints(stats.Metabolism);         
-            
-            if(stats.Gender == Gender.Female && !stats.IsNewBorn())
+            mfsm.ObtainActionPoints(stats.Metabolism);
+
+            if (stats.Gender == Gender.Female && !stats.IsNewBorn())
             {
                 if (timeToBeInHeat == 0)//Can be pregnant
                     stats.InHeat = true;
@@ -147,7 +147,7 @@ namespace EvolutionSimulation.Entities
             //Find the nearest edible plant and corpse
             foreach (StableEntity c in seenEntities)
             {
-                if (nearestEdiblePlant == null && c as EdiblePlant != null )
+                if (nearestEdiblePlant == null && c as EdiblePlant != null)
                 {
                     nearestEdiblePlant = (EdiblePlant)c;
                     if (nearestEdiblePlant.eaten) nearestEdiblePlant = null;
@@ -158,7 +158,7 @@ namespace EvolutionSimulation.Entities
                 }
                 if (nearestCorpse != null && nearestEdiblePlant != null)
                     break;
-                
+
             }
         }
 
@@ -175,7 +175,7 @@ namespace EvolutionSimulation.Entities
         /// TODO: We are forcefully cramming these states down the FSM's throat
         /// </summary>
         void ConfigureStateMachine()
-        {       
+        {
             // Alive state configuration
             // States
             // Safe-state configuration
@@ -186,7 +186,7 @@ namespace EvolutionSimulation.Entities
             IState drink = new Drinking(this);
             IState goToMate = new GoToMate(this);
             IState tryMate = new TryMate(this);
-            IState mating = new Mating(this,100);//TODO que 100 lo coja del cromosoma, es el tiempo que tardan en reproducirse
+            IState mating = new Mating(this, 100);//TODO que 100 lo coja del cromosoma, es el tiempo que tardan en reproducirse
             IState goToEat = new GoToEat(this);
             IState eat = new Eating(this);
             IState goToSafePlace = new GoToSafePlace(this);
@@ -234,7 +234,7 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToSafePlace, sleepySafeTransition, sleep);
             safeFSM.AddTransition(wander, sleepyTransition, sleep);
             safeFSM.AddTransition(sleep, wakeTransition, wander);
-            
+
             //
             // Escape-state Configuration
             // States
@@ -262,9 +262,9 @@ namespace EvolutionSimulation.Entities
             ITransition safeTransition = new SafeTransition(this);
             ITransition combatTransition = new CombatTransition(this);
             aliveFSM.AddTransition(safe, escapeTransition, escape);
-            aliveFSM.AddTransition(safe, combatTransition, combat);            
+            aliveFSM.AddTransition(safe, combatTransition, combat);
             aliveFSM.AddTransition(combat, safeTransition, safe);
-            aliveFSM.AddTransition(combat, escapeTransition, escape);           
+            aliveFSM.AddTransition(combat, escapeTransition, escape);
             aliveFSM.AddTransition(escape, safeTransition, safe);
             aliveFSM.AddTransition(escape, combatTransition, combat);
             //
@@ -274,16 +274,20 @@ namespace EvolutionSimulation.Entities
             mfsm = new Fsm(alive);
             // Transitions
             ITransition dieTransition = new DieTransition(this);
-            mfsm.AddTransition(alive, dieTransition, dead);   
+            mfsm.AddTransition(alive, dieTransition, dead);
         }
-        
+
         /// <summary>
         /// Moves a creature a specified amount
         /// </summary>
-        public void Move(int x, int y)
+        public void Move(int x, int y, int z = 0)
         {
             this.x += x;
             this.y += y;
+            if (world.isTree(x, y))
+                this.creatureLayer = (HeightLayer)z;
+            else if (creatureLayer != HeightLayer.Air)
+                creatureLayer = HeightLayer.Ground;
         }
 
         /// <summary>
@@ -305,8 +309,8 @@ namespace EvolutionSimulation.Entities
             seenEntities = world.PerceiveEntities(this, x, y, perceptionRadius);
             seenCreatures.Sort(new Utils.SortByDistance(this));   // TODO, no hacer new todo el rato
             seenEntities.Sort(new Utils.SortByDistanceSEntities(this));   // TODO, no hacer new todo el rato
-            foreach(Creature c in seenCreatures)
-            {                
+            foreach (Creature c in seenCreatures)
+            {
                 if (c.speciesName == speciesName || c.progenitorSpeciesName == speciesName || c.speciesName == progenitorSpeciesName)
                     seenSameSpeciesCreatures.Add(c);
                 else
@@ -320,7 +324,7 @@ namespace EvolutionSimulation.Entities
         public void ReceiveInteraction(Creature interacter, Interactions type)
         {
             if (InteractionsDict.ContainsKey(type))
-                foreach(Action<Creature> response in InteractionsDict[type])
+                foreach (Action<Creature> response in InteractionsDict[type])
                     response(interacter);
         }
 
@@ -334,7 +338,7 @@ namespace EvolutionSimulation.Entities
                 InteractionsDict[type] = new List<Action<Creature>>();
             InteractionsDict[type].Add(response);
         }
-        
+
         /// <summary>
         /// Removes a response to an interaction type, given the
         /// creature that interacts with this. 
@@ -360,7 +364,7 @@ namespace EvolutionSimulation.Entities
 
             nearestEnemy = interacter;
             //objectivePos = new Vector2(interacter.x, interacter.y);
-            hasBeenHit = true;             
+            hasBeenHit = true;
         }
 
         /// <summary>
@@ -377,7 +381,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         private void Poison(Creature interacter)
         {
-            if(interacter.stats.Perforation >= stats.Armor)
+            if (interacter.stats.Perforation >= stats.Armor)
                 AddStatus(new Poison(5 + (int)interacter.stats.Venom, interacter.stats.Venom));
         }
 
@@ -415,6 +419,98 @@ namespace EvolutionSimulation.Entities
             float f = chromosome.GetFeature(feat);
             float mF = chromosome.GetFeatureMax(feat);
             return unlock <= f / mF;
+        }
+
+        public enum HeightLayer { Ground, Tree, Air };
+
+        public HeightLayer creatureLayer;
+
+        int treeHeight = 1, flightHeight = 2;
+        Vector3[] path;
+        int pathIterator;
+
+        public int getTreeThreshold(double treeDensity)
+        {
+            double a = 2 * treeHeight * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / 100f);
+            double b = treeDensity * (stats.GroundSpeed / 100f + Tree.movementPenalty - stats.ArborealSpeed / 100f - 1);
+            return (int)Math.Floor((a / b) + 0.5);
+        }
+
+        int getFlyThreshold(double treeDensity)
+        {
+            double a = 2 * flightHeight * (stats.GroundSpeed / 100f * (1 - treeDensity) + treeDensity * stats.AerialSpeed / 100f);
+            double b = -2 * stats.AerialSpeed / 100f * treeHeight * treeDensity;
+            double c = stats.AerialSpeed / 100f + stats.GroundSpeed / 100f * (treeDensity - 1) - treeDensity * stats.ArborealSpeed / 100f;
+            return (int)Math.Floor(((a + b) / c) + 0.5);
+        }
+
+        public int SetPath(int x, int y, int z = 0)
+        {
+            if (!world.canMove(x, y, z)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
+            double treeDensity = 0;
+            path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, z), out treeDensity); // A*
+            int thres = getFlyThreshold(treeDensity);
+            if (thres > 0 && path.Length >= thres)
+                path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, z));// A* pero con todo gratis
+
+            //Console.Clear();
+            //for (int i = 0; i < path.Length; ++i)
+            //{
+            //    //for (int j = 0; j < path[i].X; ++j)
+            //    //{
+            //    //    if (world.isTree(j, (int)path[i].Y)) Console.BackgroundColor = ConsoleColor.Green;
+            //    //    else Console.BackgroundColor = ConsoleColor.Black; 
+            //    //    Console.Write(" ");
+            //    //}
+            //    if (world.isTree((int)path[i].X, (int)path[i].Y)) Console.BackgroundColor = ConsoleColor.Green;
+            //    else Console.BackgroundColor = ConsoleColor.Black;
+            //    Console.SetCursorPosition((int)path[i].X, (int)path[i].Y);
+
+            //    if (path[i].Z == 0) Console.Write("x");
+            //    else Console.Write("a");
+            //}
+            //Console.BackgroundColor = ConsoleColor.Black;
+            //Console.WriteLine();
+            //if (path[path.Length - 1].X != 31 || path[path.Length - 1].Y != 31)
+            //    Console.WriteLine("No se puede");
+            return GetNextCostOnPath();
+        }
+
+        //TODO:Remove
+        public void MakeFly()
+        {
+            stats.ArborealSpeed = 199;
+            stats.AerialSpeed = -1;
+            stats.GroundSpeed = 100;
+        }
+
+        public int GetNextCostOnPath()
+        {
+            int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
+            int speed;
+            switch ((int)path[pathIterator].Z)
+            {
+                case 0:
+                default:
+                    speed = stats.GroundSpeed;
+                    break;
+                case 1:
+                    speed = stats.GroundSpeed;
+                    break;
+                case 2:
+                    speed = stats.GroundSpeed;
+                    break;
+            }
+            if (world.map[x, y].plant is Tree || world.map[x, y].plant is EdibleTree)
+                return (int)(1000 * ((200f - speed * (2 - Tree.movementPenalty)) / 100f));
+            return (int)(1000 * ((200f - speed) / 100f));
+        }
+
+        public Vector3 GetNextPosOnPath()
+        {
+            if (pathIterator >= path.Length) { path = null; return new Vector3(-1, -1, -1); }
+
+            return path[pathIterator++];
         }
 
         /// <summary>
@@ -474,11 +570,11 @@ namespace EvolutionSimulation.Entities
         private Fsm mfsm;
 
 
-        public Creature nearestEnemy; 
-        public Creature nearestAlly; 
-        public Creature nearestMate; 
-        public Corpse nearestCorpse; 
-        public EdiblePlant nearestEdiblePlant; 
+        public Creature nearestEnemy;
+        public Creature nearestAlly;
+        public Creature nearestMate;
+        public Corpse nearestCorpse;
+        public EdiblePlant nearestEdiblePlant;
         //water place
         //safe place
 
@@ -537,8 +633,11 @@ namespace EvolutionSimulation.Entities
 
         //Health and damage related stats
         float maxHealth;
-        public float MaxHealth { get { return ModifyStatByAge(maxHealth); }
-            set { maxHealth = value; /* If maxHealth changes, currHealth changes the difference */ CurrHealth += MaxHealth - CurrHealth; } }
+        public float MaxHealth
+        {
+            get { return ModifyStatByAge(maxHealth); }
+            set { maxHealth = value; /* If maxHealth changes, currHealth changes the difference */ CurrHealth += MaxHealth - CurrHealth; }
+        }
         public float CurrHealth { get; set; }
         int damage;
         public int Damage { get { /* Minimum damage is 1 */ return (int)Math.Ceiling(ModifyStatByAge(damage)); } set { damage = value; } }
@@ -562,8 +661,11 @@ namespace EvolutionSimulation.Entities
 
         //Energy related stats
         float maxEnergy;
-        public float MaxEnergy { get { return maxEnergy; }
-            set { maxEnergy = value; } }
+        public float MaxEnergy
+        {
+            get { return maxEnergy; }
+            set { maxEnergy = value; }
+        }
         public float CurrEnergy { get; set; }
         public float EnergyExpense { get; set; }
 
@@ -593,14 +695,17 @@ namespace EvolutionSimulation.Entities
         public int Size { get { return (int)ModifyStatByAge(size); } set { size = value; } }
         public int LifeSpan { get; set; }
         int currAge;
-        public int CurrAge { get { return currAge; } 
-            set { float oldMaxH = MaxHealth; currAge = value; CurrHealth += MaxHealth - oldMaxH; } }
+        public int CurrAge
+        {
+            get { return currAge; }
+            set { float oldMaxH = MaxHealth; currAge = value; CurrHealth += MaxHealth - oldMaxH; }
+        }
         public int Members { get; set; }//limbs
         public int Metabolism { get; set; }
         public float MinTemperature { get; set; }
         public float MaxTemperature { get; set; }
         public float IdealTemperature { get; set; }
-        public float Hair { get; set; }
+        public bool Hair { get; set; }
 
         //Behaviour related stats
         public int Knowledge { get; set; }
@@ -615,7 +720,6 @@ namespace EvolutionSimulation.Entities
         public bool InHeat { get; set; }
 
         public bool Upright { get; set; }
-        public bool Hair { get; set; }
     }
 
 }

@@ -2,18 +2,17 @@
 {
     public class EdibleTree : EdiblePlant
     {
-        public float movementPenalty { get; private set; }
+        public static float movementPenalty { get; private set; } = 0.7f; // TODO: poner en config
+
         public EdibleTree()
         {
-            movementPenalty = RandomGenerator.Next(50, 100);
-            regrowhtTime = RandomGenerator.Next(50, 101);
+            regrowthTime = RandomGenerator.Next(50, 101);
             nutritionalValue = RandomGenerator.Next(5, 11);
         }
 
-        public EdibleTree(float movementPenalty, int regrowhtTime, float nutritionalValue)
+        public EdibleTree(int regrowhtTime, float nutritionalValue)
         {
-            this.movementPenalty = movementPenalty;
-            this.regrowhtTime = regrowhtTime;
+            this.regrowthTime = regrowhtTime;
             this.nutritionalValue = nutritionalValue;
         }
     }

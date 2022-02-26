@@ -3,6 +3,7 @@ using EvolutionSimulation.Genetics;
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using System.Numerics;
 
 namespace EvolutionSimulation
 {
@@ -163,9 +164,26 @@ namespace EvolutionSimulation
         /// Checks if target coordinates are within the map's boundaries
         /// </summary>
         /// <returns>True if it is within bounds</returns>
-        public bool canMove(int x, int y)
+        public bool canMove(int x, int y, int z = 0)
         {
-            return (x >= 0 && x < mapSize && y >= 0 && y < mapSize);
+            if (!(x >= 0 && x < mapSize && y >= 0 && y < mapSize) || (z < 2 && map[x, y].isWater)) return false;
+            if (z == 0 || z == 2) return true;
+            return isTree(x, y);
+        }
+
+         public bool isTree(int x, int y)
+        {
+            Plant p = map[x, y].plant;
+            return (p is Tree || p is EdibleTree);
+        }
+
+        /// <summary>
+        /// Checks if target coordinates are within the map's boundaries
+        /// </summary>
+        /// <returns>True if it is within bounds</returns>
+        public bool canMove(Vector3 pos)
+        {
+            return canMove((int)pos.X, (int)pos.Y, (int)pos.Z);
         }
 
         #region EntitiesManagement
@@ -236,13 +254,15 @@ namespace EvolutionSimulation
             StableEntities.ForEach(delegate (StableEntity e) { e.Tick(); });
 
             // Entity deletion
-            CreaturesToDelete.ForEach(delegate (IEntity e) {
+            CreaturesToDelete.ForEach(delegate (IEntity e)
+            {
                 Creatures.Remove(e as Creature);
                 e = null;
                 //foreach (Creature c in Creatures)
                 //    if (c.objective == e) c.objective = null;   // TODO URGENTE: Esto no deberia hacerse, pero ni poniendolo en null se quita la referencia al objetivo de la criatura
             });
-            SEntitiesToDelete.ForEach(delegate (IEntity e) { 
+            SEntitiesToDelete.ForEach(delegate (IEntity e)
+            {
                 StableEntities.Remove(e as StableEntity);
                 e = null;
                 //foreach (Creature c in Creatures)

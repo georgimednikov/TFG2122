@@ -16,22 +16,24 @@ namespace VisualizadorConsola
         public void Init()
         {
             world = new World();
-            world.Init(16);
+            world.Init(32);
             Console.WriteLine("\n");
+            WorldToBmp();
             
-            Animal c = world.CreateCreature<Animal>(5, 5);
+            Animal c = world.CreateCreature<Animal>(0, 0);
             c.stats.CurrEnergy = c.stats.MaxEnergy * 0.2f;
-            world.CreateStableEntity<Corpse>();
+            c.MakeFly();
+            //world.CreateStableEntity<Corpse>();
             //EvolutionSimulation.Genetics.CreatureChromosome cc = EvolutionSimulation.Genetics.GeneticFunctions.UniformCrossover(c.chromosome, c2.chromosome);
             //EvolutionSimulation.Genetics.GeneticFunctions.UniformMutation(ref cc, 0.95f);
             //Animal c3 = world.CreateCreature<Animal>(4, 4, cc, c.speciesName);
             //c.AddStatus(new Poison(20, 5));
-
-            for (int i = 0; i < 4; i++)
-            {
-                c = world.CreateCreature<Animal>(5, 5);
-            }
-            world.ExportContent();
+            c.SetPath(31, 31);
+            //for (int i = 0; i < 4; i++)
+            //{
+            //    c = world.CreateCreature<Animal>(5, 5);
+            //}
+            //world.ExportContent();
         }
 
 
@@ -159,7 +161,7 @@ namespace VisualizadorConsola
 
         public void WorldToBmp()
         {
-            int scale = 2;
+            int scale = 4;
             Bitmap treeMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap floraMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap heightMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -235,18 +237,19 @@ namespace VisualizadorConsola
                     //*/
 
                     Plant plant = world.map[j / scale, i / scale].plant;
-                    if (plant as Grass != null)
-                        SetPixel(j, i, Color.DarkOliveGreen, treeMap, scale);
-                    else if (plant as Bush != null)
-                        SetPixel(j, i, Color.ForestGreen, treeMap, scale);
-                    else if (plant as Tree != null)
+                    //if (plant as Grass != null)
+                    //    SetPixel(j, i, Color.DarkOliveGreen, treeMap, scale);
+                    //else if (plant as Bush != null)
+                    //    SetPixel(j, i, Color.ForestGreen, treeMap, scale);
+                    if (plant as Tree != null)
                         SetPixel(j, i, Color.LawnGreen, treeMap, scale);
                     else if (plant as EdibleTree != null)
                         SetPixel(j, i, Color.Red, treeMap, scale);
+                    //else SetPixel(j, i, Color.Black, treeMap, scale);
                 }
             }
 
-            treeMap.Save("treeTest.bmp");
+            treeMap.Save("treeTest.png");
             floraMap.Save("flora.bmp");
             heightMap.Save("height.bmp");
             tempMap.Save("temp.bmp");

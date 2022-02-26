@@ -8,19 +8,6 @@ namespace EvolutionSimulation.Entities
 {
     public class Tree : Plant
     {
-        public float movementPenalty { get; private set; }
-
-        public Tree()
-        {
-            movementPenalty = RandomGenerator.Next(50, 100);
-        }
-        public Tree(float movementPenalty)
-        {
-            this.movementPenalty = movementPenalty;
-        }
-
-        public new void Tick()
-        {
-        }
+        public static float movementPenalty { get; private set; } = 0.7f; // TODO: poner en config
     }
 }

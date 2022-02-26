@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\Entities\Animal.cs" />
+    <Compile Include="src\Entities\Astar.cs" />
     <Compile Include="src\Entities\StableEntity.cs" />
     <Compile Include="src\Entities\Bush.cs" />
     <Compile Include="src\Entities\EdiblePlant.cs" />
