@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Stateless;
-using Stateless.Graph;
 
 namespace EvolutionSimulation.FSM
 {
-
     /// <summary>
-    /// State Machine implementation. It uses the Stateless library
+    /// State Machine implementation, where the states have an associated cost.
     /// </summary>
     public class Fsm
     {
@@ -37,7 +34,6 @@ namespace EvolutionSimulation.FSM
 
         /// <summary>
         /// Adds a transition from the original state to the destiny state
-        /// If a states has no transitions
         /// </summary>
         public void AddTransition(IState og, ITransition t, IState dest)
         {
@@ -47,36 +43,22 @@ namespace EvolutionSimulation.FSM
         }
 
         /// <summary>
-        /// Attempts to execute the current state.
-        /// If the action could not be executed returns false.
+        /// Evaluates transitions and modifies the current state if any transition triggers.
+        /// Returns the cost of the target state.
         /// </summary>
-        public bool Execute()
+        public int EvaluateCost()
         {
-            int prevActionPoints = ActionPoints;
-            int cost = 0;
-            if(CurrentState.canPerformAction(ActionPoints))
-                cost = CurrentState.Action();
-            ActionPoints -= cost;
-            return prevActionPoints != ActionPoints;
-        }
-
-        /// <summary>
-        /// Triggers whichever transitions return true on its Evaluate, if there is an available transition
-        /// All transitions all evaluated, only the first one that triggers results in a transition.
-        /// </summary>
-        public void Evaluate()
-        {
-            bool firstTrigger = false;
             foreach (Connection c in machine[CurrentState])
             {
-                if (c.Transition.Evaluate() && !firstTrigger)                
-                    CurrentState = c.OutState;                
+                if (c.Transition.Evaluate())
+                {
+                    //CurrentState.OnExit();
+                    CurrentState = c.OutState;
+                    //CurrentState.OnEntry();
+                    break;
+                }
             }
-        }
-
-        public void ObtainActionPoints(int metabolism)
-        {
-            ActionPoints += metabolism * 10;
+            return CurrentState.GetCost();
         }
 
         public string ExportToDotGraph()
@@ -84,8 +66,7 @@ namespace EvolutionSimulation.FSM
             return "Fsm DOT Graph export not implemented yet";
         }
 
-        public int ActionPoints { get; private set; }
         public IState CurrentState { get; private set; }
-        Dictionary<IState, List<Connection>> machine; 
+        Dictionary<IState, List<Connection>> machine;
     }
 }

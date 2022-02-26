@@ -71,7 +71,6 @@ namespace EvolutionSimulation.Entities
             //toWake.value = (stats.CurrRest >= stats.MaxRest);
 
             stats.CurrRest -= stats.RestExpense;
-            mfsm.ObtainActionPoints(stats.Metabolism);         
             
             if(stats.Gender == Gender.Female && !stats.IsNewBorn())
             {
@@ -92,8 +91,12 @@ namespace EvolutionSimulation.Entities
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
             ProcessInput();
 
-            do { mfsm.Evaluate(); } // While the creature can keep performing actions
-            while (mfsm.Execute());// Maintains the evaluation - execution action
+            // Action points added every tick 
+            ActionPoints += stats.Metabolism * 10;
+
+            // Executes the state action if the creature has enough Action Points
+            if (mfsm.EvaluateCost() >= ActionPoints)
+                mfsm.CurrentState.Action();
 
             Clear();
         }
@@ -512,7 +515,7 @@ namespace EvolutionSimulation.Entities
         // List of entities seen at this moment by this creature
         public List<StableEntity> seenEntities { get; private set; }
 
-        public int actionPoints;
+        public int ActionPoints { get; private set; }
 
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
@@ -526,8 +529,6 @@ namespace EvolutionSimulation.Entities
         public EdiblePlant nearestEdiblePlant; 
         //water place
         //safe place
-
-        public Action arrivalAction;
 
         public bool hasBeenHit;
 

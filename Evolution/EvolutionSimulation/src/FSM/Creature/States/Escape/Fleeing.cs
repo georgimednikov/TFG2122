@@ -12,12 +12,12 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public Fleeing(Entities.Creature c) : base(c) { creature = c; }
 
-        public override bool canPerformAction(int actionPoints)
+        public override int GetCost()
         {
-            return actionPoints >= (1000 * ((200f - creature.stats.GroundSpeed) / 100f) * modifier);
+            return (int)(1000 * ((200f - creature.stats.GroundSpeed) / 100f) * modifier);
         }
 
-        public override int Action()
+        public override void Action()
         {
             // If the creature is in a different tile, simpli get away from it
             int oX = creature.nearestEnemy.x,   // Objective's position
@@ -36,9 +36,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (creature.world.canMove(creature.x - normX, creature.x - normY))
             {
                 creature.Place(creature.x + normX, creature.x + normY);
-                return (int)(1000 * ((200f - creature.stats.GroundSpeed) / 100f) * modifier); // Cost of the action performed
             }
-            return 0;
         }
 
         public override string ToString()

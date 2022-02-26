@@ -12,21 +12,21 @@
         public Mating(Entities.Creature c, int time) : base(c){ this.time = time;}
 
         // This move is energy netural, costing the same energy that is obtained in a tick
-        public override bool canPerformAction(int actionPoints)
+        public override int GetCost()
         {
-            return actionPoints >= 1000;
+            return 1000;
         }
 
         // Increases current rest
-        public override int Action()
+        public override void Action()
         {
             time--;
             if (time == 0)
             {
                 if (creature.stats.Gender == Genetics.Gender.Female)
                 {
-                   
-                    if (creature.nearestMate == null) return 1000;
+
+                    if (creature.nearestMate == null) return;
                     // Create a random number of childs
                     int numberChilds = RandomGenerator.Next(1, 5);//TODO: que el numero de hijos dependa de algo del cromosoma?
                     for (int i = 0; i < numberChilds; ++i)
@@ -47,7 +47,6 @@
             }
 
             //obj.ReceiveInteraction(creature, Entities.Interactions.mate);
-            return 1000; // Cost of the action performed
         }
 
         public override string ToString()

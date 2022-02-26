@@ -10,12 +10,12 @@ namespace EvolutionSimulation.FSM.Creature.States
     {
         public Eating(Entities.Creature c) : base(c) { creature = c; }
 
-        public override bool canPerformAction(int actionPoints)
+        public override int GetCost()
         {
-            return actionPoints < 1000;
+            return 10 * creature.stats.Metabolism;
         }
 
-        public override int Action()
+        public override void Action()
         {
             Console.WriteLine("Eating action");
             if(creature.stats.Diet == Genetics.Diet.Carnivore )
@@ -43,7 +43,6 @@ namespace EvolutionSimulation.FSM.Creature.States
                         EatCorpse();
                 }
             }
-            return 10 * creature.stats.Metabolism; // Cost of the action performed
         }
 
         public override string ToString()

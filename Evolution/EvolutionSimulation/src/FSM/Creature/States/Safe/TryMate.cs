@@ -8,17 +8,16 @@
         public TryMate(Entities.Creature c) : base(c) { creature = c; }
 
         // This move is energy netural, costing the same energy that is obtained in a tick
-        public override bool canPerformAction(int actionPoints)
+        public override int GetCost()
         {
-            return actionPoints >= 1000;
+            return 1000;
         }
 
         // Increases current rest
-        public override int Action()
+        public override void Action()
         {
-            if (creature.nearestMate == null) return 1000;
-            creature.nearestMate.ReceiveInteraction(creature, Entities.Interactions.mate);
-            return 1000; // Cost of the action performed
+            if (creature.nearestMate != null)
+                creature.nearestMate.ReceiveInteraction(creature, Entities.Interactions.mate);
         }
 
         public override string ToString()

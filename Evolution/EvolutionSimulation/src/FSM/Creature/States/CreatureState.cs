@@ -15,8 +15,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public CreatureState(Entities.Creature c) { creature = c; }
 
-        public virtual bool canPerformAction(int actionPoints) { return true; }
+        public virtual int GetCost() { return 0; }
 
-        public virtual int Action() { return 1; }
+        public virtual void Action() {}
     }
 }
