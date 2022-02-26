@@ -158,10 +158,13 @@ namespace EvolutionSimulation.Entities
             // Drinking
             ITransition thirstyTransition = new ThirstyTransition(this);
             ITransition drinkingTransition = new DrinkingTransition(this);
+            ITransition drinkingExploreTransition = new DrinkingExploreTransition(this);
             ITransition stopDrinkingTransition = new StopDrinkingTransition(this);
+            ITransition stopGoToDrinkTransition = new StopGoToDrinkTransition(this);
             safeFSM.AddTransition(wander, thirstyTransition, goToDrink);
+            safeFSM.AddTransition(wander, drinkingExploreTransition, explore);
             safeFSM.AddTransition(goToDrink, drinkingTransition, drink);
-            //safeFSM.AddTransition(goToDrink, ?, wander);
+            safeFSM.AddTransition(goToDrink, stopGoToDrinkTransition, wander);
             safeFSM.AddTransition(drink, stopDrinkingTransition, wander);
 
             // Mating
@@ -205,8 +208,10 @@ namespace EvolutionSimulation.Entities
             IState hide = new Hide(this);
             Fsm escapeFSM = new Fsm(fleeing);
             // Transitions
-            //mfsm.AddTransition(fleeing, ? , hide);
-            //mfsm.AddTransition(hide, ? , fleeing);
+            ITransition fleeTransition = new FleeTransition(this);
+            ITransition hideTranistion = new HideTransition(this);
+            escapeFSM.AddTransition(fleeing, hideTranistion , hide);
+            escapeFSM.AddTransition(hide, fleeTransition , fleeing);
             IState escape = new CompoundState("Escape", escapeFSM);
 
             // Combat-state Configuration
@@ -223,7 +228,7 @@ namespace EvolutionSimulation.Entities
 
             Fsm aliveFSM = new Fsm(safe);
             // Transitions
-            ITransition escapeTransition = new EscapeTransition(this);
+            ITransition escapeTransition = new EscapeTransition(this);   
             ITransition safeTransition = new SafeTransition(this);
             ITransition combatTransition = new CombatTransition(this);
             aliveFSM.AddTransition(safe, escapeTransition, escape);

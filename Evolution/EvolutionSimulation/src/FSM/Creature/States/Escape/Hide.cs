@@ -14,7 +14,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             return actionPoints >= 1000 * ((200f - creature.stats.GroundSpeed) / 100f);
         }
 
-        public override int Action()
+        public override int Action()    // TODO: Que es esconderse?
         {
             Console.WriteLine("Hide action");
             return 0;
