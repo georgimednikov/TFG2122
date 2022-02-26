@@ -58,6 +58,10 @@ namespace EvolutionSimulation.Entities
                 AddInteraction(Interactions.attack, RetalliateDamage);
             // Poison
             AddInteraction(Interactions.poison, Poison);
+            // Mate
+            AddInteraction(Interactions.mate, OnMate);
+            AddInteraction(Interactions.stopMate, StopMating);
+
             Console.WriteLine(mfsm.ExportToDotGraph());
         }
 
@@ -77,7 +81,6 @@ namespace EvolutionSimulation.Entities
             {
                 if (timeToBeInHeat == 0)//Can be pregnant
                     stats.InHeat = true;
-                //TODO: cuando se quede embarazada, poner timeToBeInHeat a -1
                 else if (timeToBeInHeat <= -1)// Pregnant, reset timer
                 {
                     timeToBeInHeat = stats.TimeBetweenHeats;
@@ -85,6 +88,16 @@ namespace EvolutionSimulation.Entities
                 }
                 else
                     timeToBeInHeat--;
+
+                //if the female has to do something, she doesn't want to mate
+                if (stats.CurrEnergy < stats.veryHungerThreshold * stats.MaxEnergy
+                    || stats.CurrRest < stats.exhaustThreshold * stats.MaxRest
+                    || stats.CurrHydration < stats.veryThirstyThreshold * stats.MaxHydration
+                    || mating || !stats.InHeat)
+                {
+                    wantMate = false;
+                }
+                else wantMate = true;
             }
 
             Perceive();
@@ -94,7 +107,6 @@ namespace EvolutionSimulation.Entities
 
             do { mfsm.Evaluate(); } // While the creature can keep performing actions
             while (mfsm.Execute());// Maintains the evaluation - execution action
-
 
             Clear();
         }
@@ -122,45 +134,7 @@ namespace EvolutionSimulation.Entities
             removedStatus.Clear();
         }
 
-        /// <summary>
-        /// With all the entities that the creature has perceive, 
-        /// select the most important (the nearest enemy, ally, food...)
-        /// The transitions will use this information to change a different state
-        /// </summary>
-        void ProcessInput()
-        {
-            // Find the nearest ally and mate
-            if (seenSameSpeciesCreatures.Count != 0)
-                nearestAlly = seenSameSpeciesCreatures[0];
-            foreach (Creature c in seenSameSpeciesCreatures)
-            {
-                if (c.stats.InHeat)
-                {
-                    nearestMate = c;
-                    break;
-                }
-            }
-
-            if (otherSeenCreatures.Count != 0)
-                nearestEnemy = otherSeenCreatures[0];
-
-            //Find the nearest edible plant and corpse
-            foreach (StableEntity c in seenEntities)
-            {
-                if (nearestEdiblePlant == null && c as EdiblePlant != null)
-                {
-                    nearestEdiblePlant = (EdiblePlant)c;
-                    if (nearestEdiblePlant.eaten) nearestEdiblePlant = null;
-                }
-                else if (nearestCorpse == null && c as Corpse != null)
-                {
-                    nearestCorpse = (Corpse)c;
-                }
-                if (nearestCorpse != null && nearestEdiblePlant != null)
-                    break;
-
-            }
-        }
+        
 
         /// <summary>
         /// Returns the creature's current state
@@ -197,30 +171,38 @@ namespace EvolutionSimulation.Entities
             // Drinking
             ITransition thirstyTransition = new ThirstyTransition(this);
             ITransition drinkingTransition = new DrinkingTransition(this);
+            ITransition drinkingExploreTransition = new DrinkingExploreTransition(this);
             ITransition stopDrinkingTransition = new StopDrinkingTransition(this);
+            ITransition stopGoToDrinkTransition = new StopGoToDrinkTransition(this);
             safeFSM.AddTransition(wander, thirstyTransition, goToDrink);
+            safeFSM.AddTransition(wander, drinkingExploreTransition, explore);
             safeFSM.AddTransition(goToDrink, drinkingTransition, drink);
-            //safeFSM.AddTransition(goToDrink, ?, wander);
+            safeFSM.AddTransition(goToDrink, stopGoToDrinkTransition, wander);
             safeFSM.AddTransition(drink, stopDrinkingTransition, wander);
 
             // Mating
-            ITransition mateTransition = new MateTransition(this);
+            ITransition mateTransition = new GoToMateTransition(this);
             ITransition tryMateTransition = new TryMateTransition(this);
             ITransition matingTransition = new MatingTransition(this);
             ITransition stopMatingTransition = new StopMatingTransition(this);
+            ITransition stopGoToMateTransition = new StopGoToMateTransition(this);
+            ITransition stopTryMateTransition = new StopTryMateTransition(this);
             safeFSM.AddTransition(wander, mateTransition, goToMate);
-            //safeFSM.AddTransition(goToMate, ?, wander);
             safeFSM.AddTransition(goToMate, tryMateTransition, tryMate);
-            //safeFSM.AddTransition(tryMate, ?, wander);
+            safeFSM.AddTransition(goToMate, stopGoToMateTransition, wander);
             safeFSM.AddTransition(tryMate, matingTransition, mating);
+            safeFSM.AddTransition(tryMate, stopTryMateTransition, wander);
             safeFSM.AddTransition(mating, stopMatingTransition, wander);
 
             // Eating
             ITransition hungerTransition = new HungerTransition(this);
+            ITransition hungerExploreTransition = new HungerExploreTransition(this);
             ITransition eatingTransition = new EatingTransition(this);
             ITransition stopEatingTransition = new StopEatingTransition(this);
+            ITransition stopGoToEatTransition = new StopGoToEatTransition(this);
             safeFSM.AddTransition(wander, hungerTransition, goToEat);
-            //safeFSM.AddTransition(goToEat, ?, wander);
+            safeFSM.AddTransition(wander, hungerExploreTransition, explore);
+            safeFSM.AddTransition(goToEat, stopGoToEatTransition, wander);
             safeFSM.AddTransition(goToEat, eatingTransition, eat);
             safeFSM.AddTransition(eat, stopEatingTransition, wander);
 
@@ -234,31 +216,34 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToSafePlace, sleepySafeTransition, sleep);
             safeFSM.AddTransition(wander, sleepyTransition, sleep);
             safeFSM.AddTransition(sleep, wakeTransition, wander);
-
-            //
+            
             // Escape-state Configuration
             // States
             IState fleeing = new Fleeing(this);
             IState hide = new Hide(this);
             Fsm escapeFSM = new Fsm(fleeing);
             // Transitions
-            //mfsm.AddTransition(fleeing, ? , hide);
-            //mfsm.AddTransition(hide, ? , fleeing);
+            ITransition fleeTransition = new FleeTransition(this);
+            ITransition hideTranistion = new HideTransition(this);
+            escapeFSM.AddTransition(fleeing, hideTranistion , hide);
+            escapeFSM.AddTransition(hide, fleeTransition , fleeing);
             IState escape = new CompoundState("Escape", escapeFSM);
-            //
+
             // Combat-state Configuration
             // States
             IState attack = new Attacking(this);
             IState chaseEnemy = new ChaseEnemy(this);
             Fsm combatFSM = new Fsm(chaseEnemy);
             // Transitions
-            //mfsm.AddTransition(chaseEnemy, ? , attack);
-            //mfsm.AddTransition(attack, ? , chaseEnemy);
+            ITransition attackTransition = new AttackTransition(this);
+            ITransition chaseEnemyTransition = new ChaseEnemyTransition(this);
+            combatFSM.AddTransition(chaseEnemy, attackTransition, attack);
+            combatFSM.AddTransition(attack, chaseEnemyTransition, chaseEnemy);  
             IState combat = new CompoundState("Combat", combatFSM);
-            //
+
             Fsm aliveFSM = new Fsm(safe);
             // Transitions
-            ITransition escapeTransition = new EscapeTransition(this);
+            ITransition escapeTransition = new EscapeTransition(this);   
             ITransition safeTransition = new SafeTransition(this);
             ITransition combatTransition = new CombatTransition(this);
             aliveFSM.AddTransition(safe, escapeTransition, escape);
@@ -319,6 +304,53 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
+        /// With all the entities that the creature has perceive, 
+        /// select the most important (the nearest enemy, ally, food...)
+        /// The transitions will use this information to change a different state
+        /// </summary>
+        void ProcessInput()
+        {
+            // Nearest ally
+            if (seenSameSpeciesCreatures.Count != 0)
+                nearestAlly = seenSameSpeciesCreatures[0];
+            // Find the nearest mate
+            foreach (Creature c in seenSameSpeciesCreatures)
+            {
+                if (stats.Gender == Gender.Male && c.wantMate)
+                {
+                    nearestMate = c;
+                    break;
+                }
+                else if(stats.Gender == Gender.Female && c.stats.Gender == Gender.Male)
+                {
+                    nearestMate = c;
+                    break;
+                }
+            }
+
+            if (otherSeenCreatures.Count != 0)
+                nearestEnemy = otherSeenCreatures[0];
+
+            //Find the nearest edible plant and corpse
+            foreach (StableEntity c in seenEntities)
+            {
+                if (nearestEdiblePlant == null && c as EdiblePlant != null)
+                {
+                    nearestEdiblePlant = (EdiblePlant)c;
+                    //Check if the plant has not been eaten
+                    if (nearestEdiblePlant.eaten) nearestEdiblePlant = null;
+                }
+                else if (nearestCorpse == null && c as Corpse != null)
+                {
+                    nearestCorpse = (Corpse)c;
+                }
+                if (nearestCorpse != null && nearestEdiblePlant != null)
+                    break;
+
+            }
+        }
+
+        /// <summary>
         /// Executes every response that this creature has to an interaction with other creature
         /// </summary>
         public void ReceiveInteraction(Creature interacter, Interactions type)
@@ -355,6 +387,112 @@ namespace EvolutionSimulation.Entities
                 InteractionsDict.Remove(type);
         }
 
+
+        /// <summary>
+        /// Returns the taken damage
+        /// </summary>
+        /// <param name="dmg">Incoming damage</param>
+        /// <param name="pen">Damage penetratione</param>
+        public float ComputeDamage(float dmg, float pen)
+        {
+            float amount = 0;
+            amount = (dmg) - (stats.Armor - pen);
+            amount = Math.Max(0, amount);
+            amount = Math.Min(amount, stats.CurrHealth);
+            return amount;
+        }
+
+
+        /// <summary>
+        /// Check if the eating objective is not null
+        /// </summary>
+        /// <returns>True if the creature knows where to eat </returns>
+        public bool HasEatingObjective()
+        {
+            // Hervibore and not plant objective
+            if (stats.Diet == Diet.Herbivore && nearestEdiblePlant == null)
+                return true;
+            // Carnivore and not corpse objective
+            if (stats.Diet == Diet.Carnivore && nearestCorpse == null)
+                return true;
+            // Omnivore and not plant and corpse objective
+            if (stats.Diet == Diet.Omnivore && nearestCorpse == null && nearestEdiblePlant == null)
+                return true;
+
+            return false;
+        }
+
+        /// <summary>
+        /// Calculate the distance between the creature and the given entity
+        /// </summary>
+        /// <returns> Distance between creature and entity. intMaxValue if entity is null </returns>
+        public int DistanceToObjective(IEntity entity)
+        {
+            if (entity == null) return int.MaxValue;
+
+            int x1, y1;
+            x1 = Math.Abs(x - entity.x);
+            y1 = Math.Abs(y - entity.y);
+
+            return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
+        }
+
+        /// <summary>
+        /// Check if the creature is hunger (need to eat)
+        /// </summary>
+        /// <returns> True if the creature is hunger </returns>
+        public bool IsHunger()
+        {
+            return stats.CurrEnergy > stats.hungerThreshold * stats.MaxEnergy;
+        }
+
+        /// <summary>
+        /// Check if the creature is very hunger (need to eat)
+        /// </summary>
+        /// <returns> True if the creature is very hunger </returns>
+        public bool IsVeryHunger()
+        {
+            return stats.CurrEnergy > stats.veryHungerThreshold * stats.MaxEnergy;
+        }
+
+
+        /// <summary>
+        /// Check if the creature is thirsty (need to drink)
+        /// </summary>
+        /// <returns> True if the creature is thirsty </returns>
+        public bool IsThirsty()
+        {
+            return stats.CurrHydration > stats.thirstyThreshold * stats.MaxHydration;
+        }
+
+        /// <summary>
+        /// Check if the creature is very thirsty (need to drink)
+        /// </summary>
+        /// <returns> True if the creature is very thirsty </returns>
+        public bool IsVeryThirsty()
+        {
+            return stats.CurrHydration > stats.veryThirstyThreshold * stats.MaxHydration;
+        }
+
+
+        /// <summary>
+        /// Check if the creature is tired (need to sleep)
+        /// </summary>
+        /// <returns> True if the creature is tired </returns>
+        public bool IsTired()
+        {
+            return stats.CurrRest <= stats.tiredThreshold * stats.MaxRest;
+        }
+
+        /// <summary>
+        /// Check if the creature is exhausted (need to sleep)
+        /// </summary>
+        /// <returns> True if the creature is exhausted </returns>
+        public bool IsExhausted()
+        {
+            return stats.CurrRest <= stats.exhaustThreshold * stats.MaxRest;
+        }        
+
         /// <summary>
         /// Action the creature will do upon being attacked
         /// </summary>
@@ -386,30 +524,41 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
-        /// 
+        /// If a female receive this interaction, check if she want to mate
+        /// and send a interaction to the male
         /// </summary>
-        /// <param name="interacter"> male </param>
+        /// <param name="interacter"> The creature that sends the interaction </param>
         private void OnMate(Creature interacter)
         {
-            if (!stats.InHeat && !mating) return;  // TODO: consentir o no, si tienes hambre no copular por ejemplo
-            mating = true;
-            interacter.mating = true;
+            if(wantMate && stats.Gender == Gender.Female)
+            {
+                wantMate = false;
+                mating = true;
+                matingCreature = interacter;
+                interacter.ReceiveInteraction(this, Interactions.mate);
+            }
+            else if (stats.Gender == Gender.Male)
+            {
+                mating = true;
+                matingCreature = interacter;
+            }
         }
 
         /// <summary>
-        /// Returns the taken damage
+        /// If the creature was mating and has stopped, tell the mating creature to stop as well
         /// </summary>
-        /// <param name="dmg">Incoming damage</param>
-        /// <param name="pen">Damage penetratione</param>
-        public float ComputeDamage(float dmg, float pen)
+        /// <param name="interacter"> Creature who has sent the interaction </param>
+        private void StopMating(Creature interacter)
         {
-            float amount = 0;
-            amount = (dmg) - (stats.Armor - pen);
-            amount = Math.Max(0, amount);
-            amount = Math.Min(amount, stats.CurrHealth);
-            return amount;
+            if(matingCreature != null)
+            {
+                matingCreature.ReceiveInteraction(this, Interactions.stopMate);
+                matingCreature = null;
+                mating = false;
+            }
         }
 
+        
         /// <summary>
         /// Returns if an ability is unlocked
         /// </summary>
@@ -570,11 +719,12 @@ namespace EvolutionSimulation.Entities
         private Fsm mfsm;
 
 
-        public Creature nearestEnemy;
-        public Creature nearestAlly;
+        public Creature nearestEnemy; 
+        public Creature nearestAlly; 
         public Creature nearestMate;
-        public Corpse nearestCorpse;
-        public EdiblePlant nearestEdiblePlant;
+        public Creature matingCreature;
+        public Corpse nearestCorpse; 
+        public EdiblePlant nearestEdiblePlant; 
         //water place
         //safe place
 
@@ -582,7 +732,19 @@ namespace EvolutionSimulation.Entities
 
         public bool hasBeenHit;
 
-        protected int timeToBeInHeat;
+        /// <summary>
+        /// Time in ticks to be in heat (a female)
+        /// </summary>
+        public int timeToBeInHeat;
+        /// <summary>
+        /// If a female want to mate, its false if she has needs like
+        /// sleep or eat or is mating
+        /// </summary>
+        //TODO igual si estas en el estado mating y te atacan o muere la criatura con la que estas relacionandote esto hay que ponerlo a false
+        public bool wantMate = false;
+        /// <summary>
+        /// If a creatures is mating
+        /// </summary>
         public bool mating;
 
         // Interactions that the creature can react to. Keys are the Interaction type
@@ -706,6 +868,7 @@ namespace EvolutionSimulation.Entities
         public float MaxTemperature { get; set; }
         public float IdealTemperature { get; set; }
         public bool Hair { get; set; }
+        //public float Hair { get; set; }
 
         //Behaviour related stats
         public int Knowledge { get; set; }

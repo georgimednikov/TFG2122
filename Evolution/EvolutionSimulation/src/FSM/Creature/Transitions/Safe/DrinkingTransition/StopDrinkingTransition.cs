@@ -1,7 +1,8 @@
 ﻿namespace EvolutionSimulation.FSM.Creature.Transitions
 {
     /// <summary>
-    /// Checks if the creature has drunk enough
+    /// Checks if the creature has drunk enough 
+    /// Drinking -> Wander
     /// </summary>
     class StopDrinkingTransition : CreatureTransition
     {

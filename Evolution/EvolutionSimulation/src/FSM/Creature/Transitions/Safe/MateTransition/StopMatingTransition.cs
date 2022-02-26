@@ -1,23 +1,24 @@
 ﻿namespace EvolutionSimulation.FSM.Creature.Transitions
 {
     /// <summary>
-    /// Checks if the creature has eaten enough
+    /// Checks if the creature has stopped to mate
+    /// Mating -> wander
     /// </summary>
-    class StopEatingTransition : CreatureTransition
+    class StopMatingTransition : CreatureTransition
     {
-        public StopEatingTransition(Entities.Creature creature)
+        public StopMatingTransition(Entities.Creature creature)
         {
             this.creature = creature;
         }
 
         public override bool Evaluate()
         {
-            return creature.stats.CurrEnergy >= 0.85 * creature.stats.MaxEnergy;
+            return !creature.mating;
         }
 
         public override string ToString()
         {
-            return "StopEatingTransition";
+            return "StopMatingTransition";
         }
 
     }

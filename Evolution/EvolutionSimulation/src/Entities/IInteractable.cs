@@ -26,6 +26,7 @@ namespace EvolutionSimulation.Entities
         attack, 
         initmidate, 
         mate,
+        stopMate,
         eat,
         poison
     }

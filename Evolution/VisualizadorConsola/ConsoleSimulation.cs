@@ -22,18 +22,20 @@ namespace VisualizadorConsola
             
             Animal c = world.CreateCreature<Animal>(0, 0);
             c.stats.CurrEnergy = c.stats.MaxEnergy * 0.2f;
-            c.MakeFly();
-            //world.CreateStableEntity<Corpse>();
+            c = world.CreateCreature<Animal>(5, 4); // Enemy?
+            Corpse c1 = world.CreateStableEntity<Corpse>();
+            c1.Init(c.world, 5, c.x, c.y+1, 0.4f, 0.7f, 5, 5, 80f); // TODO: stats to be derived from creacher
+
             //EvolutionSimulation.Genetics.CreatureChromosome cc = EvolutionSimulation.Genetics.GeneticFunctions.UniformCrossover(c.chromosome, c2.chromosome);
             //EvolutionSimulation.Genetics.GeneticFunctions.UniformMutation(ref cc, 0.95f);
             //Animal c3 = world.CreateCreature<Animal>(4, 4, cc, c.speciesName);
             //c.AddStatus(new Poison(20, 5));
-            c.SetPath(31, 31);
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    c = world.CreateCreature<Animal>(5, 5);
-            //}
-            //world.ExportContent();
+
+            /*for (int i = 0; i < 4; i++)
+            {
+                c = world.CreateCreature<Animal>(5, 5);
+            }
+            world.ExportContent();*/
         }
 
 

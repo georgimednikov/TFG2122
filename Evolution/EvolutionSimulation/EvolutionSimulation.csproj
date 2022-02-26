@@ -100,25 +100,35 @@
     <Compile Include="src\FSM\Creature\States\Safe\Explore.cs" />
     <Compile Include="src\FSM\Creature\States\Escape\Hide.cs" />
     <Compile Include="src\FSM\Creature\States\Escape\Fleeing.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Combat\AttackTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Combat\ChaseEnemyTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Escape\FleeTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Escape\HideTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\SafeTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\EscapeTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\CreatureTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\CombatTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\DieTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\DrinkingTransition\DrinkingExploreTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\EatingTransition\StopGoToEatTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\GoToSafePlaceTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\MatingTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\StopEatingTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\StopDrinkingTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\StopMatingTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\TryMateTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\EatingTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\DrinkingTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\EatingTransition\HungerExploreTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition\MatingTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\DrinkingTransition\StopGoToDrinkTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\EatingTransition\StopEatingTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\DrinkingTransition\StopDrinkingTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition\StopGoToMateTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition\StopTryMateTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition\StopMatingTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition\TryMateTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\EatingTransition\EatingTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\DrinkingTransition\DrinkingTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\SleepySafeTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\ThirstyTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\DrinkingTransition\ThirstyTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition\GoToMateTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\WakeTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\SleepyTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\HungerTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\EatingTransition\HungerTransition.cs" />
     <Compile Include="src\FSM\Fsm.cs" />
     <Compile Include="src\Genetics\GeneticTaxonomy.cs" />
     <Compile Include="src\Entities\Grass.cs" />
@@ -161,10 +171,7 @@
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="src\FSM\Creature\Transitions\Combat\" />
-    <Folder Include="src\FSM\Creature\Transitions\Escape\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
