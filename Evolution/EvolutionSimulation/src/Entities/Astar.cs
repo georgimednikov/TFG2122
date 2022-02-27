@@ -44,6 +44,12 @@ namespace EvolutionSimulation.Entities
 
     public static class Astar
     {
+        /// <summary>
+        /// Returns a path from path to end using A*.
+        /// </summary>
+        /// <param name="c">Creature that moves.</param>
+        /// <param name="w">World where it happens</param>
+        /// <param name="treeDensity">Percentage of trees on the path</param>
         public static Vector3[] GetPath(Creature c, World w, Vector3 start, Vector3 end, out double treeDensity)
         {
             List<GraphNode> path = new List<GraphNode>();
@@ -51,7 +57,7 @@ namespace EvolutionSimulation.Entities
             List<GraphNode> closed = new List<GraphNode>();
             GraphNode init = new GraphNode(start, null);
             open.Insert(init);
-            double heur = MyHeuristic(false, c, start, end, w, out treeDensity);
+            double heur = CustomHeuristic(false, c, start, end, w, out treeDensity);
             int thres = c.getTreeThreshold(treeDensity);
             bool treeBetter = (thres >= 0 && heur >= thres);
             while (open.Count > 0)
@@ -64,8 +70,7 @@ namespace EvolutionSimulation.Entities
                     break;
                 foreach (GraphNode n in GetNeighbours(treeBetter, c, w, current))
                 {
-                    double partialTreeDensity;
-                    n.estimatedCost = current.costSoFar + MyHeuristic(treeBetter, c, n.pos, end, w, out partialTreeDensity);
+                    n.estimatedCost = current.costSoFar + CustomHeuristic(treeBetter, c, n.pos, end, w, out double partialTreeDensity);
                     Vector3 posToEnd = end - n.pos;
                     n.euclidDist = posToEnd.X + posToEnd.Y;
                     if (!open.Contains(n))
@@ -90,7 +95,15 @@ namespace EvolutionSimulation.Entities
             return retPath;
         }
 
-        static double MyHeuristic(bool treeBetter, Creature c, Vector3 start, Vector3 end, World w, out double treeDensity)
+        /// <summary>
+        /// Heuritic for A* using linear distance, but accounting on tree movement.
+        /// </summary>
+        /// <param name="treeBetter">If theoretically tree movement is more efficient than ground</param>
+        /// <param name="c">Creature from which stats are taken from</param>
+        /// <param name="w">World where it happens</param>
+        /// <param name="treeDensity">Percentage of trees theoretically on the path</param>
+        /// <returns></returns>
+        static double CustomHeuristic(bool treeBetter, Creature c, Vector3 start, Vector3 end, World w, out double treeDensity)
         {
             Vector3 dir = end - start;
             Vector3 dirN = Vector3.Normalize(dir);
@@ -107,11 +120,19 @@ namespace EvolutionSimulation.Entities
             treeDensity /= ntiles;
 
             double ret = Math.Max(Math.Abs(dir.X), Math.Abs(dir.Y));
-            if ((start.Z == 1 || end.Z == 1) && treeBetter) ret *= treeDensity * c.stats.GroundSpeed / c.stats.ArborealSpeed;
+            if ((start.Z == (int)Creature.HeightLayer.Tree || end.Z == (int)Creature.HeightLayer.Tree) && treeBetter) ret *= treeDensity * c.stats.GroundSpeed / c.stats.ArborealSpeed;
             else ret *= (2 - Tree.movementPenalty) * treeDensity * c.stats.ArborealSpeed / c.stats.GroundSpeed;
             return ret;
         }
 
+        /// <summary>
+        /// Gets adjacent tiles and the tile above/under the current position
+        /// </summary>
+        /// <param name="treeBetter">If theoretically tree movement is more efficient than ground</param>
+        /// <param name="c">Creature from which stats are taken from</param>
+        /// <param name="w">World where it happens</param>
+        /// <param name="n">Current node</param>
+        /// <returns></returns>
         static List<GraphNode> GetNeighbours(bool treeBetter, Creature c, World w, GraphNode n)
         {
             List<GraphNode> neigh = new List<GraphNode>();
@@ -119,8 +140,8 @@ namespace EvolutionSimulation.Entities
                 for (int j = -1; j <= 1; ++j)
                 {
                     Vector3 newPos;
-                    if (i == 0 && j == 0 && w.canMove(newPos = (n.pos + new Vector3(i, j, n.pos.Z == 1 ? -1 : 1))))
-                        neigh.Add(new GraphNode(newPos, n, n.costSoFar + (treeBetter ? 0 : 1)));
+                    if (i == 0 && j == 0 && w.canMove(newPos = (new Vector3(n.pos.X + i, n.pos.Y + j, n.pos.Z == (int)Creature.HeightLayer.Tree ? (int)Creature.HeightLayer.Ground : (int)Creature.HeightLayer.Tree))))
+                        neigh.Add(new GraphNode(newPos, n, n.costSoFar + (treeBetter ? 0 : (int)Creature.HeightLayer.Tree)));
                     else if (w.canMove(newPos = (n.pos + new Vector3(i, j, 0))))
                     {
                         double costSoFar = n.costSoFar;
@@ -135,13 +156,19 @@ namespace EvolutionSimulation.Entities
             return neigh;
         }
 
+        /// <summary>
+        /// Returns a straight line using Bresenham algorithm.
+        /// </summary>
         public static Vector3[] GetAirPath(Vector3 start, Vector3 end)
         {
             int x0 = (int)start.X, x1 = (int)end.X, y0 = (int)start.Y, y1 = (int)end.Y;
             return GetPointsOnLine(x0, y0, x1, y1, (int)end.Z);
         }
 
-        public static Vector3[] GetPointsOnLine(int x0, int y0, int x1, int y1, int z1)
+        /// <summary>
+        /// Bresenham algorithm
+        /// </summary>
+        static Vector3[] GetPointsOnLine(int x0, int y0, int x1, int y1, int z1)
         {
             List<Vector3> path = new List<Vector3>();
             bool steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0);

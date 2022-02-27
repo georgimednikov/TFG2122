@@ -164,10 +164,10 @@ namespace EvolutionSimulation
         /// Checks if target coordinates are within the map's boundaries
         /// </summary>
         /// <returns>True if it is within bounds</returns>
-        public bool canMove(int x, int y, int z = 0)
+        public bool canMove(int x, int y, Creature.HeightLayer z = Creature.HeightLayer.Ground)
         {
-            if (!(x >= 0 && x < mapSize && y >= 0 && y < mapSize) || (z < 2 && map[x, y].isWater)) return false;
-            if (z == 0 || z == 2) return true;
+            if (!(x >= 0 && x < mapSize && y >= 0 && y < mapSize) || (z != Creature.HeightLayer.Air && map[x, y].isWater)) return false;
+            if (z == Creature.HeightLayer.Ground || z == Creature.HeightLayer.Air) return true;
             return isTree(x, y);
         }
 
@@ -183,7 +183,7 @@ namespace EvolutionSimulation
         /// <returns>True if it is within bounds</returns>
         public bool canMove(Vector3 pos)
         {
-            return canMove((int)pos.X, (int)pos.Y, (int)pos.Z);
+            return canMove((int)pos.X, (int)pos.Y, (Creature.HeightLayer)pos.Z);
         }
 
         #region EntitiesManagement

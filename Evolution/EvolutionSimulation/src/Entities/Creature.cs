@@ -134,7 +134,7 @@ namespace EvolutionSimulation.Entities
             removedStatus.Clear();
         }
 
-        
+
 
         /// <summary>
         /// Returns the creature's current state
@@ -216,7 +216,7 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToSafePlace, sleepySafeTransition, sleep);
             safeFSM.AddTransition(wander, sleepyTransition, sleep);
             safeFSM.AddTransition(sleep, wakeTransition, wander);
-            
+
             // Escape-state Configuration
             // States
             IState fleeing = new Fleeing(this);
@@ -225,8 +225,8 @@ namespace EvolutionSimulation.Entities
             // Transitions
             ITransition fleeTransition = new FleeTransition(this);
             ITransition hideTranistion = new HideTransition(this);
-            escapeFSM.AddTransition(fleeing, hideTranistion , hide);
-            escapeFSM.AddTransition(hide, fleeTransition , fleeing);
+            escapeFSM.AddTransition(fleeing, hideTranistion, hide);
+            escapeFSM.AddTransition(hide, fleeTransition, fleeing);
             IState escape = new CompoundState("Escape", escapeFSM);
 
             // Combat-state Configuration
@@ -238,12 +238,12 @@ namespace EvolutionSimulation.Entities
             ITransition attackTransition = new AttackTransition(this);
             ITransition chaseEnemyTransition = new ChaseEnemyTransition(this);
             combatFSM.AddTransition(chaseEnemy, attackTransition, attack);
-            combatFSM.AddTransition(attack, chaseEnemyTransition, chaseEnemy);  
+            combatFSM.AddTransition(attack, chaseEnemyTransition, chaseEnemy);
             IState combat = new CompoundState("Combat", combatFSM);
 
             Fsm aliveFSM = new Fsm(safe);
             // Transitions
-            ITransition escapeTransition = new EscapeTransition(this);   
+            ITransition escapeTransition = new EscapeTransition(this);
             ITransition safeTransition = new SafeTransition(this);
             ITransition combatTransition = new CombatTransition(this);
             aliveFSM.AddTransition(safe, escapeTransition, escape);
@@ -265,12 +265,12 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Moves a creature a specified amount
         /// </summary>
-        public void Move(int x, int y, int z = 0)
+        public void Move(int x, int y, HeightLayer z = HeightLayer.Ground)
         {
             this.x += x;
             this.y += y;
             if (world.isTree(x, y))
-                this.creatureLayer = (HeightLayer)z;
+                creatureLayer = z;
             else if (creatureLayer != HeightLayer.Air)
                 creatureLayer = HeightLayer.Ground;
         }
@@ -321,7 +321,7 @@ namespace EvolutionSimulation.Entities
                     nearestMate = c;
                     break;
                 }
-                else if(stats.Gender == Gender.Female && c.stats.Gender == Gender.Male)
+                else if (stats.Gender == Gender.Female && c.stats.Gender == Gender.Male)
                 {
                     nearestMate = c;
                     break;
@@ -491,7 +491,7 @@ namespace EvolutionSimulation.Entities
         public bool IsExhausted()
         {
             return stats.CurrRest <= stats.exhaustThreshold * stats.MaxRest;
-        }        
+        }
 
         /// <summary>
         /// Action the creature will do upon being attacked
@@ -530,7 +530,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="interacter"> The creature that sends the interaction </param>
         private void OnMate(Creature interacter)
         {
-            if(wantMate && stats.Gender == Gender.Female)
+            if (wantMate && stats.Gender == Gender.Female)
             {
                 wantMate = false;
                 mating = true;
@@ -550,7 +550,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="interacter"> Creature who has sent the interaction </param>
         private void StopMating(Creature interacter)
         {
-            if(matingCreature != null)
+            if (matingCreature != null)
             {
                 matingCreature.ReceiveInteraction(this, Interactions.stopMate);
                 matingCreature = null;
@@ -558,7 +558,7 @@ namespace EvolutionSimulation.Entities
             }
         }
 
-        
+
         /// <summary>
         /// Returns if an ability is unlocked
         /// </summary>
@@ -570,69 +570,54 @@ namespace EvolutionSimulation.Entities
             return unlock <= f / mF;
         }
 
-        public enum HeightLayer { Ground, Tree, Air };
+        public enum HeightLayer { Ground, Tree = 1, Air = 2 };
 
         public HeightLayer creatureLayer;
 
-        int treeHeight = 1, flightHeight = 2;
         Vector3[] path;
         int pathIterator;
 
+        /// <summary>
+        /// Returns minimal path length for arboreal movement being more efficient than ground.
+        /// </summary>
         public int getTreeThreshold(double treeDensity)
         {
-            double a = 2 * treeHeight * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / 100f);
+            double a = 2 * (int)HeightLayer.Tree * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / 100f);
             double b = treeDensity * (stats.GroundSpeed / 100f + Tree.movementPenalty - stats.ArborealSpeed / 100f - 1);
             return (int)Math.Floor((a / b) + 0.5);
         }
 
+        /// <summary>
+        /// Returns minimal path length for flying movement being more efficient than ground/arboreal.
+        /// </summary>
         int getFlyThreshold(double treeDensity)
         {
-            double a = 2 * flightHeight * (stats.GroundSpeed / 100f * (1 - treeDensity) + treeDensity * stats.AerialSpeed / 100f);
-            double b = -2 * stats.AerialSpeed / 100f * treeHeight * treeDensity;
+            double a = 2 * (int)HeightLayer.Air * (stats.GroundSpeed / 100f * (1 - treeDensity) + treeDensity * stats.AerialSpeed / 100f);
+            double b = -2 * stats.AerialSpeed / 100f * (int)HeightLayer.Tree * treeDensity;
             double c = stats.AerialSpeed / 100f + stats.GroundSpeed / 100f * (treeDensity - 1) - treeDensity * stats.ArborealSpeed / 100f;
             return (int)Math.Floor(((a + b) / c) + 0.5);
         }
 
-        public int SetPath(int x, int y, int z = 0)
+        /// <summary>
+        /// Sets the creature path towards the provided coordinates. Throws exception on unreacheable coordinates. Sets the path iterator to 0.
+        /// </summary>
+        /// <param name="z">Ending target layer for the creature.</param>
+        /// <returns>The cost for moving to the first position on the path.</returns>
+        public int SetPath(int x, int y, HeightLayer z = HeightLayer.Ground)
         {
             if (!world.canMove(x, y, z)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
-            double treeDensity = 0;
-            path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, z), out treeDensity); // A*
+            if ((stats.AerialSpeed == -1 && z == HeightLayer.Air) || (stats.ArborealSpeed == -1 && z == HeightLayer.Tree)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
+            path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z), out double treeDensity); // A* to the objective
             int thres = getFlyThreshold(treeDensity);
             if (thres > 0 && path.Length >= thres)
-                path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, z));// A* pero con todo gratis
-
-            //Console.Clear();
-            //for (int i = 0; i < path.Length; ++i)
-            //{
-            //    //for (int j = 0; j < path[i].X; ++j)
-            //    //{
-            //    //    if (world.isTree(j, (int)path[i].Y)) Console.BackgroundColor = ConsoleColor.Green;
-            //    //    else Console.BackgroundColor = ConsoleColor.Black; 
-            //    //    Console.Write(" ");
-            //    //}
-            //    if (world.isTree((int)path[i].X, (int)path[i].Y)) Console.BackgroundColor = ConsoleColor.Green;
-            //    else Console.BackgroundColor = ConsoleColor.Black;
-            //    Console.SetCursorPosition((int)path[i].X, (int)path[i].Y);
-
-            //    if (path[i].Z == 0) Console.Write("x");
-            //    else Console.Write("a");
-            //}
-            //Console.BackgroundColor = ConsoleColor.Black;
-            //Console.WriteLine();
-            //if (path[path.Length - 1].X != 31 || path[path.Length - 1].Y != 31)
-            //    Console.WriteLine("No se puede");
+                path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));// Straight line to the objective
+            pathIterator = 0;
             return GetNextCostOnPath();
         }
 
-        //TODO:Remove
-        public void MakeFly()
-        {
-            stats.ArborealSpeed = 199;
-            stats.AerialSpeed = -1;
-            stats.GroundSpeed = 100;
-        }
-
+        /// <summary>
+        /// Returns the cost for moving to the next position on the path. Does not advance the path iterator.
+        /// </summary>
         public int GetNextCostOnPath()
         {
             int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
@@ -655,6 +640,10 @@ namespace EvolutionSimulation.Entities
             return (int)(1000 * ((200f - speed) / 100f));
         }
 
+        /// <summary>
+        /// Returns the next position on the path. Advances the path iterator.
+        /// </summary>
+        /// <returns>Next position or (-1, -1, -1) on path end.</returns>
         public Vector3 GetNextPosOnPath()
         {
             if (pathIterator >= path.Length) { path = null; return new Vector3(-1, -1, -1); }
@@ -719,12 +708,12 @@ namespace EvolutionSimulation.Entities
         private Fsm mfsm;
 
 
-        public Creature nearestEnemy; 
-        public Creature nearestAlly; 
+        public Creature nearestEnemy;
+        public Creature nearestAlly;
         public Creature nearestMate;
         public Creature matingCreature;
-        public Corpse nearestCorpse; 
-        public EdiblePlant nearestEdiblePlant; 
+        public Corpse nearestCorpse;
+        public EdiblePlant nearestEdiblePlant;
         //water place
         //safe place
 
