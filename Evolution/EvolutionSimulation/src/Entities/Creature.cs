@@ -22,7 +22,7 @@ namespace EvolutionSimulation.Entities
         {
             seenSameSpeciesCreatures = new List<Creature>();
             otherSeenCreatures = new List<Creature>();
-            seenEntities = new List<StableEntity>();
+            seenEntities = new List<StaticEntity>();
             InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
             activeStatus = new List<Status.Status>();
             removedStatus = new List<Status.Status>();
@@ -332,7 +332,7 @@ namespace EvolutionSimulation.Entities
                 nearestEnemy = otherSeenCreatures[0];
 
             //Find the nearest edible plant and corpse
-            foreach (StableEntity c in seenEntities)
+            foreach (StaticEntity c in seenEntities)
             {
                 if (nearestEdiblePlant == null && c as EdiblePlant != null)
                 {
@@ -396,7 +396,7 @@ namespace EvolutionSimulation.Entities
         public float ComputeDamage(float dmg, float pen)
         {
             float amount = 0;
-            amount = (dmg) - (stats.Armor - pen);
+            amount = (dmg) - Math.Max((stats.Armor - pen), 0);
             amount = Math.Max(0, amount);
             amount = Math.Min(amount, stats.CurrHealth);
             return amount;
@@ -519,7 +519,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         private void Poison(Creature interacter)
         {
-            if (interacter.stats.Perforation >= stats.Armor)
+            if (interacter.stats.Perforation >= stats.Armor) // TODO: refactor: posibilidad/refrescar status
                 AddStatus(new Poison(5 + (int)interacter.stats.Venom, interacter.stats.Venom));
         }
 
@@ -602,26 +602,26 @@ namespace EvolutionSimulation.Entities
             if (thres > 0 && path.Length >= thres)
                 path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, z));// A* pero con todo gratis
 
-            //Console.Clear();
-            //for (int i = 0; i < path.Length; ++i)
-            //{
-            //    //for (int j = 0; j < path[i].X; ++j)
-            //    //{
-            //    //    if (world.isTree(j, (int)path[i].Y)) Console.BackgroundColor = ConsoleColor.Green;
-            //    //    else Console.BackgroundColor = ConsoleColor.Black; 
-            //    //    Console.Write(" ");
-            //    //}
-            //    if (world.isTree((int)path[i].X, (int)path[i].Y)) Console.BackgroundColor = ConsoleColor.Green;
-            //    else Console.BackgroundColor = ConsoleColor.Black;
-            //    Console.SetCursorPosition((int)path[i].X, (int)path[i].Y);
+            Console.Clear();
+            for (int i = 0; i < path.Length; ++i)
+            {
+                //for (int j = 0; j < path[i].X; ++j)
+                //{
+                //    if (world.isTree(j, (int)path[i].Y)) Console.BackgroundColor = ConsoleColor.Green;
+                //    else Console.BackgroundColor = ConsoleColor.Black; 
+                //    Console.Write(" ");
+                //}
+                if (world.isTree((int)path[i].X, (int)path[i].Y)) Console.BackgroundColor = ConsoleColor.Green;
+                else Console.BackgroundColor = ConsoleColor.Black;
+                Console.SetCursorPosition((int)path[i].X, (int)path[i].Y);
 
-            //    if (path[i].Z == 0) Console.Write("x");
-            //    else Console.Write("a");
-            //}
-            //Console.BackgroundColor = ConsoleColor.Black;
-            //Console.WriteLine();
-            //if (path[path.Length - 1].X != 31 || path[path.Length - 1].Y != 31)
-            //    Console.WriteLine("No se puede");
+                if (path[i].Z == 0) Console.Write("x");
+                else Console.Write("a");
+            }
+            Console.BackgroundColor = ConsoleColor.Black;
+            Console.WriteLine();
+            if (path[path.Length - 1].X != 31 || path[path.Length - 1].Y != 31)
+                Console.WriteLine("No se puede");
             return GetNextCostOnPath();
         }
 
@@ -710,7 +710,7 @@ namespace EvolutionSimulation.Entities
         public List<Creature> seenSameSpeciesCreatures { get; private set; }
         public List<Creature> otherSeenCreatures { get; private set; }
         // List of entities seen at this moment by this creature
-        public List<StableEntity> seenEntities { get; private set; }
+        public List<StaticEntity> seenEntities { get; private set; }
 
         public int actionPoints;
 
