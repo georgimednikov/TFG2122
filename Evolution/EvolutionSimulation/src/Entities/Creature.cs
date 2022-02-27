@@ -407,6 +407,7 @@ namespace EvolutionSimulation.Entities
         private void ReceiveDamage(Creature interacter)
         {
             stats.CurrHealth -= ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
+            //TODO: Cambiar target aunque normalmente sera el mas cercano asi que tampoco es tan urgente
             hasBeenHit = true;             
         }
 

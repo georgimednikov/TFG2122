@@ -5,10 +5,18 @@ namespace EvolutionSimulation.Entities
 {
     struct MemoryTileInfo
     {
+        //Te tile's position relative to the world.
+        public int x;
+        public int y;
+
+        public int ticksUnchecked; //Number of ticks since the tile has been seen for the last time.
         public bool discovered; //Whether this tile has been discovered by the creature at some point.
+
+        public float experienceDanger; //How dangerous the creature has experienced the tile to be.
+        public float tangibleDanger; //How dangerous the creature rekons the tile is.
+
         public bool water;
         public bool fruit; //Whether there is fruit in this tile.
-        public float danger; //How dangerous it is to go though this tile.
 
         //TODO: Puede que estas dos listas se puedan simplificar para que no contengan tanta informacion
         public List<Creature> creatures; //The list of creatures of a different species
@@ -21,6 +29,9 @@ namespace EvolutionSimulation.Entities
         Creature thisCreature;
         World world;
         MemoryTileInfo[,] map;
+        List<MemoryTileInfo> rememberedTiles;
+        MemoryTileComparer comparer;
+        int maxTicksUnchecked;
         int perceptionRadius; //Radius around the creature in which it percieves the world.
         int dangerRadius; //Radius around a tile in which the tile's danger spreads.
 
@@ -39,11 +50,24 @@ namespace EvolutionSimulation.Entities
             this.perceptionRadius = perceptionRadius;
             this.dangerRadius = dangerRadius;
             map = new MemoryTileInfo[world.map.GetLength(0), world.map.GetLength(1)];
+            maxTicksUnchecked = thisCreature.stats.Knowledge * 500; //TODO: Esto bien
+            rememberedTiles = new List<MemoryTileInfo>();
+            comparer = new MemoryTileComparer(thisCreature);
         }
 
         public void Update()
         {
             int x = thisCreature.x, y = thisCreature.y;
+
+            for (int i = 0; i < rememberedTiles.Count; i++)
+            {
+                MemoryTileInfo tile = rememberedTiles[i];
+                tile.ticksUnchecked++;
+                if (tile.ticksUnchecked >= maxTicksUnchecked) //If it's time to forget a tile.
+                    tile.discovered = false;
+                rememberedTiles.Remove(tile);
+            }
+
             List<Creature> perceivedCreatures = world.PerceiveCreatures(thisCreature, perceptionRadius);
             List<StableEntity> perceivedCorpses = world.PerceiveEntities(thisCreature, perceptionRadius);
 
@@ -59,12 +83,11 @@ namespace EvolutionSimulation.Entities
                     //Each tile's danger has to be reset before any danger is calculated because a tile's
                     //danger influences the rest ALL AROUND IT, so no matter how you process the area
                     //there would be overwrittes.
-                    map[x + i, y + j].danger = 0;
+                    map[x + i, y + j].tangibleDanger = 0;
 
                     //The list of creatures is also needed to calculate danger so it is done here too.
                     foreach (Creature creature in perceivedCreatures)
                     {
-                        //TODO: Quitarla si no tiene reach si solo se quiere como fuente de comida
                         if (creature.x == x + i && creature.y == y + j)
                         {
                             //If a creature is the same species as this creature or
@@ -82,6 +105,7 @@ namespace EvolutionSimulation.Entities
                         }
                     }
 
+                    //Saves the corpses in a tile and throws away the rest.
                     foreach (StableEntity entity in perceivedCorpses)
                     {
                         if (!(entity is Corpse)) perceivedCorpses.Remove(entity);
@@ -107,14 +131,44 @@ namespace EvolutionSimulation.Entities
             SearchResources();
         }
 
+        /// <summary>
+        /// Sets the creatures "fondness" (positive danger) of a tile and its surroundings, based on an experience, using dangerRadius.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="value">Value of "fondness" in the tile. It can be negative if it is actually dangerous</param>
+        public void CreateExperience(int x, int y, float value)
+        {
+            AdjustDanger(x, y, -value, true);
+        }
+
+        /// <summary>
+        /// Returns the total danger the creature feels of a tile.
+        /// </summary>
+        public float GetPositionDanger(int x, int y)
+        {
+            return map[x, y].experienceDanger + map[x, y].tangibleDanger;
+        }
+
         private void UpdateMemoryTile(int x, int y)
         {
             if (IsOutOfBounds(x, y)) return; //If the position is out of bounds it is ignored.
 
+            // If the tile is not remembered by the creature, it now is, and is added to the list.
+            if (!map[x, y].discovered)
+            {
+                map[x, y].x = x; map[x, y].y = y;
+                map[x, y].discovered = true;
+                rememberedTiles.Add(map[x, y]);
+            }
+
+            // The tile's tick count gets reseted and its information reassigned.
+            map[x, y].ticksUnchecked = 0;
             map[x, y].water = world.map[x, y].isWater;
             if (map[x, y].water) return; //If the tile is water there is nothing more to process.
 
             //There is fruit if the plant is edible and it hasn't been eaten.
+            //TODO: Hierba
             map[x, y].fruit = world.map[x, y].plant is EdiblePlant && !(world.map[x, y].plant as EdiblePlant).eaten;
 
             //The danger in a tile is calculated by adding up all the intimidation stats of the creatures in it.
@@ -123,17 +177,31 @@ namespace EvolutionSimulation.Entities
             //  0 distance -> 16
             //  1 distance -> 8
             //  2 distance -> 4...
-            float posDanger = 0;
+            float danger = 0;
             foreach (Creature creature in map[x, y].creatures)
             {
-                posDanger += creature.stats.Intimidation;
+                danger += creature.stats.Intimidation;
             }
+            AdjustDanger(x, y, danger, false);
+        }
+
+        /// <summary>
+        /// Modies the danger level of a position, and as a consequence, the tiles around it in dangerRadius
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="danger">Level of danger</param>
+        /// <param name="experience">If the danger comes from experience or perception</param>
+        private void AdjustDanger(int x, int y, float danger, bool experience)
+        {
             for (int i = -dangerRadius; i <= dangerRadius; i++)
             {
                 for (int j = -dangerRadius; j <= dangerRadius; j++)
                 {
                     if (IsOutOfBounds(x + i, y + j)) continue;
-                    map[x + i, y + j].danger += posDanger / (float)Math.Pow(2, Math.Max(i, j));
+                    float tileDanger = danger / (float)Math.Pow(2, Math.Max(i, j));
+                    if (experience) map[x + i, y + j].experienceDanger = tileDanger; // If it's experience danger it is reseted.
+                    else map[x + i, y + j].tangibleDanger += tileDanger; //If not, dangers can stack in a single tile.
                 }
             }
         }
@@ -144,8 +212,6 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         private void SearchResources()
         {
-            int x = thisCreature.x, y = thisCreature.y;
-
             //Values reset to know if a resource hasn't been found
             closestCreature = null;
             closestCreatureReachable = null;
@@ -155,53 +221,11 @@ namespace EvolutionSimulation.Entities
             closestFruit = null;
             closestWater = null;
 
-            bool tilesDiscoveredLeft = true; //This boolean is true when all tiles processed in the last iteration of the algorith where NOT discovered.
-            int searchRadius = 0; //Areas are represented by squares, and this variable represents the length of the area's side.
-
-            //TODO: Todas se han asignado
-            //While there are tiles discovered in memory they have to be processed
-            //This while ends when there has been an iteration where all tiles where undiscovered or all values have been asigned.
-            while (tilesDiscoveredLeft ||
-                (closestCreature != null &&
-                closestCreatureReachable != null &&
-                closestAlly != null &&
-                closestPossibleMate != null &&
-                closestCorpse != null &&
-                closestFruit != null &&
-                closestWater != null))
+            rememberedTiles.Sort(comparer);
+            foreach (MemoryTileInfo tile in rememberedTiles)
             {
-                tilesDiscoveredLeft = false; //It is supposed that there are no more discovered tiles to process anymore
-                for (int i = -searchRadius; i <= searchRadius; i++)
-                {
-                    for (int j = -searchRadius; j <= searchRadius;)
-                    {
-                        if (!IsOutOfBounds(x, y))
-                        {
-                            UpdateResources(x + i, y + j);
-                            if (!tilesDiscoveredLeft) //If the supposition still holds, it is checked if the tile being processed is discovered.
-                                                      //If it is not, the supposition holds; if it is, the while must continue so the value won't be changed anymore.
-                                tilesDiscoveredLeft = map[x + i, y + j].discovered;
-                        }
-
-                        //This double for does NOT go normally through an area. What it does is increase the area every iteration, doing the following:
-                        //X -> First iteration
-                        //O -> Second iteration
-                        //S -> Third iteration
-                        //S S S S S
-                        //S O O O S
-                        //S O X O S
-                        //S O O O S
-                        //S S S S S
-
-                        //So when the first or the last row is being processed, it is processed completely, otherwise, only the first and last elements are processed.
-                        //To jump from the first to the last, it is done j += searchRadius * 2 because if radius = 3 then on the first j iteration j = -3,
-                        //and after being processed j = -3 + (3 * 2) = 3, which is the last column. Then, to leave the j for, it is added again.
-                        if (i == -searchRadius || i == searchRadius) j++;
-                        else j += searchRadius * 2;
-                    }
-                }
-                //Search radius is increased.
-                searchRadius++;
+                UpdateResources(tile);
+                if (AllResourcesFound()) break; // Stops searching when everything has been found.
             }
         }
 
@@ -209,32 +233,46 @@ namespace EvolutionSimulation.Entities
         /// Given a position this method tries to assign the resources the creature could need if
         /// it hasn't found them yet and they are found in the given world tile.
         /// </summary>
-        private void UpdateResources(int x, int y)
+        private void UpdateResources(MemoryTileInfo tile)
         {
-            if (map[x, y].creatures.Count > 0)
+            if (tile.creatures.Count > 0)
             {
-                if (closestCreature == null) closestCreature = map[x, y].creatures[0];
+                if (closestCreature == null) closestCreature = tile.creatures[0];
                 if (closestCreatureReachable == null)
-                    foreach (Creature creature in map[x, y].creatures)
+                    foreach (Creature creature in tile.creatures)
                         if ((creature.creatureLayer == Creature.HeightLayer.Air && thisCreature.stats.AirReach) ||
                             creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach ||
                             creature.creatureLayer == Creature.HeightLayer.Ground)
                             closestCreatureReachable = creature;
             }
-                
-            if (map[x, y].allies.Count > 0)
+
+            if (tile.allies.Count > 0)
             {
-                if (closestAlly == null) closestAlly = map[x, y].allies[0];
+                if (closestAlly == null) closestAlly = tile.allies[0];
                 if (closestPossibleMate == null)
-                    foreach (Creature creature in map[x, y].allies)
+                    foreach (Creature creature in tile.allies)
                         if (creature.stats.InHeat) closestPossibleMate = creature;
             }
-            if (closestCorpse == null && map[x, y].creatures.Count > 0)
-                closestCorpse = map[x, y].corpses[0];
-            if (closestFruit == null && map[x, y].fruit)
-                closestFruit = new Tuple<int, int>(x, y);
-            if (closestWater == null && map[x, y].water)
-                closestWater = new Tuple<int, int>(x, y);
+            if (closestCorpse == null && tile.creatures.Count > 0)
+                closestCorpse = tile.corpses[0];
+            if (closestFruit == null && tile.fruit)
+                closestFruit = new Tuple<int, int>(tile.x, tile.y);
+            if (closestWater == null && tile.water)
+                closestWater = new Tuple<int, int>(tile.x, tile.y);
+        }
+
+        /// <summary>
+        /// Checks if the creature has recollection of all resources it might need in the world.
+        /// </summary>
+        private bool AllResourcesFound()
+        {
+            return closestCreature != null &&
+                    closestCreatureReachable != null &&
+                    closestAlly != null &&
+                    closestPossibleMate != null &&
+                    closestCorpse != null &&
+                    closestFruit != null &&
+                    closestWater != null;
         }
 
         /// <summary>
@@ -243,6 +281,26 @@ namespace EvolutionSimulation.Entities
         private bool IsOutOfBounds(int x, int y)
         {
             return x < 0 || y < 0 || x >= map.GetLength(0) || y >= map.GetLength(1);
+        }
+
+        /// <summary>
+        /// Given a creature sorts Tiles of its memory based on distance from it. The shortest goes first.
+        /// </summary>
+        private class MemoryTileComparer : Comparer<MemoryTileInfo>
+        {
+            private Creature creature;
+
+            public MemoryTileComparer(Creature creature)
+            {
+                this.creature = creature;
+            }
+
+            public override int Compare(MemoryTileInfo a, MemoryTileInfo b)
+            {
+                int aDist = Math.Abs(creature.x - a.x) + Math.Abs(creature.y - a.y);
+                int bDist = Math.Abs(creature.x - b.x) + Math.Abs(creature.y - b.y);
+                return aDist.CompareTo(bDist);
+            }
         }
     }
 }
