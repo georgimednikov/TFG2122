@@ -14,7 +14,7 @@
 
         public override bool Evaluate()
         {
-            return creature.IsHunger() && creature.HasEatingObjective(); 
+            return creature.IsHungry() && creature.HasEatingObjective(); 
         }
 
         public override string ToString()

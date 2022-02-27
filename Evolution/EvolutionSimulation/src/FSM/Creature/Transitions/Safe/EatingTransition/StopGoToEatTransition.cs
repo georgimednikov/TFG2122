@@ -21,7 +21,7 @@
                 return true;
 
             // If the creature is really hunger continue going to eating objective
-            if (creature.IsVeryHunger())
+            if (creature.IsVeryHungry())
                 return false;
 
             // If the creature is really thirsty stop going to eating objective

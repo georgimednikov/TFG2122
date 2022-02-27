@@ -120,15 +120,15 @@ namespace EvolutionSimulation.Entities
             stats.Knowledge = chromosome.GetFeature(CreatureFeature.Knowledge);
             stats.Paternity = chromosome.GetFeature(CreatureFeature.Paternity);
 
-            ModifyStatsByHabilities(abilityUnlock);
+            ModifyStatsByAbilities(abilityUnlock);
         }
 
 
         /// <summary>
-        /// Modify differents stats depending on the habilities
+        /// Modify differents stats depending on the abilities
         /// </summary>
         /// <param name="abilityUnlock"></param>
-        private void ModifyStatsByHabilities(float abilityUnlock)
+        private void ModifyStatsByAbilities(float abilityUnlock)
         {
             //Hair. Better with low temperatures and worse with high temperatures
             stats.Hair = HasAbility(CreatureFeature.Hair, abilityUnlock);

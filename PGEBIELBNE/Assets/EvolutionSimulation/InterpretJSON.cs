@@ -47,8 +47,8 @@ namespace EvolutionSimulation.Unity
 
             InstantiateWings(creature);
 
-            if (creature.stats.TreeReach)
-            { // TODO: use proper bool
+            if (creature.stats.Upright)
+            {
                 bodyEmpty.transform.Rotate(Vector3.right * -90);
             }
 
@@ -118,11 +118,11 @@ namespace EvolutionSimulation.Unity
 
         private void InstantiateHair(SpeciesExport creature)
         {
-            // TODO: how to know if it has hair
-            //if (creature.stats. == -1) return;
+            if (!creature.stats.Hair) return;
             GameObject go = Instantiate(hair, bodyEmpty);
             go.transform.localScale = Vector3.one * sizeScale;
-            go.transform.Translate(Vector3.up * (bodyForward.transform.localScale.y / 2) + Vector3.forward * (bodyForward.transform.localPosition.z));
+            go.transform.localPosition = bodyForward.transform.localPosition + Vector3.forward * 0.00528117f; // To make his toupee excel
+            go.transform.Translate(Vector3.forward * (bodyForward.transform.localScale.y / 2 + go.transform.localScale.y / 20));
         }
 
         private void InstantiateBeard(SpeciesExport creature)
@@ -130,7 +130,7 @@ namespace EvolutionSimulation.Unity
             if (creature.stats.LifeSpan <= 30 * 50 * 24 * 365) return; // TODO: this time configurable with how much is a year
             GameObject go = Instantiate(beard, bodyEmpty);
             go.transform.localScale = Vector3.one * sizeScale;
-            go.transform.Translate(Vector3.up * (-bodyForward.transform.localScale.z / 2) + Vector3.forward * (bodyForward.transform.localPosition.z));
+            go.transform.localPosition = bodyForward.transform.localPosition + Vector3.down * (bodyForward.transform.localScale.z / 2 + go.transform.localScale.z / 4) + Vector3.forward * bodyForward.transform.localScale.z / 3;
         }
 
         private void InstantiateWings(SpeciesExport creature)
