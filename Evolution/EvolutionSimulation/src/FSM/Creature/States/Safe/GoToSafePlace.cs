@@ -6,12 +6,12 @@ namespace EvolutionSimulation.FSM.Creature.States
     {
         public GoToSafePlace(Entities.Creature c) : base(c) { creature = c; }
 
-        public override bool canPerformAction(int actionPoints)
+        public override int GetCost()
         {
-            return actionPoints >= 1000 * ((200f - creature.stats.GroundSpeed) / 100f);
+            return (int)(1000 * ((200f - creature.stats.GroundSpeed) / 100f));
         }
 
-        public override int Action()
+        public override void Action()
         {
             //int nX = creature.objective.x - creature.x,
             //    nY = creature.objective.y - creature.y;
@@ -25,8 +25,6 @@ namespace EvolutionSimulation.FSM.Creature.States
             //    return (int)(1000 * ((200f - creature.stats.GroundSpeed) / 100f)); // Cost of the action performed
             //}
             Console.WriteLine("GoToSafePlace action");
-
-            return 0;
         }
 
         public override string ToString()

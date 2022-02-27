@@ -20,7 +20,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             int deltaX = oX - creature.x,       // Direction of objective
                 deltaY = oY - creature.y;
 
-            return deltaX <= danger || deltaY <= danger;  // The danger zone is a square and the creature is within it
+            return Math.Abs(deltaX) <= danger && Math.Abs(deltaY) <= danger;  // The danger zone is a square and the creature is within it
         }
 
         public override string ToString()

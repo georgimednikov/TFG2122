@@ -108,7 +108,7 @@ namespace EvolutionSimulation
             taxonomy = new GeneticTaxonomy();
             taxonomy.Init();
             Creatures = new List<Creature>();
-            StableEntities = new List<StableEntity>();
+            StableEntities = new List<StaticEntity>();
             CreaturesToDelete = new List<IEntity>();
             SEntitiesToDelete = new List<IEntity>();
             p = new Perlin();
@@ -220,7 +220,7 @@ namespace EvolutionSimulation
         /// and fulfill the same objecive during all their life-time.
         /// T: Any subclass of StableEntites i.e. Plant, Corpse
         /// </summary>
-        public T CreateStableEntity<T>() where T : StableEntity, new()
+        public T CreateStableEntity<T>() where T : StaticEntity, new()
         {
             T ent = CreateEntity<T>();
             StableEntities.Add(ent);
@@ -237,7 +237,7 @@ namespace EvolutionSimulation
         /// <summary>
         /// Designates an entity to be eliminated before the next frame
         /// </summary>
-        public void Destroy(StableEntity entity)
+        public void Destroy(StaticEntity entity)
         {
             SEntitiesToDelete.Add(entity);
         }
@@ -251,7 +251,7 @@ namespace EvolutionSimulation
             // Tick for every entity
             Creatures.Sort(new Utils.SortByMetabolism()); // TODO: priority queue
             Creatures.ForEach(delegate (Creature e) { e.Tick(); });
-            StableEntities.ForEach(delegate (StableEntity e) { e.Tick(); });
+            StableEntities.ForEach(delegate (StaticEntity e) { e.Tick(); });
 
             // Entity deletion
             CreaturesToDelete.ForEach(delegate (IEntity e)
@@ -263,7 +263,7 @@ namespace EvolutionSimulation
             });
             SEntitiesToDelete.ForEach(delegate (IEntity e)
             {
-                StableEntities.Remove(e as StableEntity);
+                StableEntities.Remove(e as StaticEntity);
                 e = null;
                 //foreach (Creature c in Creatures)
                 //    if (c.objective == e) c.objective = null;
@@ -303,10 +303,10 @@ namespace EvolutionSimulation
         /// Returns the entities in an area with a determined radius.
         /// </summary>
         /// <param name="c">The creature that is perceiving</param>
-        public List<StableEntity> PerceiveEntities(Creature c, int x, int y, int radius)
+        public List<StaticEntity> PerceiveEntities(Creature c, int x, int y, int radius)
         {
-            List<StableEntity> results = new List<StableEntity>();
-            foreach (StableEntity e in StableEntities) // TODO: use this?
+            List<StaticEntity> results = new List<StaticEntity>();
+            foreach (StaticEntity e in StableEntities) // TODO: use this?
             {
                 if (Math.Abs(e.x - x) <= radius && Math.Abs(e.y - y) <= radius) // Square vision
                     results.Add(e);
@@ -613,7 +613,7 @@ namespace EvolutionSimulation
 
         // Entities management
         public List<Creature> Creatures { get; private set; }
-        public List<StableEntity> StableEntities { get; private set; }
+        public List<StaticEntity> StableEntities { get; private set; }
         GeneticTaxonomy taxonomy;
 
 

@@ -22,7 +22,7 @@ namespace EvolutionSimulation.Entities
         {
             seenSameSpeciesCreatures = new List<Creature>();
             otherSeenCreatures = new List<Creature>();
-            seenEntities = new List<StableEntity>();
+            seenEntities = new List<StaticEntity>();
             InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
             activeStatus = new List<Status.Status>();
             removedStatus = new List<Status.Status>();
@@ -75,9 +75,8 @@ namespace EvolutionSimulation.Entities
             //toWake.value = (stats.CurrRest >= stats.MaxRest);
 
             stats.CurrRest -= stats.RestExpense;
-            mfsm.ObtainActionPoints(stats.Metabolism);
-
-            if (stats.Gender == Gender.Female && !stats.IsNewBorn())
+            
+            if(stats.Gender == Gender.Female && !stats.IsNewBorn())
             {
                 if (timeToBeInHeat == 0)//Can be pregnant
                     stats.InHeat = true;
@@ -105,8 +104,16 @@ namespace EvolutionSimulation.Entities
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
             ProcessInput();
 
-            do { mfsm.Evaluate(); } // While the creature can keep performing actions
-            while (mfsm.Execute());// Maintains the evaluation - execution action
+            // Action points added every tick 
+            ActionPoints += stats.Metabolism * 10;
+            
+            // Executes the state action if the creature has enough Action Points
+            int cost = 0;
+            while ((cost = mfsm.EvaluateCost()) <= ActionPoints)
+            {
+                mfsm.CurrentState.Action();
+                ActionPoints -= cost; 
+            }
 
             Clear();
         }
@@ -133,8 +140,6 @@ namespace EvolutionSimulation.Entities
                 activeStatus.Remove(s);
             removedStatus.Clear();
         }
-
-
 
         /// <summary>
         /// Returns the creature's current state
@@ -332,7 +337,7 @@ namespace EvolutionSimulation.Entities
                 nearestEnemy = otherSeenCreatures[0];
 
             //Find the nearest edible plant and corpse
-            foreach (StableEntity c in seenEntities)
+            foreach (StaticEntity c in seenEntities)
             {
                 if (nearestEdiblePlant == null && c as EdiblePlant != null)
                 {
@@ -396,7 +401,7 @@ namespace EvolutionSimulation.Entities
         public float ComputeDamage(float dmg, float pen)
         {
             float amount = 0;
-            amount = (dmg) - (stats.Armor - pen);
+            amount = (dmg) - Math.Max((stats.Armor - pen), 0);
             amount = Math.Max(0, amount);
             amount = Math.Min(amount, stats.CurrHealth);
             return amount;
@@ -519,7 +524,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         private void Poison(Creature interacter)
         {
-            if (interacter.stats.Perforation >= stats.Armor)
+            if (interacter.stats.Perforation >= stats.Armor) // TODO: refactor: posibilidad/refrescar status
                 AddStatus(new Poison(5 + (int)interacter.stats.Venom, interacter.stats.Venom));
         }
 
@@ -699,9 +704,9 @@ namespace EvolutionSimulation.Entities
         public List<Creature> seenSameSpeciesCreatures { get; private set; }
         public List<Creature> otherSeenCreatures { get; private set; }
         // List of entities seen at this moment by this creature
-        public List<StableEntity> seenEntities { get; private set; }
+        public List<StaticEntity> seenEntities { get; private set; }
 
-        public int actionPoints;
+        public int ActionPoints { get; private set; }
 
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
@@ -716,8 +721,6 @@ namespace EvolutionSimulation.Entities
         public EdiblePlant nearestEdiblePlant;
         //water place
         //safe place
-
-        public Action arrivalAction;
 
         public bool hasBeenHit;
 

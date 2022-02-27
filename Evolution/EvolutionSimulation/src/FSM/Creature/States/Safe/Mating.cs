@@ -12,23 +12,23 @@
         public Mating(Entities.Creature c, int time) : base(c){ this.time = time; startTime = time; }
 
         // This move is energy netural, costing the same energy that is obtained in a tick
-        public override bool canPerformAction(int actionPoints)
+        public override int GetCost()
         {
-            return actionPoints >= 1000;
+            return 1000;
         }
 
         /// <summary>
         /// Stay doing nothing (mating) while the timer is decreasing. When the timer is 0
         /// then create some creatures
         /// </summary>
-        public override int Action()
+        public override void Action()
         {
             time--;
             if (time == 0)
             {
                 if (creature.stats.Gender == Genetics.Gender.Female)
-                {                   
-                    if (creature.matingCreature == null) return 1000;
+                {
+                    if (creature.nearestMate == null) return;
                     // Create a random number of childs
                     int numberChilds = RandomGenerator.Next(1, 5);//TODO: que el numero de hijos dependa de algo del cromosoma?
                     for (int i = 0; i < numberChilds; ++i)
@@ -50,7 +50,8 @@
                 //TODO: esto hacerlo al salir del estado, sea cual sea el motivo
                 creature.matingCreature.ReceiveInteraction(creature, Entities.Interactions.stopMate);
             }
-            return 1000; // Cost of the action performed
+
+            //obj.ReceiveInteraction(creature, Entities.Interactions.mate);
         }
 
         public override string ToString()

@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace EvolutionSimulation.FSM
 {
+    /// <summary>
+    /// Class to form a superstate that performes as a FSM with different substates.
+    /// </summary>
     class CompoundState : IState
     {
         public CompoundState(string name, Fsm fsm)
@@ -13,18 +16,22 @@ namespace EvolutionSimulation.FSM
             this.name = name;
             stateMachine = fsm;
         }
-        public int Action()
+
+        /// <summary>
+        /// Performs the action of the current substate
+        /// </summary>
+        public void Action()
         {
-            int prevActionPoints = stateMachine.ActionPoints;
-            stateMachine.Evaluate();
-            if (stateMachine.Execute())
-                return prevActionPoints - stateMachine.ActionPoints;
-            return 0;
+            stateMachine.CurrentState.Action();
         }
 
-        public bool canPerformAction(int actionPoints)
+        /// <summary>
+        /// Evaluates transitions of the substates and returns the cost
+        /// of the target substate
+        /// </summary>
+        public int GetCost()
         {
-            return stateMachine.CurrentState.canPerformAction(actionPoints);
+            return stateMachine.EvaluateCost();
         }
 
         public override string ToString()

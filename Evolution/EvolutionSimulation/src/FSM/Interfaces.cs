@@ -16,12 +16,12 @@ namespace EvolutionSimulation.FSM
         /// its action with the FSm's current AP.
         /// </summary>
         /// <param name="actionPoints"></param>
-        bool canPerformAction(int actionPoints);
+        int GetCost();
 
         /// <summary>
         /// Action which is executed in the state
         /// </summary>
-        int Action();
+        void Action();
     }
 
     /// <summary>

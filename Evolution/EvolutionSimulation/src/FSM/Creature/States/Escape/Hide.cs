@@ -9,15 +9,14 @@ namespace EvolutionSimulation.FSM.Creature.States
     {
         public Hide(Entities.Creature c) : base(c) { creature = c; }
 
-        public override bool canPerformAction(int actionPoints)
+        public override int GetCost()
         {
-            return actionPoints >= 1000 * ((200f - creature.stats.GroundSpeed) / 100f);
+            return (int)(1000 * ((200f - creature.stats.GroundSpeed) / 100f));
         }
 
-        public override int Action()    // TODO: Que es esconderse?
+        public override void Action()    // TODO: Que es esconderse?
         {
             Console.WriteLine("Hide action");
-            return 0;
         }
 
         public override string ToString()

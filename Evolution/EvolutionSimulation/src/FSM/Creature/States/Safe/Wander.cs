@@ -7,12 +7,12 @@
     {
         public Wander(Entities.Creature c) : base(c) { creature = c; }
 
-        public override bool canPerformAction(int actionPoints)
+        public override int GetCost()
         {
-            return actionPoints >= 1000 * ((200f - creature.stats.GroundSpeed) / 100f);
+            return (int)(1000 * ((200f - creature.stats.GroundSpeed) / 100f));
         }
 
-        public override int Action()
+        public override void Action()
         {
             int nX = 0, nY = 0;
             do
@@ -24,9 +24,7 @@
             if (creature.world.canMove(nX, nY))
             {
                 creature.Place(nX, nY);
-                return (int)(1000 * ((200f - creature.stats.GroundSpeed) / 100f)); // Cost of the action performed
             }
-            return 0;
         }
 
         public override string ToString()
