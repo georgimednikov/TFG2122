@@ -28,8 +28,8 @@ namespace EvolutionSimulation.FSM.Creature.States
                 oY = creature.nearestEnemy.y;
             int deltaX = oX - creature.x,       // Direction of opposite movement
                 deltaY = oY - creature.y;
-            int normX = deltaX / Math.Abs(deltaX),  // Normalized direction of movement 
-                normY = deltaY / Math.Abs(deltaY);  // as you can only move once per actions (nut can have multiple actions per tick)
+            int normX = deltaX == 0 ? 0 : deltaX / Math.Abs(deltaX),  // Normalized direction of movement 
+                normY = deltaY == 0 ? 0 : deltaY / Math.Abs(deltaY);  // as you can only move once per actions (nut can have multiple actions per tick)
 
             if (creature.x == creature.nearestEnemy.x && creature.y == creature.nearestEnemy.y) // If it is in the same tile, go in a random direction
                 do {
@@ -37,9 +37,9 @@ namespace EvolutionSimulation.FSM.Creature.States
                     normY = RandomGenerator.Next(-1, 2);
                 } while (normX == 0 && normY == 0);
             
-            if (creature.world.canMove(creature.x - normX, creature.x - normY))
+            if (creature.world.canMove(creature.x - normX, creature.y - normY))
             {
-                creature.Place(creature.x + normX, creature.x + normY);
+                creature.Place(creature.x - normX, creature.y - normY);
             }
         }
 

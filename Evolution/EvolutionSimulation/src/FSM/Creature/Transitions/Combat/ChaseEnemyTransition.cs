@@ -16,7 +16,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             int deltaX = oX - creature.x,       // Direction of objective
                 deltaY = oY - creature.y;
 
-            return deltaX > 1 || deltaY > 1;    // This implies outside of melee range
+            return Math.Abs(deltaX) > 1 || Math.Abs(deltaY) > 1;    // This implies outside of melee range
         }
 
         public override string ToString()
