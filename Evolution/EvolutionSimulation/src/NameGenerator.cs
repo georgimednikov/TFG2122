@@ -13,6 +13,7 @@ namespace EvolutionSimulation
             char[] consonants = { 'b', 'c', 'd', 'n', 'g', 'h', 't', 's', 'l', 'm', 'f', 'p', 'r', 'k', 'j', 'v', 'w', 'x', 'z', 'y' };
             float[] consWeights = { 0.06f, 0.06f, 0.06f, 0.06f, 0.06f, 0.06f, 0.06f, 0.06f, 0.06f, 0.06f, 0.06f, 0.06f, 0.06f, 0.02f, 0.035f, 0.05f, 0.015f, 0.02f, 0.03f, 0.05f, };
             string name = "";
+            bool capital = true; //If the new letter must be a capital letter
             bool space = false; //If the space has been placed or not
             int amount, num = (int)CreatureFeature.Count; //Number of genes
             double value, total;
@@ -28,7 +29,13 @@ namespace EvolutionSimulation
                     total += ch.GetFeatureMax((CreatureFeature)i++);
                 }
 
-                name += consonants[GetIndexByWeight(value / total, consWeights)];
+                char cons = consonants[GetIndexByWeight(value / total, consWeights)];
+                if (capital)
+                {
+                    cons = char.ToUpper(cons);
+                    capital = false;
+                }
+                name += cons;
 
                 //After the consonant a vowel is added, with a 16.6% a second one is added too
                 //+2 to make the first 2 vowels in the array more common
@@ -45,6 +52,7 @@ namespace EvolutionSimulation
                 {
                     name += ' ';
                     space = true;
+                    capital = true;
                 }
             }
 

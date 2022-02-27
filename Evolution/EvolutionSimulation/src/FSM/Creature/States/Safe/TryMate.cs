@@ -1,7 +1,8 @@
 ﻿namespace EvolutionSimulation.FSM.Creature.States
 {
     /// <summary>
-    /// State going to reproduce, a male go to a female
+    /// State trying to reproduce. It is only for males.
+    /// A male interact with a female and "ask" to mate.
     /// </summary>
     class TryMate : CreatureState
     {

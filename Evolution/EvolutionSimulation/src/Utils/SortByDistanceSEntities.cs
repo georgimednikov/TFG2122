@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace EvolutionSimulation.Utils
 {
-    public class SortByDistanceSEntities : Comparer<Entities.StableEntity>
+    public class SortByDistanceSEntities : Comparer<Entities.StaticEntity>
     {
         Entities.Creature origin;
         public SortByDistanceSEntities(Entities.Creature creature)
@@ -11,7 +11,7 @@ namespace EvolutionSimulation.Utils
             origin = creature;
         }
 
-        public override int Compare(Entities.StableEntity c1, Entities.StableEntity c2)
+        public override int Compare(Entities.StaticEntity c1, Entities.StaticEntity c2)
         {
             int x1, y1, x2, y2;
             x1 = Math.Abs(origin.x - c1.x);

@@ -2,7 +2,8 @@
 {
     /// <summary>
     /// The creature is in a safe place (probably with other creatures of his species)
-    /// and want to sleep 
+    /// and want to sleep. If the creature is exhausted, it goes to sleep although it is 
+    /// not in a safe place
     /// </summary>
     class SleepySafeTransition : CreatureTransition
     {
@@ -13,9 +14,9 @@
 
         public override bool Evaluate()
         {
-            //TODO comprobar que es es un sitio seguro
-            return (creature.stats.CurrRest <= 0.2 * creature.stats.MaxRest /*&& safeplace*/)
-                || creature.stats.CurrRest <= 0.1 * creature.stats.MaxRest;
+            //TODO comprobar que es un sitio seguro
+            return (creature.IsTired() /*&& safeplace*/)
+                || creature.IsExhausted();
         }
 
         public override string ToString()

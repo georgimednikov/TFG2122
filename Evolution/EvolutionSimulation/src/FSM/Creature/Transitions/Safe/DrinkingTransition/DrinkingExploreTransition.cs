@@ -14,11 +14,10 @@
 
         public override bool Evaluate()
         {
-            if (creature.stats.CurrHydration > creature.stats.thirstyThreshold * creature.stats.MaxHydration) return false;
 
             //TODO drinking objective
             return false;
-            //return !creature.HasDrinkingObjective();
+            //return creature.IsThirsty() && !creature.HasDrinkingObjective();
         }
 
         public override string ToString()

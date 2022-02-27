@@ -10,7 +10,7 @@ namespace EvolutionSimulation.Entities
     /// Entities that don't evolve and have simple behaviours (i.e. Plants and Corpses).
     /// Everything that it's not a Creature. They stay the same during all its LifeTime. 
     /// </summary>
-    public abstract class StableEntity : IEntity
+    public abstract class StaticEntity : IEntity
     {
         /// <summary>
         /// Initializes the Entity
