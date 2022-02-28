@@ -40,6 +40,6 @@ namespace EvolutionSimulation.FSM
         }
 
         string name;
-        Fsm stateMachine;
+        public Fsm stateMachine { get; private set; }
     }
 }
