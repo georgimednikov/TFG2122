@@ -15,7 +15,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            return (creature.nearestEnemy != null || creature.hasBeenHit)
+            return (creature.GetClosestCreature() != null || creature.hasBeenHit)
                 && (creature.stats.Aggressiveness < 1 ||    // TODO: Poner un valor de verdad en agresividad
                 creature.stats.CurrHealth < creature.stats.MaxHealth * threshold);  // So even an aggresive creature has self-preservation instincts
             //TODO: revisar entidades vistas y considerar agresividad

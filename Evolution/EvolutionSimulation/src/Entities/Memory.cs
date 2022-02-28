@@ -40,7 +40,7 @@ namespace EvolutionSimulation.Entities
         public Creature closestAlly { get; private set; }
         public Creature closestPossibleMate { get; private set; }
         public Corpse closestCorpse { get; private set; }
-        public Tuple<int, int> closestFruit { get; private set; }
+        public EdiblePlant closestFruit { get; private set; }
         public Tuple<int, int> closestWater { get; private set; }
 
         public Memory(Creature c, World w)
@@ -76,7 +76,7 @@ namespace EvolutionSimulation.Entities
             }
 
             List<Creature> perceivedCreatures = world.PerceiveCreatures(thisCreature, perceptionRadius);
-            List<StableEntity> perceivedEntities = world.PerceiveEntities(thisCreature, perceptionRadius);
+            List<StaticEntity> perceivedEntities = world.PerceiveEntities(thisCreature, perceptionRadius);
 
             //This for structure is recurrent all throughtout this class and is explained with the following example:
             //With radius = 3, it goes from -3 inclusive to 3 inclusive in both axis, going through -3, -2, -1, 0, 1, 2, 3
@@ -108,7 +108,7 @@ namespace EvolutionSimulation.Entities
                     }
 
                     //Saves the corpses in a tile and throws away the rest.
-                    foreach (StableEntity entity in perceivedEntities)
+                    foreach (StaticEntity entity in perceivedEntities)
                     {
                         if (!(entity is Corpse)) perceivedEntities.Remove(entity);
                         else if (entity.x == x + i && entity.y == y + j)
@@ -253,7 +253,7 @@ namespace EvolutionSimulation.Entities
             if (closestCorpse == null && tile.creatures.Count > 0)
                 closestCorpse = tile.corpses[0];
             if (closestFruit == null && tile.fruit)
-                closestFruit = new Tuple<int, int>(tile.x, tile.y);
+                closestFruit = world.map[tile.x, tile.y].plant as EdiblePlant;
             if (closestWater == null && tile.water)
                 closestWater = new Tuple<int, int>(tile.x, tile.y);
         }

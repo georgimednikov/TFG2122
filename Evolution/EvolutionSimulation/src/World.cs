@@ -303,7 +303,7 @@ namespace EvolutionSimulation
         /// Returns the entities in an area with a determined radius.
         /// </summary>
         /// <param name="c">The creature that is perceiving</param>
-        public List<StaticEntity> PerceiveEntities(Creature c, int x, int y, int radius)
+        public List<StaticEntity> PerceiveEntities(Creature c, int radius)
         {
             List<StaticEntity> results = new List<StaticEntity>();
             foreach (StaticEntity e in StableEntities) // TODO: use this?

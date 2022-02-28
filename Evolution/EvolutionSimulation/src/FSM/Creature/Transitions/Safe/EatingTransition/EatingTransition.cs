@@ -17,25 +17,25 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         {
             if(creature.stats.Diet == Genetics.Diet.Herbivore )
             {
-                return creature.nearestEdiblePlant != null
-                  && Math.Abs(creature.nearestEdiblePlant.x - creature.x) < 1
-                  && Math.Abs(creature.nearestEdiblePlant.y - creature.y) < 1;
+                return creature.GetClosestFruit() != null
+                  && Math.Abs(creature.GetClosestFruit().x - creature.x) < 1
+                  && Math.Abs(creature.GetClosestFruit().y - creature.y) < 1;
             }
 
             if (creature.stats.Diet == Genetics.Diet.Carnivore )
             {
-                return creature.nearestCorpse != null
-                  && Math.Abs(creature.nearestCorpse.x - creature.x) < 1
-                  && Math.Abs(creature.nearestCorpse.y - creature.y) < 1;
+                return creature.GetClosestCorpse() != null
+                  && Math.Abs(creature.GetClosestCorpse().x - creature.x) < 1
+                  && Math.Abs(creature.GetClosestCorpse().y - creature.y) < 1;
             }
 
             //Omnivore
-            return (creature.nearestCorpse != null
-                && Math.Abs(creature.nearestCorpse.x - creature.x) < 1
-                && Math.Abs(creature.nearestCorpse.y - creature.y) < 1) 
-                || creature.nearestEdiblePlant != null
-                && Math.Abs(creature.nearestEdiblePlant.x - creature.x) < 1
-                && Math.Abs(creature.nearestEdiblePlant.y - creature.y) < 1; ;
+            return (creature.GetClosestCorpse() != null
+                && Math.Abs(creature.GetClosestCorpse().x - creature.x) < 1
+                && Math.Abs(creature.GetClosestCorpse().y - creature.y) < 1) 
+                || creature.GetClosestFruit() != null
+                && Math.Abs(creature.GetClosestFruit().x - creature.x) < 1
+                && Math.Abs(creature.GetClosestFruit().y - creature.y) < 1; ;
             
         }
 

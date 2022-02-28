@@ -624,7 +624,7 @@ namespace EvolutionSimulation.Entities
         public CreatureChromosome chromosome { get; private set; }
         public CreatureStats stats { get; private set; }
 
-        public int actionPoints;
+        public int ActionPoints { get; private set; }
 
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
@@ -664,7 +664,7 @@ namespace EvolutionSimulation.Entities
         public Creature GetClosestCreature() { return memory.closestCreature; }
         public Creature GetClosestCreatureReachable() { return memory.closestCreatureReachable; }
         public Corpse GetClosestCorpse() { return memory.closestCorpse; }
-        public Tuple<int, int> GetClosestFruit() { return memory.closestFruit; }
+        public EdiblePlant GetClosestFruit() { return memory.closestFruit; }
         public Tuple<int, int> GetClosestWater() { return memory.closestWater; }
     }
 }

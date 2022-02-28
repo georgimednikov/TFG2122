@@ -24,14 +24,14 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void Action()
         {
             // If the creature is in a different tile, simpli get away from it
-            int oX = creature.nearestEnemy.x,   // Objective's position
-                oY = creature.nearestEnemy.y;
+            int oX = creature.GetClosestCreature().x,   // Objective's position
+                oY = creature.GetClosestCreature().y;
             int deltaX = oX - creature.x,       // Direction of opposite movement
                 deltaY = oY - creature.y;
             int normX = deltaX == 0 ? 0 : deltaX / Math.Abs(deltaX),  // Normalized direction of movement 
                 normY = deltaY == 0 ? 0 : deltaY / Math.Abs(deltaY);  // as you can only move once per actions (nut can have multiple actions per tick)
 
-            if (creature.x == creature.nearestEnemy.x && creature.y == creature.nearestEnemy.y) // If it is in the same tile, go in a random direction
+            if (creature.x == creature.GetClosestCreature().x && creature.y == creature.GetClosestCreature().y) // If it is in the same tile, go in a random direction
                 do {
                     normX = RandomGenerator.Next(-1, 2);
                     normY = RandomGenerator.Next(-1, 2);

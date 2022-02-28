@@ -28,7 +28,7 @@
             {
                 if (creature.stats.Gender == Genetics.Gender.Female)
                 {
-                    if (creature.nearestMate == null) return;
+                    if (creature.GetClosestPossibleMate() == null) return;
                     // Create a random number of childs
                     int numberChilds = RandomGenerator.Next(1, 5);//TODO: que el numero de hijos dependa de algo del cromosoma?
                     for (int i = 0; i < numberChilds; ++i)
