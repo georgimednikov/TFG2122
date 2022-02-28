@@ -108,7 +108,7 @@ namespace EvolutionSimulation
             taxonomy = new GeneticTaxonomy();
             taxonomy.Init();
             Creatures = new List<Creature>();
-            StableEntities = new List<StableEntity>();
+            StableEntities = new List<StaticEntity>();
             CreaturesToDelete = new List<IEntity>();
             SEntitiesToDelete = new List<IEntity>();
             p = new Perlin();
@@ -164,10 +164,10 @@ namespace EvolutionSimulation
         /// Checks if target coordinates are within the map's boundaries
         /// </summary>
         /// <returns>True if it is within bounds</returns>
-        public bool canMove(int x, int y, int z = 0)
+        public bool canMove(int x, int y, Creature.HeightLayer z = Creature.HeightLayer.Ground)
         {
-            if (!(x >= 0 && x < mapSize && y >= 0 && y < mapSize) || (z < 2 && map[x, y].isWater)) return false;
-            if (z == 0 || z == 2) return true;
+            if (!(x >= 0 && x < mapSize && y >= 0 && y < mapSize) || (z != Creature.HeightLayer.Air && map[x, y].isWater)) return false;
+            if (z == Creature.HeightLayer.Ground || z == Creature.HeightLayer.Air) return true;
             return isTree(x, y);
         }
 
@@ -183,7 +183,7 @@ namespace EvolutionSimulation
         /// <returns>True if it is within bounds</returns>
         public bool canMove(Vector3 pos)
         {
-            return canMove((int)pos.X, (int)pos.Y, (int)pos.Z);
+            return canMove((int)pos.X, (int)pos.Y, (Creature.HeightLayer)pos.Z);
         }
 
         #region EntitiesManagement
@@ -220,7 +220,7 @@ namespace EvolutionSimulation
         /// and fulfill the same objecive during all their life-time.
         /// T: Any subclass of StableEntites i.e. Plant, Corpse
         /// </summary>
-        public T CreateStableEntity<T>() where T : StableEntity, new()
+        public T CreateStableEntity<T>() where T : StaticEntity, new()
         {
             T ent = CreateEntity<T>();
             StableEntities.Add(ent);
@@ -237,7 +237,7 @@ namespace EvolutionSimulation
         /// <summary>
         /// Designates an entity to be eliminated before the next frame
         /// </summary>
-        public void Destroy(StableEntity entity)
+        public void Destroy(StaticEntity entity)
         {
             SEntitiesToDelete.Add(entity);
         }
@@ -251,7 +251,7 @@ namespace EvolutionSimulation
             // Tick for every entity
             Creatures.Sort(new Utils.SortByMetabolism()); // TODO: priority queue
             Creatures.ForEach(delegate (Creature e) { e.Tick(); });
-            StableEntities.ForEach(delegate (StableEntity e) { e.Tick(); });
+            StableEntities.ForEach(delegate (StaticEntity e) { e.Tick(); });
 
             // Entity deletion
             CreaturesToDelete.ForEach(delegate (IEntity e)
@@ -263,7 +263,7 @@ namespace EvolutionSimulation
             });
             SEntitiesToDelete.ForEach(delegate (IEntity e)
             {
-                StableEntities.Remove(e as StableEntity);
+                StableEntities.Remove(e as StaticEntity);
                 e = null;
                 //foreach (Creature c in Creatures)
                 //    if (c.objective == e) c.objective = null;
@@ -303,10 +303,10 @@ namespace EvolutionSimulation
         /// Returns the entities in an area with a determined radius.
         /// </summary>
         /// <param name="c">The creature that is perceiving</param>
-        public List<StableEntity> PerceiveEntities(Creature c, int radius)
+        public List<StaticEntity> PerceiveEntities(Creature c, int x, int y, int radius)
         {
-            List<StableEntity> results = new List<StableEntity>();
-            foreach (StableEntity e in StableEntities) // TODO: use this?
+            List<StaticEntity> results = new List<StaticEntity>();
+            foreach (StaticEntity e in StableEntities) // TODO: use this?
             {
                 if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius) // Square vision
                     results.Add(e);
@@ -613,7 +613,7 @@ namespace EvolutionSimulation
 
         // Entities management
         public List<Creature> Creatures { get; private set; }
-        public List<StableEntity> StableEntities { get; private set; }
+        public List<StaticEntity> StableEntities { get; private set; }
         GeneticTaxonomy taxonomy;
 
 

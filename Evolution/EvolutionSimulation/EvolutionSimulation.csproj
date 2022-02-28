@@ -72,7 +72,8 @@
     <Compile Include="src\Entities\Animal.cs" />
     <Compile Include="src\Entities\Astar.cs" />
     <Compile Include="src\Entities\Memory.cs" />
-    <Compile Include="src\Entities\StableEntity.cs" />
+    <Compile Include="src\Entities\CreatureStats.cs" />
+    <Compile Include="src\Entities\StaticEntity.cs" />
     <Compile Include="src\Entities\Bush.cs" />
     <Compile Include="src\Entities\EdiblePlant.cs" />
     <Compile Include="src\Entities\EdibleTree.cs" />
@@ -84,10 +85,8 @@
     <Compile Include="src\Entities\Status\IStatus.cs" />
     <Compile Include="src\Entities\Tree.cs" />
     <Compile Include="src\FSM\CompoundState.cs" />
-    <Compile Include="src\FSM\Creature\States\Combat.cs" />
-    <Compile Include="src\FSM\Creature\States\Escape.cs" />
-    <Compile Include="src\FSM\Creature\States\Safe.cs" />
     <Compile Include="src\FSM\Creature\States\Combat\ChaseEnemy.cs" />
+    <Compile Include="src\FSM\Creature\States\Dead.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\GoToMate.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\GoToSafePlace.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\GoToEat.cs" />
@@ -140,11 +139,8 @@
     <Compile Include="src\Genetics\CreatureFeatures.cs" />
     <Compile Include="src\Genetics\CreatureChromosome.cs" />
     <Compile Include="src\Genetics\GeneticFunctions.cs" />
-    <Compile Include="src\FSM\Creature\States\Alive.cs" />
-    <Compile Include="src\FSM\Creature\States\Dead.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\Eating.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\Wander.cs" />
-    <Compile Include="src\FSM\StatelessFsm.cs" />
     <Compile Include="src\FSM\Interfaces.cs" />
     <Compile Include="src\Entities\IInteractable.cs" />
     <Compile Include="src\Perlin.cs" />
@@ -163,9 +159,6 @@
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="stateless, Version=4.0.0.0, Culture=neutral, PublicKeyToken=93038f0927583c9a, processorArchitecture=MSIL">
-      <HintPath>..\packages\stateless.5.11.0\lib\net472\stateless.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Numerics" />

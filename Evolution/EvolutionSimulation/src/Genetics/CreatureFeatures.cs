@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+
 namespace EvolutionSimulation.Genetics
 {
     public enum CreatureFeature

@@ -26,7 +26,7 @@
                 return false;
 
             // If the creature is really hunger stop going to drinking objective
-            if (creature.IsVeryHunger())
+            if (creature.IsVeryHungry())
                 return true;
 
             return false;

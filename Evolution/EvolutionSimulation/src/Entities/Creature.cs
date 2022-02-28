@@ -76,7 +76,6 @@ namespace EvolutionSimulation.Entities
             //toWake.value = (stats.CurrRest >= stats.MaxRest);
 
             stats.CurrRest -= stats.RestExpense;
-            mfsm.ObtainActionPoints(stats.Metabolism);         
             
             if(stats.Gender == Gender.Female && !stats.IsNewBorn())
             {
@@ -105,8 +104,16 @@ namespace EvolutionSimulation.Entities
             foreach (Status.Status s in activeStatus)   // Activates each status effect
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
 
-            do { mfsm.Evaluate(); } // While the creature can keep performing actions
-            while (mfsm.Execute());// Maintains the evaluation - execution action
+            // Action points added every tick 
+            ActionPoints += stats.Metabolism * 10;
+            
+            // Executes the state action if the creature has enough Action Points
+            int cost = 0;
+            while ((cost = mfsm.EvaluateCost()) <= ActionPoints)
+            {
+                mfsm.CurrentState.Action();
+                ActionPoints -= cost; 
+            }
 
             Clear();
         }
@@ -123,8 +130,6 @@ namespace EvolutionSimulation.Entities
                 activeStatus.Remove(s);
             removedStatus.Clear();
         }
-
-        
 
         /// <summary>
         /// Returns the creature's current state
@@ -206,7 +211,7 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToSafePlace, sleepySafeTransition, sleep);
             safeFSM.AddTransition(wander, sleepyTransition, sleep);
             safeFSM.AddTransition(sleep, wakeTransition, wander);
-            
+
             // Escape-state Configuration
             // States
             IState fleeing = new Fleeing(this);
@@ -215,8 +220,8 @@ namespace EvolutionSimulation.Entities
             // Transitions
             ITransition fleeTransition = new FleeTransition(this);
             ITransition hideTranistion = new HideTransition(this);
-            escapeFSM.AddTransition(fleeing, hideTranistion , hide);
-            escapeFSM.AddTransition(hide, fleeTransition , fleeing);
+            escapeFSM.AddTransition(fleeing, hideTranistion, hide);
+            escapeFSM.AddTransition(hide, fleeTransition, fleeing);
             IState escape = new CompoundState("Escape", escapeFSM);
 
             // Combat-state Configuration
@@ -228,12 +233,12 @@ namespace EvolutionSimulation.Entities
             ITransition attackTransition = new AttackTransition(this);
             ITransition chaseEnemyTransition = new ChaseEnemyTransition(this);
             combatFSM.AddTransition(chaseEnemy, attackTransition, attack);
-            combatFSM.AddTransition(attack, chaseEnemyTransition, chaseEnemy);  
+            combatFSM.AddTransition(attack, chaseEnemyTransition, chaseEnemy);
             IState combat = new CompoundState("Combat", combatFSM);
 
             Fsm aliveFSM = new Fsm(safe);
             // Transitions
-            ITransition escapeTransition = new EscapeTransition(this);   
+            ITransition escapeTransition = new EscapeTransition(this);
             ITransition safeTransition = new SafeTransition(this);
             ITransition combatTransition = new CombatTransition(this);
             aliveFSM.AddTransition(safe, escapeTransition, escape);
@@ -255,12 +260,12 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Moves a creature a specified amount
         /// </summary>
-        public void Move(int x, int y, int z = 0)
+        public void Move(int x, int y, HeightLayer z = HeightLayer.Ground)
         {
             this.x += x;
             this.y += y;
             if (world.isTree(x, y))
-                this.creatureLayer = (HeightLayer)z;
+                creatureLayer = z;
             else if (creatureLayer != HeightLayer.Air)
                 creatureLayer = HeightLayer.Ground;
         }
@@ -311,6 +316,22 @@ namespace EvolutionSimulation.Entities
                 InteractionsDict.Remove(type);
         }
 
+
+        /// <summary>
+        /// Returns the taken damage
+        /// </summary>
+        /// <param name="dmg">Incoming damage</param>
+        /// <param name="pen">Damage penetratione</param>
+        public float ComputeDamage(float dmg, float pen)
+        {
+            float amount = 0;
+            amount = (dmg) - Math.Max((stats.Armor - pen), 0);
+            amount = Math.Max(0, amount);
+            amount = Math.Min(amount, stats.CurrHealth);
+            return amount;
+        }
+
+
         /// <summary>
         /// Check if the eating objective is not null
         /// </summary>
@@ -349,7 +370,7 @@ namespace EvolutionSimulation.Entities
         /// Check if the creature is hunger (need to eat)
         /// </summary>
         /// <returns> True if the creature is hunger </returns>
-        public bool IsHunger()
+        public bool IsHungry()
         {
             return stats.CurrEnergy > stats.hungerThreshold * stats.MaxEnergy;
         }
@@ -358,7 +379,7 @@ namespace EvolutionSimulation.Entities
         /// Check if the creature is very hunger (need to eat)
         /// </summary>
         /// <returns> True if the creature is very hunger </returns>
-        public bool IsVeryHunger()
+        public bool IsVeryHungry()
         {
             return stats.CurrEnergy > stats.veryHungerThreshold * stats.MaxEnergy;
         }
@@ -425,7 +446,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         private void Poison(Creature interacter)
         {
-            if(interacter.stats.Perforation >= stats.Armor)
+            if (interacter.stats.Perforation >= stats.Armor) // TODO: refactor: posibilidad/refrescar status
                 AddStatus(new Poison(5 + (int)interacter.stats.Venom, interacter.stats.Venom));
         }
 
@@ -464,19 +485,6 @@ namespace EvolutionSimulation.Entities
             }
         }
 
-        /// <summary>
-        /// Returns the taken damage
-        /// </summary>
-        /// <param name="dmg">Incoming damage</param>
-        /// <param name="pen">Damage penetratione</param>
-        public float ComputeDamage(float dmg, float pen)
-        {
-            float amount = 0;
-            amount = (dmg) - (stats.Armor - pen);
-            amount = Math.Max(0, amount);
-            amount = Math.Min(amount, stats.CurrHealth);
-            return amount;
-        }
 
         /// <summary>
         /// Returns if an ability is unlocked
@@ -489,69 +497,54 @@ namespace EvolutionSimulation.Entities
             return unlock <= f / mF;
         }
 
-        public enum HeightLayer { Ground, Tree, Air };
+        public enum HeightLayer { Ground, Tree = 1, Air = 2 };
 
         public HeightLayer creatureLayer;
 
-        int treeHeight = 1, flightHeight = 2;
         Vector3[] path;
         int pathIterator;
 
+        /// <summary>
+        /// Returns minimal path length for arboreal movement being more efficient than ground.
+        /// </summary>
         public int getTreeThreshold(double treeDensity)
         {
-            double a = 2 * treeHeight * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / 100f);
+            double a = 2 * (int)HeightLayer.Tree * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / 100f);
             double b = treeDensity * (stats.GroundSpeed / 100f + Tree.movementPenalty - stats.ArborealSpeed / 100f - 1);
             return (int)Math.Floor((a / b) + 0.5);
         }
 
+        /// <summary>
+        /// Returns minimal path length for flying movement being more efficient than ground/arboreal.
+        /// </summary>
         int getFlyThreshold(double treeDensity)
         {
-            double a = 2 * flightHeight * (stats.GroundSpeed / 100f * (1 - treeDensity) + treeDensity * stats.AerialSpeed / 100f);
-            double b = -2 * stats.AerialSpeed / 100f * treeHeight * treeDensity;
+            double a = 2 * (int)HeightLayer.Air * (stats.GroundSpeed / 100f * (1 - treeDensity) + treeDensity * stats.AerialSpeed / 100f);
+            double b = -2 * stats.AerialSpeed / 100f * (int)HeightLayer.Tree * treeDensity;
             double c = stats.AerialSpeed / 100f + stats.GroundSpeed / 100f * (treeDensity - 1) - treeDensity * stats.ArborealSpeed / 100f;
             return (int)Math.Floor(((a + b) / c) + 0.5);
         }
 
-        public int SetPath(int x, int y, int z = 0)
+        /// <summary>
+        /// Sets the creature path towards the provided coordinates. Throws exception on unreacheable coordinates. Sets the path iterator to 0.
+        /// </summary>
+        /// <param name="z">Ending target layer for the creature.</param>
+        /// <returns>The cost for moving to the first position on the path.</returns>
+        public int SetPath(int x, int y, HeightLayer z = HeightLayer.Ground)
         {
             if (!world.canMove(x, y, z)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
-            double treeDensity = 0;
-            path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, z), out treeDensity); // A*
+            if ((stats.AerialSpeed == -1 && z == HeightLayer.Air) || (stats.ArborealSpeed == -1 && z == HeightLayer.Tree)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
+            path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z), out double treeDensity); // A* to the objective
             int thres = getFlyThreshold(treeDensity);
             if (thres > 0 && path.Length >= thres)
-                path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, z));// A* pero con todo gratis
-
-            //Console.Clear();
-            //for (int i = 0; i < path.Length; ++i)
-            //{
-            //    //for (int j = 0; j < path[i].X; ++j)
-            //    //{
-            //    //    if (world.isTree(j, (int)path[i].Y)) Console.BackgroundColor = ConsoleColor.Green;
-            //    //    else Console.BackgroundColor = ConsoleColor.Black; 
-            //    //    Console.Write(" ");
-            //    //}
-            //    if (world.isTree((int)path[i].X, (int)path[i].Y)) Console.BackgroundColor = ConsoleColor.Green;
-            //    else Console.BackgroundColor = ConsoleColor.Black;
-            //    Console.SetCursorPosition((int)path[i].X, (int)path[i].Y);
-
-            //    if (path[i].Z == 0) Console.Write("x");
-            //    else Console.Write("a");
-            //}
-            //Console.BackgroundColor = ConsoleColor.Black;
-            //Console.WriteLine();
-            //if (path[path.Length - 1].X != 31 || path[path.Length - 1].Y != 31)
-            //    Console.WriteLine("No se puede");
+                path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));// Straight line to the objective
+            pathIterator = 0;
             return GetNextCostOnPath();
         }
 
-        //TODO:Remove
-        public void MakeFly()
-        {
-            stats.ArborealSpeed = 199;
-            stats.AerialSpeed = -1;
-            stats.GroundSpeed = 100;
-        }
-
+        /// <summary>
+        /// Returns the cost for moving to the next position on the path. Does not advance the path iterator.
+        /// </summary>
         public int GetNextCostOnPath()
         {
             int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
@@ -574,6 +567,10 @@ namespace EvolutionSimulation.Entities
             return (int)(1000 * ((200f - speed) / 100f));
         }
 
+        /// <summary>
+        /// Returns the next position on the path. Advances the path iterator.
+        /// </summary>
+        /// <returns>Next position or (-1, -1, -1) on path end.</returns>
         public Vector3 GetNextPosOnPath()
         {
             if (pathIterator >= path.Length) { path = null; return new Vector3(-1, -1, -1); }
@@ -633,9 +630,6 @@ namespace EvolutionSimulation.Entities
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         private Fsm mfsm;
 
-
-        public Action arrivalAction;
-
         public bool hasBeenHit;
 
         public Creature matingCreature;
@@ -673,131 +667,4 @@ namespace EvolutionSimulation.Entities
         public Tuple<int, int> GetClosestFruit() { return memory.closestFruit; }
         public Tuple<int, int> GetClosestWater() { return memory.closestWater; }
     }
-
-
-
-
-
-
-
-
-
-
-    public class CreatureStats
-    {
-        //TODO valores pls dejad de ser randoms
-        private float startMultiplier = 0.33f; //Starting multiplier of newborns
-        private float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
-
-        public float tiredThreshold = 0.40f; //After which percentage of currRest the creature should sleep with low priority
-        //After which percentage of currRest the creature should sleep with high priority and some stats are dimished
-        public float exhaustThreshold = 0.15f;
-
-        public float hungerThreshold = 0.40f; //After which percentage of currEnergy the creature should eat with low priority
-        //After which percentage of currEnergy the creature should eat with high priority
-        public float veryHungerThreshold = 0.15f;
-
-        public float thirstyThreshold = 0.40f; //After which percentage of currHydration the creature should eat with low priority
-        //After which percentage of currHydration the creature should eat with high priority
-        public float veryThirstyThreshold = 0.15f;
-
-        /// <summary>
-        /// Modifies the given stat based on age
-        /// </summary>
-        float ModifyStatByAge(float stat)
-        {
-            return stat * Math.Min(1.0f, (1 - startMultiplier) / (LifeSpan * adulthoodThreshold) * currAge + startMultiplier);
-        }
-
-        public bool IsNewBorn() { return LifeSpan * adulthoodThreshold < currAge; }
-
-        public Gender Gender { get; set; }
-
-        //Nutrition related stats
-        public Diet Diet { get; set; }
-        public float Scavenger { get; set; } //From 0 (normal chance of getting poisoned) to 1 (cannot get poisoned)
-
-        //Health and damage related stats
-        float maxHealth;
-        public float MaxHealth { get { return ModifyStatByAge(maxHealth); }
-            set { maxHealth = value; /* If maxHealth changes, currHealth changes the difference */ CurrHealth += MaxHealth - CurrHealth; } }
-        public float CurrHealth { get; set; }
-        int damage;
-        public int Damage { get { /* Minimum damage is 1 */ return (int)Math.Ceiling(ModifyStatByAge(damage)); } set { damage = value; } }
-        int armor;
-        public int Armor { get { return (int)ModifyStatByAge(armor); } set { armor = value; } }
-        int perforation;
-        public int Perforation { get { return (int)ModifyStatByAge(perforation); } set { perforation = value; } }
-        float venom;
-        public float Venom { get { return ModifyStatByAge(venom); } set { venom = value; } }
-        float counter; // Puas
-        public float Counter { get { return ModifyStatByAge(counter); } set { counter = value; } }
-
-        //Mobility related stats
-        public int AerialSpeed { get; set; }
-        public int ArborealSpeed { get; set; }
-        public int GroundSpeed { get; set; }
-
-        //Reaches
-        public bool AirReach { get; set; } // TODO: que afecte la edad?
-        public bool TreeReach { get; set; }
-
-        //Energy related stats
-        float maxEnergy;
-        public float MaxEnergy { get { return maxEnergy; }
-            set { maxEnergy = value; } }
-        public float CurrEnergy { get; set; }
-        public float EnergyExpense { get; set; }
-
-        //Hydration related stats
-        public float MaxHydration { get; set; }
-        public float CurrHydration { get; set; }
-        public float HydrationExpense { get; set; }
-
-        //Rest related stats
-        public float MaxRest { get; set; }
-        float currRest;
-        public float CurrRest { get { return currRest; } set { currRest = value; if (currRest < 0) currRest = 0; } }
-        public float RestRecovery { get; set; }
-        public float RestExpense { get; set; }
-
-        //Environment related stats
-        public int Camouflage { get; set; }// TODO: que dependa de la edad pero al reves
-        int aggressiveness;
-        public int Aggressiveness { get { return (int)ModifyStatByAge(aggressiveness); } set { aggressiveness = value; } }
-        int intimidation;
-        public int Intimidation { get { return (int)ModifyStatByAge(intimidation); } set { intimidation = value; } }
-        public int Perception { get; set; }
-        public float NightDebuff { get; set; }
-
-        //Physique related stats
-        int size;
-        public int Size { get { return (int)ModifyStatByAge(size); } set { size = value; } }
-        public int LifeSpan { get; set; }
-        int currAge;
-        public int CurrAge { get { return currAge; } 
-            set { float oldMaxH = MaxHealth; currAge = value; CurrHealth += MaxHealth - oldMaxH; } }
-        public int Members { get; set; }//limbs
-        public int Metabolism { get; set; }
-        public float MinTemperature { get; set; }
-        public float MaxTemperature { get; set; }
-        public float IdealTemperature { get; set; }
-        //public float Hair { get; set; }
-
-        //Behaviour related stats
-        public int Knowledge { get; set; }
-        public int Paternity { get; set; }
-
-        //Multipliers
-        public float HealthRegeneration { get; set; }
-        public float MaxSpeed { get; set; }
-
-        //Reproduction stats
-        public int TimeBetweenHeats { get; set; }
-        public bool InHeat { get; set; }
-
-        public bool Upright { get; set; }
-        public bool Hair { get; set; }
-    }
-
 }

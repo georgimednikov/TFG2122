@@ -2,7 +2,7 @@
 
 namespace EvolutionSimulation.Entities
 {
-    public class Corpse : StableEntity, IInteractable<Creature>
+    public class Corpse : StaticEntity, IInteractable<Creature>
     {
         /// <summary>
         /// Initializes the Corpse

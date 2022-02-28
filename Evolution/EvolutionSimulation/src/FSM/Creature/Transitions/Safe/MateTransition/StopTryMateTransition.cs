@@ -17,7 +17,7 @@
                 return true;
 
             return creature.nearestMate == null || (!creature.nearestMate.wantMate && !creature.mating)
-                || creature.IsHunger() || creature.IsThirsty() || creature.IsTired();
+                || creature.IsHungry() || creature.IsThirsty() || creature.IsTired();
         }
 
         public override string ToString()
