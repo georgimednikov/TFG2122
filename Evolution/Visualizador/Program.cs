@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+using EvolutionSimulation;
 
 namespace Visualizador
 {
@@ -14,8 +11,12 @@ namespace Visualizador
         [STAThread]
         static void Main()
         {
-            EvolutionSimulation.WorkingDirectories.AskDirectories();
-
+#if DEBUG
+            UserInfo.SetDebugInfo();
+#else
+            if (!UserInfo.AskInfoUsingWindows())
+                return;
+#endif
             //Application.EnableVisualStyles();
             //Application.SetCompatibleTextRenderingDefault(false);
             //EvolutionSimulation.Genetics.CreatureChromosome.SetChromosome("../../Chromosome.json");

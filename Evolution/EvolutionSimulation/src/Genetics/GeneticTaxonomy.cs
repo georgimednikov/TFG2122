@@ -67,8 +67,8 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         public void Init()
         {
-            string jsonWeigths = WorkingDirectories.DataDirectory + "SimilarityGeneWeight.json";
-            string jsonSimilarity = WorkingDirectories.DataDirectory + "SimilaritySpecies.json";
+            string jsonWeigths = UserInfo.DataDirectory + "SimilarityGeneWeight.json";
+            string jsonSimilarity = UserInfo.DataDirectory + "SimilaritySpecies.json";
 
             //The different weights for each gene when calculating the similarities
             //between two creatures is read from the designated json file
@@ -328,7 +328,7 @@ namespace EvolutionSimulation.Genetics
                 Species sp = existingSpecies[i];
                 SpeciesExport export = new SpeciesExport(sp.name, sp.original.stats);
                 string species = JsonConvert.SerializeObject(export, Formatting.Indented);
-                File.WriteAllText(WorkingDirectories.ExportDirectory + "Species_" + i + ".json", species);
+                File.WriteAllText(UserInfo.ExportDirectory + "Species_" + i + ".json", species);
             }
         }
     }

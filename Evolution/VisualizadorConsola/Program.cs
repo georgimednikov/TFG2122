@@ -6,7 +6,12 @@ namespace VisualizadorConsola
     {
         static void Main(string[] args)
         {
-            WorkingDirectories.SetDirectories();
+#if DEBUG
+            UserInfo.SetDebugInfo();
+#else
+            if (!UserInfo.AskInfoUsingConsole())
+                return;
+#endif
             EvolutionSimulation.Genetics.CreatureChromosome.SetChromosome();
             ISimulation s = new ConsoleSimulation();
             s.Init();

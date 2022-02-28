@@ -596,7 +596,7 @@ namespace EvolutionSimulation
         {
             taxonomy.ExportSpecies();
             string word = JsonConvert.SerializeObject(map, Formatting.Indented);
-            System.IO.File.WriteAllText(WorkingDirectories.ExportDirectory + "World.json", word);
+            System.IO.File.WriteAllText(UserInfo.ExportDirectory + "World.json", word);
         }
 
         // Map with physical properties
