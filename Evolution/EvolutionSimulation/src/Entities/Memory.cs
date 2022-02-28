@@ -43,16 +43,17 @@ namespace EvolutionSimulation.Entities
         public Tuple<int, int> closestFruit { get; private set; }
         public Tuple<int, int> closestWater { get; private set; }
 
-        public Memory(Creature c, World w, int perceptionRadius, int dangerRadius)
+        public Memory(Creature c, World w)
         {
             thisCreature = c;
             world = w;
-            this.perceptionRadius = perceptionRadius;
-            this.dangerRadius = dangerRadius;
             map = new MemoryTileInfo[world.map.GetLength(0), world.map.GetLength(1)];
-            maxTicksUnchecked = thisCreature.stats.Knowledge * 500; //TODO: Esto bien
             rememberedTiles = new List<MemoryTileInfo>();
             comparer = new MemoryTileComparer(thisCreature);
+
+            maxTicksUnchecked = thisCreature.stats.Knowledge * 500; //TODO: Esto bien
+            perceptionRadius = thisCreature.stats.Perception;
+            dangerRadius = thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness;
         }
 
         public void Update()
@@ -75,7 +76,7 @@ namespace EvolutionSimulation.Entities
             }
 
             List<Creature> perceivedCreatures = world.PerceiveCreatures(thisCreature, perceptionRadius);
-            List<StableEntity> perceivedCorpses = world.PerceiveEntities(thisCreature, perceptionRadius);
+            List<StableEntity> perceivedEntities = world.PerceiveEntities(thisCreature, perceptionRadius);
 
             //This for structure is recurrent all throughtout this class and is explained with the following example:
             //With radius = 3, it goes from -3 inclusive to 3 inclusive in both axis, going through -3, -2, -1, 0, 1, 2, 3
@@ -107,28 +108,19 @@ namespace EvolutionSimulation.Entities
                     }
 
                     //Saves the corpses in a tile and throws away the rest.
-                    foreach (StableEntity entity in perceivedCorpses)
+                    foreach (StableEntity entity in perceivedEntities)
                     {
-                        if (!(entity is Corpse)) perceivedCorpses.Remove(entity);
+                        if (!(entity is Corpse)) perceivedEntities.Remove(entity);
                         else if (entity.x == x + i && entity.y == y + j)
                         {
                             map[x + i, y + j].corpses.Add(entity as Corpse);
-                            perceivedCorpses.Remove(entity); //Once processed the object is removed to reduce cost.
+                            perceivedEntities.Remove(entity); //Once processed the object is removed to reduce cost.
                         }
                     }
-                }
-            }
-
-            //With the danger values reset and creatures accounted for, the information
-            //for every tile in sight can be updated.
-            for (int i = -perceptionRadius; i <= perceptionRadius; i++)
-            {
-                for (int j = -perceptionRadius; j <= perceptionRadius; j++)
-                {
+                    //With the creatures accounted for, the information for every tile in sight can be updated.
                     UpdateMemoryTile(x + i, y + j);
                 }
             }
-
             SearchResources();
         }
 
@@ -172,12 +164,6 @@ namespace EvolutionSimulation.Entities
             //TODO: Hierba
             map[x, y].fruit = world.map[x, y].plant is EdiblePlant && !(world.map[x, y].plant as EdiblePlant).eaten;
 
-            //The danger in a tile is calculated by adding up all the intimidation stats of the creatures in it.
-            //Then, the danger is increased in the vecinity in a radius, dividing the original danger
-            //by a power of 2 depending on distance:
-            //  0 distance -> 16
-            //  1 distance -> 8
-            //  2 distance -> 4...
             float danger = 0;
             foreach (Creature creature in map[x, y].creatures)
             {
@@ -195,6 +181,12 @@ namespace EvolutionSimulation.Entities
         /// <param name="experience">If the danger comes from experience or perception</param>
         private void AdjustDanger(int x, int y, float danger, bool experience)
         {
+            //The danger in a tile is calculated by adding up all the intimidation stats of the creatures in it.
+            //Then, the danger is increased in the vecinity in a radius, dividing the original danger
+            //by a power of 2 depending on distance:
+            //  0 distance -> 16
+            //  1 distance -> 8
+            //  2 distance -> 4...
             for (int i = -dangerRadius; i <= dangerRadius; i++)
             {
                 for (int j = -dangerRadius; j <= dangerRadius; j++)

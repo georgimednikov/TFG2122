@@ -44,7 +44,7 @@ namespace EvolutionSimulation.Entities
             speciesName = name;
             stats = new CreatureStats();
             //TODO: Los parametros de abajo no se donde ponerlos xd
-            memory = new Memory(this, world, 10, 5);
+            memory = new Memory(this, world);
             //speciesName = "None";
             SetStats();
             this.x = x;
