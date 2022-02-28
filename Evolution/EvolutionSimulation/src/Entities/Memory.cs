@@ -64,8 +64,14 @@ namespace EvolutionSimulation.Entities
                 MemoryTileInfo tile = rememberedTiles[i];
                 tile.ticksUnchecked++;
                 if (tile.ticksUnchecked >= maxTicksUnchecked) //If it's time to forget a tile.
+                {
                     tile.discovered = false;
-                rememberedTiles.Remove(tile);
+                    //If the tile is forgotten the the creature no longer feels danger/fondness of it and its vecinity.
+                    //To undo that information, the danger is adjusted with the opposite value.
+                    AdjustDanger(tile.x, tile.y, -tile.tangibleDanger, false);
+                    AdjustDanger(tile.x, tile.y, -tile.experienceDanger, true);
+                    rememberedTiles.Remove(tile);
+                }
             }
 
             List<Creature> perceivedCreatures = world.PerceiveCreatures(thisCreature, perceptionRadius);
@@ -79,11 +85,6 @@ namespace EvolutionSimulation.Entities
                 for (int j = -perceptionRadius; j <= perceptionRadius; j++)
                 {
                     if (IsOutOfBounds(x + i, y + j)) continue;
-
-                    //Each tile's danger has to be reset before any danger is calculated because a tile's
-                    //danger influences the rest ALL AROUND IT, so no matter how you process the area
-                    //there would be overwrittes.
-                    map[x + i, y + j].tangibleDanger = 0;
 
                     //The list of creatures is also needed to calculate danger so it is done here too.
                     foreach (Creature creature in perceivedCreatures)
@@ -101,7 +102,7 @@ namespace EvolutionSimulation.Entities
                             else
                                 map[x + i, y + j].creatures.Add(creature);
 
-                            perceivedCreatures.Remove(creature);
+                            perceivedCreatures.Remove(creature); //Once processed the object is removed to reduce cost.
                         }
                     }
 
@@ -112,7 +113,7 @@ namespace EvolutionSimulation.Entities
                         else if (entity.x == x + i && entity.y == y + j)
                         {
                             map[x + i, y + j].corpses.Add(entity as Corpse);
-                            perceivedCorpses.Remove(entity);
+                            perceivedCorpses.Remove(entity); //Once processed the object is removed to reduce cost.
                         }
                     }
                 }
@@ -186,7 +187,7 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
-        /// Modies the danger level of a position, and as a consequence, the tiles around it in dangerRadius
+        /// Modies the danger level of a position, and as a consequence, the tiles around it in dangerRadius.
         /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
@@ -235,9 +236,12 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         private void UpdateResources(MemoryTileInfo tile)
         {
+            //If there are creatures unrelated to the creature:
             if (tile.creatures.Count > 0)
             {
+                //The first one is assigned as the closest one if there isn't one already.
                 if (closestCreature == null) closestCreature = tile.creatures[0];
+                //The fist creature reachable is assigned if there isn't one already.
                 if (closestCreatureReachable == null)
                     foreach (Creature creature in tile.creatures)
                         if ((creature.creatureLayer == Creature.HeightLayer.Air && thisCreature.stats.AirReach) ||
@@ -246,6 +250,7 @@ namespace EvolutionSimulation.Entities
                             closestCreatureReachable = creature;
             }
 
+            //Same everything else.
             if (tile.allies.Count > 0)
             {
                 if (closestAlly == null) closestAlly = tile.allies[0];
