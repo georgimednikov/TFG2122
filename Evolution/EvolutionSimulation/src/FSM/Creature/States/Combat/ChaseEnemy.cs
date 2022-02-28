@@ -21,8 +21,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
-            int oX = creature.nearestEnemy.x,   // Objective's position
-                oY = creature.nearestEnemy.y;
+            int oX = creature.GetClosestCreatureReachable().x,   // Objective's position
+                oY = creature.GetClosestCreatureReachable().y;
             int deltaX = oX - creature.x,       // Direction of movement
                 deltaY = oY - creature.y;
             int normX = deltaX == 0 ? 0 : deltaX / Math.Abs(deltaX),  // Normalized direction of movement 

@@ -28,15 +28,15 @@ namespace EvolutionSimulation.FSM.Creature.States
             }
             else//Omnivore
             {
-                if (creature.nearestCorpse == null)
+                if (creature.GetClosestCorpse() == null)
                     EatPlant();
-                else if (creature.nearestEdiblePlant == null)
+                else if (creature.GetClosestFruit() == null)
                     EatCorpse();
                 else
                 {
                     //Eat the nearest food (nearestEdiblePlant or Corpse)
-                    int distPlant = creature.DistanceToObjective(creature.nearestEdiblePlant),
-                        distCorpse = creature.DistanceToObjective(creature.nearestCorpse);
+                    int distPlant = creature.DistanceToObjective(creature.GetClosestFruit()),
+                        distCorpse = creature.DistanceToObjective(creature.GetClosestCorpse());
                     if (distPlant < distCorpse)
                         EatPlant();
                     else
@@ -56,7 +56,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         protected void EatPlant()
         {
-            creature.stats.CurrEnergy += creature.nearestEdiblePlant.Eat();
+            creature.stats.CurrEnergy += creature.GetClosestFruit().Eat();
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         protected void EatCorpse()
         {
-            creature.nearestCorpse.ReceiveInteraction(creature, Entities.Interactions.eat);
+            creature.GetClosestCorpse().ReceiveInteraction(creature, Entities.Interactions.eat);
         }
     }
 }

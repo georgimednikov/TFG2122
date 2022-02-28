@@ -16,7 +16,7 @@
             if (creature.stats.Gender == Genetics.Gender.Female)//just in case
                 return true;
 
-            return creature.nearestMate == null || (!creature.nearestMate.wantMate && !creature.mating)
+            return creature.GetClosestPossibleMate() == null || (!creature.GetClosestPossibleMate().wantMate && !creature.mating)
                 || creature.IsHungry() || creature.IsThirsty() || creature.IsTired();
         }
 

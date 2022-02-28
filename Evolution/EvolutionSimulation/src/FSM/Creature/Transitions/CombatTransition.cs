@@ -15,7 +15,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            return (creature.nearestEnemy != null || creature.hasBeenHit) 
+            return (creature.GetClosestCreatureReachable() != null || creature.hasBeenHit) 
                 && creature.stats.Aggressiveness > 0    // TODO: Poner un valor de verdad en agresividad
                 && creature.stats.CurrHealth >= creature.stats.MaxHealth * threshold;    // So it does not immediately return to combat while fleeing
             //TODO: revisar entidades vistas y considerar agresividad
