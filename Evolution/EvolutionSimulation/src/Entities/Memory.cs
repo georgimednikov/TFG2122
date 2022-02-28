@@ -3,29 +3,29 @@ using System.Collections.Generic;
 
 namespace EvolutionSimulation.Entities
 {
-    struct MemoryTileInfo
-    {
-        //Te tile's position relative to the world.
-        public int x;
-        public int y;
-
-        public int ticksUnchecked; //Number of ticks since the tile has been seen for the last time.
-        public bool discovered; //Whether this tile has been discovered by the creature at some point.
-
-        public float experienceDanger; //How dangerous the creature has experienced the tile to be.
-        public float tangibleDanger; //How dangerous the creature rekons the tile is.
-
-        public bool water;
-        public bool fruit; //Whether there is fruit in this tile.
-
-        //TODO: Puede que estas dos listas se puedan simplificar para que no contengan tanta informacion
-        public List<Creature> creatures; //The list of creatures of a different species
-        public List<Creature> allies; //The list of creatures of the same species
-        public List<Corpse> corpses; //The nutritional value of each edible corpse seen.
-    }
-
     public class Memory
     {
+        private class MemoryTileInfo
+        {
+            //Te tile's position relative to the world.
+            public int x;
+            public int y;
+
+            public int ticksUnchecked; //Number of ticks since the tile has been seen for the last time.
+            public bool discovered; //Whether this tile has been discovered by the creature at some point.
+
+            public float experienceDanger; //How dangerous the creature has experienced the tile to be.
+            public float tangibleDanger; //How dangerous the creature rekons the tile is.
+
+            public bool water;
+            public bool fruit; //Whether there is fruit in this tile.
+
+            //TODO: Puede que estas dos listas se puedan simplificar para que no contengan tanta informacion
+            public List<Creature> creatures = new List<Creature>(); //The list of creatures of a different species
+            public List<Creature> allies = new List<Creature>(); //The list of creatures of the same species
+            public List<Corpse> corpses = new List<Corpse>(); //The nutritional value of each edible corpse seen.
+        }
+
         Creature thisCreature;
         World world;
         MemoryTileInfo[,] map;
@@ -48,6 +48,9 @@ namespace EvolutionSimulation.Entities
             thisCreature = c;
             world = w;
             map = new MemoryTileInfo[world.map.GetLength(0), world.map.GetLength(1)];
+            for (int i = 0; i < map.GetLength(0); i++)
+                for (int j = 0; j < map.GetLength(1); j++)
+                    map[i, j] = new MemoryTileInfo();
             rememberedTiles = new List<MemoryTileInfo>();
             comparer = new MemoryTileComparer(thisCreature);
 
