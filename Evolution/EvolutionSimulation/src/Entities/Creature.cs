@@ -438,7 +438,7 @@ namespace EvolutionSimulation.Entities
         private void RetalliateDamage(Creature interacter)
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
-            Console.WriteLine("Criatura de " + x + ", " + y + " devuelve " + stats.Counter + " de daño!");
+            Console.WriteLine(speciesName + "(" + x + "," + y +") devuelve " + stats.Counter + " de daño");
         }
 
         /// <summary>

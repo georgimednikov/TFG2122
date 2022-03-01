@@ -19,23 +19,23 @@ namespace EvolutionSimulation.Entities.Status
         public override bool OnTick()
         {
             owner.stats.CurrHealth -= damage;
-            Console.WriteLine("Poison dealt " + damage.ToString() + " damage, " + owner.stats.CurrHealth + " hp remaining");
+            Console.WriteLine("Poison dealt " + damage.ToString() + " damage to " + owner.speciesName + "(" + owner.x + "," + owner.y + ")");
             return base.OnTick();
         }
 
         public override void OnApply()
         {
-            Console.WriteLine("Poison applied for " + damage.ToString() + " damage per turn.");
+            Console.WriteLine("Poison applied for " + damage.ToString() + " damage/tick to " + owner.speciesName + "(" + owner.x + "," + owner.y + ")"");
         }
 
         public override void OnRemove()
         {
-            Console.WriteLine("Poison removed.");
+            Console.WriteLine("Poison removed from " + owner.speciesName + "(" + owner.x + "," + owner.y + ")");
         }
 
         public override void OnExpire()
         {
-            Console.WriteLine("Poison expired.");
+            Console.WriteLine("Poison expired from " + owner.speciesName + "(" + owner.x + "," + owner.y + ")");
         }
     }
 }
