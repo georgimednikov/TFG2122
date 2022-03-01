@@ -18,9 +18,9 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             if (creature.stats.Gender == Genetics.Gender.Female)//just in case
                 return false;
 
-            return creature.nearestMate != null
-               && Math.Abs(creature.nearestMate.x - creature.x) < 1
-               && Math.Abs(creature.nearestMate.y - creature.y) < 1;
+            return creature.GetClosestPossibleMate() != null
+               && Math.Abs(creature.GetClosestPossibleMate().x - creature.x) < 1
+               && Math.Abs(creature.GetClosestPossibleMate().y - creature.y) < 1;
         }
 
         public override string ToString()

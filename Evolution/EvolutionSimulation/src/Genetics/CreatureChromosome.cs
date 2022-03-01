@@ -107,7 +107,7 @@ namespace EvolutionSimulation.Genetics
         static public void SetChromosome()
         {
             //TODO: Actualizar directorios con el nuevo sistema
-            string json = WorkingDirectories.DataDirectory + "Chromosome.json";
+            string json = UserInfo.DataDirectory + "Chromosome.json";
 
             if (!File.Exists(json))
                 throw new Exception("Cannot find JSON with chromosome information");

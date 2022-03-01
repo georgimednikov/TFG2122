@@ -20,8 +20,8 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             if (creature.stats.Gender == Genetics.Gender.Female)
                 return false;
 
-            return creature.nearestMate != null
-                && creature.nearestMate.wantMate    //the objective wantMate (just in case)                                                                    
+            return creature.GetClosestPossibleMate() != null
+                && creature.GetClosestPossibleMate().wantMate    //the objective wantMate (just in case)                                                                    
                 && !creature.stats.IsNewBorn();     // and it has to be adult
 
         }

@@ -15,8 +15,8 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            int oX = creature.nearestEnemy.x,   // Objective's position
-                oY = creature.nearestEnemy.y;
+            int oX = creature.GetClosestCreature().x,   // Objective's position
+                oY = creature.GetClosestCreature().y;
             int deltaX = oX - creature.x,       // Direction of objective
                 deltaY = oY - creature.y;
 

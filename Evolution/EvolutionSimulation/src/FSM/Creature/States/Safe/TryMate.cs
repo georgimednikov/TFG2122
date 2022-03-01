@@ -17,8 +17,8 @@
         // Increases current rest
         public override void Action()
         {
-            if (creature.nearestMate != null)
-                creature.nearestMate.ReceiveInteraction(creature, Entities.Interactions.mate);
+            if (creature.GetClosestPossibleMate() != null)
+                creature.GetClosestPossibleMate().ReceiveInteraction(creature, Entities.Interactions.mate);
         }
 
         public override string ToString()

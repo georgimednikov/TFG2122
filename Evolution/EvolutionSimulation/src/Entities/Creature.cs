@@ -4,8 +4,8 @@ using EvolutionSimulation.FSM;
 using EvolutionSimulation.FSM.Creature.States;
 using EvolutionSimulation.FSM.Creature.Transitions;
 using EvolutionSimulation.Genetics;
-using System.Numerics;
 using EvolutionSimulation.Entities.Status;
+using System.Numerics;
 
 namespace EvolutionSimulation.Entities
 {
@@ -20,12 +20,9 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public Creature()
         {
-            seenSameSpeciesCreatures = new List<Creature>();
-            otherSeenCreatures = new List<Creature>();
-            seenEntities = new List<StaticEntity>();
             InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
             activeStatus = new List<Status.Status>();
-            removedStatus = new List<Status.Status>();
+            removedStatus = new List<Status.Status>();          
         }
 
         /// <summary>
@@ -36,7 +33,7 @@ namespace EvolutionSimulation.Entities
         {
             world = w;
 
-            if (chromosome == null)
+            if(chromosome == null)
             {
                 this.chromosome = new CreatureChromosome();
             }
@@ -46,6 +43,8 @@ namespace EvolutionSimulation.Entities
             }
             speciesName = name;
             stats = new CreatureStats();
+            //TODO: Los parametros de abajo no se donde ponerlos xd
+            memory = new Memory(this, world);
             //speciesName = "None";
             SetStats();
             this.x = x;
@@ -56,8 +55,10 @@ namespace EvolutionSimulation.Entities
             AddInteraction(Interactions.attack, ReceiveDamage);
             if (HasAbility(CreatureFeature.Thorns, 0.65f))
                 AddInteraction(Interactions.attack, RetalliateDamage);
+
             // Poison
             AddInteraction(Interactions.poison, Poison);
+
             // Mate
             AddInteraction(Interactions.mate, OnMate);
             AddInteraction(Interactions.stopMate, StopMating);
@@ -99,10 +100,9 @@ namespace EvolutionSimulation.Entities
                 else wantMate = true;
             }
 
-            Perceive();
+            memory.Update();
             foreach (Status.Status s in activeStatus)   // Activates each status effect
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
-            ProcessInput();
 
             // Action points added every tick 
             ActionPoints += stats.Metabolism * 10;
@@ -123,17 +123,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         void Clear()
         {
-            nearestEnemy = null;
-            nearestAlly = null;
-            nearestMate = null;
-            nearestCorpse = null;
-            nearestEdiblePlant = null;
-
-
             hasBeenHit = false; // TODO: Reset flags en general
-            seenSameSpeciesCreatures.Clear();
-            otherSeenCreatures.Clear();
-            seenEntities.Clear();
 
             // Clears the statuses marked for deletion
             foreach (Status.Status s in removedStatus)
@@ -154,7 +144,7 @@ namespace EvolutionSimulation.Entities
         /// TODO: We are forcefully cramming these states down the FSM's throat
         /// </summary>
         void ConfigureStateMachine()
-        {
+        {       
             // Alive state configuration
             // States
             // Safe-state configuration
@@ -165,7 +155,7 @@ namespace EvolutionSimulation.Entities
             IState drink = new Drinking(this);
             IState goToMate = new GoToMate(this);
             IState tryMate = new TryMate(this);
-            IState mating = new Mating(this, 100);//TODO que 100 lo coja del cromosoma, es el tiempo que tardan en reproducirse
+            IState mating = new Mating(this,100);//TODO que 100 lo coja del cromosoma, es el tiempo que tardan en reproducirse
             IState goToEat = new GoToEat(this);
             IState eat = new Eating(this);
             IState goToSafePlace = new GoToSafePlace(this);
@@ -252,9 +242,9 @@ namespace EvolutionSimulation.Entities
             ITransition safeTransition = new SafeTransition(this);
             ITransition combatTransition = new CombatTransition(this);
             aliveFSM.AddTransition(safe, escapeTransition, escape);
-            aliveFSM.AddTransition(safe, combatTransition, combat);
+            aliveFSM.AddTransition(safe, combatTransition, combat);            
             aliveFSM.AddTransition(combat, safeTransition, safe);
-            aliveFSM.AddTransition(combat, escapeTransition, escape);
+            aliveFSM.AddTransition(combat, escapeTransition, escape);           
             aliveFSM.AddTransition(escape, safeTransition, safe);
             aliveFSM.AddTransition(escape, combatTransition, combat);
             //
@@ -264,7 +254,7 @@ namespace EvolutionSimulation.Entities
             mfsm = new Fsm(alive);
             // Transitions
             ITransition dieTransition = new DieTransition(this);
-            mfsm.AddTransition(alive, dieTransition, dead);
+            mfsm.AddTransition(alive, dieTransition, dead); 
         }
 
         /// <summary>
@@ -290,78 +280,12 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
-        /// Checks the perception area around this entity for other entities
-        /// </summary>
-        void Perceive()
-        {
-            int perceptionRadius = 4; // TODO: calculate this using the Perception stat
-            List<Creature> seenCreatures = world.PerceiveCreatures(this, x, y, perceptionRadius);
-            seenEntities = world.PerceiveEntities(this, x, y, perceptionRadius);
-            seenCreatures.Sort(new Utils.SortByDistance(this));   // TODO, no hacer new todo el rato
-            seenEntities.Sort(new Utils.SortByDistanceSEntities(this));   // TODO, no hacer new todo el rato
-            foreach (Creature c in seenCreatures)
-            {
-                if (c.speciesName == speciesName || c.progenitorSpeciesName == speciesName || c.speciesName == progenitorSpeciesName)
-                    seenSameSpeciesCreatures.Add(c);
-                else
-                    otherSeenCreatures.Add(c);
-            }
-        }
-
-        /// <summary>
-        /// With all the entities that the creature has perceive, 
-        /// select the most important (the nearest enemy, ally, food...)
-        /// The transitions will use this information to change a different state
-        /// </summary>
-        void ProcessInput()
-        {
-            // Nearest ally
-            if (seenSameSpeciesCreatures.Count != 0)
-                nearestAlly = seenSameSpeciesCreatures[0];
-            // Find the nearest mate
-            foreach (Creature c in seenSameSpeciesCreatures)
-            {
-                if (stats.Gender == Gender.Male && c.wantMate)
-                {
-                    nearestMate = c;
-                    break;
-                }
-                else if (stats.Gender == Gender.Female && c.stats.Gender == Gender.Male)
-                {
-                    nearestMate = c;
-                    break;
-                }
-            }
-
-            if (otherSeenCreatures.Count != 0)
-                nearestEnemy = otherSeenCreatures[0];
-
-            //Find the nearest edible plant and corpse
-            foreach (StaticEntity c in seenEntities)
-            {
-                if (nearestEdiblePlant == null && c as EdiblePlant != null)
-                {
-                    nearestEdiblePlant = (EdiblePlant)c;
-                    //Check if the plant has not been eaten
-                    if (nearestEdiblePlant.eaten) nearestEdiblePlant = null;
-                }
-                else if (nearestCorpse == null && c as Corpse != null)
-                {
-                    nearestCorpse = (Corpse)c;
-                }
-                if (nearestCorpse != null && nearestEdiblePlant != null)
-                    break;
-
-            }
-        }
-
-        /// <summary>
         /// Executes every response that this creature has to an interaction with other creature
         /// </summary>
         public void ReceiveInteraction(Creature interacter, Interactions type)
         {
             if (InteractionsDict.ContainsKey(type))
-                foreach (Action<Creature> response in InteractionsDict[type])
+                foreach(Action<Creature> response in InteractionsDict[type])
                     response(interacter);
         }
 
@@ -375,7 +299,7 @@ namespace EvolutionSimulation.Entities
                 InteractionsDict[type] = new List<Action<Creature>>();
             InteractionsDict[type].Add(response);
         }
-
+        
         /// <summary>
         /// Removes a response to an interaction type, given the
         /// creature that interacts with this. 
@@ -415,13 +339,13 @@ namespace EvolutionSimulation.Entities
         public bool HasEatingObjective()
         {
             // Hervibore and not plant objective
-            if (stats.Diet == Diet.Herbivore && nearestEdiblePlant == null)
+            if (stats.Diet == Diet.Herbivore && memory.closestFruit == null)
                 return true;
             // Carnivore and not corpse objective
-            if (stats.Diet == Diet.Carnivore && nearestCorpse == null)
+            if (stats.Diet == Diet.Carnivore && memory.closestCorpse == null)
                 return true;
             // Omnivore and not plant and corpse objective
-            if (stats.Diet == Diet.Omnivore && nearestCorpse == null && nearestEdiblePlant == null)
+            if (stats.Diet == Diet.Omnivore && memory.closestCorpse == null && memory.closestFruit == null)
                 return true;
 
             return false;
@@ -504,10 +428,8 @@ namespace EvolutionSimulation.Entities
         private void ReceiveDamage(Creature interacter)
         {
             stats.CurrHealth -= ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
-
-            nearestEnemy = interacter;
-            //objectivePos = new Vector2(interacter.x, interacter.y);
-            hasBeenHit = true;
+            //TODO: Cambiar target aunque normalmente sera el mas cercano asi que tampoco es tan urgente
+            hasBeenHit = true;             
         }
 
         /// <summary>
@@ -688,6 +610,8 @@ namespace EvolutionSimulation.Entities
         #endregion
 
         #region Attributes
+        Memory memory;
+
         // World tile position
         public int x { get; private set; }
         public int y { get; private set; }
@@ -700,30 +624,15 @@ namespace EvolutionSimulation.Entities
         public CreatureChromosome chromosome { get; private set; }
         public CreatureStats stats { get; private set; }
 
-        // List of creatures seen at this moment by this creature
-        public List<Creature> seenSameSpeciesCreatures { get; private set; }
-        public List<Creature> otherSeenCreatures { get; private set; }
-        // List of entities seen at this moment by this creature
-        public List<StaticEntity> seenEntities { get; private set; }
-
         public int ActionPoints { get; private set; }
 
         // State machine
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         private Fsm mfsm;
 
-
-        public Creature nearestEnemy;
-        public Creature nearestAlly;
-        public Creature nearestMate;
-        public Creature matingCreature;
-        public Corpse nearestCorpse;
-        public EdiblePlant nearestEdiblePlant;
-        //water place
-        //safe place
-
         public bool hasBeenHit;
 
+        public Creature matingCreature;
         /// <summary>
         /// Time in ticks to be in heat (a female)
         /// </summary>
@@ -749,5 +658,13 @@ namespace EvolutionSimulation.Entities
         // List of status effects to be removed
         List<Status.Status> removedStatus;
         #endregion
+
+        public Creature GetClosestAlly() { return memory.closestAlly; }
+        public Creature GetClosestPossibleMate() { return memory.closestPossibleMate; }
+        public Creature GetClosestCreature() { return memory.closestCreature; }
+        public Creature GetClosestCreatureReachable() { return memory.closestCreatureReachable; }
+        public Corpse GetClosestCorpse() { return memory.closestCorpse; }
+        public EdiblePlant GetClosestFruit() { return memory.closestFruit; }
+        public Tuple<int, int> GetClosestWater() { return memory.closestWater; }
     }
 }

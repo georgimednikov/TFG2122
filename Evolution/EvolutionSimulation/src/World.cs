@@ -298,13 +298,13 @@ namespace EvolutionSimulation
         /// Returns the creatures in an area with a determined radius.
         /// </summary>
         /// <param name="c">The creature that is perceiving</param>
-        public List<Creature> PerceiveCreatures(Creature c, int x, int y, int radius)
+        public List<Creature> PerceiveCreatures(Creature c, int radius)
         {
             List<Creature> results = new List<Creature>();
             foreach (Creature e in Creatures) // TODO: use this?
             {
                 if (e == c) continue; // Reference comparison
-                if (Math.Abs(e.x - x) <= radius && Math.Abs(e.y - y) <= radius) // Square vision
+                if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius) // Square vision
                     results.Add(e);
             }
             return results;
@@ -314,12 +314,12 @@ namespace EvolutionSimulation
         /// Returns the entities in an area with a determined radius.
         /// </summary>
         /// <param name="c">The creature that is perceiving</param>
-        public List<StaticEntity> PerceiveEntities(Creature c, int x, int y, int radius)
+        public List<StaticEntity> PerceiveEntities(Creature c, int radius)
         {
             List<StaticEntity> results = new List<StaticEntity>();
             foreach (StaticEntity e in StableEntities) // TODO: use this?
             {
-                if (Math.Abs(e.x - x) <= radius && Math.Abs(e.y - y) <= radius) // Square vision
+                if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius) // Square vision
                     results.Add(e);
             }
             return results;
@@ -607,7 +607,7 @@ namespace EvolutionSimulation
         {
             taxonomy.ExportSpecies();
             string word = JsonConvert.SerializeObject(map, Formatting.Indented);
-            System.IO.File.WriteAllText(WorkingDirectories.ExportDirectory + "World.json", word);
+            System.IO.File.WriteAllText(UserInfo.ExportDirectory + "World.json", word);
         }
 
         // Map with physical properties
