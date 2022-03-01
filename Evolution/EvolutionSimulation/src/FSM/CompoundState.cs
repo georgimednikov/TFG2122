@@ -34,6 +34,15 @@ namespace EvolutionSimulation.FSM
             return stateMachine.EvaluateCost();
         }
 
+        public void OnEntry()
+        {
+            stateMachine.CurrentState.OnEntry();
+        }
+
+        public void OnExit()
+        {
+            stateMachine.CurrentState.OnExit();
+        }
         public override string ToString()
         {
             return name;

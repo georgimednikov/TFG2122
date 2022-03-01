@@ -52,9 +52,9 @@ namespace EvolutionSimulation.FSM
             {
                 if (c.Transition.Evaluate())
                 {
-                    //CurrentState.OnExit();
+                    CurrentState.OnExit();
                     CurrentState = c.OutState;
-                    //CurrentState.OnEntry();
+                    CurrentState.OnEntry();
                     break;
                 }
             }

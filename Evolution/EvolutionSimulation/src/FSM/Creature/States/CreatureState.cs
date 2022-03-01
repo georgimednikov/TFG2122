@@ -18,5 +18,9 @@ namespace EvolutionSimulation.FSM.Creature.States
         public virtual int GetCost() { return 0; }
 
         public virtual void Action() {}
+
+        public virtual void OnEntry() {}
+
+        public virtual void OnExit() {}
     }
 }
