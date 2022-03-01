@@ -58,7 +58,7 @@ namespace EvolutionSimulation.Entities
             GraphNode init = new GraphNode(start, null);
             open.Insert(init);
             double heur = CustomHeuristic(false, c, start, end, w, out treeDensity);
-            int thres = c.getTreeThreshold(treeDensity);
+            int thres = c.GetTreeThreshold(treeDensity);
             bool treeBetter = (thres >= 0 && heur >= thres);
             while (open.Count > 0)
             {

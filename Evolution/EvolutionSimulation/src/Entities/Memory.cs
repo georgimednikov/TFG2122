@@ -35,15 +35,29 @@ namespace EvolutionSimulation.Entities
         int perceptionRadius; //Radius around the creature in which it percieves the world.
         int dangerRadius; //Radius around a tile in which the tile's danger spreads.
 
-        public Creature closestCreature { get; private set; }
-        public Creature closestCreatureReachable { get; private set; }
-        public Creature closestAlly { get; private set; }
-        public Creature closestPossibleMate { get; private set; }
-        public Corpse closestCorpse { get; private set; }
-        public EdiblePlant closestFruit { get; private set; }
-        public Tuple<int, int> closestWater { get; private set; }
-        public Tuple<int, int> closestSafePlace { get; private set; }
-        public Tuple<int, int> undiscoveredPlace { get; private set; }
+        Creature closestCreature;
+        Creature closestCreatureReachable;
+        Creature closestAlly;
+        Creature closestPossibleMate;
+        Corpse closestCorpse;
+        EdiblePlant closestFruit;
+        Tuple<int, int> closestWater;
+        Tuple<int, int> closestSafePlace;
+        Tuple<int, int> undiscoveredPlace;
+
+        public Creature ClosestCreature() { return closestCreature; }
+        public Creature ClosestCreatureReachable() { return closestCreatureReachable; }
+        public Creature ClosestAlly() { return closestAlly; }
+        public Creature ClosestPossibleMate() { return closestPossibleMate; }
+        public Corpse ClosestCorpse() { return closestCorpse; }
+        public EdiblePlant ClosestFruit() { return closestFruit; }
+        public Tuple<int, int> ClosestWater() { return closestWater; }
+        public Tuple<int, int> ClosestSafePlace() { return closestSafePlace; }
+        public Tuple<int, int> UndiscoveredPlace() {
+            if (undiscoveredPlace == null || map[undiscoveredPlace.Item1, undiscoveredPlace.Item2].discovered)
+                GetNewUndiscoveredPlace();    
+            return undiscoveredPlace;
+        }
 
         public Memory(Creature c, World w)
         {
@@ -54,7 +68,7 @@ namespace EvolutionSimulation.Entities
                 for (int j = 0; j < map.GetLength(1); j++)
                     map[i, j] = new MemoryTileInfo();
 
-            LocateClosestUndiscoveredPlace();
+            GetNewUndiscoveredPlace();
 
             rememberedTiles = new List<MemoryTileInfo>();
             comparer = new MemoryTileComparer(thisCreature);
@@ -229,7 +243,7 @@ namespace EvolutionSimulation.Entities
                 UpdateResources(tile);
                 if (AllResourcesFound()) break; // Stops searching when everything has been found.
             }
-            LocateClosestUndiscoveredPlace();
+            GetNewUndiscoveredPlace();
         }
 
         /// <summary>
@@ -286,46 +300,31 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
-        /// Gets the closest unknown position in the map for the creature.
+        /// Gets a random unknown position in the map for the creature a certain distance away so
+        /// it can utilize its mobility, since if the target position is close it will always walk there.
         /// </summary>
-        private void LocateClosestUndiscoveredPlace()
+        private void GetNewUndiscoveredPlace()
         {
-            int x = thisCreature.x, y = thisCreature.y;
-            int searchRadius = perceptionRadius + 1;
-
-            // This is basically cosmic horror but it is the most efficient way to do this that I could come up with :)
-            while (true)
+            // A min dist so that the place is somewhat far away and the creature has to move for a while,
+            // moving through its preferred medium that way.
+            // The radius = perceptionRadius * 2, diameter = radius * 2 + the center, since it is not counted.
+            int minDistRadius = perceptionRadius * 2;
+            int minDistDiameter = minDistRadius * 2 + 1;
+            int x, y;
+            do
             {
-                for (int i = -searchRadius; i <= searchRadius; i++)
-                {
-                    for (int j = -searchRadius; j <= searchRadius;)
-                    {
-                        if (!IsOutOfBounds(x + i, y + j) && !map[x + i, y + j].discovered)
-                        {
-                            undiscoveredPlace = new Tuple<int, int>(x + i, y + j);
-                            return;
-                        }
+                // The way this formula works is by placing the "cursor" in the X position of the creature first
+                // and then adding the radius + 1 to be located in the first tile past the min dist from the creature.
+                // Then the random number, which can have values up to the number of tiles left outside the area,
+                // is added, and then % size to loop to the left of the creature.
+                int num = RandomGenerator.Next(0, map.GetLength(0) - minDistDiameter);
+                x = (thisCreature.x + minDistRadius + 1 + num) % map.GetLength(0);
 
-                        //This double for does NOT go normally through an area. What it does is increase the area every iteration, doing the following:
-                        //X -> First iteration
-                        //O -> Second iteration
-                        //S -> Third iteration
-                        //S S S S S
-                        //S O O O S
-                        //S O X O S
-                        //S O O O S
-                        //S S S S S
-
-                        //So when the first or the last row is being processed, it is processed completely, otherwise, only the first and last elements are processed.
-                        //To jump from the first to the last, it is done j += searchRadius * 2 because if radius = 3 then on the first j iteration j = -3,
-                        //and after being processed j = -3 + (3 * 2) = 3, which is the last column. Then, to leave the j for, it is added again.
-                        if (i == -searchRadius || i == searchRadius) j++;
-                        else j += searchRadius * 2;
-                    }
-                }
-                //Search radius is increased.
-                searchRadius++;
+                num = RandomGenerator.Next(0, map.GetLength(1) - minDistDiameter);
+                y = (thisCreature.y + minDistRadius + 1 + num) % map.GetLength(1);
             }
+            while (map[x, y].discovered);
+            undiscoveredPlace = new Tuple<int, int>(x, y);
         }
 
         /// <summary>

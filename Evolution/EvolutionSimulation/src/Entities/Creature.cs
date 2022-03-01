@@ -273,10 +273,14 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Places a creature in the designated coordinates
         /// </summary>
-        public void Place(int x, int y)
+        public void Place(int x, int y, HeightLayer z = HeightLayer.Ground)
         {
             this.x = x;
             this.y = y;
+            if (world.isTree(x, y))
+                creatureLayer = z;
+            else if (creatureLayer != HeightLayer.Air)
+                creatureLayer = HeightLayer.Ground;
         }
 
         /// <summary>
@@ -339,13 +343,13 @@ namespace EvolutionSimulation.Entities
         public bool HasEatingObjective()
         {
             // Hervibore and not plant objective
-            if (stats.Diet == Diet.Herbivore && memory.closestFruit == null)
+            if (stats.Diet == Diet.Herbivore && memory.ClosestFruit() == null)
                 return true;
             // Carnivore and not corpse objective
-            if (stats.Diet == Diet.Carnivore && memory.closestCorpse == null)
+            if (stats.Diet == Diet.Carnivore && memory.ClosestCorpse() == null)
                 return true;
             // Omnivore and not plant and corpse objective
-            if (stats.Diet == Diet.Omnivore && memory.closestCorpse == null && memory.closestFruit == null)
+            if (stats.Diet == Diet.Omnivore && memory.ClosestCorpse() == null && memory.ClosestFruit() == null)
                 return true;
 
             return false;
@@ -507,7 +511,7 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Returns minimal path length for arboreal movement being more efficient than ground.
         /// </summary>
-        public int getTreeThreshold(double treeDensity)
+        public int GetTreeThreshold(double treeDensity)
         {
             double a = 2 * (int)HeightLayer.Tree * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / 100f);
             double b = treeDensity * (stats.GroundSpeed / 100f + Tree.movementPenalty - stats.ArborealSpeed / 100f - 1);
@@ -517,7 +521,7 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Returns minimal path length for flying movement being more efficient than ground/arboreal.
         /// </summary>
-        int getFlyThreshold(double treeDensity)
+        int GetFlyThreshold(double treeDensity)
         {
             double a = 2 * (int)HeightLayer.Air * (stats.GroundSpeed / 100f * (1 - treeDensity) + treeDensity * stats.AerialSpeed / 100f);
             double b = -2 * stats.AerialSpeed / 100f * (int)HeightLayer.Tree * treeDensity;
@@ -535,7 +539,7 @@ namespace EvolutionSimulation.Entities
             if (!world.canMove(x, y, z)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
             if ((stats.AerialSpeed == -1 && z == HeightLayer.Air) || (stats.ArborealSpeed == -1 && z == HeightLayer.Tree)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
             path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z), out double treeDensity); // A* to the objective
-            int thres = getFlyThreshold(treeDensity);
+            int thres = GetFlyThreshold(treeDensity);
             if (thres > 0 && path.Length >= thres)
                 path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));// Straight line to the objective
             pathIterator = 0;
@@ -659,14 +663,14 @@ namespace EvolutionSimulation.Entities
         List<Status.Status> removedStatus;
         #endregion
 
-        public Creature GetClosestAlly() { return memory.closestAlly; }
-        public Creature GetClosestPossibleMate() { return memory.closestPossibleMate; }
-        public Creature GetClosestCreature() { return memory.closestCreature; }
-        public Creature GetClosestCreatureReachable() { return memory.closestCreatureReachable; }
-        public Corpse GetClosestCorpse() { return memory.closestCorpse; }
-        public EdiblePlant GetClosestFruit() { return memory.closestFruit; }
-        public Tuple<int, int> GetClosestWater() { return memory.closestWater; }
-        public Tuple<int, int> GetClosestSafePlace() { return memory.closestSafePlace; }
-        public Tuple<int, int> GetUndiscoveredPlace() { return memory.undiscoveredPlace; }
+        public Creature GetClosestAlly() { return memory.ClosestAlly(); }
+        public Creature GetClosestPossibleMate() { return memory.ClosestPossibleMate(); }
+        public Creature GetClosestCreature() { return memory.ClosestCreature(); }
+        public Creature GetClosestCreatureReachable() { return memory.ClosestCreatureReachable(); }
+        public Corpse GetClosestCorpse() { return memory.ClosestCorpse(); }
+        public EdiblePlant GetClosestFruit() { return memory.ClosestFruit(); }
+        public Tuple<int, int> GetClosestWater() { return memory.ClosestWater(); }
+        public Tuple<int, int> GetClosestSafePlace() { return memory.ClosestSafePlace(); }
+        public Tuple<int, int> GetUndiscoveredPlace() { return memory.UndiscoveredPlace(); }
     }
 }
