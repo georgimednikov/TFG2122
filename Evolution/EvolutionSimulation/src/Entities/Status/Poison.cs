@@ -25,7 +25,7 @@ namespace EvolutionSimulation.Entities.Status
 
         public override void OnApply()
         {
-            Console.WriteLine("Poison applied for " + damage.ToString() + " damage/tick to " + owner.speciesName + "(" + owner.x + "," + owner.y + ")"");
+            Console.WriteLine("Poison applied for " + damage.ToString() + " damage/tick to " + owner.speciesName + "(" + owner.x + "," + owner.y + ")");
         }
 
         public override void OnRemove()
