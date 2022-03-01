@@ -10,13 +10,13 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         public EscapeTransition(Entities.Creature creature)
         {
             this.creature = creature;
-            threshold = 0.25f - (creature.stats.Aggressiveness / 100f); // TODO: Mirar parametros mas a fondo
+            threshold = 0.25f - (creature.stats.Aggressiveness / 50f); // TODO: Magical numberinos
         }
 
         public override bool Evaluate()
         {
             return (creature.GetClosestCreature() != null || creature.hasBeenHit)
-                && (creature.stats.Aggressiveness < 1 ||    // TODO: Poner un valor de verdad en agresividad
+                && (creature.stats.Aggressiveness < 0.5 * (float)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) ||  // Inferior to 50% equals non-aggresive
                 creature.stats.CurrHealth < creature.stats.MaxHealth * threshold);  // So even an aggresive creature has self-preservation instincts
             //TODO: revisar entidades vistas y considerar agresividad
         }

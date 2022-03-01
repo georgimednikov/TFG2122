@@ -10,13 +10,13 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         public CombatTransition(Entities.Creature creature)
         {
             this.creature = creature;
-            threshold = 0.25f - (creature.stats.Aggressiveness / 100f); // TODO: A mayor agresividad mas se arriesga, revisar cifras
+            threshold = 0.25f - (creature.stats.Aggressiveness / 50f); // TODO: A mayor agresividad mas se arriesga, revisar cifras
         }
 
         public override bool Evaluate()
         {
             return (creature.GetClosestCreatureReachable() != null || creature.hasBeenHit) 
-                && creature.stats.Aggressiveness > 0    // TODO: Poner un valor de verdad en agresividad
+                && creature.stats.Aggressiveness >= 0.5 * (float)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness)
                 && creature.stats.CurrHealth >= creature.stats.MaxHealth * threshold;    // So it does not immediately return to combat while fleeing
             //TODO: revisar entidades vistas y considerar agresividad
         }

@@ -2,7 +2,6 @@
 
 namespace EvolutionSimulation.FSM.Creature.States
 {
-    // TODO: Estado para testear, hacer el estado correctamente
     class ChaseEnemy : CreatureState
     {
         // How costly it is to move compared to regular safe movement
@@ -11,7 +10,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public ChaseEnemy(Entities.Creature c) : base(c) 
         { 
             creature = c;
-            modifier = 1.1f - (c.stats.Aggressiveness / 10f); // TODO: Modificador que dependa bien, ahora mimso a mas gresividad mejor persigue
+            modifier = 1.1f - (c.stats.Aggressiveness / 20f) * 0.4f; // TODO: Modificador que dependa bien, ahora mismo a mas agresividad mejor persigue
         }
 
         public override int GetCost()

@@ -438,7 +438,7 @@ namespace EvolutionSimulation.Entities
         private void RetalliateDamage(Creature interacter)
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
-            Console.WriteLine("Criatura de " + x + ", " + y + " devuelve " + stats.Counter + " de daño!");
+            Console.WriteLine(speciesName + "(" + x + "," + y +") devuelve " + stats.Counter + " de daño");
         }
 
         /// <summary>
@@ -446,8 +446,8 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         private void Poison(Creature interacter)
         {
-            if (interacter.stats.Perforation >= stats.Armor) // TODO: refactor: posibilidad/refrescar status
-                AddStatus(new Poison(5 + (int)interacter.stats.Venom, interacter.stats.Venom));
+            if (interacter.stats.Perforation >= stats.Armor)    // Venoms stack, no refreshing
+                AddStatus(new Poison((int)(interacter.stats.Venom), interacter.stats.Venom * 0.25f));
         }
 
         /// <summary>

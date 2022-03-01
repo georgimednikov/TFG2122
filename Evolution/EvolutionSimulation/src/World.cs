@@ -96,8 +96,7 @@ namespace EvolutionSimulation
         {
             if (config == null) throw new NullReferenceException("World generation config is null");
 
-            Validator.ValidatorResult result;
-            if ((result = Validator.Validate(config)) != Validator.ValidatorResult.NoError) Validator.ExceptionThrow(result); //TODO: Preguntar a Cleon si hay una manera mejor
+            Validator.Validate(config);
 
             evaluateHeight = (config.evaluateHeight != null) ? config.evaluateHeight : EvaluateHeightCurve;
             evaluateInfluence = (config.evaluateInfluence != null) ? config.evaluateInfluence : EvaluateInfluenceCurve;
@@ -301,7 +300,7 @@ namespace EvolutionSimulation
         public List<Creature> PerceiveCreatures(Creature c, int radius)
         {
             List<Creature> results = new List<Creature>();
-            foreach (Creature e in Creatures) // TODO: use this?
+            foreach (Creature e in Creatures)
             {
                 if (e == c) continue; // Reference comparison
                 if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius) // Square vision
@@ -317,7 +316,7 @@ namespace EvolutionSimulation
         public List<StaticEntity> PerceiveEntities(Creature c, int radius)
         {
             List<StaticEntity> results = new List<StaticEntity>();
-            foreach (StaticEntity e in StableEntities) // TODO: use this?
+            foreach (StaticEntity e in StableEntities)
             {
                 if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius) // Square vision
                     results.Add(e);
@@ -616,7 +615,7 @@ namespace EvolutionSimulation
         bool day;
         public uint step;
         // 50 steps equals and hour, and 24 hours equal a day. 365 days equal a year
-        int ticksHour = 50, hoursDay = 24, daysYear = 365;  // TODO: Quitar lo de year, es necesario?
+        public static int ticksHour = 50, hoursDay = 24, daysYear = 365;
         // The day begins 6:30 and ends at 20:00.
         float morning = 6.5f, night = 20;
         // Perlin noise generator
@@ -627,8 +626,6 @@ namespace EvolutionSimulation
         public List<StaticEntity> StableEntities { get; private set; }
         GeneticTaxonomy taxonomy;
 
-
-        // TODO: podemos dejar esto asi o comparar los tipos en una sola lista
         List<IEntity> CreaturesToDelete;
         List<IEntity> SEntitiesToDelete;
     }

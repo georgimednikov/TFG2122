@@ -15,15 +15,15 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override int GetCost()
         {
             attackMod = 0;
-            if (poison = creature.HasAbility(Genetics.CreatureFeature.Venomous, 0.5f))  // TODO: No se que poner aqui
-                attackMod += 100;                                                       // TODO: poner esto que dependa de algo lo que sea
+            if (poison = creature.HasAbility(Genetics.CreatureFeature.Venomous, 0.5f))  
+                attackMod += 100 * creature.stats.Venom;    // Costs 100 more per point in Venom                                                      
             return (int)(1000 + attackMod);
         }
 
         // Increases current rest
         public override void Action()
         {
-            if (creature.GetClosestCreature() == null) return;   // TODO: esto va asi?
+            if (creature.GetClosestCreature() == null) return;
             
             if(poison)
                 creature.GetClosestCreatureReachable().ReceiveInteraction(creature, Entities.Interactions.poison);
