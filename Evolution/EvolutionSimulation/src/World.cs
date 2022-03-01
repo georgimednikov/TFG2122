@@ -615,7 +615,7 @@ namespace EvolutionSimulation
         bool day;
         public uint step;
         // 50 steps equals and hour, and 24 hours equal a day. 365 days equal a year
-        int ticksHour = 50, hoursDay = 24, daysYear = 365;
+        public static int ticksHour = 50, hoursDay = 24, daysYear = 365;
         // The day begins 6:30 and ends at 20:00.
         float morning = 6.5f, night = 20;
         // Perlin noise generator
