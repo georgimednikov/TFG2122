@@ -96,8 +96,7 @@ namespace EvolutionSimulation
         {
             if (config == null) throw new NullReferenceException("World generation config is null");
 
-            Validator.ValidatorResult result;
-            if ((result = Validator.Validate(config)) != Validator.ValidatorResult.NoError) Validator.ExceptionThrow(result); //TODO: Preguntar a Cleon si hay una manera mejor
+            Validator.Validate(config);
 
             evaluateHeight = (config.evaluateHeight != null) ? config.evaluateHeight : EvaluateHeightCurve;
             evaluateInfluence = (config.evaluateInfluence != null) ? config.evaluateInfluence : EvaluateInfluenceCurve;
