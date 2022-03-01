@@ -96,8 +96,7 @@ namespace EvolutionSimulation
         {
             if (config == null) throw new NullReferenceException("World generation config is null");
 
-            Validator.ValidatorResult result;
-            if ((result = Validator.Validate(config)) != Validator.ValidatorResult.NoError) Validator.ExceptionThrow(result); //TODO: Preguntar a Cleon si hay una manera mejor
+            Validator.Validate(config);
 
             evaluateHeight = (config.evaluateHeight != null) ? config.evaluateHeight : EvaluateHeightCurve;
             evaluateInfluence = (config.evaluateInfluence != null) ? config.evaluateInfluence : EvaluateInfluenceCurve;
@@ -161,9 +160,9 @@ namespace EvolutionSimulation
         }
 
         /// <summary>
-        /// Checks if target coordinates are within the map's boundaries
+        /// Checks if target coordinates are available in the map
         /// </summary>
-        /// <returns>True if it is within bounds</returns>
+        /// <returns>True if it is within position is available</returns>
         public bool canMove(int x, int y, Creature.HeightLayer z = Creature.HeightLayer.Ground)
         {
             if (!(x >= 0 && x < mapSize && y >= 0 && y < mapSize) || (z != Creature.HeightLayer.Air && map[x, y].isWater)) return false;
@@ -171,7 +170,18 @@ namespace EvolutionSimulation
             return isTree(x, y);
         }
 
-         public bool isTree(int x, int y)
+        /// <summary>
+        /// Checks if target coordinates are within the map's boundaries
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns>True if it is within bounds</returns>
+        public bool checkBounds(int x, int y)
+        {
+            return (x >= 0 && x < mapSize && y >= 0 && y < mapSize);
+        }
+
+        public bool isTree(int x, int y)
         {
             Plant p = map[x, y].plant;
             return (p is Tree || p is EdibleTree);
@@ -427,7 +437,7 @@ namespace EvolutionSimulation
                             for (int j = -(int)(mapScale / 5); j <= (int)(mapScale / 5); j++)
                             {
                                 if (j == 0 && i == 0) continue;
-                                if (canMove(xIndex + i, yIndex + j))
+                                if (checkBounds(xIndex + i, yIndex + j))
                                 {
                                     avgHumidity -= map[xIndex + i, yIndex + j].humidity;
                                     avgTemp -= map[xIndex + i, yIndex + j].temperature;

@@ -238,11 +238,11 @@ namespace VisualizadorConsola
                     //*/
 
                     Plant plant = world.map[j / scale, i / scale].plant;
-                    //if (plant as Grass != null)
-                    //    SetPixel(j, i, Color.DarkOliveGreen, treeMap, scale);
-                    //else if (plant as Bush != null)
-                    //    SetPixel(j, i, Color.ForestGreen, treeMap, scale);
-                    if (plant as Tree != null)
+                    if (plant as Grass != null)
+                        SetPixel(j, i, Color.DarkOliveGreen, treeMap, scale);
+                    else if (plant as Bush != null)
+                        SetPixel(j, i, Color.ForestGreen, treeMap, scale);
+                    else if (plant as Tree != null)
                         SetPixel(j, i, Color.LawnGreen, treeMap, scale);
                     else if (plant as EdibleTree != null)
                         SetPixel(j, i, Color.Red, treeMap, scale);
