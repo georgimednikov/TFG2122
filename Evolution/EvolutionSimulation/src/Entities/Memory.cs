@@ -42,6 +42,8 @@ namespace EvolutionSimulation.Entities
         public Corpse closestCorpse { get; private set; }
         public EdiblePlant closestFruit { get; private set; }
         public Tuple<int, int> closestWater { get; private set; }
+        public Tuple<int, int> closestSafePlace { get; private set; }
+        public Tuple<int, int> undiscoveredPlace { get; private set; }
 
         public Memory(Creature c, World w)
         {
@@ -51,6 +53,8 @@ namespace EvolutionSimulation.Entities
             for (int i = 0; i < map.GetLength(0); i++)
                 for (int j = 0; j < map.GetLength(1); j++)
                     map[i, j] = new MemoryTileInfo();
+
+            LocateClosestUndiscoveredPlace();
 
             rememberedTiles = new List<MemoryTileInfo>();
             comparer = new MemoryTileComparer(thisCreature);
@@ -217,6 +221,7 @@ namespace EvolutionSimulation.Entities
             closestCorpse = null;
             closestFruit = null;
             closestWater = null;
+            closestSafePlace = null;
 
             rememberedTiles.Sort(comparer);
             foreach (MemoryTileInfo tile in rememberedTiles)
@@ -224,6 +229,7 @@ namespace EvolutionSimulation.Entities
                 UpdateResources(tile);
                 if (AllResourcesFound()) break; // Stops searching when everything has been found.
             }
+            LocateClosestUndiscoveredPlace();
         }
 
         /// <summary>
@@ -260,6 +266,8 @@ namespace EvolutionSimulation.Entities
                 closestFruit = world.map[tile.x, tile.y].plant as EdiblePlant;
             if (closestWater == null && tile.water)
                 closestWater = new Tuple<int, int>(tile.x, tile.y);
+            if (closestSafePlace == null && GetPositionDanger(tile.x, tile.y) == 0)
+                closestSafePlace = new Tuple<int, int>(tile.x, tile.y);
         }
 
         /// <summary>
@@ -273,7 +281,51 @@ namespace EvolutionSimulation.Entities
                     closestPossibleMate != null &&
                     closestCorpse != null &&
                     closestFruit != null &&
-                    closestWater != null;
+                    closestWater != null &&
+                    closestSafePlace != null;
+        }
+
+        /// <summary>
+        /// Gets the closest unknown position in the map for the creature.
+        /// </summary>
+        private void LocateClosestUndiscoveredPlace()
+        {
+            int x = thisCreature.x, y = thisCreature.y;
+            int searchRadius = perceptionRadius + 1;
+
+            // This is basically cosmic horror but it is the most efficient way to do this that I could come up with :)
+            while (true)
+            {
+                for (int i = -searchRadius; i <= searchRadius; i++)
+                {
+                    for (int j = -searchRadius; j <= searchRadius;)
+                    {
+                        if (!IsOutOfBounds(x + i, y + j) && !map[x + i, y + j].discovered)
+                        {
+                            undiscoveredPlace = new Tuple<int, int>(x + i, y + j);
+                            return;
+                        }
+
+                        //This double for does NOT go normally through an area. What it does is increase the area every iteration, doing the following:
+                        //X -> First iteration
+                        //O -> Second iteration
+                        //S -> Third iteration
+                        //S S S S S
+                        //S O O O S
+                        //S O X O S
+                        //S O O O S
+                        //S S S S S
+
+                        //So when the first or the last row is being processed, it is processed completely, otherwise, only the first and last elements are processed.
+                        //To jump from the first to the last, it is done j += searchRadius * 2 because if radius = 3 then on the first j iteration j = -3,
+                        //and after being processed j = -3 + (3 * 2) = 3, which is the last column. Then, to leave the j for, it is added again.
+                        if (i == -searchRadius || i == searchRadius) j++;
+                        else j += searchRadius * 2;
+                    }
+                }
+                //Search radius is increased.
+                searchRadius++;
+            }
         }
 
         /// <summary>

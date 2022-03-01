@@ -666,5 +666,7 @@ namespace EvolutionSimulation.Entities
         public Corpse GetClosestCorpse() { return memory.closestCorpse; }
         public EdiblePlant GetClosestFruit() { return memory.closestFruit; }
         public Tuple<int, int> GetClosestWater() { return memory.closestWater; }
+        public Tuple<int, int> GetClosestSafePlace() { return memory.closestSafePlace; }
+        public Tuple<int, int> GetUndiscoveredPlace() { return memory.undiscoveredPlace; }
     }
 }
