@@ -1,4 +1,6 @@
-﻿namespace EvolutionSimulation.FSM.Creature.States
+﻿using System;
+
+namespace EvolutionSimulation.FSM.Creature.States
 {
     /// <summary>
     /// State reproducing. After a given time (in tick) if is a female it will create
@@ -14,7 +16,7 @@
         // This move is energy netural, costing the same energy that is obtained in a tick
         public override int GetCost()
         {
-            return 1000;
+            return 1000;//TODO
         }
 
         /// <summary>
@@ -23,6 +25,8 @@
         /// </summary>
         public override void Action()
         {
+            Console.WriteLine("Mating action");
+
             time--;
             if (time == 0)
             {
@@ -44,14 +48,18 @@
                         creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName);
                     }
                     creature.timeToBeInHeat = -1;
-                }
-                //Ends the reproducing's action
-                time = startTime;//reset time
-                //TODO: esto hacerlo al salir del estado, sea cual sea el motivo
-                creature.matingCreature.ReceiveInteraction(creature, Entities.Interactions.stopMate);
+                }                
             }
+        }
 
-            //obj.ReceiveInteraction(creature, Entities.Interactions.mate);
+        /// <summary>
+        /// At the end of the action whatever the reason was, reset the timer
+        /// and interact with the mating creature to stop mating
+        /// </summary>
+        public override void OnExit()
+        {
+            time = startTime;
+            creature.matingCreature.ReceiveInteraction(creature, Entities.Interactions.stopMate);
         }
 
         public override string ToString()

@@ -11,7 +11,7 @@
         // This move is energy netural, costing the same energy that is obtained in a tick
         public override int GetCost()
         {
-            return 1000;
+            return 1000;//TODO
         }
 
         // Increases current rest

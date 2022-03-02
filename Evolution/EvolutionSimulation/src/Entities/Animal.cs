@@ -97,7 +97,7 @@ namespace EvolutionSimulation.Entities
             stats.EnergyExpense = 1 + stats.Metabolism / (float)chromosome.GetFeatureMax(CreatureFeature.Metabolism);
             stats.MaxHydration = resourceAmount;
             stats.CurrHydration = stats.MaxHydration;
-            stats.HydrationExpense = stats.EnergyExpense;
+            stats.HydrationExpense = stats.EnergyExpense;//TODO que sea un poco mayor que EnergyExpense, json
 
             stats.MaxRest = resourceAmount;
             stats.CurrRest = stats.MaxRest;
