@@ -76,29 +76,8 @@ namespace EvolutionSimulation.Entities
             //toWake.value = (stats.CurrRest >= stats.MaxRest);
 
             stats.CurrRest -= stats.RestExpense;
-            
-            if(stats.Gender == Gender.Female && !stats.IsNewBorn())
-            {
-                if (timeToBeInHeat == 0)//Can be pregnant
-                    stats.InHeat = true;
-                else if (timeToBeInHeat <= -1)// Pregnant, reset timer
-                {
-                    timeToBeInHeat = stats.TimeBetweenHeats;
-                    stats.InHeat = false;
-                }
-                else
-                    timeToBeInHeat--;
 
-                //if the female has to do something, she doesn't want to mate
-                if (stats.CurrEnergy < stats.veryHungerThreshold * stats.MaxEnergy
-                    || stats.CurrRest < stats.exhaustThreshold * stats.MaxRest
-                    || stats.CurrHydration < stats.veryThirstyThreshold * stats.MaxHydration
-                    || mating || !stats.InHeat)
-                {
-                    wantMate = false;
-                }
-                else wantMate = true;
-            }
+            FemaleTick();
 
             memory.Update();
             foreach (Status.Status s in activeStatus)   // Activates each status effect
@@ -129,6 +108,34 @@ namespace EvolutionSimulation.Entities
             foreach (Status.Status s in removedStatus)
                 activeStatus.Remove(s);
             removedStatus.Clear();
+        }
+
+        /// <summary>
+        /// Update the inHeat stat of a female.
+        /// Also check if she want to mate or not
+        /// </summary>
+        void FemaleTick()
+        {
+            if (stats.Gender == Gender.Female && !stats.IsNewBorn())
+            {
+                if (timeToBeInHeat == 0)//Can be pregnant
+                    stats.InHeat = true;
+                else if (timeToBeInHeat <= -1)// Pregnant, reset timer
+                {
+                    timeToBeInHeat = stats.TimeBetweenHeats;
+                    stats.InHeat = false;
+                }
+                else
+                    timeToBeInHeat--;
+
+                //if the female has to do something, she doesn't want to mate
+                if (IsExhausted() || IsVeryHungry() || IsVeryThirsty()
+                    || mating || !stats.InHeat)
+                {
+                    wantMate = false;
+                }
+                else wantMate = true;
+            }
         }
 
         #region Genetics and Taxonomy
@@ -167,7 +174,6 @@ namespace EvolutionSimulation.Entities
         /// If a female want to mate, its false if she has needs like
         /// sleep or eat or is mating
         /// </summary>
-        //TODO igual si estas en el estado mating y te atacan o muere la criatura con la que estas relacionandote esto hay que ponerlo a false
         public bool wantMate = false;
         /// <summary>
         /// If a creatures is mating
@@ -206,6 +212,34 @@ namespace EvolutionSimulation.Entities
             Fsm safeFSM = new Fsm(wander);
             IState safe = new CompoundState("Safe", safeFSM);
 
+
+            // Sleeping
+            ITransition goToSafePlaceTransition = new GoToSafePlaceTransition(this);
+            ITransition stopGoToSafePlaceTransition = new StopGoToSafePlaceTransition(this);
+            ITransition safePlaceExploreTransition = new SafePlaceExploreTransition(this);
+            ITransition sleepySafeTransition = new SleepySafeTransition(this);
+            ITransition sleepyTransition = new SleepyTransition(this);
+            ITransition wakeTransition = new WakeTransition(this);
+            safeFSM.AddTransition(wander, goToSafePlaceTransition, goToSafePlace);
+            safeFSM.AddTransition(goToSafePlace, stopGoToSafePlaceTransition, wander);
+            safeFSM.AddTransition(wander, safePlaceExploreTransition, explore);
+            safeFSM.AddTransition(goToSafePlace, sleepySafeTransition, sleep);
+            safeFSM.AddTransition(explore, sleepyTransition, sleep);
+            safeFSM.AddTransition(wander, sleepyTransition, sleep);
+            safeFSM.AddTransition(sleep, wakeTransition, wander);
+
+            // Eating
+            ITransition hungerTransition = new HungerTransition(this);
+            ITransition hungerExploreTransition = new HungerExploreTransition(this);
+            ITransition eatingTransition = new EatingTransition(this);
+            ITransition stopEatingTransition = new StopEatingTransition(this);
+            ITransition stopGoToEatTransition = new StopGoToEatTransition(this);
+            safeFSM.AddTransition(wander, hungerTransition, goToEat);
+            safeFSM.AddTransition(wander, hungerExploreTransition, explore);
+            safeFSM.AddTransition(goToEat, stopGoToEatTransition, wander);
+            safeFSM.AddTransition(goToEat, eatingTransition, eat);
+            safeFSM.AddTransition(eat, stopEatingTransition, wander);
+
             // Drinking
             ITransition thirstyTransition = new ThirstyTransition(this);
             ITransition drinkingTransition = new DrinkingTransition(this);
@@ -229,31 +263,11 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToMate, tryMateTransition, tryMate);
             safeFSM.AddTransition(goToMate, stopGoToMateTransition, wander);
             safeFSM.AddTransition(tryMate, matingTransition, mating);
+            safeFSM.AddTransition(goToDrink, matingTransition, mating);
+            safeFSM.AddTransition(goToEat, matingTransition, mating);
+            safeFSM.AddTransition(goToSafePlace, matingTransition, mating);
             safeFSM.AddTransition(tryMate, stopTryMateTransition, wander);
             safeFSM.AddTransition(mating, stopMatingTransition, wander);
-
-            // Eating
-            ITransition hungerTransition = new HungerTransition(this);
-            ITransition hungerExploreTransition = new HungerExploreTransition(this);
-            ITransition eatingTransition = new EatingTransition(this);
-            ITransition stopEatingTransition = new StopEatingTransition(this);
-            ITransition stopGoToEatTransition = new StopGoToEatTransition(this);
-            safeFSM.AddTransition(wander, hungerTransition, goToEat);
-            safeFSM.AddTransition(wander, hungerExploreTransition, explore);
-            safeFSM.AddTransition(goToEat, stopGoToEatTransition, wander);
-            safeFSM.AddTransition(goToEat, eatingTransition, eat);
-            safeFSM.AddTransition(eat, stopEatingTransition, wander);
-
-            // Sleeping
-            ITransition goToSafePlaceTransition = new GoToSafePlaceTransition(this);
-            ITransition sleepySafeTransition = new SleepySafeTransition(this);
-            ITransition sleepyTransition = new SleepyTransition(this);
-            ITransition wakeTransition = new WakeTransition(this);
-            safeFSM.AddTransition(wander, goToSafePlaceTransition, goToSafePlace);
-            //safeFSM.AddTransition(goToSafePlace, ?, wander);
-            safeFSM.AddTransition(goToSafePlace, sleepySafeTransition, sleep);
-            safeFSM.AddTransition(wander, sleepyTransition, sleep);
-            safeFSM.AddTransition(sleep, wakeTransition, wander);
 
             // Escape-state Configuration
             // States
@@ -579,6 +593,21 @@ namespace EvolutionSimulation.Entities
             int x1, y1;
             x1 = Math.Abs(x - entity.x);
             y1 = Math.Abs(y - entity.y);
+
+            return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
+        }
+
+        /// <summary>
+        /// Calculate the distance between the creature and the given pos
+        /// </summary>
+        /// <returns> Distance between creature and pos. intMaxValue if out of the map </returns>
+        public int DistanceToObjective(int xObj, int yObj)
+        {
+            if (!world.checkBounds(xObj, yObj)) return int.MaxValue;
+
+            int x1, y1;
+            x1 = Math.Abs(x - xObj);
+            y1 = Math.Abs(y - yObj);
 
             return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
         }

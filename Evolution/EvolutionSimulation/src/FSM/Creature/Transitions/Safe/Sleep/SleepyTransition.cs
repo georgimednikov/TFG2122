@@ -1,5 +1,10 @@
 ﻿namespace EvolutionSimulation.FSM.Creature.Transitions
 {
+    /// <summary>
+    /// The creature try to sleep in a safe place but 
+    /// if it is exhausted, it will sleep anywhere
+    /// Wander/Explore -> Sleeping
+    /// </summary>
     class SleepyTransition : CreatureTransition
     {
         public SleepyTransition(Entities.Creature creature)

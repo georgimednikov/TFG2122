@@ -1,5 +1,8 @@
 ﻿namespace EvolutionSimulation.FSM.Creature.States
 {
+    /// <summary>
+    /// The creature is sleeping, he recover Rest
+    /// </summary>
     class Sleeping : CreatureState
     {
         public Sleeping(Entities.Creature c) : base(c) { creature = c; }
