@@ -131,6 +131,49 @@ namespace EvolutionSimulation.Entities
             removedStatus.Clear();
         }
 
+        #region Genetics and Taxonomy
+        // Taxonomy
+        public string speciesName;
+        public string progenitorSpeciesName;
+
+        // Genetics
+        public CreatureChromosome chromosome { get; private set; }
+        public CreatureStats stats { get; private set; }
+
+        /// <summary>
+        /// Sets the stats of the creature.
+        /// </summary>
+        abstract public void SetStats();
+        #endregion
+
+        #region State Machine
+        public int ActionPoints { get; private set; }
+
+        // State machine
+        // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
+        private Fsm mfsm;
+
+        // State related attributes
+
+        public bool hasBeenHit;
+
+        public Creature matingCreature;
+
+        /// <summary>
+        /// Time in ticks to be in heat (a female)
+        /// </summary>
+        public int timeToBeInHeat;
+        /// <summary>
+        /// If a female want to mate, its false if she has needs like
+        /// sleep or eat or is mating
+        /// </summary>
+        //TODO igual si estas en el estado mating y te atacan o muere la criatura con la que estas relacionandote esto hay que ponerlo a false
+        public bool wantMate = false;
+        /// <summary>
+        /// If a creatures is mating
+        /// </summary>
+        public bool mating;
+
         /// <summary>
         /// Returns the creature's current state
         /// </summary>
@@ -257,32 +300,14 @@ namespace EvolutionSimulation.Entities
             mfsm.AddTransition(alive, dieTransition, dead); 
         }
 
-        /// <summary>
-        /// Moves a creature a specified amount
-        /// </summary>
-        public void Move(int x, int y, HeightLayer z = HeightLayer.Ground)
-        {
-            this.x += x;
-            this.y += y;
-            if (world.isTree(x, y))
-                creatureLayer = z;
-            else if (creatureLayer != HeightLayer.Air)
-                creatureLayer = HeightLayer.Ground;
-        }
+        #endregion
 
-        /// <summary>
-        /// Places a creature in the designated coordinates
-        /// </summary>
-        public void Place(int x, int y, HeightLayer z = HeightLayer.Ground)
-        {
-            this.x = x;
-            this.y = y;
-            if (world.isTree(x, y))
-                creatureLayer = z;
-            else if (creatureLayer != HeightLayer.Air)
-                creatureLayer = HeightLayer.Ground;
-        }
+        #region Interactions
+        // Interactions that the creature can react to. Keys are the Interaction type
+        // and values are the actions that the creature performs when something interacts with it.
+        Dictionary<Interactions, List<Action<Creature>>> InteractionsDict;
 
+        // Methods to receive and respond to interactions
         /// <summary>
         /// Executes every response that this creature has to an interaction with other creature
         /// </summary>
@@ -320,6 +345,7 @@ namespace EvolutionSimulation.Entities
                 InteractionsDict.Remove(type);
         }
 
+        // Standard reactions to interactions
 
         /// <summary>
         /// Returns the taken damage
@@ -335,97 +361,6 @@ namespace EvolutionSimulation.Entities
             return amount;
         }
 
-
-        /// <summary>
-        /// Check if the eating objective is not null
-        /// </summary>
-        /// <returns>True if the creature knows where to eat </returns>
-        public bool HasEatingObjective()
-        {
-            // Hervibore and not plant objective
-            if (stats.Diet == Diet.Herbivore && memory.ClosestFruit() == null)
-                return true;
-            // Carnivore and not corpse objective
-            if (stats.Diet == Diet.Carnivore && memory.ClosestCorpse() == null)
-                return true;
-            // Omnivore and not plant and corpse objective
-            if (stats.Diet == Diet.Omnivore && memory.ClosestCorpse() == null && memory.ClosestFruit() == null)
-                return true;
-
-            return false;
-        }
-
-        /// <summary>
-        /// Calculate the distance between the creature and the given entity
-        /// </summary>
-        /// <returns> Distance between creature and entity. intMaxValue if entity is null </returns>
-        public int DistanceToObjective(IEntity entity)
-        {
-            if (entity == null) return int.MaxValue;
-
-            int x1, y1;
-            x1 = Math.Abs(x - entity.x);
-            y1 = Math.Abs(y - entity.y);
-
-            return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
-        }
-
-        /// <summary>
-        /// Check if the creature is hunger (need to eat)
-        /// </summary>
-        /// <returns> True if the creature is hunger </returns>
-        public bool IsHungry()
-        {
-            return stats.CurrEnergy > stats.hungerThreshold * stats.MaxEnergy;
-        }
-
-        /// <summary>
-        /// Check if the creature is very hunger (need to eat)
-        /// </summary>
-        /// <returns> True if the creature is very hunger </returns>
-        public bool IsVeryHungry()
-        {
-            return stats.CurrEnergy > stats.veryHungerThreshold * stats.MaxEnergy;
-        }
-
-
-        /// <summary>
-        /// Check if the creature is thirsty (need to drink)
-        /// </summary>
-        /// <returns> True if the creature is thirsty </returns>
-        public bool IsThirsty()
-        {
-            return stats.CurrHydration > stats.thirstyThreshold * stats.MaxHydration;
-        }
-
-        /// <summary>
-        /// Check if the creature is very thirsty (need to drink)
-        /// </summary>
-        /// <returns> True if the creature is very thirsty </returns>
-        public bool IsVeryThirsty()
-        {
-            return stats.CurrHydration > stats.veryThirstyThreshold * stats.MaxHydration;
-        }
-
-
-        /// <summary>
-        /// Check if the creature is tired (need to sleep)
-        /// </summary>
-        /// <returns> True if the creature is tired </returns>
-        public bool IsTired()
-        {
-            return stats.CurrRest <= stats.tiredThreshold * stats.MaxRest;
-        }
-
-        /// <summary>
-        /// Check if the creature is exhausted (need to sleep)
-        /// </summary>
-        /// <returns> True if the creature is exhausted </returns>
-        public bool IsExhausted()
-        {
-            return stats.CurrRest <= stats.exhaustThreshold * stats.MaxRest;
-        }
-
         /// <summary>
         /// Action the creature will do upon being attacked
         /// </summary>
@@ -433,7 +368,7 @@ namespace EvolutionSimulation.Entities
         {
             stats.CurrHealth -= ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
             //TODO: Cambiar target aunque normalmente sera el mas cercano asi que tampoco es tan urgente
-            hasBeenHit = true;             
+            hasBeenHit = true;
         }
 
         /// <summary>
@@ -442,7 +377,7 @@ namespace EvolutionSimulation.Entities
         private void RetalliateDamage(Creature interacter)
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
-            Console.WriteLine(speciesName + "(" + x + "," + y +") devuelve " + stats.Counter + " de daño");
+            Console.WriteLine(speciesName + "(" + x + "," + y + ") devuelve " + stats.Counter + " de daño");
         }
 
         /// <summary>
@@ -488,7 +423,65 @@ namespace EvolutionSimulation.Entities
                 mating = false;
             }
         }
+        #endregion
 
+        #region Creature Information
+
+        // Stats related information
+
+        /// <summary>
+        /// Check if the creature is hunger (need to eat)
+        /// </summary>
+        /// <returns> True if the creature is hunger </returns>
+        public bool IsHungry()
+        {
+            return stats.CurrEnergy > stats.hungerThreshold * stats.MaxEnergy;
+        }
+
+        /// <summary>
+        /// Check if the creature is very hunger (need to eat)
+        /// </summary>
+        /// <returns> True if the creature is very hunger </returns>
+        public bool IsVeryHungry()
+        {
+            return stats.CurrEnergy > stats.veryHungerThreshold * stats.MaxEnergy;
+        }
+
+        /// <summary>
+        /// Check if the creature is thirsty (need to drink)
+        /// </summary>
+        /// <returns> True if the creature is thirsty </returns>
+        public bool IsThirsty()
+        {
+            return stats.CurrHydration > stats.thirstyThreshold * stats.MaxHydration;
+        }
+
+        /// <summary>
+        /// Check if the creature is very thirsty (need to drink)
+        /// </summary>
+        /// <returns> True if the creature is very thirsty </returns>
+        public bool IsVeryThirsty()
+        {
+            return stats.CurrHydration > stats.veryThirstyThreshold * stats.MaxHydration;
+        }
+
+        /// <summary>
+        /// Check if the creature is tired (need to sleep)
+        /// </summary>
+        /// <returns> True if the creature is tired </returns>
+        public bool IsTired()
+        {
+            return stats.CurrRest <= stats.tiredThreshold * stats.MaxRest;
+        }
+
+        /// <summary>
+        /// Check if the creature is exhausted (need to sleep)
+        /// </summary>
+        /// <returns> True if the creature is exhausted </returns>
+        public bool IsExhausted()
+        {
+            return stats.CurrRest <= stats.exhaustThreshold * stats.MaxRest;
+        }
 
         /// <summary>
         /// Returns if an ability is unlocked
@@ -501,12 +494,93 @@ namespace EvolutionSimulation.Entities
             return unlock <= f / mF;
         }
 
+        // Memory related information
+        Memory memory;
+
+        /// <summary>
+        /// Check if the eating objective is not null
+        /// </summary>
+        /// <returns>True if the creature knows where to eat </returns>
+        public bool HasEatingObjective()
+        {
+            // Hervibore and not plant objective
+            if (stats.Diet == Diet.Herbivore && memory.ClosestFruit() == null)
+                return true;
+            // Carnivore and not corpse objective
+            if (stats.Diet == Diet.Carnivore && memory.ClosestCorpse() == null)
+                return true;
+            // Omnivore and not plant and corpse objective
+            if (stats.Diet == Diet.Omnivore && memory.ClosestCorpse() == null && memory.ClosestFruit() == null)
+                return true;
+
+            return false;
+        }
+        public Creature GetClosestAlly() { return memory.ClosestAlly(); }
+        public Creature GetClosestPossibleMate() { return memory.ClosestPossibleMate(); }
+        public Creature GetClosestCreature() { return memory.ClosestCreature(); }
+        public Creature GetClosestCreatureReachable() { return memory.ClosestCreatureReachable(); }
+        public Corpse GetClosestCorpse() { return memory.ClosestCorpse(); }
+        public EdiblePlant GetClosestFruit() { return memory.ClosestFruit(); }
+        public Tuple<int, int> GetClosestWater() { return memory.ClosestWater(); }
+        public Tuple<int, int> GetClosestSafePlace() { return memory.ClosestSafePlace(); }
+        public Tuple<int, int> GetUndiscoveredPlace() { return memory.UndiscoveredPlace(); }
+        #endregion
+
+        #region World Info, Movement and Paths
+
+        // World tile position
+        public int x { get; private set; }
+        public int y { get; private set; }
+        // World in which the creature resides
+        public World world { get; private set; }
         public enum HeightLayer { Ground, Tree = 1, Air = 2 };
 
         public HeightLayer creatureLayer;
 
         Vector3[] path;
         int pathIterator;
+
+
+        /// <summary>
+        /// Moves a creature a specified amount
+        /// </summary>
+        public void Move(int x, int y, HeightLayer z = HeightLayer.Ground)
+        {
+            this.x += x;
+            this.y += y;
+            if (world.isTree(x, y))
+                creatureLayer = z;
+            else if (creatureLayer != HeightLayer.Air)
+                creatureLayer = HeightLayer.Ground;
+        }
+
+        /// <summary>
+        /// Places a creature in the designated coordinates
+        /// </summary>
+        public void Place(int x, int y, HeightLayer z = HeightLayer.Ground)
+        {
+            this.x = x;
+            this.y = y;
+            if (world.isTree(x, y))
+                creatureLayer = z;
+            else if (creatureLayer != HeightLayer.Air)
+                creatureLayer = HeightLayer.Ground;
+        }
+
+        /// <summary>
+        /// Calculate the distance between the creature and the given entity
+        /// </summary>
+        /// <returns> Distance between creature and entity. intMaxValue if entity is null </returns>
+        public int DistanceToObjective(IEntity entity)
+        {
+            if (entity == null) return int.MaxValue;
+
+            int x1, y1;
+            x1 = Math.Abs(x - entity.x);
+            y1 = Math.Abs(y - entity.y);
+
+            return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
+        }
 
         /// <summary>
         /// Returns minimal path length for arboreal movement being more efficient than ground.
@@ -581,13 +655,16 @@ namespace EvolutionSimulation.Entities
 
             return path[pathIterator++];
         }
-
-        /// <summary>
-        /// Sets the stats of the creature.
-        /// </summary>
-        abstract public void SetStats();
+        #endregion
 
         #region Status Effects
+
+        // List of active status effects
+        List<Status.Status> activeStatus;
+
+        // List of status effects to be removed
+        List<Status.Status> removedStatus;
+
         /// <summary>
         /// Adds a status to the list of active statuses
         /// </summary>
@@ -612,65 +689,5 @@ namespace EvolutionSimulation.Entities
             }
         }
         #endregion
-
-        #region Attributes
-        Memory memory;
-
-        // World tile position
-        public int x { get; private set; }
-        public int y { get; private set; }
-        // World in which the creature resides
-        public World world { get; private set; }
-
-        // Genetic
-        public string speciesName;
-        public string progenitorSpeciesName;
-        public CreatureChromosome chromosome { get; private set; }
-        public CreatureStats stats { get; private set; }
-
-        public int ActionPoints { get; private set; }
-
-        // State machine
-        // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
-        private Fsm mfsm;
-
-        public bool hasBeenHit;
-
-        public Creature matingCreature;
-        /// <summary>
-        /// Time in ticks to be in heat (a female)
-        /// </summary>
-        public int timeToBeInHeat;
-        /// <summary>
-        /// If a female want to mate, its false if she has needs like
-        /// sleep or eat or is mating
-        /// </summary>
-        //TODO igual si estas en el estado mating y te atacan o muere la criatura con la que estas relacionandote esto hay que ponerlo a false
-        public bool wantMate = false;
-        /// <summary>
-        /// If a creatures is mating
-        /// </summary>
-        public bool mating;
-
-        // Interactions that the creature can react to. Keys are the Interaction type
-        // and values are the actions that the creature performs when something interacts with it.
-        Dictionary<Interactions, List<Action<Creature>>> InteractionsDict;
-
-        // List of active status effects
-        List<Status.Status> activeStatus;
-
-        // List of status effects to be removed
-        List<Status.Status> removedStatus;
-        #endregion
-
-        public Creature GetClosestAlly() { return memory.ClosestAlly(); }
-        public Creature GetClosestPossibleMate() { return memory.ClosestPossibleMate(); }
-        public Creature GetClosestCreature() { return memory.ClosestCreature(); }
-        public Creature GetClosestCreatureReachable() { return memory.ClosestCreatureReachable(); }
-        public Corpse GetClosestCorpse() { return memory.ClosestCorpse(); }
-        public EdiblePlant GetClosestFruit() { return memory.ClosestFruit(); }
-        public Tuple<int, int> GetClosestWater() { return memory.ClosestWater(); }
-        public Tuple<int, int> GetClosestSafePlace() { return memory.ClosestSafePlace(); }
-        public Tuple<int, int> GetUndiscoveredPlace() { return memory.UndiscoveredPlace(); }
     }
 }
