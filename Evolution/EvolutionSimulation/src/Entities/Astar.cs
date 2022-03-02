@@ -87,10 +87,10 @@ namespace EvolutionSimulation.Entities
             }
             treeDensity = ((float)passedTrees) / ((float)path.Count);
             path.Reverse();
-            Vector3[] retPath = new Vector3[path.Count];
-            for (int i = 0; i < path.Count; ++i)
+            Vector3[] retPath = new Vector3[path.Count - 1];
+            for (int i = 1; i < path.Count; ++i)
             {
-                retPath[i] = path[i].pos;
+                retPath[i - 1] = path[i].pos;
             }
             return retPath;
         }

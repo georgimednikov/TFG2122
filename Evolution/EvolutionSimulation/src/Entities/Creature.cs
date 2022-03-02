@@ -515,6 +515,7 @@ namespace EvolutionSimulation.Entities
 
             return false;
         }
+
         public Creature GetClosestAlly() { return memory.ClosestAlly(); }
         public Creature GetClosestPossibleMate() { return memory.ClosestPossibleMate(); }
         public Creature GetClosestCreature() { return memory.ClosestCreature(); }

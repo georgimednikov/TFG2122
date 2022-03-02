@@ -11,19 +11,19 @@ namespace EvolutionSimulation.Entities
             public int x;
             public int y;
 
-            public int ticksUnchecked; //Number of ticks since the tile has been seen for the last time.
-            public bool discovered; //Whether this tile has been discovered by the creature at some point.
+            public int ticksUnchecked;  //Number of ticks since the tile has been seen for the last time.
+            public bool discovered;     //Whether this tile has been discovered by the creature at some point.
 
-            public float experienceDanger; //How dangerous the creature has experienced the tile to be.
-            public float tangibleDanger; //How dangerous the creature rekons the tile is.
+            public float experienceDanger;  //How dangerous the creature has experienced the tile to be.
+            public float tangibleDanger;    //How dangerous the creature rekons the tile is.
 
             public bool water;
-            public bool fruit; //Whether there is fruit in this tile.
+            public bool fruit;  //Whether there is fruit in this tile.
 
             //TODO: Puede que estas dos listas se puedan simplificar para que no contengan tanta informacion
             public List<Creature> creatures = new List<Creature>(); //The list of creatures of a different species
-            public List<Creature> allies = new List<Creature>(); //The list of creatures of the same species
-            public List<Corpse> corpses = new List<Corpse>(); //The nutritional value of each edible corpse seen.
+            public List<Creature> allies = new List<Creature>();    //The list of creatures of the same species
+            public List<Corpse> corpses = new List<Corpse>();       //The nutritional value of each edible corpse seen.
         }
 
         Creature thisCreature;
@@ -32,8 +32,8 @@ namespace EvolutionSimulation.Entities
         List<MemoryTileInfo> rememberedTiles;
         MemoryTileComparer comparer;
         int maxTicksUnchecked;
-        int perceptionRadius; //Radius around the creature in which it percieves the world.
-        int dangerRadius; //Radius around a tile in which the tile's danger spreads.
+        int perceptionRadius;   //Radius around the creature in which it percieves the world.
+        int dangerRadius;       //Radius around a tile in which the tile's danger spreads.
 
         Creature closestCreature;
         Creature closestCreatureReachable;
@@ -73,8 +73,8 @@ namespace EvolutionSimulation.Entities
             rememberedTiles = new List<MemoryTileInfo>();
             comparer = new MemoryTileComparer(thisCreature);
 
-            maxTicksUnchecked = thisCreature.stats.Knowledge * 500; //TODO: Esto bien
-            perceptionRadius = thisCreature.stats.Perception;
+            maxTicksUnchecked = thisCreature.stats.Knowledge * 500; //  TODO: Esto bien
+            perceptionRadius = /*thisCreature.stats.Perception*/ 5; // TODO: Perception es literalmente 0, eso no vale así que hay que arreglarlo
             dangerRadius = thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness;
         }
 
@@ -125,7 +125,7 @@ namespace EvolutionSimulation.Entities
                             else
                                 map[x + i, y + j].creatures.Add(creature);
 
-                            perceivedCreatures.Remove(creature); //Once processed the object is removed to reduce cost.
+                            //perceivedCreatures.Remove(creature); //Once processed the object is removed to reduce cost.
                         }
                     }
 
@@ -136,7 +136,7 @@ namespace EvolutionSimulation.Entities
                         else if (entity.x == x + i && entity.y == y + j)
                         {
                             map[x + i, y + j].corpses.Add(entity as Corpse);
-                            perceivedEntities.Remove(entity); //Once processed the object is removed to reduce cost.
+                            //perceivedEntities.Remove(entity); //Once processed the object is removed to reduce cost.
                         }
                     }
                     //With the creatures accounted for, the information for every tile in sight can be updated.
@@ -274,7 +274,7 @@ namespace EvolutionSimulation.Entities
                     foreach (Creature creature in tile.allies)
                         if (creature.stats.InHeat) closestPossibleMate = creature;
             }
-            if (closestCorpse == null && tile.creatures.Count > 0)
+            if (closestCorpse == null && tile.corpses.Count > 0)
                 closestCorpse = tile.corpses[0];
             if (closestFruit == null && tile.fruit)
                 closestFruit = world.map[tile.x, tile.y].plant as EdiblePlant;
