@@ -1,4 +1,5 @@
 ﻿using EvolutionSimulation;
+using System;
 
 namespace VisualizadorConsola
 {
