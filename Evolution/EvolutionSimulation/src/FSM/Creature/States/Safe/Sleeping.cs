@@ -1,4 +1,6 @@
-﻿namespace EvolutionSimulation.FSM.Creature.States
+﻿using System;
+
+namespace EvolutionSimulation.FSM.Creature.States
 {
     /// <summary>
     /// The creature is sleeping, he recover Rest
@@ -19,6 +21,8 @@
             creature.stats.CurrRest += creature.stats.RestRecovery;
             if (creature.stats.CurrRest > creature.stats.MaxRest)
                 creature.stats.CurrRest = creature.stats.MaxRest;
+
+            Console.WriteLine("Sleeping action");
         }
 
         public override string ToString()

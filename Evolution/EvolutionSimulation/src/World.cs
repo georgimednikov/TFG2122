@@ -165,7 +165,8 @@ namespace EvolutionSimulation
         /// <returns>True if it is within position is available</returns>
         public bool canMove(int x, int y, Creature.HeightLayer z = Creature.HeightLayer.Ground)
         {
-            if (!(x >= 0 && x < mapSize && y >= 0 && y < mapSize) || (z != Creature.HeightLayer.Air && map[x, y].isWater)) return false;
+            if (!(x >= 0 && x < mapSize && y >= 0 && y < mapSize) || (z != Creature.HeightLayer.Air && map[x, y].isWater))
+                return false;
             if (z == Creature.HeightLayer.Ground || z == Creature.HeightLayer.Air) return true;
             return isTree(x, y);
         }
@@ -183,6 +184,8 @@ namespace EvolutionSimulation
 
         public bool isTree(int x, int y)
         {
+            if (x < 0 || y < 0)
+                return false;
             Plant p = map[x, y].plant;
             return (p is Tree || p is EdibleTree);
         }
