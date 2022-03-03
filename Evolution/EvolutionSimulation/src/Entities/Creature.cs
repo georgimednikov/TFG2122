@@ -509,7 +509,7 @@ namespace EvolutionSimulation.Entities
         }
 
         // Memory related information
-        Memory memory;
+        public Memory memory;
 
         /// <summary>
         /// Check if the eating objective is not null
