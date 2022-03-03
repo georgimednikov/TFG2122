@@ -655,6 +655,10 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public int GetNextCostOnPath()
         {
+            // TODO Hay que tener en cuenta el path sea de longuitud 0
+            if (path == null || path.Length == 0)
+                return 0;
+
             int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
             int speed;
             switch ((int)path[pathIterator].Z)

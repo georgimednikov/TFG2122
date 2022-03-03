@@ -34,7 +34,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             Console.WriteLine("Explore action");
 
             Vector3 nextPos = creature.GetNextPosOnPath();
-            if (nextPos.X < 0)
+            if (nextPos.X < 0 || nextPos.Y < 0)
             {
                 Tuple<int, int> posToDiscover = creature.GetUndiscoveredPlace();
                 creature.SetPath(posToDiscover.Item1, posToDiscover.Item2);

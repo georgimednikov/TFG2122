@@ -15,15 +15,21 @@ namespace EvolutionSimulation.FSM.Creature.States
             return creature.GetNextCostOnPath();
         }
 
+        public override void OnEntry()
+        {
+            creature.SetPath(creature.GetClosestPossibleMate().x, creature.GetClosestPossibleMate().y);
+        }
+
         /// <summary>
         /// Go to the closest possible mate
         /// </summary>
         public override void Action()
         {
-            creature.SetPath(creature.GetClosestPossibleMate().x, creature.GetClosestPossibleMate().y);
             Vector3 nextPos = creature.GetNextPosOnPath();
-            creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+            if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
+                creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             Console.WriteLine("GoToMate action");
+            creature.SetPath(creature.GetClosestPossibleMate().x, creature.GetClosestPossibleMate().y);
         }
 
         public override string ToString()

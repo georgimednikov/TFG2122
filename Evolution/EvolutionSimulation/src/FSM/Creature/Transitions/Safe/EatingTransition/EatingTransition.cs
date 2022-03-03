@@ -35,13 +35,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
                   && Math.Abs(creature.GetClosestCorpse().y - creature.y) < 1;
             }
 
-            //Omnivore 
-            return (creature.GetClosestCorpse() != null
-                && Math.Abs(creature.GetClosestCorpse().x - creature.x) < 1
-                && Math.Abs(creature.GetClosestCorpse().y - creature.y) < 1) 
-                || creature.GetClosestFruit() != null
-                && Math.Abs(creature.GetClosestFruit().x - creature.x) < 1
-                && Math.Abs(creature.GetClosestFruit().y - creature.y) < 1; ;
+            int distPlant = creature.DistanceToObjective(creature.GetClosestFruit()),
+                distCorpse = creature.DistanceToObjective(creature.GetClosestCorpse());
+            //Omnivore, close to an eating objective
+            return (creature.GetClosestCorpse() != null && distCorpse <= 1)
+                ||(creature.GetClosestFruit() != null && distPlant <= 1); 
             
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Numerics;
 
 namespace EvolutionSimulation.FSM.Creature.States
 {
@@ -9,6 +10,10 @@ namespace EvolutionSimulation.FSM.Creature.States
     {
         // How costly it is to move compared to regular safe movement
         private float modifier;
+        // Position of the danger
+        int dngX, dngY;
+        // Objective of the escape path
+        int pathX, pathY;
 
         public Fleeing(Entities.Creature c) : base(c)
         {
@@ -16,20 +21,30 @@ namespace EvolutionSimulation.FSM.Creature.States
             modifier = 1.1f - (creature.stats.GroundSpeed / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) * UniverseParametersManager.parameters.fleeingCostMultiplier);
         }
 
-        public override int GetCost()
+        public override void OnEntry()
         {
-            return (int)(UniverseParametersManager.parameters.baseActionCost * ((creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) - creature.stats.GroundSpeed) / (creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) / 2)) * modifier);
+            Entities.Creature objective = creature.GetClosestCreature();
+            dngX = objective.x;
+            dngY = objective.y;
+            pathX = 0;
+            pathY = 0;
+            positionAwayFromMe(ref pathX, ref pathY);
+            creature.SetPath(pathX, pathY);   // This MUST be set up for the cost of the action to work
         }
 
-        public override void Action()
+        public override int GetCost()
+        {
+            return (int)(creature.GetNextCostOnPath() * modifier);
+        }
+
+        // TODO: Esto no deberia estar aqui!!!
+        public void positionAwayFromMe(ref int fX, ref int fY)
         {
             // If the creature is in a different tile, simpli get away from it
-            int oX = creature.GetClosestCreature().x,   // Objective's position
-                oY = creature.GetClosestCreature().y;
-            int deltaX = oX - creature.x,       // Direction of opposite movement
-                deltaY = oY - creature.y;
+            int deltaX = dngX - creature.x,       // Direction of opposite movement
+                deltaY = dngY - creature.y;
             int normX = deltaX == 0 ? 0 : deltaX / Math.Abs(deltaX),  // Normalized direction of movement 
-                normY = deltaY == 0 ? 0 : deltaY / Math.Abs(deltaY);  // as you can only move once per actions (nut can have multiple actions per tick)
+                normY = deltaY == 0 ? 0 : deltaY / Math.Abs(deltaY);  // as you can only move once per action (but can have multiple actions per tick)
 
             if (creature.x == creature.GetClosestCreature().x && creature.y == creature.GetClosestCreature().y) // If it is in the same tile, go in a random direction
                 do
@@ -38,9 +53,31 @@ namespace EvolutionSimulation.FSM.Creature.States
                     normY = RandomGenerator.Next(-1, 2);
                 } while (normX == 0 && normY == 0);
 
-            if (creature.world.canMove(creature.x - normX, creature.y - normY))
+            int xSum = 0, ySum = 0;
+            while (creature.world.canMove(creature.x + xSum - normX, creature.y + ySum - normY))  // Attempts to find the point furthest aay from attacker
             {
-                creature.Place(creature.x - normX, creature.y - normY);
+                xSum -= normX;
+                ySum -= normY;
+            }
+
+            fX = creature.x + xSum;
+            fY = creature.y + ySum;
+        }
+
+        public override void Action()
+        {
+            Vector3 nextPos = creature.GetNextPosOnPath();
+            if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
+                creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+
+            // Attempts to see if the escape route has changed
+            Entities.Creature objective = creature.GetClosestCreature();
+            if(dngX != objective.x || dngY != objective.y)  // If it has changed, reassign the path
+            {
+                dngX = objective.x;
+                dngY = objective.y;
+                positionAwayFromMe(ref pathX, ref pathY);
+                creature.SetPath(pathX, pathY);
             }
         }
 
