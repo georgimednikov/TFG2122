@@ -16,8 +16,9 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         public override bool Evaluate()
         {
             return (creature.GetClosestCreatureReachable() != null || creature.hasBeenHit) 
-                && creature.stats.Aggressiveness >= 0.5 * (float)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness)
-                && creature.stats.CurrHealth >= creature.stats.MaxHealth * threshold;    // So it does not immediately return to combat while fleeing
+                && (creature.stats.Aggressiveness >= 0.5 * (float)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness)
+                && creature.stats.CurrHealth >= creature.stats.MaxHealth * threshold) 
+                || creature.cornered;    // So it does not immediately return to combat while fleeing
             //TODO: revisar entidades vistas y considerar agresividad
         }
 

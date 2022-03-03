@@ -555,6 +555,7 @@ namespace EvolutionSimulation.Entities
         Vector3[] path;
         int pathIterator;
 
+        public bool cornered { get; set; }  // This determines if the creature cannot flee fruther and must fight back
 
         /// <summary>
         /// Moves a creature a specified amount

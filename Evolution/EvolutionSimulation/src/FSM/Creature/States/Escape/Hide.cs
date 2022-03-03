@@ -11,7 +11,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override int GetCost()
         {
-            return (int)(1000 * ((200f - creature.stats.GroundSpeed) / 100f));
+            return 1000;
         }
 
         public override void Action()    // TODO: Que es esconderse?

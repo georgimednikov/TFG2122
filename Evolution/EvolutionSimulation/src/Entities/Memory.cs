@@ -109,6 +109,8 @@ namespace EvolutionSimulation.Entities
                 {
                     if (IsOutOfBounds(x + i, y + j)) continue;
 
+                    map[x + i, y + j].allies.Clear();
+                    map[x + i, y + j].creatures.Clear();
                     //The list of creatures is also needed to calculate danger so it is done here too.
                     foreach (Creature creature in perceivedCreatures)
                     {

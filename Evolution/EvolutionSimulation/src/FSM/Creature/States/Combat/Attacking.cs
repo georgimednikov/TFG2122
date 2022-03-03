@@ -17,7 +17,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             attackMod = 0;
             if (poison = creature.HasAbility(Genetics.CreatureFeature.Venomous, 0.5f))  
                 attackMod += 100 * creature.stats.Venom;    // Costs 100 more per point in Venom                                                      
-            return (int)(1000 + attackMod);
+            return (int)(1000 + attackMod); // TODO: 1000
         }
 
         // Increases current rest
@@ -28,7 +28,14 @@ namespace EvolutionSimulation.FSM.Creature.States
             if(poison)
                 creature.GetClosestCreatureReachable().ReceiveInteraction(creature, Entities.Interactions.poison);
             creature.GetClosestCreatureReachable().ReceiveInteraction(creature, Entities.Interactions.attack);
+            Console.WriteLine(creature.speciesName + " ATTACK KILL");
         }
+
+        //// No longer cornered, as combat is done
+        //public override void OnExit()
+        //{
+        //    creature.cornered = false;
+        //}
 
         public override string ToString()
         {

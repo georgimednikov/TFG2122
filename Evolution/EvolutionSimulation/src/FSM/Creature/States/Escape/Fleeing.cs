@@ -29,12 +29,15 @@ namespace EvolutionSimulation.FSM.Creature.States
             pathX = 0;
             pathY = 0;
             positionAwayFromMe(ref pathX, ref pathY);
-            creature.SetPath(pathX, pathY);   // This MUST be set up for the cost of the action to work
+            if (pathX == creature.x && pathY == creature.y)
+                creature.cornered = true;
+            else
+                creature.SetPath(pathX, pathY);
         }
 
         public override int GetCost()
         {
-            return (int)(creature.GetNextCostOnPath() * modifier);
+            return creature.cornered? 1000 : (int)(creature.GetNextCostOnPath() * modifier);
         }
 
         // TODO: Esto no deberia estar aqui!!!
@@ -66,9 +69,12 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
-            Vector3 nextPos = creature.GetNextPosOnPath();
-            if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
-                creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+            if (!creature.cornered)
+            {
+                Vector3 nextPos = creature.GetNextPosOnPath();
+                if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
+                    creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+            }
 
             // Attempts to see if the escape route has changed
             Entities.Creature objective = creature.GetClosestCreature();
@@ -77,7 +83,10 @@ namespace EvolutionSimulation.FSM.Creature.States
                 dngX = objective.x;
                 dngY = objective.y;
                 positionAwayFromMe(ref pathX, ref pathY);
-                creature.SetPath(pathX, pathY);
+                if (pathX == creature.x && pathY == creature.y)
+                    creature.cornered = true;
+                else
+                    creature.SetPath(pathX, pathY);
             }
         }
 
