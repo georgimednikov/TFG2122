@@ -173,6 +173,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>if not exist assets\ mkdir assets\
-xcopy ..\assets assets\ /H /E /Y</PostBuildEvent>
+xcopy ..\assets assets\ /H /E /Y
+xcopy *.dll ..\..\..\PGEBIELBNE\Assets\Plugins</PostBuildEvent>
   </PropertyGroup>
 </Project>
