@@ -12,7 +12,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override int GetCost()
         {
-            return 10 * creature.stats.Metabolism;
+            return UniverseParametersManager.parameters.eatingCostMultiplier * creature.stats.Metabolism;
         }
 
         public override void Action()

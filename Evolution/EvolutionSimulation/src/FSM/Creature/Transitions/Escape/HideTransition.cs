@@ -10,7 +10,8 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         public HideTransition(Entities.Creature creature)
         {
             this.creature = creature;
-            danger = (int)(5 - creature.stats.Aggressiveness / (float)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * 4);  // The more aggresive a creature is, the lesser its danger range
+            danger = (int)((UniverseParametersManager.parameters.hidingTransitionMultiplier + 1) - creature.stats.Aggressiveness /
+                (float)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.hidingTransitionMultiplier);  // The more aggresive a creature is, the lesser its danger range
         }                                                                                                                                               // And therefore, the less it runs away
 
         public override bool Evaluate()
@@ -25,7 +26,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override string ToString()
         {
-            return "ChaseEnemyTransition";
+            return "HideTransition";
         }
 
     }

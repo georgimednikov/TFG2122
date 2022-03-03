@@ -94,6 +94,12 @@ namespace EvolutionSimulation
         /// </summary>
         public void Init(WorldGenConfig config)
         {
+            ticksHour = UniverseParametersManager.parameters.ticksPerHour;
+            hoursDay = UniverseParametersManager.parameters.hoursPerDay;
+            daysYear = UniverseParametersManager.parameters.daysPerYear;
+            morning = UniverseParametersManager.parameters.morningStart;
+            night = UniverseParametersManager.parameters.nightStart;
+
             if (config == null) throw new NullReferenceException("World generation config is null");
 
             Validator.Validate(config);
@@ -615,9 +621,9 @@ namespace EvolutionSimulation
         bool day;
         public uint step;
         // 50 steps equals and hour, and 24 hours equal a day. 365 days equal a year
-        public static int ticksHour = 50, hoursDay = 24, daysYear = 365;
+        public static int ticksHour, hoursDay, daysYear;
         // The day begins 6:30 and ends at 20:00.
-        float morning = 6.5f, night = 20;
+        float morning, night;
         // Perlin noise generator
         Perlin p;
 

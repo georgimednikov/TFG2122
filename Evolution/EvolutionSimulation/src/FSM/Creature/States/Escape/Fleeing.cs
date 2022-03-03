@@ -10,15 +10,15 @@ namespace EvolutionSimulation.FSM.Creature.States
         // How costly it is to move compared to regular safe movement
         private float modifier;
 
-        public Fleeing(Entities.Creature c) : base(c) 
-        { 
+        public Fleeing(Entities.Creature c) : base(c)
+        {
             creature = c;
-            modifier = 1.1f - (creature.stats.GroundSpeed / 150f);  // TODO: Que dependa bien de stats
+            modifier = 1.1f - (creature.stats.GroundSpeed / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) * UniverseParametersManager.parameters.fleeingCostMultiplier);
         }
 
         public override int GetCost()
         {
-            return (int)(1000 * ((200f - creature.stats.GroundSpeed) / 100f) * modifier);
+            return (int)(UniverseParametersManager.parameters.baseActionCost * ((creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) - creature.stats.GroundSpeed) / (creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) / 2)) * modifier);
         }
 
         public override void Action()
@@ -32,11 +32,12 @@ namespace EvolutionSimulation.FSM.Creature.States
                 normY = deltaY == 0 ? 0 : deltaY / Math.Abs(deltaY);  // as you can only move once per actions (nut can have multiple actions per tick)
 
             if (creature.x == creature.GetClosestCreature().x && creature.y == creature.GetClosestCreature().y) // If it is in the same tile, go in a random direction
-                do {
+                do
+                {
                     normX = RandomGenerator.Next(-1, 2);
                     normY = RandomGenerator.Next(-1, 2);
                 } while (normX == 0 && normY == 0);
-            
+
             if (creature.world.canMove(creature.x - normX, creature.y - normY))
             {
                 creature.Place(creature.x - normX, creature.y - normY);

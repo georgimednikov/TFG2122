@@ -7,7 +7,7 @@ namespace EvolutionSimulation.Entities
     {
         private class MemoryTileInfo
         {
-            //Te tile's position relative to the world.
+            //The tile's position relative to the world.
             public int x;
             public int y;
 
@@ -32,7 +32,7 @@ namespace EvolutionSimulation.Entities
         List<MemoryTileInfo> rememberedTiles;
         MemoryTileComparer comparer;
         int maxTicksUnchecked;
-        int perceptionRadius;   //Radius around the creature in which it percieves the world.
+        int perceptionRadius;   //Radius around the creature in which it perceives the world.
         int dangerRadius;       //Radius around a tile in which the tile's danger spreads.
 
         Creature closestCreature;
@@ -73,7 +73,7 @@ namespace EvolutionSimulation.Entities
             rememberedTiles = new List<MemoryTileInfo>();
             comparer = new MemoryTileComparer(thisCreature);
 
-            maxTicksUnchecked = thisCreature.stats.Knowledge * 500; //  TODO: Esto bien
+            maxTicksUnchecked = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
             perceptionRadius = /*thisCreature.stats.Perception*/ 5; // TODO: Perception es literalmente 0, eso no vale así que hay que arreglarlo
             dangerRadius = thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness;
         }

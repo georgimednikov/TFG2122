@@ -15,6 +15,7 @@ namespace VisualizadorConsola
     {
         public void Init()
         {
+            UniverseParametersManager.ReadJSON();
             world = new World();
             world.Init(32);
             Console.WriteLine("\n");

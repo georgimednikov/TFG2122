@@ -84,7 +84,7 @@ namespace EvolutionSimulation.Entities
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
 
             // Action points added every tick 
-            ActionPoints += stats.Metabolism * 10;
+            ActionPoints += stats.Metabolism * (int)Math.Ceiling((float)UniverseParametersManager.parameters.baseActionCost / (chromosome.GetFeatureMax(CreatureFeature.Metabolism) / 2));
             
             // Executes the state action if the creature has enough Action Points
             int cost = 0;
@@ -617,8 +617,8 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public int GetTreeThreshold(double treeDensity)
         {
-            double a = 2 * (int)HeightLayer.Tree * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / 100f);
-            double b = treeDensity * (stats.GroundSpeed / 100f + Tree.movementPenalty - stats.ArborealSpeed / 100f - 1);
+            double a = 2 * (int)HeightLayer.Tree * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2));
+            double b = treeDensity * (stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) + Tree.movementPenalty - stats.ArborealSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) - 1);
             return (int)Math.Floor((a / b) + 0.5);
         }
 
@@ -627,9 +627,9 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         int GetFlyThreshold(double treeDensity)
         {
-            double a = 2 * (int)HeightLayer.Air * (stats.GroundSpeed / 100f * (1 - treeDensity) + treeDensity * stats.AerialSpeed / 100f);
-            double b = -2 * stats.AerialSpeed / 100f * (int)HeightLayer.Tree * treeDensity;
-            double c = stats.AerialSpeed / 100f + stats.GroundSpeed / 100f * (treeDensity - 1) - treeDensity * stats.ArborealSpeed / 100f;
+            double a = 2 * (int)HeightLayer.Air * (stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) * (1 - treeDensity) + treeDensity * stats.AerialSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2));
+            double b = -2 * stats.AerialSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) * (int)HeightLayer.Tree * treeDensity;
+            double c = stats.AerialSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) + stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) * (treeDensity - 1) - treeDensity * stats.ArborealSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2);
             return (int)Math.Floor(((a + b) / c) + 0.5);
         }
 
@@ -671,8 +671,8 @@ namespace EvolutionSimulation.Entities
                     break;
             }
             if (world.map[x, y].plant is Tree || world.map[x, y].plant is EdibleTree)
-                return (int)(1000 * ((200f - speed * (2 - Tree.movementPenalty)) / 100f));
-            return (int)(1000 * ((200f - speed) / 100f));
+                return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed * (2 - Tree.movementPenalty)) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2)));
+            return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2)));
         }
 
         /// <summary>

@@ -10,7 +10,7 @@
         // This move is energy netural, costing the same nergy that is obtained in a tick
         public override int GetCost()
         {
-            return 10 * creature.stats.Metabolism;
+            return UniverseParametersManager.parameters.sleepingCostMultiplier * creature.stats.Metabolism;
         }
 
         // Increases current rest

@@ -135,6 +135,7 @@
     <Compile Include="src\Genetics\GeneticTaxonomy.cs" />
     <Compile Include="src\Entities\Grass.cs" />
     <Compile Include="src\NameGenerator.cs" />
+    <Compile Include="src\UniverseParameters.cs" />
     <Compile Include="src\Utils\PriorityQueue.cs" />
     <Compile Include="src\RandomGenerator.cs" />
     <Compile Include="src\Entities\Corpse.cs" />
