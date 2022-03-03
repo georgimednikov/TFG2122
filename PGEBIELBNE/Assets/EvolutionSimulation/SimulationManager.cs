@@ -7,15 +7,18 @@ namespace EvolutionSimulation.Unity
     public class SimulationManager : MonoBehaviour
     {
         public int SimulationYears;
+        public CreatureManager creatureManager;
 
-        //CreatureManager
         UnitySimulation simulation;
         void Start()
         {
             simulation = new UnitySimulation();
-            simulation.Init();
+
             simulation.yearsToSimulate = SimulationYears;
+            simulation.Init();
             simulation.Run();
+
+            simulation.Subscribe(creatureManager);
         }
 
         void Update()

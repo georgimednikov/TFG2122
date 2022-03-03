@@ -133,6 +133,7 @@
     <Compile Include="src\Genetics\GeneticTaxonomy.cs" />
     <Compile Include="src\Entities\Grass.cs" />
     <Compile Include="src\NameGenerator.cs" />
+    <Compile Include="src\Utils\ListenerPattern.cs" />
     <Compile Include="src\Utils\PriorityQueue.cs" />
     <Compile Include="src\RandomGenerator.cs" />
     <Compile Include="src\Entities\Corpse.cs" />
@@ -174,6 +175,6 @@
   <PropertyGroup>
     <PostBuildEvent>if not exist assets\ mkdir assets\
 xcopy ..\assets assets\ /H /E /Y
-xcopy *.dll ..\..\..\PGEBIELBNE\Assets\Plugins</PostBuildEvent>
+xcopy *.dll ..\..\..\PGEBIELBNE\Assets\Plugins /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>
