@@ -272,7 +272,7 @@ namespace EvolutionSimulation.Entities
                 if (closestAlly == null) closestAlly = tile.allies[0];
                 if (closestPossibleMate == null)
                     foreach (Creature creature in tile.allies)
-                        if (creature.stats.InHeat) closestPossibleMate = creature;
+                        if (creature.wantMate) closestPossibleMate = creature;
             }
             if (closestCorpse == null && tile.corpses.Count > 0)
                 closestCorpse = tile.corpses[0];

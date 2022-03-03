@@ -21,8 +21,11 @@ namespace VisualizadorConsola
             WorldToBmp();
             
             Animal c = world.CreateCreature<Animal>(5, 3);
-            c.stats.CurrEnergy = c.stats.MaxEnergy * 0.2f;
-            c = world.CreateCreature<Animal>(5, 5); // Enemy?
+            c.stats.Aggressiveness = 0;
+            c.stats.Metabolism = 200;
+            Animal d = world.CreateCreature<Animal>(5, 5); // Enemy
+            d.stats.Aggressiveness = 50;
+            d.stats.Metabolism = 50;
             //Corpse c1 = world.CreateStableEntity<Corpse>();
             //c1.Init(c.world, 5, c.x, c.y+1, 0.4f, 0.7f, 5, 5, 80f); // TODO: stats to be derived from creacher
 

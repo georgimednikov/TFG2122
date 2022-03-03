@@ -111,7 +111,9 @@
     <Compile Include="src\FSM\Creature\Transitions\DieTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\DrinkingTransition\DrinkingExploreTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\EatingTransition\StopGoToEatTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\GoToSafePlaceTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\Sleep\StopGoToSafePlaceTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\Sleep\SafePlaceExploreTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\Sleep\GoToSafePlaceTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\EatingTransition\HungerExploreTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition\MatingTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\DrinkingTransition\StopGoToDrinkTransition.cs" />
@@ -123,11 +125,11 @@
     <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition\TryMateTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\EatingTransition\EatingTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\DrinkingTransition\DrinkingTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\SleepySafeTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\Sleep\SleepySafeTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\DrinkingTransition\ThirstyTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition\GoToMateTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\WakeTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\SleepyTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\Sleep\WakeTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\Sleep\SleepyTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\EatingTransition\HungerTransition.cs" />
     <Compile Include="src\FSM\Fsm.cs" />
     <Compile Include="src\Genetics\GeneticTaxonomy.cs" />

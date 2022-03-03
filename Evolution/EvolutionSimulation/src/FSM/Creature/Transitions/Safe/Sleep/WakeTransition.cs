@@ -2,6 +2,7 @@
 {
     /// <summary>
     /// Checks if the creature has rest enough
+    /// Sleeping -> Wander
     /// </summary>
     class WakeTransition : CreatureTransition
     {

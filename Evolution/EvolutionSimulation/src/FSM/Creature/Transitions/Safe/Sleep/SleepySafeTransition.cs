@@ -4,6 +4,7 @@
     /// The creature is in a safe place (probably with other creatures of his species)
     /// and want to sleep. If the creature is exhausted, it goes to sleep although it is 
     /// not in a safe place
+    /// GoToSafePlace -> Sleeping
     /// </summary>
     class SleepySafeTransition : CreatureTransition
     {
@@ -12,10 +13,13 @@
             this.creature = creature;
         }
 
+        /// <summary>
+        /// Check is is tired and close to the safe place or is exhausted
+        /// </summary>
         public override bool Evaluate()
         {
-            //TODO comprobar que es un sitio seguro
-            return (creature.IsTired() /*&& safeplace*/)
+            int xObj= creature.GetClosestSafePlace().Item1, yObj = creature.GetClosestSafePlace().Item2;
+            return (creature.IsTired() && creature.DistanceToObjective(xObj, yObj) <= 1)
                 || creature.IsExhausted();
         }
 

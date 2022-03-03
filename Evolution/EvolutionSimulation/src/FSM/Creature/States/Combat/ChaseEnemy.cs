@@ -23,12 +23,17 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            objX = -1;
-            objY = -1;  // This will trigger a path set on its next action
+            Entities.Creature objective = creature.GetClosestCreatureReachable();
+            objX = objective.x;
+            objY = objective.y; 
+            creature.SetPath(objX, objY);   // This MUST be set up for the cost of the action to work
         }
 
         public override void Action()
         {
+            Vector3 nextPos = creature.GetNextPosOnPath();  // Follow the specified path
+            creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+
             Entities.Creature objective = creature.GetClosestCreatureReachable();   // This is NOT cached because objective can change to another creature
             if (objX != objective.x ||  // If objective is somewhere else,
                 objY != objective.y)    // adjust path accordingly
@@ -37,9 +42,8 @@ namespace EvolutionSimulation.FSM.Creature.States
                 objY = objective.y;
                 creature.SetPath(objX, objY);   // Set the path the creature must follow
             }
-
-            Vector3 nextPos = creature.GetNextPosOnPath();  // Follow the specified path
-            creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+            // All of this is done AFTER the action due to the fact that GetCost reflects the cost of the older path
+            // Were it to be changed BEFORE, the new position's cost may not be the same as the one returned before
         }
 
         public override string ToString()
