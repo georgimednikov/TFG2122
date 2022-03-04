@@ -56,10 +56,10 @@ namespace EvolutionSimulation.FSM.Creature.States
                     normY = RandomGenerator.Next(-1, 2);
                 } while (normX == 0 && normY == 0);
 
-            int xSum = 0, ySum = 0;
-            while (creature.world.canMove(creature.x + xSum - normX, creature.y + ySum - normY))  // Attempts to find the point furthest aay from attacker
+            int xSum = 0, ySum = 0; // TODO: Debe depender de vision
+            while (creature.world.canMove(creature.x + xSum - normX, creature.y + ySum - normY))  // Attempts to find the point furthest away from attacker
             {
-                xSum -= normX;
+                xSum -= normX; 
                 ySum -= normY;
             }
 
@@ -88,7 +88,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 else
                     creature.SetPath(pathX, pathY);
             }
-            Console.WriteLine(creature.speciesName + " FLEE");
+            Console.WriteLine(creature.speciesName + " FLEES (" + creature.x + ", " + creature.y + ")");
         }
 
         public override string ToString()

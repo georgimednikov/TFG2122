@@ -42,7 +42,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 objY = objective.y;
                 creature.SetPath(objX, objY);   // Set the path the creature must follow
             }
-            Console.WriteLine(creature.speciesName + " CHASE");
+            Console.WriteLine(creature.speciesName + " CHASES " + objective.speciesName);
             // All of this is done AFTER the action due to the fact that GetCost reflects the cost of the older path
             // Were it to be changed BEFORE, the new position's cost may not be the same as the one returned before
         }
