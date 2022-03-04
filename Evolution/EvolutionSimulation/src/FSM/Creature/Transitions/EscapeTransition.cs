@@ -17,7 +17,8 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         {
             return (creature.GetClosestCreature() != null || creature.hasBeenHit)
                 && (creature.stats.Aggressiveness < 0.5 * (float)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) ||  // Inferior to 50% equals non-aggresive
-                creature.stats.CurrHealth < creature.stats.MaxHealth * threshold);  // So even an aggresive creature has self-preservation instincts
+                creature.stats.CurrHealth < creature.stats.MaxHealth * threshold)   // So even an aggresive creature has self-preservation instincts
+                && !creature.cornered;
             //TODO: revisar entidades vistas y considerar agresividad
         }
 

@@ -210,7 +210,7 @@ namespace EvolutionSimulation.Entities
             IState goToSafePlace = new GoToSafePlace(this);
             IState sleep = new Sleeping(this);
             Fsm safeFSM = new Fsm(wander);
-            IState safe = new CompoundState("Safe", safeFSM);
+            IState safe = new CalmState("Safe", safeFSM, this);
 
 
             // Sleeping

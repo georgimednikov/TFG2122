@@ -86,6 +86,7 @@
     <Compile Include="src\Entities\Tree.cs" />
     <Compile Include="src\FSM\CompoundState.cs" />
     <Compile Include="src\FSM\Creature\States\Combat\ChaseEnemy.cs" />
+    <Compile Include="src\FSM\Creature\States\CalmState.cs" />
     <Compile Include="src\FSM\Creature\States\Dead.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\GoToMate.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\GoToSafePlace.cs" />

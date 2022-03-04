@@ -29,17 +29,17 @@ namespace EvolutionSimulation.FSM
         /// Evaluates transitions of the substates and returns the cost
         /// of the target substate
         /// </summary>
-        public int GetCost()
+        public virtual int GetCost()
         {
             return stateMachine.EvaluateCost();
         }
 
-        public void OnEntry()
+        public virtual void OnEntry()
         {
             stateMachine.CurrentState.OnEntry();
         }
 
-        public void OnExit()
+        public virtual void OnExit()
         {
             stateMachine.CurrentState.OnExit();
         }
