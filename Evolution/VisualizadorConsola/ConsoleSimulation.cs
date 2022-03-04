@@ -19,11 +19,12 @@ namespace VisualizadorConsola
             world = new World();
             world.Init(320);
             Console.WriteLine("\n");
-            WorldToBmp();
+            //WorldToBmp();
             
             Animal c = world.CreateCreature<Animal>(5, 3);
             c.stats.Aggressiveness = 0;
             c.stats.Metabolism = 200;
+            c.SetPath(30, 30);
             //Animal d = world.CreateCreature<Animal>(5, 5); // Enemy
             //d.stats.Aggressiveness = 100;
             //d.stats.Metabolism = 100;

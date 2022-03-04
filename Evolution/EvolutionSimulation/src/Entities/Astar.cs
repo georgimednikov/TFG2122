@@ -114,7 +114,7 @@ namespace EvolutionSimulation.Entities
             Vector3 dirAux = start;
             int ntiles = 0;
             treeDensity = 0;
-            while ((dirAux - end).Length() > 1)
+            while ((dirAux - end).Length() > 0.75)
             {
                 if (w.isTree((int)Math.Round(dirAux.X), (int)Math.Round(dirAux.Y)))
                     treeDensity++;
