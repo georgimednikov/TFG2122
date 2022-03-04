@@ -7,23 +7,23 @@ namespace EvolutionSimulation.Entities
     {
         private class MemoryTileInfo
         {
-            //Te tile's position relative to the world.
+            //The tile's position relative to the world.
             public int x;
             public int y;
 
-            public int ticksUnchecked; //Number of ticks since the tile has been seen for the last time.
-            public bool discovered; //Whether this tile has been discovered by the creature at some point.
+            public int ticksUnchecked;  //Number of ticks since the tile has been seen for the last time.
+            public bool discovered;     //Whether this tile has been discovered by the creature at some point.
 
-            public float experienceDanger; //How dangerous the creature has experienced the tile to be.
-            public float tangibleDanger; //How dangerous the creature rekons the tile is.
+            public float experienceDanger;  //How dangerous the creature has experienced the tile to be.
+            public float tangibleDanger;    //How dangerous the creature rekons the tile is.
 
             public bool water;
-            public bool fruit; //Whether there is fruit in this tile.
+            public bool fruit;  //Whether there is fruit in this tile.
 
             //TODO: Puede que estas dos listas se puedan simplificar para que no contengan tanta informacion
             public List<Creature> creatures = new List<Creature>(); //The list of creatures of a different species
-            public List<Creature> allies = new List<Creature>(); //The list of creatures of the same species
-            public List<Corpse> corpses = new List<Corpse>(); //The nutritional value of each edible corpse seen.
+            public List<Creature> allies = new List<Creature>();    //The list of creatures of the same species
+            public List<Corpse> corpses = new List<Corpse>();       //The nutritional value of each edible corpse seen.
         }
 
         Creature thisCreature;
@@ -32,8 +32,8 @@ namespace EvolutionSimulation.Entities
         List<MemoryTileInfo> rememberedTiles;
         MemoryTileComparer comparer;
         int maxTicksUnchecked;
-        int perceptionRadius; //Radius around the creature in which it percieves the world.
-        int dangerRadius; //Radius around a tile in which the tile's danger spreads.
+        int perceptionRadius;   //Radius around the creature in which it perceives the world.
+        int dangerRadius;       //Radius around a tile in which the tile's danger spreads.
 
         Creature closestCreature;
         Creature closestCreatureReachable;
@@ -71,8 +71,8 @@ namespace EvolutionSimulation.Entities
             rememberedTiles = new List<MemoryTileInfo>();
             comparer = new MemoryTileComparer(thisCreature);
 
-            maxTicksUnchecked = thisCreature.stats.Knowledge * 500; //TODO: Esto bien
-            perceptionRadius = thisCreature.stats.Perception;
+            maxTicksUnchecked = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
+            perceptionRadius = /*thisCreature.stats.Perception*/ 5; // TODO: Perception es literalmente 0, eso no vale así que hay que arreglarlo
             dangerRadius = thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness;
 
             GetNewUndiscoveredPlace();
@@ -272,7 +272,7 @@ namespace EvolutionSimulation.Entities
                 if (closestAlly == null) closestAlly = tile.allies[0];
                 if (closestPossibleMate == null)
                     foreach (Creature creature in tile.allies)
-                        if (creature.stats.InHeat) closestPossibleMate = creature;
+                        if (creature.wantMate) closestPossibleMate = creature;
             }
             if (closestCorpse == null && tile.corpses.Count > 0)
                 closestCorpse = tile.corpses[0];

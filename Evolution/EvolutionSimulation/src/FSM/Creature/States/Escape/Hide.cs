@@ -11,7 +11,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override int GetCost()
         {
-            return (int)(1000 * ((200f - creature.stats.GroundSpeed) / 100f));
+            return (int)(UniverseParametersManager.parameters.baseActionCost * ((creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) - creature.stats.GroundSpeed) / (creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) / 2)));
         }
 
         public override void Action()    // TODO: Que es esconderse?

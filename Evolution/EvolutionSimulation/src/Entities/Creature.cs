@@ -76,37 +76,16 @@ namespace EvolutionSimulation.Entities
             //toWake.value = (stats.CurrRest >= stats.MaxRest);
 
             stats.CurrRest -= stats.RestExpense;
-            
-            if(stats.Gender == Gender.Female && !stats.IsNewBorn())
-            {
-                if (timeToBeInHeat == 0)//Can be pregnant
-                    stats.InHeat = true;
-                else if (timeToBeInHeat <= -1)// Pregnant, reset timer
-                {
-                    timeToBeInHeat = stats.TimeBetweenHeats;
-                    stats.InHeat = false;
-                }
-                else
-                    timeToBeInHeat--;
 
-                //if the female has to do something, she doesn't want to mate
-                if (stats.CurrEnergy < stats.veryHungerThreshold * stats.MaxEnergy
-                    || stats.CurrRest < stats.exhaustThreshold * stats.MaxRest
-                    || stats.CurrHydration < stats.veryThirstyThreshold * stats.MaxHydration
-                    || mating || !stats.InHeat)
-                {
-                    wantMate = false;
-                }
-                else wantMate = true;
-            }
+            FemaleTick();
 
             memory.Update();
             foreach (Status.Status s in activeStatus)   // Activates each status effect
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
 
             // Action points added every tick 
-            ActionPoints += stats.Metabolism * 10;
-
+            ActionPoints += stats.Metabolism * (int)Math.Ceiling((float)UniverseParametersManager.parameters.baseActionCost / (chromosome.GetFeatureMax(CreatureFeature.Metabolism) / 2));
+            
             // Executes the state action if the creature has enough Action Points
             int cost = 0;
             while ((cost = mfsm.EvaluateCost()) <= ActionPoints)
@@ -128,6 +107,34 @@ namespace EvolutionSimulation.Entities
             foreach (Status.Status s in removedStatus)
                 activeStatus.Remove(s);
             removedStatus.Clear();
+        }
+
+        /// <summary>
+        /// Update the inHeat stat of a female.
+        /// Also check if she want to mate or not
+        /// </summary>
+        void FemaleTick()
+        {
+            if (stats.Gender == Gender.Female && !stats.IsNewBorn())
+            {
+                if (timeToBeInHeat == 0)//Can be pregnant
+                    stats.InHeat = true;
+                else if (timeToBeInHeat <= -1)// Pregnant, reset timer
+                {
+                    timeToBeInHeat = stats.TimeBetweenHeats;
+                    stats.InHeat = false;
+                }
+                else
+                    timeToBeInHeat--;
+
+                //if the female has to do something, she doesn't want to mate
+                if (IsExhausted() || IsVeryHungry() || IsVeryThirsty()
+                    || mating || !stats.InHeat)
+                {
+                    wantMate = false;
+                }
+                else wantMate = true;
+            }
         }
 
         #region Genetics and Taxonomy
@@ -166,7 +173,6 @@ namespace EvolutionSimulation.Entities
         /// If a female want to mate, its false if she has needs like
         /// sleep or eat or is mating
         /// </summary>
-        //TODO igual si estas en el estado mating y te atacan o muere la criatura con la que estas relacionandote esto hay que ponerlo a false
         public bool wantMate = false;
         /// <summary>
         /// If a creatures is mating
@@ -230,6 +236,9 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToMate, tryMateTransition, tryMate);
             safeFSM.AddTransition(goToMate, stopGoToMateTransition, wander);
             safeFSM.AddTransition(tryMate, matingTransition, mating);
+            safeFSM.AddTransition(goToDrink, matingTransition, mating);
+            safeFSM.AddTransition(goToEat, matingTransition, mating);
+            safeFSM.AddTransition(goToSafePlace, matingTransition, mating);
             safeFSM.AddTransition(tryMate, stopTryMateTransition, wander);
             safeFSM.AddTransition(mating, stopMatingTransition, wander);
 
@@ -502,7 +511,7 @@ namespace EvolutionSimulation.Entities
         }
 
         // Memory related information
-        Memory memory;
+        public Memory memory;
 
         /// <summary>
         /// Check if the eating objective is not null
@@ -522,6 +531,7 @@ namespace EvolutionSimulation.Entities
 
             return false;
         }
+
         public Creature GetClosestAlly() { return memory.ClosestAlly(); }
         public Creature GetClosestPossibleMate() { return memory.ClosestPossibleMate(); }
         public Creature GetClosestCreature() { return memory.ClosestCreature(); }
@@ -590,12 +600,27 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
+        /// Calculate the distance between the creature and the given pos
+        /// </summary>
+        /// <returns> Distance between creature and pos. intMaxValue if out of the map </returns>
+        public int DistanceToObjective(int xObj, int yObj)
+        {
+            if (!world.checkBounds(xObj, yObj)) return int.MaxValue;
+
+            int x1, y1;
+            x1 = Math.Abs(x - xObj);
+            y1 = Math.Abs(y - yObj);
+
+            return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
+        }
+
+        /// <summary>
         /// Returns minimal path length for arboreal movement being more efficient than ground.
         /// </summary>
         public int GetTreeThreshold(double treeDensity)
         {
-            double a = 2 * (int)HeightLayer.Tree * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / 100f);
-            double b = treeDensity * (stats.GroundSpeed / 100f + Tree.movementPenalty - stats.ArborealSpeed / 100f - 1);
+            double a = 2 * (int)HeightLayer.Tree * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2));
+            double b = treeDensity * (stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) + Tree.movementPenalty - stats.ArborealSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) - 1);
             return (int)Math.Floor((a / b) + 0.5);
         }
 
@@ -604,9 +629,9 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         int GetFlyThreshold(double treeDensity)
         {
-            double a = 2 * (int)HeightLayer.Air * (stats.GroundSpeed / 100f * (1 - treeDensity) + treeDensity * stats.AerialSpeed / 100f);
-            double b = -2 * stats.AerialSpeed / 100f * (int)HeightLayer.Tree * treeDensity;
-            double c = stats.AerialSpeed / 100f + stats.GroundSpeed / 100f * (treeDensity - 1) - treeDensity * stats.ArborealSpeed / 100f;
+            double a = 2 * (int)HeightLayer.Air * (stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) * (1 - treeDensity) + treeDensity * stats.AerialSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2));
+            double b = -2 * stats.AerialSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) * (int)HeightLayer.Tree * treeDensity;
+            double c = stats.AerialSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) + stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) * (treeDensity - 1) - treeDensity * stats.ArborealSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2);
             return (int)Math.Floor(((a + b) / c) + 0.5);
         }
 
@@ -632,6 +657,10 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public int GetNextCostOnPath()
         {
+            // TODO Hay que tener en cuenta el path sea de longuitud 0
+            if (path == null || path.Length == 0)
+                return 0;
+
             int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
             int speed;
             switch ((int)path[pathIterator].Z)
@@ -648,8 +677,8 @@ namespace EvolutionSimulation.Entities
                     break;
             }
             if (world.map[x, y].plant is Tree || world.map[x, y].plant is EdibleTree)
-                return (int)(1000 * ((200f - speed * (2 - Tree.movementPenalty)) / 100f));
-            return (int)(1000 * ((200f - speed) / 100f));
+                return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed * (2 - Tree.movementPenalty)) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2)));
+            return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2)));
         }
 
         /// <summary>

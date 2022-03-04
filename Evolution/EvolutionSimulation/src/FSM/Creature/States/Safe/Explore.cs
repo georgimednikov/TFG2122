@@ -40,7 +40,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (creature.IsHungry() && !creature.HasEatingObjective()) Console.WriteLine("Comida");
 
             Vector3 nextPos = creature.GetNextPosOnPath();
-            if (nextPos.X < 0)
+            if (nextPos.X < 0 || nextPos.Y < 0)
             {
                 Tuple<int, int> posToDiscover = creature.GetUndiscoveredPlace();
                 Console.WriteLine("SetPath de Explore Action");

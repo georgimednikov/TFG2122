@@ -2,6 +2,9 @@
 
 namespace EvolutionSimulation.FSM.Creature.States
 {
+    /// <summary>
+    /// The creature is sleeping, he recover Rest
+    /// </summary>
     class Sleeping : CreatureState
     {
         public Sleeping(Entities.Creature c) : base(c) { creature = c; }
@@ -9,7 +12,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         // This move is energy netural, costing the same nergy that is obtained in a tick
         public override int GetCost()
         {
-            return 10 * creature.stats.Metabolism;
+            return UniverseParametersManager.parameters.sleepingCostMultiplier * creature.stats.Metabolism;
         }
 
         // Increases current rest
@@ -20,6 +23,8 @@ namespace EvolutionSimulation.FSM.Creature.States
             creature.stats.CurrRest += creature.stats.RestRecovery;
             if (creature.stats.CurrRest > creature.stats.MaxRest)
                 creature.stats.CurrRest = creature.stats.MaxRest;
+
+            Console.WriteLine("Sleeping action");
         }
 
         public override string ToString()

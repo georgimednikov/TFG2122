@@ -3,8 +3,8 @@
 namespace EvolutionSimulation.FSM.Creature.States
 {
     /// <summary>
-    /// Action that eat an edible plant or a corpse depending on the creature's diet
-    /// gaining some energy
+    /// Action that a creature eats an edible plant or a corpse depending on
+    /// the creature's diet gaining some energy
     /// </summary>
     class Eating : CreatureState
     {
@@ -12,7 +12,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override int GetCost()
         {
-            return 10 * creature.stats.Metabolism;
+            return UniverseParametersManager.parameters.eatingCostMultiplier * creature.stats.Metabolism;
         }
 
         public override void Action()
@@ -34,7 +34,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                     EatCorpse();
                 else
                 {
-                    //Eat the nearest food (nearestEdiblePlant or Corpse)
+                    //Eat the nearest food (nearest Fruit or Corpse)
                     int distPlant = creature.DistanceToObjective(creature.GetClosestFruit()),
                         distCorpse = creature.DistanceToObjective(creature.GetClosestCorpse());
                     if (distPlant < distCorpse)

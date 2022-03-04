@@ -90,11 +90,10 @@ namespace EvolutionSimulation.Entities
             Console.WriteLine("Sale del segundo bucle");
             treeDensity = ((float)passedTrees) / ((float)path.Count);
             path.Reverse();
-            Vector3[] retPath = new Vector3[path.Count];
-            Console.WriteLine("Path count: " + path.Count);
-            for (int i = 0; i < path.Count; ++i)
+            Vector3[] retPath = new Vector3[path.Count - 1];
+            for (int i = 1; i < path.Count; ++i)
             {
-                retPath[i] = path[i].pos;
+                retPath[i - 1] = path[i].pos;
             }
             Console.WriteLine("Acaba Astar");
             return retPath;
@@ -146,7 +145,7 @@ namespace EvolutionSimulation.Entities
                 {
                     Vector3 newPos;
                     if (i == 0 && j == 0 && w.canMove(newPos = (new Vector3(n.pos.X + i, n.pos.Y + j, n.pos.Z == (int)Creature.HeightLayer.Tree ? (int)Creature.HeightLayer.Ground : (int)Creature.HeightLayer.Tree))))
-                        neigh.Add(new GraphNode(newPos, n, n.costSoFar + (treeBetter ? 0 : (int)Creature.HeightLayer.Tree)));
+                        neigh.Add(new GraphNode(newPos, n, n.costSoFar + (treeBetter ? 0 : (int)Creature.HeightLayer.Tree) - c.memory.GetPositionDanger((int)n.pos.X, (int)n.pos.Y)));
                     else if (w.canMove(newPos = (n.pos + new Vector3(i, j, 0))))
                     {
                         double costSoFar = n.costSoFar;
@@ -155,7 +154,7 @@ namespace EvolutionSimulation.Entities
                         if (p is Tree) costSoFar += (2 - Tree.movementPenalty);
                         else if (p is EdibleTree) costSoFar += (2 - EdibleTree.movementPenalty);
                         else costSoFar += 1;
-                        neigh.Add(new GraphNode(newPos, n, costSoFar));
+                        neigh.Add(new GraphNode(newPos, n, costSoFar - c.memory.GetPositionDanger((int)n.pos.X + i, (int)n.pos.Y + j)));
                     }
                 }
             return neigh;
