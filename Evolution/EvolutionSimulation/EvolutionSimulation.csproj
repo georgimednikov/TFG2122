@@ -110,12 +110,11 @@
     <Compile Include="src\FSM\Creature\Transitions\CombatTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\DieTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\DoneExploringTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\SafePlaceExploreTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\Sleep\SafePlaceExploreTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition\MatingExploreTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\DrinkingTransition\DrinkingExploreTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\EatingTransition\StopGoToEatTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\Sleep\StopGoToSafePlaceTransition.cs" />
-    <Compile Include="src\FSM\Creature\Transitions\Safe\Sleep\SafePlaceExploreTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\Sleep\GoToSafePlaceTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\EatingTransition\HungerExploreTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition\MatingTransition.cs" />

@@ -1,7 +1,7 @@
 ﻿namespace EvolutionSimulation.FSM.Creature.Transitions
 {
     /// <summary>
-    /// Checks if the creature is tired and do not know a safe place
+    /// Checks if a creature needs to find a safe and does not know where to go
     /// Wander -> Explore
     /// </summary>
     class SafePlaceExploreTransition : CreatureTransition
@@ -13,13 +13,12 @@
 
         public override bool Evaluate()
         {
-            
-            return creature.IsTired() && creature.GetClosestSafePlace() == null;
+            return creature.GetClosestSafePlace() == null;
         }
 
         public override string ToString()
         {
-            return "SafePlaceExploreTransition";
+            return "MateExploreTransition";
         }
 
     }
