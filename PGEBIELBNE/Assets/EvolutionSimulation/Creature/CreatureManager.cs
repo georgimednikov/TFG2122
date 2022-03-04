@@ -1,9 +1,12 @@
-using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using EvolutionSimulation;
+using EvolutionSimulation.Genetics;
 
 namespace EvolutionSimulation.Unity
 {
-    public class InterpretJSON : MonoBehaviour
+    public class CreatureManager : MonoBehaviour
     {
         public GameObject body;
         public GameObject[] legs;
@@ -21,41 +24,53 @@ namespace EvolutionSimulation.Unity
         float sizeScale;
 
         float baseHeight;
-        
-        public void CreateCreature(TextAsset json)
+
+        public void InitalizeCreature(Entities.Creature creature)
         {
-            SpeciesExport creature = Newtonsoft.Json.JsonConvert.DeserializeObject<SpeciesExport>(json.text);
+            SpeciesExport species = new SpeciesExport(creature.speciesName, creature.stats);
+            Init(species);
+        }
+        public void InitalizeCreature(TextAsset json)
+        {
+            SpeciesExport species = Newtonsoft.Json.JsonConvert.DeserializeObject<SpeciesExport>(json.text);
+            Init(species);
+        }
+        void Init(SpeciesExport species)
+        {
+            
             //SpeciesExport creature = JsonUtility.FromJson<SpeciesExport>(json.text);
-            sizeScale = creature.stats.ModifyStatByAge(creature.stats.Size) / 100f;
+            sizeScale = species.stats.Size / 100f;
             baseHeight = sizeScale / 1.25f;
             bodyEmpty = new GameObject("BodyEmpty").transform;
             bodyEmpty.parent = transform;
             bodyEmpty.localPosition = Vector3.zero;
             bodyEmpty.Translate(Vector3.up * (sizeScale + baseHeight));
 
-            InstantiateBody(creature);
+            InstantiateBody(species);
 
-            InstantiateMouth(creature);
+            InstantiateMouth(species);
 
             // InstantiateArmour(creature);
 
-            InstantiateSpikes(creature);
+            InstantiateSpikes(species);
 
-            InstantiateHair(creature);
+            InstantiateHair(species);
 
-            InstantiateBeard(creature);
+            InstantiateBeard(species);
 
-            InstantiateWings(creature);
+            InstantiateWings(species);
 
-            if (creature.stats.Upright)
+            if (species.stats.Upright)
             {
                 bodyEmpty.transform.Rotate(Vector3.right * -90);
             }
 
-            InstantiateStatusBar(creature);
+            InstantiateStatusBar(species);
 
-            InstantiateLegs(creature);
+            InstantiateLegs(species);
         }
+
+        #region Creature Meshes
 
         private void InstantiateMouth(SpeciesExport creature)
         {
@@ -153,5 +168,7 @@ namespace EvolutionSimulation.Unity
             go.transform.localScale = Vector3.one * sizeScale;
             go.transform.Translate(Vector3.up * 3 * (sizeScale + baseHeight));
         }
+        #endregion
     }
 }
+

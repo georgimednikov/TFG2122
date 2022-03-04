@@ -8,8 +8,8 @@ namespace EvolutionSimulation.Entities
     /// </summary>
     public abstract class Plant : StaticEntity
     {
-        public int x { get; private set; }
-        public int y { get; private set; }
+        public int x { get; protected set; }
+        public int y { get; protected set; }
 
         virtual public void Tick()
         {

@@ -5,7 +5,7 @@ using EvolutionSimulation;
 using EvolutionSimulation.Entities;
 using EvolutionSimulation.Utils;
 
-public class CreatureManager : MonoBehaviour, IListener<World>
+public class WorldCreaturesManager : MonoBehaviour, IListener<World>
 {
     public GameObject creaturePrefab;
     public void OnNotify(World info)

@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7305408888903237958}
-  - component: {fileID: 7305408888903237957}
+  - component: {fileID: 7187816045978883168}
   m_Layer: 0
   m_Name: Creature
   m_TagString: Untagged
@@ -31,7 +31,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7305408888903237957
+--- !u!114 &7187816045978883168
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -40,13 +40,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 7305408888903237956}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e89c9d7d9b73e41448c8820513e7edc3, type: 3}
+  m_Script: {fileID: 11500000, guid: a3f1824e1f686754f97fd1c980d91295, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   body: {fileID: 7887754594758098477, guid: d72611e8dd38e8f4c920d190d6db3bdf, type: 3}
   legs:
-  - {fileID: 919132149155446097, guid: dbcd1670b667cb94ca3ecee1d8934f34, type: 3}
   - {fileID: 919132149155446097, guid: b888f2836c9ad3744ad5b866daa577d4, type: 3}
+  - {fileID: 919132149155446097, guid: dbcd1670b667cb94ca3ecee1d8934f34, type: 3}
   - {fileID: 919132149155446097, guid: fc7205d6997f6e047bb092c35a5c73f3, type: 3}
   mouths:
   - {fileID: 919132149155446097, guid: 9b741b14d19f8534ea81b31067a9ebce, type: 3}
