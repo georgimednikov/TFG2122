@@ -113,7 +113,7 @@ namespace EvolutionSimulation.Genetics
                 throw new Exception("Cannot find JSON with chromosome information");
             string file = File.ReadAllText(json);
             List<Gene> genes = JsonConvert.DeserializeObject<List<Gene>>(file);
-
+            Validator.Validate(genes);
             SetStructure(genes);
         }
 
@@ -124,9 +124,6 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         public static void SetStructure(List<Gene> genes)
         {
-            if (genes.Count != (int)CreatureFeature.Count)
-                throw new Exception("The number of genes and max values must be the same as the total features");
-            
             geneInfo = genes.ToArray();
             geneMaxValues = new int[genes.Count];
             for (int i = 0; i < genes.Count; ++i)
@@ -150,13 +147,10 @@ namespace EvolutionSimulation.Genetics
                     //In other words, a negative relation may not modify the value, but if it is accounted for it would add extra bits surpassing the max value.
                     if (relation.percentage > 0)
                         //The highest possible value of the features related is calculated (percentaje * maxValue)
-                        relationsMaxValue += (int)Math.Ceiling(relation.percentage * geneMaxValues[featureIndex]); //The percetaje gets truncated!!!
+                        relationsMaxValue += (int)Math.Ceiling(relation.percentage * geneMaxValues[(int)relation.feature]); //The percetaje gets truncated!!!
                     
                 }
                 int leftover = geneMaxValues[featureIndex] - relationsMaxValue;
-                if (leftover <= 0)
-                    throw new Exception("The genes must not depend completely on other genes and must have percetage values in their relations between 0 and 1");
-
                 genePos[featureIndex] = new Tuple<int, int>(chromosomeSize, leftover); //Start and length in bits of the feature
                 chromosomeSize += leftover;
             }
@@ -223,7 +217,7 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         public void SetFeatures()
         {
-            geneValues = Enumerable.Repeat(-1, genePos.Length).ToArray();
+            geneValues = new int[genePos.Length];
             //We need to order geneInfo because the relations of the genes 
             Gene[] geneInfoOrdered = (Gene[])geneInfo.Clone();
             Array.Sort(geneInfoOrdered);
@@ -243,10 +237,6 @@ namespace EvolutionSimulation.Genetics
                 }
                 foreach (Relation relation in geneInfo[i].relations)
                 {
-                    if (geneValues[(int)relation.feature] < 0)
-                        throw new Exception("The genes must have been passed in order of dependency of relations");
-
-                    //total += relationValue / (relationMaxValue / (relationPercentage * featureMaxValue))
                     int relationMaxValue = geneInfoOrdered[(int)relation.feature].maxValue;
                     int relationValue = geneValues[(int)relation.feature];
                     total += (int)Math.Ceiling(relationValue / (relationMaxValue / (relation.percentage * geneInfo[i].maxValue)));
