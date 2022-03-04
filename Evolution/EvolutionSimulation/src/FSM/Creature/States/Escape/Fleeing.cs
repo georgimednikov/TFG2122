@@ -15,10 +15,10 @@ namespace EvolutionSimulation.FSM.Creature.States
         // Objective of the escape path
         int pathX, pathY;
 
-        public Fleeing(Entities.Creature c) : base(c) 
-        { 
+        public Fleeing(Entities.Creature c) : base(c)
+        {
             creature = c;
-            modifier = 1.1f - (creature.stats.GroundSpeed / 150f);  // TODO: Que dependa bien de stats
+            modifier = 1.1f - (creature.stats.GroundSpeed / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) * UniverseParametersManager.parameters.fleeingCostMultiplier);
         }
 
         public override void OnEntry()
@@ -43,6 +43,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         // TODO: Esto no deberia estar aqui!!!
         public void positionAwayFromMe(ref int fX, ref int fY)
         {
+            Console.WriteLine("Fleeing");
+
             // If the creature is in a different tile, simpli get away from it
             int deltaX = dngX - creature.x,       // Direction of opposite movement
                 deltaY = dngY - creature.y;

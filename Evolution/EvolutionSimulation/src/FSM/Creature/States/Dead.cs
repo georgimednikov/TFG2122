@@ -29,12 +29,12 @@ namespace EvolutionSimulation.FSM.Creature.States
                 World.ticksHour + ((creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size) * World.ticksHour * World.hoursDay * 7) - World.ticksHour) 
                 * (creature.stats.Size / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size)),  // From an hour to two weeks of lifetime, depending on size
                 creature.x, creature.y, 
-                creature.stats.MaxHealth / 100f,    // The less health, the faster the rot
-                creature.HasAbility(Genetics.CreatureFeature.Venomous, 0.5f) ?  
+                creature.stats.MaxHealth * UniverseParametersManager.parameters.rotStartMultiplier,    // The less health, the faster the rot
+                creature.HasAbility(Genetics.CreatureFeature.Venomous, UniverseParametersManager.parameters.abilityUnlockPercentage) ?  
                 (creature.stats.Venom / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Venomous)) : 0,   // If it is venomous it will be more risky to eat 
                 (int)(creature.stats.Venom),
                 creature.stats.Venom * 0.25f, 
-                80f * creature.stats.Size / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size));  // TODO: testiar
+                UniverseParametersManager.parameters.corpseNutritionPointsMultiplier * creature.stats.Size / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size));  // TODO: testiar
         }
 
         public override string ToString()

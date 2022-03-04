@@ -94,6 +94,12 @@ namespace EvolutionSimulation
         /// </summary>
         public void Init(WorldGenConfig config)
         {
+            ticksHour = UniverseParametersManager.parameters.ticksPerHour;
+            hoursDay = UniverseParametersManager.parameters.hoursPerDay;
+            daysYear = UniverseParametersManager.parameters.daysPerYear;
+            morning = UniverseParametersManager.parameters.morningStart;
+            night = UniverseParametersManager.parameters.nightStart;
+
             if (config == null) throw new NullReferenceException("World generation config is null");
 
             Validator.Validate(config);
@@ -124,8 +130,8 @@ namespace EvolutionSimulation
                 heightWaves[0].amplitude = 1f;
                 heightWaves[1] = new Wave();
                 heightWaves[1].seed = RandomGenerator.Next(0, 10000);
-                heightWaves[1].frequency = 1f;
-                heightWaves[1].amplitude = 0;
+                heightWaves[1].frequency = 20f;
+                heightWaves[1].amplitude = 10;
             }
 
 
@@ -269,7 +275,13 @@ namespace EvolutionSimulation
             // Entity deletion
             CreaturesToDelete.ForEach(delegate (IEntity e)
             {
-                Creatures.Remove(e as Creature);
+                Creature tmp = e as Creature;
+                Creatures.Remove(tmp);
+                // Destroy the reference of itself on it children
+                tmp.childs.ForEach(delegate (Creature c)
+                {
+                    c.ParentDead(tmp);
+                });
                 e = null;
                 //foreach (Creature c in Creatures)
                 //    if (c.objective == e) c.objective = null;   // TODO URGENTE: Esto no deberia hacerse, pero ni poniendolo en null se quita la referencia al objetivo de la criatura
@@ -618,9 +630,9 @@ namespace EvolutionSimulation
         bool day;
         public uint step;
         // 50 steps equals and hour, and 24 hours equal a day. 365 days equal a year
-        public static int ticksHour = 50, hoursDay = 24, daysYear = 365;
+        public static int ticksHour, hoursDay, daysYear;
         // The day begins 6:30 and ends at 20:00.
-        float morning = 6.5f, night = 20;
+        float morning, night;
         // Perlin noise generator
         Perlin p;
 

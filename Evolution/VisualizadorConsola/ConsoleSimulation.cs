@@ -15,8 +15,9 @@ namespace VisualizadorConsola
     {
         public void Init()
         {
+            UniverseParametersManager.ReadJSON();
             world = new World();
-            world.Init(32);
+            world.Init(320);
             Console.WriteLine("\n");
             WorldToBmp();
             
@@ -34,11 +35,11 @@ namespace VisualizadorConsola
             //Animal c3 = world.CreateCreature<Animal>(4, 4, cc, c.speciesName);
             //c.AddStatus(new Poison(20, 5));
 
-            /*for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
                 c = world.CreateCreature<Animal>(5, 5);
             }
-            world.ExportContent();*/
+            world.ExportContent();
         }
 
 
@@ -217,16 +218,16 @@ namespace VisualizadorConsola
                     //*/
 
                     val = world.map[j / scale, i / scale].flora;
-                    int aux = 0;
-                    //*
+                    //int aux = 0;
                     if (val == 0)
                         if (world.map[j / scale, i / scale].isWater)
                         {
                             SetPixel(j, i, Color.DarkBlue, treeMap, scale);
                             SetPixel(j, i, Color.DarkBlue, floraMap, scale);
-                            aux = 1;
+                            //aux = 1;
                         }
                         else SetPixel(j, i, Color.Black, floraMap, scale);
+                    //*
                     else if (val < 0.1) SetPixel(j, i, Color.DarkRed, floraMap, scale);
                     else if (val < 0.2) SetPixel(j, i, Color.Red, floraMap, scale);
                     else if (val < 0.3) SetPixel(j, i, Color.OrangeRed, floraMap, scale);

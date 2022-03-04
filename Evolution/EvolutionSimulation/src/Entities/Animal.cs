@@ -7,22 +7,22 @@ namespace EvolutionSimulation.Entities
     {
         public override void SetStats()
         {
-            //The percentage of an ability that has to be had in order to unlock it
-            float abilityUnlock = 0.4f;
+            float abilityUnlock = UniverseParametersManager.parameters.abilityUnlockPercentage;
 
-            int minHealth = 10; //Minimum amount of health
-            int healthValue = 2; //Health gained per point of constitution
-            int maxMembers = 11;//its not inclusive [0-11)
-            int minRestExpense = 1;
-            int maxRestExpense = 5;
-            int minEnergy = 50;
-            int resourceAmount = 100; //Max amount of sleep/hydratation
-            int sizeToEnergyRatio = 2; //The creature gains 1 point of max energy for every sizeToEnergyRatio of Size
-            float minLifeSpan = 0.5f; // Minimum yearsAlive
-            float exhaustToSleepRatio = 3; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
-            float nightPerceptionPenalty = 0.4f; //Percentage of the max Perception lost at night
-            float minMobilityMedium = 0.6f; //When moving through a special medium the slowest speed possible is its mobility * (0.6 - 1.0) depending on proficiency
-            float mobilityPenalty = 0.7f; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
+            int minHealth = UniverseParametersManager.parameters.minHealth; 
+            int healthValue = UniverseParametersManager.parameters.healthGainMultiplier; 
+            int maxLimbs = UniverseParametersManager.parameters.maxLimbs;
+            int minRestExpense = UniverseParametersManager.parameters.minRestExpense;
+            int maxRestExpense = UniverseParametersManager.parameters.maxRestExpense;
+            //int minEnergy = 50;
+            //int sizeToEnergyRatio = 2; //The creature gains 1 point of max energy for every sizeToEnergyRatio of Size
+            int resourceAmount = UniverseParametersManager.parameters.resourceAmount; //Max amount of /*energy/*/sleep/hydration
+            int minPerception = UniverseParametersManager.parameters.minPerception;
+            float minLifeSpan = UniverseParametersManager.parameters.minLifeSpan; // Minimum years alive
+            float exhaustToSleepRatio = UniverseParametersManager.parameters.exhaustToSleepRatio; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
+            float nightPerceptionPenalty = UniverseParametersManager.parameters.nightPerceptionPenalty; //Percentage of the max Perception lost at night
+            float minMobilityMedium = UniverseParametersManager.parameters.minMobilityMedium; //When moving through a special medium the slowest speed possible is its mobility * (0.6 - 1.0) depending on proficiency
+            float mobilityPenalty = UniverseParametersManager.parameters.mobilityPenalty; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
                                           //A ground creature moves fast on the ground, but cannot move throught the air/trees
                                           //An arboreal creature moves fast through trees, but arborealSpeed * mobilityPenalty on the ground
                                           //An aerial creature moves fast in the air, but arborealSpeed = aerialSpeed * mobilityPenalty and groundSpeed = arborealSpeed * mobilityPenalty
@@ -36,8 +36,8 @@ namespace EvolutionSimulation.Entities
             stats.LifeSpan = world.YearToTick(chromosome.GetFeature(CreatureFeature.Longevity) + minLifeSpan);
 
             //Multipliers
-            stats.HealthRegeneration = 0.1f;
-            stats.MaxSpeed = 1.5f;
+            stats.HealthRegeneration = UniverseParametersManager.parameters.healthRegeneration;
+            stats.MaxSpeed = UniverseParametersManager.parameters.maxSpeed;
 
             stats.Gender = chromosome.GetGender();
 
@@ -85,14 +85,14 @@ namespace EvolutionSimulation.Entities
             if (!HasAbility(CreatureFeature.Thorns, abilityUnlock)) stats.Counter = 0;
             else stats.Counter = chromosome.GetFeature(CreatureFeature.Thorns);
 
-            stats.Members = SetStatInRange(CreatureFeature.Members, maxMembers);
+            stats.Members = SetStatInRange(CreatureFeature.Members, maxLimbs + 1);//its not inclusive [0-11)
 
             stats.Metabolism = chromosome.GetFeature(CreatureFeature.Metabolism);
             stats.IdealTemperature = chromosome.GetFeature(CreatureFeature.IdealTemperature);
             stats.MinTemperature = stats.IdealTemperature - chromosome.GetFeature(CreatureFeature.TemperatureRange);
             stats.MaxTemperature = stats.IdealTemperature + chromosome.GetFeature(CreatureFeature.TemperatureRange);
 
-            stats.MaxEnergy = minEnergy + stats.Size / sizeToEnergyRatio;
+            stats.MaxEnergy = resourceAmount; // minEnergy + stats.Size / sizeToEnergyRatio; TODO: en teoria es el mismo valor todos los recursos, cambia el gasto
             stats.CurrEnergy = stats.MaxEnergy;
             stats.EnergyExpense = 1 + stats.Metabolism / (float)chromosome.GetFeatureMax(CreatureFeature.Metabolism);
             stats.MaxHydration = resourceAmount;
@@ -101,13 +101,14 @@ namespace EvolutionSimulation.Entities
 
             stats.MaxRest = resourceAmount;
             stats.CurrRest = stats.MaxRest;
-            stats.RestExpense = minRestExpense + (maxRestExpense - minRestExpense) * (1 - (float)chromosome.GetFeature(CreatureFeature.Resistence) / chromosome.GetFeatureMax(CreatureFeature.Resistence));
+            stats.RestExpense = minRestExpense + (maxRestExpense - minRestExpense) * (1 - (float)chromosome.GetFeature(CreatureFeature.Resistance) / chromosome.GetFeatureMax(CreatureFeature.Resistance));
             stats.RestRecovery = stats.RestExpense * exhaustToSleepRatio;
 
             //Environment related stats
             stats.Camouflage = chromosome.GetFeature(CreatureFeature.Camouflage);
             stats.Aggressiveness = chromosome.GetFeature(CreatureFeature.Aggressiveness);
-            stats.Perception = chromosome.GetFeature(CreatureFeature.Perception);
+            int maxPerception = chromosome.GetFeatureMax(CreatureFeature.Perception);
+            stats.Perception = (int)((float)chromosome.GetFeature(CreatureFeature.Perception) / maxPerception * (maxPerception - minPerception)) + minPerception;
 
             //A percentage equal to nightPerceptionPenalty of the max perception is lost at night
             stats.NightDebuff = chromosome.GetFeatureMax(CreatureFeature.Perception) * nightPerceptionPenalty;
@@ -118,7 +119,9 @@ namespace EvolutionSimulation.Entities
 
             //Behaviour related stats
             stats.Knowledge = chromosome.GetFeature(CreatureFeature.Knowledge);
-            stats.Paternity = chromosome.GetFeature(CreatureFeature.Paternity);
+
+            if (!HasAbility(CreatureFeature.Paternity, abilityUnlock)) stats.Paternity = 0;
+            else stats.Paternity = chromosome.GetFeature(CreatureFeature.Paternity);
 
             ModifyStatsByAbilities(abilityUnlock);
         }
@@ -157,7 +160,7 @@ namespace EvolutionSimulation.Entities
 
                 int hornsValue = chromosome.GetFeature(CreatureFeature.Horns);
                 stats.Damage += hornsValue;
-                intimidation += hornsValue * 1.5f;
+                intimidation += hornsValue * UniverseParametersManager.parameters.hornIntimidationMultiplier;
             }
 
 

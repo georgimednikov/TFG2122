@@ -1,4 +1,6 @@
-﻿namespace EvolutionSimulation.FSM.Creature.States
+﻿using System;
+
+namespace EvolutionSimulation.FSM.Creature.States
 {
     /// <summary>
     /// State trying to reproduce. It is only for males.
@@ -11,12 +13,14 @@
         // This move is energy netural, costing the same energy that is obtained in a tick
         public override int GetCost()
         {
-            return 1000;//TODO
+            return (int)UniverseParametersManager.parameters.baseActionCost;//TODO
         }
 
         // Increases current rest
         public override void Action()
         {
+            Console.WriteLine("Try to mate");
+
             if (creature.GetClosestPossibleMate() != null)
                 creature.GetClosestPossibleMate().ReceiveInteraction(creature, Entities.Interactions.mate);
         }

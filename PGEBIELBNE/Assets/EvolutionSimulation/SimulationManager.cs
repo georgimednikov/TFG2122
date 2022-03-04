@@ -7,7 +7,7 @@ namespace EvolutionSimulation.Unity
     public class SimulationManager : MonoBehaviour
     {
         public int SimulationYears;
-        public CreatureManager creatureManager;
+        public WorldCreaturesManager creatureManager;
 
         UnitySimulation simulation;
         void Start()

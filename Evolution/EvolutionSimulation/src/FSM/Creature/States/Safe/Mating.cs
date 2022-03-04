@@ -16,7 +16,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         // This move is energy netural, costing the same energy that is obtained in a tick
         public override int GetCost()
         {
-            return 1000;//TODO
+            return (int)UniverseParametersManager.parameters.baseActionCost;//TODO
         }
 
         /// <summary>
@@ -45,7 +45,18 @@ namespace EvolutionSimulation.FSM.Creature.States
                         // The new creature's pos (near to the parents)
                         int nx = creature.x + RandomGenerator.Next(-1, 2);
                         int ny = creature.y + RandomGenerator.Next(-1, 2);
-                        creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName);
+                        Entities.Animal child = creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName);
+
+                        // Add the parents to the new creature and the child to the parents
+                        child.father = creature.matingCreature;
+                        child.mother = creature;
+                        creature.matingCreature.childs.Add(child);
+                        creature.childs.Add(child);
+                        // Follow randomly the father or the mother
+                        if (RandomGenerator.Next(0, 2) == 0)
+                            child.parentToFollow = child.father;
+                        else
+                            child.parentToFollow = child.mother;
                     }
                     creature.timeToBeInHeat = -1;
                 }                

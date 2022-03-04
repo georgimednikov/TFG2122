@@ -44,12 +44,12 @@ namespace EvolutionSimulation.Entities
             speciesName = name;
             stats = new CreatureStats();
             //TODO: Los parametros de abajo no se donde ponerlos xd
-            memory = new Memory(this, world);
             //speciesName = "None";
             SetStats();
             this.x = x;
             this.y = y;
             timeToBeInHeat = stats.TimeBetweenHeats;
+            memory = new Memory(this, world);
             ConfigureStateMachine();
             // Attack
             AddInteraction(Interactions.attack, ReceiveDamage);
@@ -84,7 +84,7 @@ namespace EvolutionSimulation.Entities
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
 
             // Action points added every tick 
-            ActionPoints += stats.Metabolism * 10;
+            ActionPoints += stats.Metabolism * (int)Math.Ceiling((float)UniverseParametersManager.parameters.baseActionCost / (chromosome.GetFeatureMax(CreatureFeature.Metabolism) / 2));
             
             // Executes the state action if the creature has enough Action Points
             int cost = 0;
@@ -93,8 +93,29 @@ namespace EvolutionSimulation.Entities
                 mfsm.CurrentState.Action();
                 ActionPoints -= cost; 
             }
-
             Clear();
+        }
+
+        /// <summary>
+        /// When a creature dies calls this method to notify its children
+        /// that the creature has died
+        /// </summary>
+        /// <param name="parent"> The parent of the creature that has died</param>
+        // TODO si quien muere no sabe donde esta (no lo recuerda), no hacer nada. hay que modificar memory
+        // lo mismo al reves, si muere el padre pero no sabe donde esta la madre, no cambiar la referencia
+        public void ParentDead(Creature parent)
+        {
+            if (parent == father)
+            {
+                father = null;
+            }
+            else
+            {
+                mother = null;
+            }
+            
+            //change reference to follow
+            parentToFollow = parent == father ? mother : father;
         }
 
         /// <summary>
@@ -137,7 +158,6 @@ namespace EvolutionSimulation.Entities
                 else wantMate = true;
             }
         }
-
         #region Genetics and Taxonomy
         // Taxonomy
         public string speciesName;
@@ -146,6 +166,7 @@ namespace EvolutionSimulation.Entities
         // Genetics
         public CreatureChromosome chromosome { get; private set; }
         public CreatureStats stats { get; private set; }
+
 
         /// <summary>
         /// Sets the stats of the creature.
@@ -204,7 +225,7 @@ namespace EvolutionSimulation.Entities
             IState drink = new Drinking(this);
             IState goToMate = new GoToMate(this);
             IState tryMate = new TryMate(this);
-            IState mating = new Mating(this,100);//TODO que 100 lo coja del cromosoma, es el tiempo que tardan en reproducirse
+            IState mating = new Mating(this, 100);//TODO que 100 lo coja del cromosoma, es el tiempo que tardan en reproducirse
             IState goToEat = new GoToEat(this);
             IState eat = new Eating(this);
             IState goToSafePlace = new GoToSafePlace(this);
@@ -212,6 +233,20 @@ namespace EvolutionSimulation.Entities
             Fsm safeFSM = new Fsm(wander);
             IState safe = new CalmState("Safe", safeFSM, this);
 
+            // Done exploring
+            ITransition doneExploringTransition = new DoneExploringTransition(this);
+            safeFSM.AddTransition(explore, doneExploringTransition, wander);
+
+            // TODO queremos esto? si lo dejamos, quitar comprobaciones en las transiciones de si tiene la habilidad o no
+            // Follow Parent
+            if (stats.Paternity > 0)
+            {
+                IState followParent = new FollowParent(this);
+                ITransition followParentTransition = new FollowParentTransition(this);
+                ITransition stopFollowParentTransition = new StopFollowParentTransition(this);
+                safeFSM.AddTransition(wander, followParentTransition, followParent);
+                safeFSM.AddTransition(followParent, stopFollowParentTransition, wander);
+            }
 
             // Sleeping
             ITransition goToSafePlaceTransition = new GoToSafePlaceTransition(this);
@@ -228,6 +263,18 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(wander, sleepyTransition, sleep);
             safeFSM.AddTransition(sleep, wakeTransition, wander);
 
+            // Drinking
+            ITransition thirstyTransition = new ThirstyTransition(this);
+            ITransition drinkingTransition = new DrinkingTransition(this);
+            ITransition drinkingExploreTransition = new DrinkingExploreTransition(this);
+            ITransition stopDrinkingTransition = new StopDrinkingTransition(this);
+            ITransition stopGoToDrinkTransition = new StopGoToDrinkTransition(this);
+            safeFSM.AddTransition(wander, drinkingExploreTransition, explore);
+            safeFSM.AddTransition(wander, thirstyTransition, goToDrink);
+            safeFSM.AddTransition(goToDrink, drinkingTransition, drink);
+            safeFSM.AddTransition(goToDrink, stopGoToDrinkTransition, wander);
+            safeFSM.AddTransition(drink, stopDrinkingTransition, wander);
+
             // Eating
             ITransition hungerTransition = new HungerTransition(this);
             ITransition hungerExploreTransition = new HungerExploreTransition(this);
@@ -240,25 +287,15 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToEat, eatingTransition, eat);
             safeFSM.AddTransition(eat, stopEatingTransition, wander);
 
-            // Drinking
-            ITransition thirstyTransition = new ThirstyTransition(this);
-            ITransition drinkingTransition = new DrinkingTransition(this);
-            ITransition drinkingExploreTransition = new DrinkingExploreTransition(this);
-            ITransition stopDrinkingTransition = new StopDrinkingTransition(this);
-            ITransition stopGoToDrinkTransition = new StopGoToDrinkTransition(this);
-            safeFSM.AddTransition(wander, thirstyTransition, goToDrink);
-            safeFSM.AddTransition(wander, drinkingExploreTransition, explore);
-            safeFSM.AddTransition(goToDrink, drinkingTransition, drink);
-            safeFSM.AddTransition(goToDrink, stopGoToDrinkTransition, wander);
-            safeFSM.AddTransition(drink, stopDrinkingTransition, wander);
-
             // Mating
             ITransition mateTransition = new GoToMateTransition(this);
             ITransition tryMateTransition = new TryMateTransition(this);
             ITransition matingTransition = new MatingTransition(this);
+            ITransition matingExploreTransition = new MatingExploreTransition(this);
             ITransition stopMatingTransition = new StopMatingTransition(this);
             ITransition stopGoToMateTransition = new StopGoToMateTransition(this);
             ITransition stopTryMateTransition = new StopTryMateTransition(this);
+            safeFSM.AddTransition(wander, matingExploreTransition, explore);
             safeFSM.AddTransition(wander, mateTransition, goToMate);
             safeFSM.AddTransition(goToMate, tryMateTransition, tryMate);
             safeFSM.AddTransition(goToMate, stopGoToMateTransition, wander);
@@ -267,7 +304,7 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToEat, matingTransition, mating);
             safeFSM.AddTransition(goToSafePlace, matingTransition, mating);
             safeFSM.AddTransition(tryMate, stopTryMateTransition, wander);
-            safeFSM.AddTransition(mating, stopMatingTransition, wander);
+            safeFSM.AddTransition(mating, stopMatingTransition, wander);           
 
             // Escape-state Configuration
             // States
@@ -530,6 +567,7 @@ namespace EvolutionSimulation.Entities
             return false;
         }
 
+        // Memory
         public Creature GetClosestAlly() { return memory.ClosestAlly(); }
         public Creature GetClosestPossibleMate() { return memory.ClosestPossibleMate(); }
         public Creature GetClosestCreature() { return memory.ClosestCreature(); }
@@ -539,6 +577,13 @@ namespace EvolutionSimulation.Entities
         public Tuple<int, int> GetClosestWater() { return memory.ClosestWater(); }
         public Tuple<int, int> GetClosestSafePlace() { return memory.ClosestSafePlace(); }
         public Tuple<int, int> GetUndiscoveredPlace() { return memory.UndiscoveredPlace(); }
+
+        // Parents
+        public Creature father { get; set; }
+        public Creature mother { get; set; }
+        public Creature parentToFollow { get; set; }
+        //Childs
+        public List<Creature> childs;
         #endregion
 
         #region World Info, Movement and Paths
@@ -618,8 +663,8 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public int GetTreeThreshold(double treeDensity)
         {
-            double a = 2 * (int)HeightLayer.Tree * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / 100f);
-            double b = treeDensity * (stats.GroundSpeed / 100f + Tree.movementPenalty - stats.ArborealSpeed / 100f - 1);
+            double a = 2 * (int)HeightLayer.Tree * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2));
+            double b = treeDensity * (stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) + Tree.movementPenalty - stats.ArborealSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) - 1);
             return (int)Math.Floor((a / b) + 0.5);
         }
 
@@ -628,9 +673,9 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         int GetFlyThreshold(double treeDensity)
         {
-            double a = 2 * (int)HeightLayer.Air * (stats.GroundSpeed / 100f * (1 - treeDensity) + treeDensity * stats.AerialSpeed / 100f);
-            double b = -2 * stats.AerialSpeed / 100f * (int)HeightLayer.Tree * treeDensity;
-            double c = stats.AerialSpeed / 100f + stats.GroundSpeed / 100f * (treeDensity - 1) - treeDensity * stats.ArborealSpeed / 100f;
+            double a = 2 * (int)HeightLayer.Air * (stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) * (1 - treeDensity) + treeDensity * stats.AerialSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2));
+            double b = -2 * stats.AerialSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) * (int)HeightLayer.Tree * treeDensity;
+            double c = stats.AerialSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) + stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) * (treeDensity - 1) - treeDensity * stats.ArborealSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2);
             return (int)Math.Floor(((a + b) / c) + 0.5);
         }
 
@@ -676,8 +721,8 @@ namespace EvolutionSimulation.Entities
                     break;
             }
             if (world.map[x, y].plant is Tree || world.map[x, y].plant is EdibleTree)
-                return (int)(1000 * ((200f - speed * (2 - Tree.movementPenalty)) / 100f));
-            return (int)(1000 * ((200f - speed) / 100f));
+                return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed * (2 - Tree.movementPenalty)) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2)));
+            return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2)));
         }
 
         /// <summary>

@@ -2,33 +2,23 @@
 
 namespace EvolutionSimulation.Entities
 {
+    [Serializable]
     public class CreatureStats
     {
-        //TODO valores pls dejad de ser randoms
-        private float startMultiplier = 0.33f; //Starting multiplier of newborns
-        private float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
+        private float startMultiplier = UniverseParametersManager.parameters.newbornStatMultiplier; //Starting multiplier of newborns
+        private float adulthoodThreshold = UniverseParametersManager.parameters.adulthoodThreshold; //After which percentage of lifespan the creature has his stats not dimished by age
 
-        public float tiredThreshold = 0.40f; //After which percentage of currRest the creature should sleep with low priority
+        public float tiredThreshold = UniverseParametersManager.parameters.tiredThreshold; //After which percentage of currRest the creature should sleep with low priority
         //After which percentage of currRest the creature should sleep with high priority and some stats are dimished
-        public float exhaustThreshold = 0.15f;
+        public float exhaustThreshold = UniverseParametersManager.parameters.exhaustThreshold;
 
-        public float hungerThreshold = 0.40f; //After which percentage of currEnergy the creature should eat with low priority
+        public float hungerThreshold = UniverseParametersManager.parameters.hungryThreshold; //After which percentage of currEnergy the creature should eat with low priority
         //After which percentage of currEnergy the creature should eat with high priority
-        public float veryHungerThreshold = 0.15f;
+        public float veryHungerThreshold = UniverseParametersManager.parameters.veryHungryThreshold;
 
-        public float thirstyThreshold = 0.40f; //After which percentage of currHydration the creature should eat with low priority
+        public float thirstyThreshold = UniverseParametersManager.parameters.thirstyThreshold; //After which percentage of currHydration the creature should eat with low priority
         //After which percentage of currHydration the creature should eat with high priority
-        public float veryThirstyThreshold = 0.15f;
-
-        /// <summary>
-        /// Modifies the given stat based on age
-        /// </summary>
-        float ModifyStatByAge(float stat)
-        {
-            return stat * Math.Min(1.0f, (1 - startMultiplier) / (LifeSpan * adulthoodThreshold) * currAge + startMultiplier);
-        }
-
-        public bool IsNewBorn() { return LifeSpan * adulthoodThreshold < currAge; }
+        public float veryThirstyThreshold = UniverseParametersManager.parameters.veryThirstyThreshold;
 
         public Genetics.Gender Gender { get; set; }
 
@@ -126,5 +116,15 @@ namespace EvolutionSimulation.Entities
         public bool InHeat { get; set; }
 
         public bool Upright { get; set; }
+
+        /// <summary>
+        /// Modifies the given stat based on age
+        /// </summary>
+        float ModifyStatByAge(float stat)
+        {
+            return stat * Math.Min(1.0f, (1 - startMultiplier) / (LifeSpan * adulthoodThreshold) * currAge + startMultiplier);
+        }
+
+        public bool IsNewBorn() { return LifeSpan * adulthoodThreshold < currAge; }
     }
 }

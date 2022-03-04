@@ -16,7 +16,7 @@
             int distPlant = creature.DistanceToObjective(creature.GetClosestFruit()),
                 distCorpse = creature.DistanceToObjective(creature.GetClosestCorpse());
 
-            return creature.stats.CurrEnergy >= creature.stats.MaxEnergy                // no hunger
+            return creature.stats.CurrEnergy >= UniverseParametersManager.parameters.stopEatingTransitionEnergyMultiplier * creature.stats.MaxEnergy         // no hunger
                 || (distCorpse > 1 && distPlant > 1)                                    // Both eating objective are far
                 || (distPlant > 1 && creature.stats.Diet == Genetics.Diet.Herbivore)    // hervibore and plant objective is far
                 || (distCorpse > 1 && creature.stats.Diet == Genetics.Diet.Carnivore);  // carnivore and corpse objective is far

@@ -8,12 +8,14 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override int GetCost()
         {
-            return 10 * creature.stats.Metabolism;
+            return UniverseParametersManager.parameters.drinkingCostMultiplier * creature.stats.Metabolism;
         }
 
         public override void Action()
         {
             Console.WriteLine("Drinking action");
+
+            creature.stats.CurrHydration = Math.Min(creature.stats.CurrHydration + creature.stats.HydrationExpense * 5, creature.stats.MaxHydration);
         }
 
         public override string ToString()

@@ -2,7 +2,7 @@
 {
     public class EdibleTree : EdiblePlant
     {
-        public static float movementPenalty { get; private set; } = 0.7f; // TODO: poner en config
+        public static float movementPenalty { get; private set; } = UniverseParametersManager.parameters.treeMovementPenalty;
 
         public EdibleTree()
         {

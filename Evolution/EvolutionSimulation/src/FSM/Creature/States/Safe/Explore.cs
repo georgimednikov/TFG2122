@@ -33,6 +33,11 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             Console.WriteLine("Explore action");
 
+            if (creature.wantMate && creature.GetClosestPossibleMate() == null) Console.WriteLine("Mate");
+            if (creature.IsThirsty() && creature.GetClosestWater() == null) Console.WriteLine("Agua");
+            if (creature.IsTired() && creature.GetClosestSafePlace() == null) Console.WriteLine("Cansado");
+            if (creature.IsHungry() && !creature.HasEatingObjective()) Console.WriteLine("Comida");
+
             Vector3 nextPos = creature.GetNextPosOnPath();
             if (nextPos.X < 0 || nextPos.Y < 0)
             {

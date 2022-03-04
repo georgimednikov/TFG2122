@@ -1,4 +1,6 @@
-﻿namespace EvolutionSimulation.FSM.Creature.States
+﻿using System;
+
+namespace EvolutionSimulation.FSM.Creature.States
 {
     /// <summary>
     /// Move randomly until the creature has something to do
@@ -9,11 +11,13 @@
 
         public override int GetCost()
         {
-            return (int)(1000 * ((200f - creature.stats.GroundSpeed) / 100f));
+            return (int)(UniverseParametersManager.parameters.baseActionCost * ((creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) - creature.stats.GroundSpeed) / (creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) / 2)));
         }
 
         public override void Action()
         {
+            Console.WriteLine("Wander");
+
             int nX = 0, nY = 0;
             do
             {

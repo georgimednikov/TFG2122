@@ -15,9 +15,9 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override int GetCost()
         {
             attackMod = 0;
-            if (poison = creature.HasAbility(Genetics.CreatureFeature.Venomous, 0.5f))  
-                attackMod += 100 * creature.stats.Venom;    // Costs 100 more per point in Venom                                                      
-            return (int)(1000 + attackMod); // TODO: 1000
+            if (poison = creature.HasAbility(Genetics.CreatureFeature.Venomous, UniverseParametersManager.parameters.abilityUnlockPercentage))  
+                attackMod += UniverseParametersManager.parameters.venomCostMultiplier * creature.stats.Venom;    // Costs 100 more per point in Venom                                                      
+            return (int)(UniverseParametersManager.parameters.baseActionCost + attackMod);
         }
 
         // Increases current rest

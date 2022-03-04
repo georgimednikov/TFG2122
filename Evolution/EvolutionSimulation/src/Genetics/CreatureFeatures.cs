@@ -16,7 +16,7 @@ namespace EvolutionSimulation.Genetics
         [EnumMember(Value = "Mobility")]
         Mobility,
         [EnumMember(Value = "Resistence")]
-        Resistence,
+        Resistance,
         [EnumMember(Value = "Perception")]
         Perception,
         [EnumMember(Value = "Knowledge")]
@@ -70,12 +70,14 @@ namespace EvolutionSimulation.Genetics
         Count
     }
 
+    [System.Serializable]
     public enum Gender
     {
         Male,
         Female
     }
 
+    [System.Serializable]
     public enum Diet
     {
         Herbivore,
