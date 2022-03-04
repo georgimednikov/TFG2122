@@ -88,6 +88,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 else
                     creature.SetPath(pathX, pathY);
             }
+            Console.WriteLine(creature.speciesName + " FLEE");
         }
 
         public override string ToString()
