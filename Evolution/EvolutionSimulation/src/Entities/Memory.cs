@@ -68,14 +68,14 @@ namespace EvolutionSimulation.Entities
                 for (int j = 0; j < map.GetLength(1); j++)
                     map[i, j] = new MemoryTileInfo();
 
-            GetNewUndiscoveredPlace();
-
             rememberedTiles = new List<MemoryTileInfo>();
             comparer = new MemoryTileComparer(thisCreature);
 
             maxTicksUnchecked = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
             perceptionRadius = /*thisCreature.stats.Perception*/ 5; // TODO: Perception es literalmente 0, eso no vale así que hay que arreglarlo
             dangerRadius = thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness;
+
+            GetNewUndiscoveredPlace();
         }
 
         public void Update()
@@ -307,9 +307,11 @@ namespace EvolutionSimulation.Entities
         {
             // A min dist so that the place is somewhat far away and the creature has to move for a while,
             // moving through its preferred medium that way.
-            // The radius = perceptionRadius * 2, diameter = radius * 2 + the center, since it is not counted.
-            int minDistRadius = perceptionRadius * 2;
+            // The radius = perceptionRadius, diameter = radius * 2 + the center, since it is not counted.
+            int minDistRadius = perceptionRadius;
+            int maxDistRadius = (int)(perceptionRadius * 2);
             int minDistDiameter = minDistRadius * 2 + 1;
+            int maxDistDiameter = maxDistRadius * 2 + 1;
             int x, y;
             do
             {
@@ -317,13 +319,13 @@ namespace EvolutionSimulation.Entities
                 // and then adding the radius + 1 to be located in the first tile past the min dist from the creature.
                 // Then the random number, which can have values up to the number of tiles left outside the area,
                 // is added, and then % size to loop to the left of the creature.
-                int num = RandomGenerator.Next(0, map.GetLength(0) - minDistDiameter);
-                x = (thisCreature.x + minDistRadius + 1 + num) % map.GetLength(0);
+                int num = RandomGenerator.Next(0, maxDistDiameter - minDistDiameter);
+                x = (thisCreature.x + minDistRadius + 1 + num) % maxDistDiameter;
 
-                num = RandomGenerator.Next(0, map.GetLength(1) - minDistDiameter);
-                y = (thisCreature.y + minDistRadius + 1 + num) % map.GetLength(1);
+                num = RandomGenerator.Next(0, maxDistDiameter - minDistDiameter);
+                y = (thisCreature.y + minDistRadius + 1 + num) % maxDistDiameter;
             }
-            while (map[x, y].discovered);
+            while (map[x, y].water && map[x, y].discovered && map[x, y].ticksUnchecked < (maxTicksUnchecked / 2));
             undiscoveredPlace = new Tuple<int, int>(x, y);
         }
 

@@ -1,19 +1,19 @@
 ﻿namespace EvolutionSimulation.FSM.Creature.Transitions
 {
     /// <summary>
-    /// Checks if a creature needs to find a safe and does not know where to go
+    /// Checks if a creature needs to find a mate and does not know where to go
     /// Wander -> Explore
     /// </summary>
-    class SafePlaceExploreTransition : CreatureTransition
+    class MatingExploreTransition : CreatureTransition
     {
-        public SafePlaceExploreTransition(Entities.Creature creature)
+        public MatingExploreTransition(Entities.Creature creature)
         {
             this.creature = creature;
         }
 
         public override bool Evaluate()
         {
-            return creature.GetClosestSafePlace() == null;
+            return creature.wantMate && creature.GetClosestPossibleMate() == null;
         }
 
         public override string ToString()

@@ -14,6 +14,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void Action()
         {
             Console.WriteLine("Drinking action");
+
+            creature.stats.CurrHydration = Math.Min(creature.stats.CurrHydration + creature.stats.HydrationExpense * 5, creature.stats.MaxHydration);
         }
 
         public override string ToString()

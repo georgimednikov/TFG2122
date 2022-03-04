@@ -14,10 +14,7 @@
 
         public override bool Evaluate()
         {
-
-            //TODO drinking objective
-            return false;
-            //return creature.IsThirsty() && !creature.HasDrinkingObjective();
+            return creature.IsThirsty() && creature.GetClosestWater() == null;
         }
 
         public override string ToString()

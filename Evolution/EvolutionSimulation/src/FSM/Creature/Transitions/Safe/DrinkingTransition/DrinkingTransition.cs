@@ -19,11 +19,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            //TODO que el objetivo sea el de beber
-            return false;
-            //return creature.objective != null
-            //   && Math.Abs(creature.objective.x - creature.x) < 1
-            //   && Math.Abs(creature.objective.y - creature.y) < 1;
+            return Math.Abs(creature.GetClosestWater().Item1 - creature.x) <= 1 && Math.Abs(creature.GetClosestWater().Item2 - creature.y) <= 1;
         }
 
         public override string ToString()

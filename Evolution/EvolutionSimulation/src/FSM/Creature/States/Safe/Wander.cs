@@ -1,4 +1,6 @@
-﻿namespace EvolutionSimulation.FSM.Creature.States
+﻿using System;
+
+namespace EvolutionSimulation.FSM.Creature.States
 {
     /// <summary>
     /// Move randomly until the creature has something to do
@@ -14,6 +16,8 @@
 
         public override void Action()
         {
+            Console.WriteLine("Wander");
+
             int nX = 0, nY = 0;
             do
             {

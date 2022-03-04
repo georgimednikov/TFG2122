@@ -44,12 +44,12 @@ namespace EvolutionSimulation.Entities
             speciesName = name;
             stats = new CreatureStats();
             //TODO: Los parametros de abajo no se donde ponerlos xd
-            memory = new Memory(this, world);
             //speciesName = "None";
             SetStats();
             this.x = x;
             this.y = y;
             timeToBeInHeat = stats.TimeBetweenHeats;
+            memory = new Memory(this, world);
             ConfigureStateMachine();
             // Attack
             AddInteraction(Interactions.attack, ReceiveDamage);
@@ -93,7 +93,6 @@ namespace EvolutionSimulation.Entities
                 mfsm.CurrentState.Action();
                 ActionPoints -= cost; 
             }
-
             Clear();
         }
 
@@ -212,42 +211,14 @@ namespace EvolutionSimulation.Entities
             Fsm safeFSM = new Fsm(wander);
             IState safe = new CompoundState("Safe", safeFSM);
 
-
-            // Sleeping
-            ITransition goToSafePlaceTransition = new GoToSafePlaceTransition(this);
-            ITransition stopGoToSafePlaceTransition = new StopGoToSafePlaceTransition(this);
-            ITransition safePlaceExploreTransition = new SafePlaceExploreTransition(this);
-            ITransition sleepySafeTransition = new SleepySafeTransition(this);
-            ITransition sleepyTransition = new SleepyTransition(this);
-            ITransition wakeTransition = new WakeTransition(this);
-            safeFSM.AddTransition(wander, goToSafePlaceTransition, goToSafePlace);
-            safeFSM.AddTransition(goToSafePlace, stopGoToSafePlaceTransition, wander);
-            safeFSM.AddTransition(wander, safePlaceExploreTransition, explore);
-            safeFSM.AddTransition(goToSafePlace, sleepySafeTransition, sleep);
-            safeFSM.AddTransition(explore, sleepyTransition, sleep);
-            safeFSM.AddTransition(wander, sleepyTransition, sleep);
-            safeFSM.AddTransition(sleep, wakeTransition, wander);
-
-            // Eating
-            ITransition hungerTransition = new HungerTransition(this);
-            ITransition hungerExploreTransition = new HungerExploreTransition(this);
-            ITransition eatingTransition = new EatingTransition(this);
-            ITransition stopEatingTransition = new StopEatingTransition(this);
-            ITransition stopGoToEatTransition = new StopGoToEatTransition(this);
-            safeFSM.AddTransition(wander, hungerTransition, goToEat);
-            safeFSM.AddTransition(wander, hungerExploreTransition, explore);
-            safeFSM.AddTransition(goToEat, stopGoToEatTransition, wander);
-            safeFSM.AddTransition(goToEat, eatingTransition, eat);
-            safeFSM.AddTransition(eat, stopEatingTransition, wander);
-
             // Drinking
             ITransition thirstyTransition = new ThirstyTransition(this);
             ITransition drinkingTransition = new DrinkingTransition(this);
             ITransition drinkingExploreTransition = new DrinkingExploreTransition(this);
             ITransition stopDrinkingTransition = new StopDrinkingTransition(this);
             ITransition stopGoToDrinkTransition = new StopGoToDrinkTransition(this);
-            safeFSM.AddTransition(wander, thirstyTransition, goToDrink);
             safeFSM.AddTransition(wander, drinkingExploreTransition, explore);
+            safeFSM.AddTransition(wander, thirstyTransition, goToDrink);
             safeFSM.AddTransition(goToDrink, drinkingTransition, drink);
             safeFSM.AddTransition(goToDrink, stopGoToDrinkTransition, wander);
             safeFSM.AddTransition(drink, stopDrinkingTransition, wander);
@@ -256,9 +227,11 @@ namespace EvolutionSimulation.Entities
             ITransition mateTransition = new GoToMateTransition(this);
             ITransition tryMateTransition = new TryMateTransition(this);
             ITransition matingTransition = new MatingTransition(this);
+            ITransition matingExploreTransition = new MatingExploreTransition(this);
             ITransition stopMatingTransition = new StopMatingTransition(this);
             ITransition stopGoToMateTransition = new StopGoToMateTransition(this);
             ITransition stopTryMateTransition = new StopTryMateTransition(this);
+            safeFSM.AddTransition(wander, matingExploreTransition, explore);
             safeFSM.AddTransition(wander, mateTransition, goToMate);
             safeFSM.AddTransition(goToMate, tryMateTransition, tryMate);
             safeFSM.AddTransition(goToMate, stopGoToMateTransition, wander);
@@ -268,6 +241,35 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToSafePlace, matingTransition, mating);
             safeFSM.AddTransition(tryMate, stopTryMateTransition, wander);
             safeFSM.AddTransition(mating, stopMatingTransition, wander);
+
+            // Eating
+            ITransition hungerTransition = new HungerTransition(this);
+            ITransition hungerExploreTransition = new HungerExploreTransition(this);
+            ITransition eatingTransition = new EatingTransition(this);
+            ITransition stopEatingTransition = new StopEatingTransition(this);
+            ITransition stopGoToEatTransition = new StopGoToEatTransition(this);
+            safeFSM.AddTransition(wander, hungerExploreTransition, explore);
+            safeFSM.AddTransition(wander, hungerTransition, goToEat);
+            safeFSM.AddTransition(goToEat, stopGoToEatTransition, wander);
+            safeFSM.AddTransition(goToEat, eatingTransition, eat);
+            safeFSM.AddTransition(eat, stopEatingTransition, wander);
+
+            // Sleeping
+            ITransition goToSafePlaceTransition = new GoToSafePlaceTransition(this);
+            ITransition safePlaceExploreTransition = new SafePlaceExploreTransition(this);
+            ITransition sleepySafeTransition = new SleepySafeTransition(this);
+            ITransition sleepyTransition = new SleepyTransition(this);
+            ITransition wakeTransition = new WakeTransition(this);
+            safeFSM.AddTransition(wander, safePlaceExploreTransition, explore);
+            safeFSM.AddTransition(wander, goToSafePlaceTransition, goToSafePlace);
+            //safeFSM.AddTransition(goToSafePlace, ?, wander);
+            safeFSM.AddTransition(goToSafePlace, sleepySafeTransition, sleep);
+            safeFSM.AddTransition(wander, sleepyTransition, sleep);
+            safeFSM.AddTransition(sleep, wakeTransition, wander);
+
+            // Done exploring
+            ITransition doneExploringTransition = new DoneExploringTransition(this);
+            safeFSM.AddTransition(explore, doneExploringTransition, wander);
 
             // Escape-state Configuration
             // States

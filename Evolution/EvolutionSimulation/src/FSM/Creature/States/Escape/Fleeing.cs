@@ -40,6 +40,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         // TODO: Esto no deberia estar aqui!!!
         public void positionAwayFromMe(ref int fX, ref int fY)
         {
+            Console.WriteLine("Fleeing");
+
             // If the creature is in a different tile, simpli get away from it
             int deltaX = dngX - creature.x,       // Direction of opposite movement
                 deltaY = dngY - creature.y;

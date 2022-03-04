@@ -22,6 +22,7 @@ namespace EvolutionSimulation
         public int minRestExpense = 1; // How much does rest go down every tick
         public int maxRestExpense = 5;
         public int resourceAmount = 100; //Max amount of every resource
+        public int minPerception = 5;
         public float minLifeSpan = 0.5f; // Minimum years alive
         public float exhaustToSleepRatio = 3; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
         public float nightPerceptionPenalty = 0.4f; //Percentage of the max Perception lost at night

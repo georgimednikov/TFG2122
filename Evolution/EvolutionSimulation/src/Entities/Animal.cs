@@ -17,6 +17,7 @@ namespace EvolutionSimulation.Entities
             //int minEnergy = 50;
             //int sizeToEnergyRatio = 2; //The creature gains 1 point of max energy for every sizeToEnergyRatio of Size
             int resourceAmount = UniverseParametersManager.parameters.resourceAmount; //Max amount of /*energy/*/sleep/hydration
+            int minPerception = UniverseParametersManager.parameters.minPerception;
             float minLifeSpan = UniverseParametersManager.parameters.minLifeSpan; // Minimum years alive
             float exhaustToSleepRatio = UniverseParametersManager.parameters.exhaustToSleepRatio; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
             float nightPerceptionPenalty = UniverseParametersManager.parameters.nightPerceptionPenalty; //Percentage of the max Perception lost at night
@@ -106,7 +107,8 @@ namespace EvolutionSimulation.Entities
             //Environment related stats
             stats.Camouflage = chromosome.GetFeature(CreatureFeature.Camouflage);
             stats.Aggressiveness = chromosome.GetFeature(CreatureFeature.Aggressiveness);
-            stats.Perception = chromosome.GetFeature(CreatureFeature.Perception);
+            int maxPerception = chromosome.GetFeatureMax(CreatureFeature.Perception);
+            stats.Perception = (int)((float)chromosome.GetFeature(CreatureFeature.Perception) / maxPerception * (maxPerception - minPerception)) + minPerception;
 
             //A percentage equal to nightPerceptionPenalty of the max perception is lost at night
             stats.NightDebuff = chromosome.GetFeatureMax(CreatureFeature.Perception) * nightPerceptionPenalty;
