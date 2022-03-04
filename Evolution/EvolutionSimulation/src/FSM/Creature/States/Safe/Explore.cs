@@ -26,7 +26,6 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void OnEntry()
         {
             Tuple<int, int> posToDiscover = creature.GetUndiscoveredPlace();
-            Console.WriteLine("SetPath de Explore OnEntry");
             creature.SetPath(posToDiscover.Item1, posToDiscover.Item2);
         }
 
@@ -43,7 +42,6 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (nextPos.X < 0 || nextPos.Y < 0)
             {
                 Tuple<int, int> posToDiscover = creature.GetUndiscoveredPlace();
-                Console.WriteLine("SetPath de Explore Action");
                 creature.SetPath(posToDiscover.Item1, posToDiscover.Item2);
                 nextPos = creature.GetNextPosOnPath();
             }

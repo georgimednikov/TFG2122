@@ -17,6 +17,7 @@ namespace EvolutionSimulation.Entities
             //int minEnergy = 50;
             //int sizeToEnergyRatio = 2; //The creature gains 1 point of max energy for every sizeToEnergyRatio of Size
             int resourceAmount = UniverseParametersManager.parameters.resourceAmount; //Max amount of /*energy/*/sleep/hydration
+            int minPerception = UniverseParametersManager.parameters.minPerception;
             float minLifeSpan = UniverseParametersManager.parameters.minLifeSpan; // Minimum years alive
             float exhaustToSleepRatio = UniverseParametersManager.parameters.exhaustToSleepRatio; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
             float nightPerceptionPenalty = UniverseParametersManager.parameters.nightPerceptionPenalty; //Percentage of the max Perception lost at night

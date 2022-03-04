@@ -63,7 +63,7 @@ namespace EvolutionSimulation.Entities
             }                      
         }
 
-        public void Tick()
+        public new void Tick()
         {
             Edible = lifeTime > putridTime;
 
