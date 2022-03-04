@@ -1,4 +1,6 @@
-﻿namespace EvolutionSimulation.FSM.Creature.States
+﻿using System;
+
+namespace EvolutionSimulation.FSM.Creature.States
 {
     /// <summary>
     /// State trying to reproduce. It is only for males.
@@ -17,6 +19,8 @@
         // Increases current rest
         public override void Action()
         {
+            Console.WriteLine("Try to mate");
+
             if (creature.GetClosestPossibleMate() != null)
                 creature.GetClosestPossibleMate().ReceiveInteraction(creature, Entities.Interactions.mate);
         }

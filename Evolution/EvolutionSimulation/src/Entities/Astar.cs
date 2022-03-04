@@ -52,6 +52,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="treeDensity">Percentage of trees on the path</param>
         public static Vector3[] GetPath(Creature c, World w, Vector3 start, Vector3 end, out double treeDensity)
         {
+            Console.WriteLine("Empieza Astar: " + (end - start));
             List<GraphNode> path = new List<GraphNode>();
             Utils.PriorityQueue<GraphNode> open = new Utils.PriorityQueue<GraphNode>();
             List<GraphNode> closed = new List<GraphNode>();
@@ -77,6 +78,7 @@ namespace EvolutionSimulation.Entities
                         open.Insert(n);
                 }
             }
+            Console.WriteLine("Sale del primer bucle");
             GraphNode aux = closed[closed.Count - 1];
             int passedTrees = 0;
             while (aux != null)
@@ -85,13 +87,16 @@ namespace EvolutionSimulation.Entities
                 path.Add(aux);
                 aux = aux.prev;
             }
+            Console.WriteLine("Sale del segundo bucle");
             treeDensity = ((float)passedTrees) / ((float)path.Count);
             path.Reverse();
             Vector3[] retPath = new Vector3[path.Count];
+            Console.WriteLine("Path count: " + path.Count);
             for (int i = 0; i < path.Count; ++i)
             {
                 retPath[i] = path[i].pos;
             }
+            Console.WriteLine("Acaba Astar");
             return retPath;
         }
 
@@ -110,7 +115,7 @@ namespace EvolutionSimulation.Entities
             Vector3 dirAux = start;
             int ntiles = 0;
             treeDensity = 0;
-            while ((dirAux - end).Length() > 0.5)
+            while ((dirAux - end).Length() > 1)
             {
                 if (w.isTree((int)Math.Round(dirAux.X), (int)Math.Round(dirAux.Y)))
                     treeDensity++;

@@ -16,7 +16,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             Tuple<int, int> posToDrink = creature.GetClosestWater();
             //Angle between the creatures position and the position of the water from 0 to 180 positive or negative.
-            double degrees = Math.Atan2(posToDrink.Item2 - creature.y, posToDrink.Item1 - creature.x) * (180 / Math.PI);
+            double degrees = Math.Atan2(creature.y - posToDrink.Item2, creature.x - posToDrink.Item1) * (180 / Math.PI);
 
             //Now the sector has to be accounted for.
 

@@ -16,7 +16,7 @@ namespace VisualizadorConsola
         public void Init()
         {
             world = new World();
-            world.Init(32);
+            world.Init(320);
             Console.WriteLine("\n");
             WorldToBmp();
             

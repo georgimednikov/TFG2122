@@ -14,9 +14,6 @@
 
         public override bool Evaluate()
         {
-            //TODO objetivo de beber
-            //if (!creature.HasEatingObjective()) return true;
-
             // Max priority to sleep
             if (creature.IsExhausted())
                 return true;

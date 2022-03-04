@@ -1,4 +1,6 @@
-﻿namespace EvolutionSimulation.FSM.Creature.States
+﻿using System;
+
+namespace EvolutionSimulation.FSM.Creature.States
 {
     /// <summary>
     /// State reproducing. After a given time (in tick) if is a female it will create
@@ -23,6 +25,8 @@
         /// </summary>
         public override void Action()
         {
+            Console.WriteLine("Mating");
+
             time--;
             if (time == 0)
             {

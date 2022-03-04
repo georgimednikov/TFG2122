@@ -23,6 +23,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
+            Console.WriteLine("Fleeing");
+
             // If the creature is in a different tile, simpli get away from it
             int oX = creature.GetClosestCreature().x,   // Objective's position
                 oY = creature.GetClosestCreature().y;
