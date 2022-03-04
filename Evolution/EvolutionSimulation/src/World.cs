@@ -275,7 +275,13 @@ namespace EvolutionSimulation
             // Entity deletion
             CreaturesToDelete.ForEach(delegate (IEntity e)
             {
-                Creatures.Remove(e as Creature);
+                Creature tmp = e as Creature;
+                Creatures.Remove(tmp);
+                // Destroy the reference of itself on it children
+                tmp.childs.ForEach(delegate (Creature c)
+                {
+                    c.ParentDead(tmp);
+                });
                 e = null;
                 //foreach (Creature c in Creatures)
                 //    if (c.objective == e) c.objective = null;   // TODO URGENTE: Esto no deberia hacerse, pero ni poniendolo en null se quita la referencia al objetivo de la criatura

@@ -87,6 +87,7 @@
     <Compile Include="src\FSM\CompoundState.cs" />
     <Compile Include="src\FSM\Creature\States\Combat\ChaseEnemy.cs" />
     <Compile Include="src\FSM\Creature\States\Dead.cs" />
+    <Compile Include="src\FSM\Creature\States\Safe\FollowParent.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\GoToMate.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\GoToSafePlace.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\GoToEat.cs" />
@@ -109,7 +110,9 @@
     <Compile Include="src\FSM\Creature\Transitions\CreatureTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\CombatTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\DieTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\ChildTransitions\StopFollowParentTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\DoneExploringTransition.cs" />
+    <Compile Include="src\FSM\Creature\Transitions\Safe\ChildTransitions\FollowParentTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\Sleep\SafePlaceExploreTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\MateTransition\MatingExploreTransition.cs" />
     <Compile Include="src\FSM\Creature\Transitions\Safe\DrinkingTransition\DrinkingExploreTransition.cs" />

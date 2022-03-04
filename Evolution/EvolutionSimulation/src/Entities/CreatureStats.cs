@@ -2,6 +2,7 @@
 
 namespace EvolutionSimulation.Entities
 {
+    [Serializable]
     public class CreatureStats
     {
         private float startMultiplier = UniverseParametersManager.parameters.newbornStatMultiplier; //Starting multiplier of newborns
@@ -18,16 +19,6 @@ namespace EvolutionSimulation.Entities
         public float thirstyThreshold = UniverseParametersManager.parameters.thirstyThreshold; //After which percentage of currHydration the creature should eat with low priority
         //After which percentage of currHydration the creature should eat with high priority
         public float veryThirstyThreshold = UniverseParametersManager.parameters.veryThirstyThreshold;
-
-        /// <summary>
-        /// Modifies the given stat based on age
-        /// </summary>
-        float ModifyStatByAge(float stat)
-        {
-            return stat * Math.Min(1.0f, (1 - startMultiplier) / (LifeSpan * adulthoodThreshold) * currAge + startMultiplier);
-        }
-
-        public bool IsNewBorn() { return LifeSpan * adulthoodThreshold < currAge; }
 
         public Genetics.Gender Gender { get; set; }
 
@@ -125,5 +116,15 @@ namespace EvolutionSimulation.Entities
         public bool InHeat { get; set; }
 
         public bool Upright { get; set; }
+
+        /// <summary>
+        /// Modifies the given stat based on age
+        /// </summary>
+        float ModifyStatByAge(float stat)
+        {
+            return stat * Math.Min(1.0f, (1 - startMultiplier) / (LifeSpan * adulthoodThreshold) * currAge + startMultiplier);
+        }
+
+        public bool IsNewBorn() { return LifeSpan * adulthoodThreshold < currAge; }
     }
 }
