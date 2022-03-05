@@ -42,30 +42,30 @@ namespace EvolutionSimulation.Entities
         }
         public int Damage
         {
-            get { /* Minimum damage is 1 */ return (int)Math.Ceiling(ModifyStatByAge(Damage)); }
-            set { Damage = value; }
+            get { /* Minimum damage is 1 */ return (int)Math.Ceiling(ModifyStatByAge(baseStats.Damage)); }
+            set { baseStats.Damage = value; }
         }
         public int Armor
         {
-            get { return (int)ModifyStatByAge(Armor); }
-            set { Armor = value; }
+            get { return (int)ModifyStatByAge(baseStats.Armor); }
+            set { baseStats.Armor = value; }
         }
         public int Perforation
         {
-            get { return (int)ModifyStatByAge(Perforation); }
-            set { Perforation = value; }
+            get { return (int)ModifyStatByAge(baseStats.Perforation); }
+            set { baseStats.Perforation = value; }
         }
         public float Venom
         {
-            get { return ModifyStatByAge(Venom); }
-            set { Venom = value; }
+            get { return ModifyStatByAge(baseStats.Venom); }
+            set { baseStats.Venom = value; }
         }
 
         // Reflected damage (spikes)
         public float Counter
         {
-            get { return ModifyStatByAge(Counter); }
-            set { Counter = value; }
+            get { return ModifyStatByAge(baseStats.Counter); }
+            set { baseStats.Counter = value; }
         }
 
         //Mobility related stats
@@ -161,13 +161,13 @@ namespace EvolutionSimulation.Entities
         }
         public int Aggressiveness
         {
-            get { return (int)ModifyStatByAge(Aggressiveness); }
-            set { Aggressiveness = value; }
+            get { return (int)ModifyStatByAge(baseStats.Aggressiveness); }
+            set { baseStats.Aggressiveness = value; }
         }
         public int Intimidation
         {
-            get { return (int)ModifyStatByAge(Intimidation); }
-            set { Intimidation = value; }
+            get { return (int)ModifyStatByAge(baseStats.Intimidation); }
+            set { baseStats.Intimidation = value; }
         }
         public int Perception
         {
@@ -183,8 +183,8 @@ namespace EvolutionSimulation.Entities
         //Physique related stats
         public int Size
         {
-            get { return (int)ModifyStatByAge(Size); }
-            set { Size = value; }
+            get { return (int)ModifyStatByAge(baseStats.Size); }
+            set { baseStats.Size = value; }
         }
         public int LifeSpan
         {
@@ -194,8 +194,8 @@ namespace EvolutionSimulation.Entities
 
         public int CurrAge
         {
-            get { return CurrAge; }
-            set { float oldMaxH = MaxHealth; CurrAge = value; CurrHealth += MaxHealth - oldMaxH; }
+            get { return baseStats.CurrAge; }
+            set { float oldMaxH = MaxHealth; baseStats.CurrAge = value; CurrHealth += MaxHealth - oldMaxH; }
         }
         public int Members //limbs
         {

@@ -28,11 +28,7 @@ namespace VisualizadorConsola
             Animal d = world.CreateCreature<Animal>(5, 5); // Enemy
             d.stats.Aggressiveness = 50;
             d.stats.Metabolism = 50;
-            world.ExportContent();
-            using(StreamReader reader = new StreamReader("../../ResultingData/Species_0")){
-                EvolutionSimulation.Genetics.SpeciesExport test = EvolutionSimulation.Genetics.SpeciesExport.GetExportFromJSON(reader.ReadToEnd());
-                
-            }
+
             //Corpse c1 = world.CreateStableEntity<Corpse>();
             //c1.Init(c.world, 5, c.x, c.y+1, 0.4f, 0.7f, 5, 5, 80f); // TODO: stats to be derived from creacher
 
