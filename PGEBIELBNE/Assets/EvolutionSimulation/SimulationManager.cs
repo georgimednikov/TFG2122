@@ -5,18 +5,19 @@ namespace UnitySimulation
     public class SimulationManager : MonoBehaviour
     {
         public int SimulationYears;
-        public WorldCreaturesManager creatureManager;
+        public int InitalAnimals;
+        public WorldCreaturesManager worldCreatureManager;
 
         UnitySimulation simulation;
         void Start()
         {
             simulation = new UnitySimulation();
 
-            simulation.yearsToSimulate = SimulationYears;
+            simulation.SetInitialParameters(SimulationYears, InitalAnimals);
             simulation.Init();
             simulation.Run();
 
-            simulation.Subscribe(creatureManager);
+            simulation.Subscribe(worldCreatureManager);
         }
 
         void Update()

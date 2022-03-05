@@ -11,8 +11,13 @@ namespace UnitySimulation
     {
         public void Init()
         {
+            world_listeners = new List<IListener<World>>();
             world = new World();
             world.Init(32);
+            for (int i = 0; i < initialAnimals; i++)
+            {
+                EvolutionSimulation.Entities.Animal c = world.CreateCreature<EvolutionSimulation.Entities.Animal>(5, 5);
+            }
         }
 
         /// <summary>
@@ -40,6 +45,17 @@ namespace UnitySimulation
                 listener.OnNotify(world);
         }
 
+        /// <summary>
+        /// Sets the parameters for the initial simulation before visualization
+        /// </summary>
+        /// <param name="years"> Number of years to simulate </param>
+        /// <param name="animals"> Number of animals that are initially created </param>
+        public void SetInitialParameters(int years, int animals)
+        {
+            yearsToSimulate = years;
+            initialAnimals = animals;
+        }
+
         public bool Subscribe(IListener<World> listener)
         {
             if (world_listeners.Contains(listener)) return false;
@@ -53,7 +69,8 @@ namespace UnitySimulation
         }
 
         World world;
-        public int yearsToSimulate;
+        int yearsToSimulate;
+        int initialAnimals;
 
         List<IListener<World>> world_listeners;
     }
