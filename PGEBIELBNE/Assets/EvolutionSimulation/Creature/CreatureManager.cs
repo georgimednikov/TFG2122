@@ -1,10 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using EvolutionSimulation;
+using EvolutionSimulation.Entities;
 using EvolutionSimulation.Genetics;
+using UnityEngine;
 
-namespace EvolutionSimulation.Unity
+namespace UnitySimulation
 {
     public class CreatureManager : MonoBehaviour
     {
@@ -25,20 +23,18 @@ namespace EvolutionSimulation.Unity
 
         float baseHeight;
 
-        public void InitalizeCreature(Entities.Creature creature)
+        public void InitalizeCreature(Creature creature)
         {
             SpeciesExport species = new SpeciesExport(creature.speciesName, creature.stats);
             Init(species);
         }
         public void InitalizeCreature(TextAsset json)
         {
-            SpeciesExport species = Newtonsoft.Json.JsonConvert.DeserializeObject<SpeciesExport>(json.text);
+            SpeciesExport species = SpeciesExport.GetExportFromJSON(json.text);
             Init(species);
         }
         void Init(SpeciesExport species)
         {
-            
-            //SpeciesExport creature = JsonUtility.FromJson<SpeciesExport>(json.text);
             sizeScale = species.stats.Size / 100f;
             baseHeight = sizeScale / 1.25f;
             bodyEmpty = new GameObject("BodyEmpty").transform;

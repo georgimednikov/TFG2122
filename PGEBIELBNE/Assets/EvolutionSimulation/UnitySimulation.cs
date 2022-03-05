@@ -1,10 +1,8 @@
-using UnityEngine;
-using EvolutionSimulation;
-using System;
 using System.Collections.Generic;
+using EvolutionSimulation;
 using EvolutionSimulation.Utils;
 
-namespace EvolutionSimulation.Unity
+namespace UnitySimulation
 {
     // TODO: a ver esto puede estar en el propio SimulationManager, pero por si luego usamos 
     // el propio Simulation de la dll. La cosa esque ese no tiene un Step.

@@ -1,10 +1,11 @@
 using System;
 using UnityEngine;
 
-namespace EvolutionSimulation.Unity
+namespace UnitySimulation
 {
     public class GenerateCreatures : MonoBehaviour
     {
+        
         [Serializable]
         public struct CreatureSpawn
         {
@@ -23,7 +24,6 @@ namespace EvolutionSimulation.Unity
         
         public CreatureSpawn[] creatureDistribution;
 
-        // Start is called before the first frame update
         void Start()
         {
             Terrain terrain = GetComponent<Terrain>();

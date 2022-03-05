@@ -1,8 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-namespace EvolutionSimulation.Unity
+namespace UnitySimulation
 {
     public class SimulationManager : MonoBehaviour
     {

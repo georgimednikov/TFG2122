@@ -70,14 +70,12 @@ namespace EvolutionSimulation.Genetics
         Count
     }
 
-    [System.Serializable]
     public enum Gender
     {
         Male,
         Female
     }
 
-    [System.Serializable]
     public enum Diet
     {
         Herbivore,

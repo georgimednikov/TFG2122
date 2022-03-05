@@ -32,13 +32,18 @@ namespace EvolutionSimulation.Genetics
 
     public struct SpeciesExport
     {
-        public string name { get; }
-        public CreatureStats stats { get; }
+        public string name;
+        public CreatureBaseStats stats;
 
         public SpeciesExport(string name, CreatureStats stats)
         {
             this.name = name;
-            this.stats = stats;
+            this.stats = stats.GetBaseStats();
+        }
+
+        public static SpeciesExport GetExportFromJSON(string json)
+        {
+            return JsonConvert.DeserializeObject<SpeciesExport>(json);
         }
     }
 

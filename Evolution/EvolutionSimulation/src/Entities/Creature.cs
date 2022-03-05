@@ -167,7 +167,6 @@ namespace EvolutionSimulation.Entities
         public CreatureChromosome chromosome { get; private set; }
         public CreatureStats stats { get; private set; }
 
-
         /// <summary>
         /// Sets the stats of the creature.
         /// </summary>
