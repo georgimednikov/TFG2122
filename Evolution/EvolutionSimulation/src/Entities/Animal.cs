@@ -119,7 +119,9 @@ namespace EvolutionSimulation.Entities
 
             //Behaviour related stats
             stats.Knowledge = chromosome.GetFeature(CreatureFeature.Knowledge);
-            stats.Paternity = chromosome.GetFeature(CreatureFeature.Paternity);
+
+            if (!HasAbility(CreatureFeature.Paternity, abilityUnlock)) stats.Paternity = 0;
+            else stats.Paternity = chromosome.GetFeature(CreatureFeature.Paternity);
 
             ModifyStatsByAbilities(abilityUnlock);
         }
