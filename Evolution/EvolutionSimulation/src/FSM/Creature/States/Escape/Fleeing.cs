@@ -37,7 +37,11 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override int GetCost()
         {
-            return creature.cornered? UniverseParametersManager.parameters.baseActionCost : (int)(creature.GetNextCostOnPath() * modifier);
+            int cost = creature.GetNextCostOnPath();
+            if(cost < 0) {
+                creature.cornered = true;
+                return UniverseParametersManager.parameters.baseActionCost;
+            } else return creature.cornered? UniverseParametersManager.parameters.baseActionCost : (int)(cost * modifier);
         }
 
         // TODO: Esto no deberia estar aqui!!!

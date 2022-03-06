@@ -506,9 +506,10 @@ namespace EvolutionSimulation
         {
             if (parameters.fleeingTransitionMultiplier <= 0 || parameters.hidingTransitionMultiplier <= 0 || parameters.stopEatingTransitionEnergyMultiplier <= 0 || 
                 parameters.combatTransitionHealthThresholdMultiplier <= 0 || parameters.escapeTransitionAggressivenessThreshold <= 0 || 
-                parameters.escapeTransitionHealthThresholdMultiplier <= 0|| parameters.safeTransitionAggressivenessThreshold <= 0) 
+                parameters.escapeTransitionHealthThresholdMultiplier <= 0|| parameters.safeTransitionAggressivenessThreshold <= 0 ||
+                parameters.combatTransitionAggressivenessThreshold <= 0) 
                 throw new UniverseParameterIsZeroException("The provided transition parameters must be positive");
-            if (parameters.escapeTransitionAggressivenessThreshold > 1)
+            if (parameters.escapeTransitionAggressivenessThreshold > 1 || parameters.combatTransitionAggressivenessThreshold > 1)
                 throw new PercentageOverOneException("The provided transition percentages are over one");
         }
 
