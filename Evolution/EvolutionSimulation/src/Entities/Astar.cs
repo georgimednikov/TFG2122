@@ -78,7 +78,7 @@ namespace EvolutionSimulation.Entities
                         open.Insert(n);
                 }
             }
-            Console.WriteLine("Sale del primer bucle");
+
             GraphNode aux = closed[closed.Count - 1];
             int passedTrees = 0;
             while (aux != null)
@@ -87,7 +87,7 @@ namespace EvolutionSimulation.Entities
                 path.Add(aux);
                 aux = aux.prev;
             }
-            Console.WriteLine("Sale del segundo bucle");
+
             treeDensity = ((float)passedTrees) / ((float)path.Count);
             path.Reverse();
             Vector3[] retPath = new Vector3[path.Count - 1];

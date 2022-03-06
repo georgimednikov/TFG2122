@@ -13,8 +13,7 @@
 
         public override bool Evaluate()
         {
-            
-            return !creature.IsTired() || creature.GetClosestSafePlace() == null;
+            return !creature.IsTired() || creature.GetClosestSafePlacePosition() == null;
         }
 
         public override string ToString()

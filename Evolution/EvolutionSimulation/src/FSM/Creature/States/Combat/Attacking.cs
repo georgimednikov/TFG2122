@@ -23,7 +23,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         // Increases current rest
         public override void Action()
         {
-            if (creature.GetClosestCreature() == null) return;
+            if (creature.GetClosestCreatureReachable() == null) return;
             
             if(poison)
                 creature.GetClosestCreatureReachable().ReceiveInteraction(creature, Entities.Interactions.poison);

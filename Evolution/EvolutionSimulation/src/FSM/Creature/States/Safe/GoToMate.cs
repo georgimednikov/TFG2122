@@ -8,6 +8,8 @@ namespace EvolutionSimulation.FSM.Creature.States
     /// </summary>
     class GoToMate : CreatureState
     {
+        Tuple<int, int> matePos;
+
         public GoToMate(Entities.Creature c) : base(c) { creature = c; }
 
         public override int GetCost()
@@ -17,7 +19,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            creature.SetPath(creature.GetClosestPossibleMate().x, creature.GetClosestPossibleMate().y);
+            matePos = creature.GetClosestPossibleMatePosition();
+            creature.SetPath(matePos.Item1, matePos.Item2);
         }
 
         /// <summary>
@@ -25,11 +28,16 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override void Action()
         {
+            Console.WriteLine("GoToMate action");
             Vector3 nextPos = creature.GetNextPosOnPath();
             if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-            Console.WriteLine("GoToMate action");
-            creature.SetPath(creature.GetClosestPossibleMate().x, creature.GetClosestPossibleMate().y);
+
+            if (matePos != creature.GetClosestPossibleMatePosition())
+            {
+                matePos = creature.GetClosestPossibleMatePosition();
+                creature.SetPath(matePos.Item1, matePos.Item2);
+            }
         }
 
         public override string ToString()

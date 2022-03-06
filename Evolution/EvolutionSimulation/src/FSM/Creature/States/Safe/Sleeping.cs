@@ -18,13 +18,11 @@ namespace EvolutionSimulation.FSM.Creature.States
         // Increases current rest
         public override void Action()
         {
-            Console.WriteLine("Sleeping");
+            Console.WriteLine("Sleeping action");
 
             creature.stats.CurrRest += creature.stats.RestRecovery;
             if (creature.stats.CurrRest > creature.stats.MaxRest)
                 creature.stats.CurrRest = creature.stats.MaxRest;
-
-            Console.WriteLine("Sleeping action");
         }
 
         public override string ToString()

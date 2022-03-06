@@ -18,7 +18,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             Console.WriteLine("Wander");
 
-            int nX = 0, nY = 0;
+            int nX, nY;
             do
             {
                 nX = creature.x + RandomGenerator.Next(-1, 2);

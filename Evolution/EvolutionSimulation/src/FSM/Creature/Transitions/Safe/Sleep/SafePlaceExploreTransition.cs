@@ -13,7 +13,7 @@
 
         public override bool Evaluate()
         {
-            return creature.GetClosestSafePlace() == null;
+            return creature.GetClosestSafePlacePosition() == null;
         }
 
         public override string ToString()

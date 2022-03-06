@@ -28,20 +28,10 @@ namespace EvolutionSimulation.FSM.Creature.States
             }
             else//Omnivore
             {
-                if (creature.GetClosestCorpse() == null)
-                    EatPlant();
-                else if (creature.GetClosestFruit() == null)
+                if (creature.GetClosestCorpse() != null)
                     EatCorpse();
-                else
-                {
-                    //Eat the nearest food (nearest Fruit or Corpse)
-                    int distPlant = creature.DistanceToObjective(creature.GetClosestFruit()),
-                        distCorpse = creature.DistanceToObjective(creature.GetClosestCorpse());
-                    if (distPlant < distCorpse)
-                        EatPlant();
-                    else
-                        EatCorpse();
-                }
+                else if (creature.GetClosestFruit() != null)
+                    EatPlant();
             }
         }
 
