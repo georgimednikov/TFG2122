@@ -28,7 +28,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             degrees += 45.0 / 2;
 
             int sector = (int)(degrees / 45);
-            Tuple<int, int> finalPosition = SectorToPosition(sector);
+            Tuple<int, int> finalPosition = SectorToPosition(posToDrink, sector);
             //int cont = 0;
             //while (creature.world.map[finalPosition.Item1, finalPosition.Item2].isWater)
             //{
@@ -56,28 +56,28 @@ namespace EvolutionSimulation.FSM.Creature.States
             return "GoToDrinkState";
         }
 
-        private Tuple<int, int> SectorToPosition(int sector)
+        private Tuple<int, int> SectorToPosition(Tuple<int, int> pos, int sector)
         {
             switch (sector)
             {
                 case 0:
-                    return new Tuple<int, int>(0, 1);
+                    return new Tuple<int, int>(pos.Item1 + 1, pos.Item2);
                 case 1:
-                    return new Tuple<int, int>(1, 1);
+                    return new Tuple<int, int>(pos.Item1 + 1, pos.Item2 + 1);
                 case 2:
-                    return new Tuple<int, int>(0, 1);
+                    return new Tuple<int, int>(pos.Item1, pos.Item2 + 1);
                 case 3:
-                    return new Tuple<int, int>(-1, 1);
+                    return new Tuple<int, int>(pos.Item1 - 1, pos.Item2 + 1);
                 case 4:
-                    return new Tuple<int, int>(-1, 0);
+                    return new Tuple<int, int>(pos.Item1 - 1, pos.Item2);
                 case 5:
-                    return new Tuple<int, int>(-1, -1);
+                    return new Tuple<int, int>(pos.Item1 - 1, pos.Item2 - 1);
                 case 6:
-                    return new Tuple<int, int>(0, -1);
+                    return new Tuple<int, int>(pos.Item1, pos.Item2 - 1);
                 case 7:
-                    return new Tuple<int, int>(1, -1);
+                    return new Tuple<int, int>(pos.Item1 + 1, pos.Item2 - 1);
                 default:
-                    return new Tuple<int, int>(-1, -1);
+                    throw new Exception("Error calculating closest position to water in GoToDrink");
             }
         }
     }
