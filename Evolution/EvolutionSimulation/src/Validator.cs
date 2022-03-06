@@ -452,7 +452,7 @@ namespace EvolutionSimulation
         {
             if (parameters.ticksPerHour <= 0 || parameters.hoursPerDay <= 0 || parameters.daysPerYear <= 0 || parameters.morningStart <= 0 || parameters.nightStart <= 0) 
                 throw new UniverseParameterIsZeroException("The provided time parameters must be positive");
-            if(parameters.morningStart < parameters.nightStart)
+            if(parameters.morningStart > parameters.nightStart)
                 throw new MinMaxValueSwappedException("The day must start before night starts");
             if(parameters.morningStart > parameters.hoursPerDay || parameters.nightStart > parameters.hoursPerDay)
                 throw new UniverseParameterBeyondMaxException("The provided day change parameters are beyond the duration of a day in hours");
