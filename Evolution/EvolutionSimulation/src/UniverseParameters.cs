@@ -80,6 +80,7 @@ namespace EvolutionSimulation
                 throw new Exception("Cannot find JSON with universe parameters with name: " + UserInfo.DataDirectory + "UniverseParameters.json");
             string file = File.ReadAllText(jsonParameters);
             parameters = JsonConvert.DeserializeObject<UniverseParameters>(file);
+            Validator.Validate(parameters);
         }
 
         public static void WriteDefaultParameters()

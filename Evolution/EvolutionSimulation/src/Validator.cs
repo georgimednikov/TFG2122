@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using EvolutionSimulation.Genetics;
 
 namespace EvolutionSimulation
@@ -384,6 +385,137 @@ namespace EvolutionSimulation
                 throw new SimilarityThesholdNotValid("The provided similarity species threshold must be a positive number smaller than one to allow reproduction");
 
             return;
+        }
+        #endregion
+
+        #region UniverseParameters
+        public class UniverseParameterIsZeroException : Exception
+        {
+            public UniverseParameterIsZeroException() { }
+            public UniverseParameterIsZeroException(string message) : base(message) { }
+            public UniverseParameterIsZeroException(string message, Exception inner) : base(message, inner) { }
+            protected UniverseParameterIsZeroException(
+              System.Runtime.Serialization.SerializationInfo info,
+              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+        }
+
+        public class UniverseParameterBeyondMaxException : Exception
+        {
+            public UniverseParameterBeyondMaxException() { }
+            public UniverseParameterBeyondMaxException(string message) : base(message) { }
+            public UniverseParameterBeyondMaxException(string message, Exception inner) : base(message, inner) { }
+            protected UniverseParameterBeyondMaxException(
+              System.Runtime.Serialization.SerializationInfo info,
+              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+        }
+
+        public class MinMaxValueSwappedException : Exception
+        {
+            public MinMaxValueSwappedException() { }
+            public MinMaxValueSwappedException(string message) : base(message) { }
+            public MinMaxValueSwappedException(string message, Exception inner) : base(message, inner) { }
+            protected MinMaxValueSwappedException(
+              System.Runtime.Serialization.SerializationInfo info,
+              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+        }
+
+        public class PercentageOverOneException : Exception
+        {
+            public PercentageOverOneException() { }
+            public PercentageOverOneException(string message) : base(message) { }
+            public PercentageOverOneException(string message, Exception inner) : base(message, inner) { }
+            protected PercentageOverOneException(
+              System.Runtime.Serialization.SerializationInfo info,
+              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+        }
+
+        public static void Validate(UniverseParameters parameters) 
+        {
+            ValidateWorld(parameters);
+
+            ValidateCreature(parameters);
+
+            ValidateCreatureStats(parameters);
+
+            ValidateTrees(parameters);
+
+            ValidateMemory(parameters);
+
+            ValidateCreatureStates(parameters);
+
+            ValidateCreatureTransitions(parameters);
+
+            ValidateCorpse(parameters);
+        }
+
+        static void ValidateWorld(UniverseParameters parameters)
+        {
+            if (parameters.ticksPerHour <= 0 || parameters.hoursPerDay <= 0 || parameters.daysPerYear <= 0 || parameters.morningStart <= 0 || parameters.nightStart <= 0) 
+                throw new UniverseParameterIsZeroException("The provided time parameters must be positive");
+            if(parameters.morningStart < parameters.nightStart)
+                throw new MinMaxValueSwappedException("The day must start before night starts");
+            if(parameters.morningStart > parameters.hoursPerDay || parameters.nightStart > parameters.hoursPerDay)
+                throw new UniverseParameterBeyondMaxException("The provided day change parameters are beyond the duration of a day in hours");
+        }
+
+        static void ValidateCreature(UniverseParameters parameters)
+        {
+            if (parameters.abilityUnlockPercentage <= 0 || parameters.minHealth <= 0 || parameters.healthGainMultiplier <= 0 || 
+                parameters.healthRegeneration <= 0 || parameters.maxLimbs <= 0 || parameters.minRestExpense <= 0 || parameters.maxRestExpense <= 0 ||
+                parameters.resourceAmount <= 0 || parameters.minLifeSpan <= 0 || parameters.exhaustToSleepRatio <= 0 || parameters.nightPerceptionPenalty <= 0 ||
+                parameters.minMobilityMedium <= 0 || parameters.mobilityPenalty <= 0 || parameters.maxSpeed <= 0 || parameters.hornIntimidationMultiplier <= 0) 
+                throw new UniverseParameterIsZeroException("The provided creature parameters must be positive");
+            if (parameters.maxRestExpense < parameters.minRestExpense)
+                throw new MinMaxValueSwappedException("The maximum amount of rest expense is lower than the minimium");
+            if (parameters.abilityUnlockPercentage > 1 || parameters.nightPerceptionPenalty > 1 || parameters.minMobilityMedium > 1 || parameters.mobilityPenalty > 1)
+                throw new PercentageOverOneException("The provided creature percentages are over one");
+        }
+
+        static void ValidateCreatureStats(UniverseParameters parameters)
+        {
+            if (parameters.newbornStatMultiplier <= 0 || parameters.adulthoodThreshold <= 0 || parameters.tiredThreshold <= 0 || parameters.exhaustThreshold <= 0 ||
+                parameters.hungryThreshold <= 0 || parameters.veryHungryThreshold <= 0 || parameters.thirstyThreshold <= 0 || parameters.veryThirstyThreshold <= 0) 
+                throw new UniverseParameterIsZeroException("The provided stat parameters must be positive");
+            if (parameters.newbornStatMultiplier > 1 || parameters.adulthoodThreshold > 1 || parameters.tiredThreshold > 1 || parameters.exhaustThreshold > 1 ||
+                parameters.hungryThreshold > 1 || parameters.veryHungryThreshold > 1 || parameters.thirstyThreshold > 1 || parameters.veryThirstyThreshold > 1)
+                throw new PercentageOverOneException("The provided stat percentages are over one");
+        }
+
+        static void ValidateTrees(UniverseParameters parameters)
+        {
+            if (parameters.treeMovementPenalty <= 0) 
+                throw new UniverseParameterIsZeroException("The provided tree parameters must be positive");
+            if (parameters.treeMovementPenalty > 1)
+                throw new PercentageOverOneException("The provided tree percentages are over one");
+        }
+
+        static void ValidateMemory(UniverseParameters parameters)
+        {
+            if (parameters.knowledgeTickMultiplier <= 0) 
+                throw new UniverseParameterIsZeroException("The provided tree parameters must be positive");
+        }
+
+        static void ValidateCreatureStates(UniverseParameters parameters)
+        {
+            if (parameters.baseActionCost <= 0 || parameters.venomCostMultiplier <= 0 || parameters.chaseCostMultiplier <= 0 || parameters.fleeingCostMultiplier <= 0 ||
+                parameters.drinkingCostMultiplier <= 0 || parameters.eatingCostMultiplier <= 0|| parameters.sleepingCostMultiplier <= 0) 
+                throw new UniverseParameterIsZeroException("The provided state parameters must be positive");
+        }
+
+        static void ValidateCreatureTransitions(UniverseParameters parameters)
+        {
+            if (parameters.fleeingTransitionMultiplier <= 0 || parameters.hidingTransitionMultiplier <= 0 || parameters.stopEatingTransitionEnergyMultiplier <= 0 || 
+                parameters.combatTransitionHealthThresholdMultiplier <= 0 || parameters.escapeTransitionAggressivenessThreshold <= 0 || 
+                parameters.escapeTransitionHealthThresholdMultiplier <= 0|| parameters.safeTransitionAggressivenessThreshold <= 0) 
+                throw new UniverseParameterIsZeroException("The provided transition parameters must be positive");
+            if (parameters.escapeTransitionAggressivenessThreshold > 1)
+                throw new PercentageOverOneException("The provided transition percentages are over one");
+        }
+
+        static void ValidateCorpse(UniverseParameters parameters)
+        {
+            if (parameters.rotStartMultiplier <= 0 || parameters.corpseNutritionPointsMultiplier <= 0) 
+                throw new UniverseParameterIsZeroException("The provided corpse parameters must be positive");
         }
         #endregion
     }
