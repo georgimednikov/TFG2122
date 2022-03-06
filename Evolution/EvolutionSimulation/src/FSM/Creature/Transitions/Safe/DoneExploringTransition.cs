@@ -15,9 +15,9 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            if (creature.wantMate && creature.GetClosestPossibleMate() == null) return false;
-            if (creature.IsThirsty() && creature.GetClosestWater() == null) return false;
-            if (creature.IsTired() && creature.GetClosestSafePlace() == null) return false;
+            if (creature.wantMate && creature.GetClosestPossibleMatePosition() == null) return false;
+            if (creature.IsThirsty() && creature.GetClosestWaterPosition() == null) return false;
+            if (creature.IsTired() && creature.GetClosestSafePlacePosition() == null) return false;
             if (creature.IsHungry() && !creature.HasEatingObjective()) return false;
             return true;
         }

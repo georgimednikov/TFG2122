@@ -32,13 +32,18 @@ namespace EvolutionSimulation.Genetics
 
     public struct SpeciesExport
     {
-        public string name { get; }
-        public CreatureStats stats { get; }
+        public string name;
+        public CreatureBaseStats stats;
 
         public SpeciesExport(string name, CreatureStats stats)
         {
             this.name = name;
-            this.stats = stats;
+            this.stats = stats.GetBaseStats();
+        }
+
+        public static SpeciesExport GetExportFromJSON(string json)
+        {
+            return JsonConvert.DeserializeObject<SpeciesExport>(json);
         }
     }
 
@@ -80,8 +85,7 @@ namespace EvolutionSimulation.Genetics
             //In tuples to facilitate the modification of the file
             //(the feature name is written instead of a number)
             Tuple<CreatureFeature, float>[] weights = JsonConvert.DeserializeObject<Tuple<CreatureFeature, float>[]>(file);
-            if (weights.Length != (int)CreatureFeature.Count)
-                throw new Exception("JSON with gene weights to calculate genetic similarities has an invalid size");
+            Validator.Validate(weights);
             speciesGeneWeights = new float[weights.Length];
             foreach (var t in weights)
             {
@@ -92,6 +96,7 @@ namespace EvolutionSimulation.Genetics
 
             file = File.ReadAllText(jsonSimilarity);
             minGeneticSimilarity = JsonConvert.DeserializeObject<float>(file);
+            Validator.Validate(minGeneticSimilarity);
         }
 
 
@@ -180,18 +185,6 @@ namespace EvolutionSimulation.Genetics
         /// <returns> Value between 0-1. 1 has the same values and 0 different values</returns>
         private float GeneticSimilarity(CreatureChromosome creature1, CreatureChromosome creature2)
         {
-            if (speciesGeneWeights.Length != (int)CreatureFeature.Count)
-            {
-                throw new Exception("Weights must have the same length as CreatureFeatures");
-            }
-            float sum = 0;
-            foreach (float w in speciesGeneWeights)
-                sum += w;
-            if (sum < 0.98 || sum > 1) //Wiggle room
-            {
-                throw new Exception("Weights sum must be 1");
-            }
-
             float total = 0;
             //Check the similarity of each gene
             for (int i = 0; i < (int)CreatureFeature.Count; ++i)

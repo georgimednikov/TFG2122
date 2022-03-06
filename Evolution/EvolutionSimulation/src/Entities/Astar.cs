@@ -78,7 +78,7 @@ namespace EvolutionSimulation.Entities
                         open.Insert(n);
                 }
             }
-            Console.WriteLine("Sale del primer bucle");
+
             GraphNode aux = closed[closed.Count - 1];
             int passedTrees = 0;
             while (aux != null)
@@ -87,7 +87,7 @@ namespace EvolutionSimulation.Entities
                 path.Add(aux);
                 aux = aux.prev;
             }
-            Console.WriteLine("Sale del segundo bucle");
+
             treeDensity = ((float)passedTrees) / ((float)path.Count);
             path.Reverse();
             Vector3[] retPath = new Vector3[path.Count - 1];
@@ -114,14 +114,14 @@ namespace EvolutionSimulation.Entities
             Vector3 dirAux = start;
             int ntiles = 0;
             treeDensity = 0;
-            while ((dirAux - end).Length() > 0.75)
+            while ((dirAux - end).Length() > 0.6f)
             {
                 if (w.isTree((int)Math.Round(dirAux.X), (int)Math.Round(dirAux.Y)))
                     treeDensity++;
                 ntiles++;
                 dirAux += dirN;
             }
-            treeDensity /= ntiles;
+            if(ntiles != 0) treeDensity /= ntiles;
 
             double ret = Math.Max(Math.Abs(dir.X), Math.Abs(dir.Y));
             if ((start.Z == (int)Creature.HeightLayer.Tree || end.Z == (int)Creature.HeightLayer.Tree) && treeBetter) ret *= treeDensity * c.stats.GroundSpeed / c.stats.ArborealSpeed;

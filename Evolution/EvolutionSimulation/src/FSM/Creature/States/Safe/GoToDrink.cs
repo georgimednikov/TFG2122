@@ -14,7 +14,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            Tuple<int, int> posToDrink = creature.GetClosestWater();
+            Tuple<int, int> posToDrink = creature.GetClosestWaterPosition();
             //Angle between the creatures position and the position of the water from 0 to 180 positive or negative.
             double degrees = Math.Atan2(creature.y - posToDrink.Item2, creature.x - posToDrink.Item1) * (180 / Math.PI);
 
@@ -29,16 +29,16 @@ namespace EvolutionSimulation.FSM.Creature.States
 
             int sector = (int)(degrees / 45);
             Tuple<int, int> finalPosition = SectorToPosition(sector);
-            int cont = 0;
-            while (creature.world.map[finalPosition.Item1, finalPosition.Item2].isWater)
-            {
-                //The increment has to have the same sign as cont to add their values without possible substractions,
-                //but cont's sign has to be mantained to alternate between going "left" or "right" realtive to the current sector.
-                int inc = 1; if (cont < 0) inc *= -1;
-                cont = (cont + inc) * -1;
-                sector = (sector + cont) % 8;
-                finalPosition = SectorToPosition(sector);
-            }
+            //int cont = 0;
+            //while (creature.world.map[finalPosition.Item1, finalPosition.Item2].isWater)
+            //{
+            //    //The increment has to have the same sign as cont to add their values without possible substractions,
+            //    //but cont's sign has to be mantained to alternate between going "left" or "right" realtive to the current sector.
+            //    int inc = 1; if (cont < 0) inc *= -1;
+            //    cont = (cont + inc) * -1;
+            //    sector = (sector + cont) % 8;
+            //    finalPosition = SectorToPosition(sector);
+            //}
 
             creature.SetPath(finalPosition.Item1, finalPosition.Item2);
         }

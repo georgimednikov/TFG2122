@@ -18,9 +18,7 @@
         /// </summary>
         public override bool Evaluate()
         {
-            int xObj= creature.GetClosestSafePlace().Item1, yObj = creature.GetClosestSafePlace().Item2;
-            return (creature.IsTired() && creature.DistanceToObjective(xObj, yObj) <= 1)
-                || creature.IsExhausted();
+            return (creature.IsTired() && creature.DistanceToObjective(creature.GetClosestSafePlacePosition()) <= 1) || creature.IsExhausted();
         }
 
         public override string ToString()

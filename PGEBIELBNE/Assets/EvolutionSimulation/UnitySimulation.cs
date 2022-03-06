@@ -1,10 +1,8 @@
-using UnityEngine;
-using EvolutionSimulation;
-using System;
 using System.Collections.Generic;
+using EvolutionSimulation;
 using EvolutionSimulation.Utils;
 
-namespace EvolutionSimulation.Unity
+namespace UnitySimulation
 {
     // TODO: a ver esto puede estar en el propio SimulationManager, pero por si luego usamos 
     // el propio Simulation de la dll. La cosa esque ese no tiene un Step.
@@ -13,8 +11,13 @@ namespace EvolutionSimulation.Unity
     {
         public void Init()
         {
+            world_listeners = new List<IListener<World>>();
             world = new World();
             world.Init(32);
+            for (int i = 0; i < initialAnimals; i++)
+            {
+                EvolutionSimulation.Entities.Animal c = world.CreateCreature<EvolutionSimulation.Entities.Animal>(5, 5);
+            }
         }
 
         /// <summary>
@@ -42,6 +45,17 @@ namespace EvolutionSimulation.Unity
                 listener.OnNotify(world);
         }
 
+        /// <summary>
+        /// Sets the parameters for the initial simulation before visualization
+        /// </summary>
+        /// <param name="years"> Number of years to simulate </param>
+        /// <param name="animals"> Number of animals that are initially created </param>
+        public void SetInitialParameters(int years, int animals)
+        {
+            yearsToSimulate = years;
+            initialAnimals = animals;
+        }
+
         public bool Subscribe(IListener<World> listener)
         {
             if (world_listeners.Contains(listener)) return false;
@@ -55,7 +69,8 @@ namespace EvolutionSimulation.Unity
         }
 
         World world;
-        public int yearsToSimulate;
+        int yearsToSimulate;
+        int initialAnimals;
 
         List<IListener<World>> world_listeners;
     }

@@ -29,13 +29,13 @@
                 return true;
 
             //If the creature doesn't have any objective to eat
-            if (creature.GetClosestFruit() == null && creature.GetClosestCorpse() == null)
+            if (creature.GetClosestFruitPosition() == null && creature.GetClosestCorpsePosition() == null)
                 return true;
             //If the creature doesn't have a fruit to eat and is herbivore
-            if (creature.stats.Diet == Genetics.Diet.Herbivore && creature.GetClosestFruit() == null)
+            if (creature.stats.Diet == Genetics.Diet.Herbivore && creature.GetClosestFruitPosition() == null)
                 return true;
             //If the creature doesn't a corpse to eat and is carnivore
-            if (creature.stats.Diet == Genetics.Diet.Carnivore && creature.GetClosestCorpse() == null)
+            if (creature.stats.Diet == Genetics.Diet.Carnivore && creature.GetClosestCorpsePosition() == null)
                 return true;
 
             return false;

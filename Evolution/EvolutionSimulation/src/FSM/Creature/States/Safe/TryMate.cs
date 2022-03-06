@@ -13,7 +13,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         // This move is energy netural, costing the same energy that is obtained in a tick
         public override int GetCost()
         {
-            return (int)UniverseParametersManager.parameters.baseActionCost;//TODO
+            return UniverseParametersManager.parameters.baseActionCost;//TODO
         }
 
         // Increases current rest
@@ -21,7 +21,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             Console.WriteLine("Try to mate");
 
-            if (creature.GetClosestPossibleMate() != null)
+            if (creature.GetClosestPossibleMatePosition() != null &&
+                creature.DistanceToObjective(creature.GetClosestPossibleMatePosition()) <= 1) //TODO quitar este 1
                 creature.GetClosestPossibleMate().ReceiveInteraction(creature, Entities.Interactions.mate);
         }
 

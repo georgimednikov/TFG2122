@@ -167,7 +167,6 @@ namespace EvolutionSimulation.Entities
         public CreatureChromosome chromosome { get; private set; }
         public CreatureStats stats { get; private set; }
 
-
         /// <summary>
         /// Sets the stats of the creature.
         /// </summary>
@@ -255,12 +254,12 @@ namespace EvolutionSimulation.Entities
             ITransition sleepySafeTransition = new SleepySafeTransition(this);
             ITransition sleepyTransition = new SleepyTransition(this);
             ITransition wakeTransition = new WakeTransition(this);
+            safeFSM.AddTransition(wander, sleepyTransition, sleep);
+            safeFSM.AddTransition(wander, safePlaceExploreTransition, explore);
             safeFSM.AddTransition(wander, goToSafePlaceTransition, goToSafePlace);
             safeFSM.AddTransition(goToSafePlace, stopGoToSafePlaceTransition, wander);
-            safeFSM.AddTransition(wander, safePlaceExploreTransition, explore);
             safeFSM.AddTransition(goToSafePlace, sleepySafeTransition, sleep);
             safeFSM.AddTransition(explore, sleepyTransition, sleep);
-            safeFSM.AddTransition(wander, sleepyTransition, sleep);
             safeFSM.AddTransition(sleep, wakeTransition, wander);
 
             // Drinking
@@ -271,8 +270,8 @@ namespace EvolutionSimulation.Entities
             ITransition stopGoToDrinkTransition = new StopGoToDrinkTransition(this);
             safeFSM.AddTransition(wander, drinkingExploreTransition, explore);
             safeFSM.AddTransition(wander, thirstyTransition, goToDrink);
-            safeFSM.AddTransition(goToDrink, drinkingTransition, drink);
             safeFSM.AddTransition(goToDrink, stopGoToDrinkTransition, wander);
+            safeFSM.AddTransition(goToDrink, drinkingTransition, drink);
             safeFSM.AddTransition(drink, stopDrinkingTransition, wander);
 
             // Eating
@@ -281,8 +280,8 @@ namespace EvolutionSimulation.Entities
             ITransition eatingTransition = new EatingTransition(this);
             ITransition stopEatingTransition = new StopEatingTransition(this);
             ITransition stopGoToEatTransition = new StopGoToEatTransition(this);
-            safeFSM.AddTransition(wander, hungerTransition, goToEat);
             safeFSM.AddTransition(wander, hungerExploreTransition, explore);
+            safeFSM.AddTransition(wander, hungerTransition, goToEat);
             safeFSM.AddTransition(goToEat, stopGoToEatTransition, wander);
             safeFSM.AddTransition(goToEat, eatingTransition, eat);
             safeFSM.AddTransition(eat, stopEatingTransition, wander);
@@ -297,14 +296,14 @@ namespace EvolutionSimulation.Entities
             ITransition stopTryMateTransition = new StopTryMateTransition(this);
             safeFSM.AddTransition(wander, matingExploreTransition, explore);
             safeFSM.AddTransition(wander, mateTransition, goToMate);
-            safeFSM.AddTransition(goToMate, tryMateTransition, tryMate);
             safeFSM.AddTransition(goToMate, stopGoToMateTransition, wander);
+            safeFSM.AddTransition(goToMate, tryMateTransition, tryMate);
             safeFSM.AddTransition(tryMate, matingTransition, mating);
+            safeFSM.AddTransition(tryMate, stopTryMateTransition, wander);
+            safeFSM.AddTransition(mating, stopMatingTransition, wander);           
             safeFSM.AddTransition(goToDrink, matingTransition, mating);
             safeFSM.AddTransition(goToEat, matingTransition, mating);
             safeFSM.AddTransition(goToSafePlace, matingTransition, mating);
-            safeFSM.AddTransition(tryMate, stopTryMateTransition, wander);
-            safeFSM.AddTransition(mating, stopMatingTransition, wander);           
 
             // Escape-state Configuration
             // States
@@ -545,6 +544,8 @@ namespace EvolutionSimulation.Entities
             return unlock <= f / mF;
         }
 
+
+        #region Memory
         // Memory related information
         public Memory memory;
 
@@ -555,28 +556,64 @@ namespace EvolutionSimulation.Entities
         public bool HasEatingObjective()
         {
             // Hervibore and not plant objective
-            if (stats.Diet == Diet.Herbivore && memory.ClosestFruit() == null)
+            if (stats.Diet == Diet.Herbivore && memory.ClosestFruitPosition() == null)
                 return true;
             // Carnivore and not corpse objective
-            if (stats.Diet == Diet.Carnivore && memory.ClosestCorpse() == null)
+            if (stats.Diet == Diet.Carnivore && memory.ClosestCorpsePosition() == null)
                 return true;
             // Omnivore and not plant and corpse objective
-            if (stats.Diet == Diet.Omnivore && memory.ClosestCorpse() == null && memory.ClosestFruit() == null)
+            if (stats.Diet == Diet.Omnivore && memory.ClosestCorpsePosition() == null && memory.ClosestFruitPosition() == null)
                 return true;
 
             return false;
         }
 
-        // Memory
+        public float GetDanger() { return memory.GetPositionDanger(x, y); }
+
+        /// <summary>
+        /// Returns the position of the closest ally the creature remembers.
+        /// </summary>
+        public Tuple<int, int> GetClosestAllyPosition() { return memory.ClosestAllyPosition(); }
+        /// <summary>
+        /// Returns the position of the closest possible mate the creature remembers.
+        /// </summary>
+        public Tuple<int, int> GetClosestPossibleMatePosition() { return memory.ClosestPossibleMatePosition(); }
+        /// <summary>
+        /// Returns the position of the closest not allied creature the creature remembers.
+        /// </summary>
+        public Tuple<int, int> GetClosestCreaturePosition() { return memory.ClosestCreaturePosition(); }
+        /// <summary>
+        /// Returns the position of the closest rechable creature the creature remembers.
+        /// </summary>
+        public Tuple<int, int> GetClosestCreatureReachablePosition() { return memory.ClosestCreatureReachablePosition(); }
+        /// <summary>
+        /// Returns the position of the closest corpse the creature remembers.
+        /// </summary>
+        public Tuple<int, int> GetClosestCorpsePosition() { return memory.ClosestCorpsePosition(); }
+        /// <summary>
+        /// Returns the position of the closest edible plant the creature remembers.
+        /// </summary>
+        public Tuple<int, int> GetClosestFruitPosition() { return memory.ClosestFruitPosition(); }
+        /// <summary>
+        /// Returns the position of the closest mass of water the creature remembers.
+        /// </summary>
+        public Tuple<int, int> GetClosestWaterPosition() { return memory.ClosestWaterPosition(); }
+        /// <summary>
+        /// Returns the position of the closest safe place the creature remembers.
+        /// </summary>
+        public Tuple<int, int> GetClosestSafePlacePosition() { return memory.ClosestSafePlacePosition(); }
+        /// <summary>
+        /// Returns the position of a random place the creature barely remembers or does not remember at all.
+        /// </summary>
+        public Tuple<int, int> GetUndiscoveredPlacePosition() { return memory.UndiscoveredPlacePosition(); }
+
         public Creature GetClosestAlly() { return memory.ClosestAlly(); }
         public Creature GetClosestPossibleMate() { return memory.ClosestPossibleMate(); }
         public Creature GetClosestCreature() { return memory.ClosestCreature(); }
         public Creature GetClosestCreatureReachable() { return memory.ClosestCreatureReachable(); }
         public Corpse GetClosestCorpse() { return memory.ClosestCorpse(); }
         public EdiblePlant GetClosestFruit() { return memory.ClosestFruit(); }
-        public Tuple<int, int> GetClosestWater() { return memory.ClosestWater(); }
-        public Tuple<int, int> GetClosestSafePlace() { return memory.ClosestSafePlace(); }
-        public Tuple<int, int> GetUndiscoveredPlace() { return memory.UndiscoveredPlace(); }
+        #endregion
 
         // Parents
         public Creature father { get; set; }
@@ -647,13 +684,13 @@ namespace EvolutionSimulation.Entities
         /// Calculate the distance between the creature and the given pos
         /// </summary>
         /// <returns> Distance between creature and pos. intMaxValue if out of the map </returns>
-        public int DistanceToObjective(int xObj, int yObj)
+        public int DistanceToObjective(Tuple<int, int> pos)
         {
-            if (!world.checkBounds(xObj, yObj)) return int.MaxValue;
+            if (!world.checkBounds(pos.Item1, pos.Item2)) return int.MaxValue;
 
             int x1, y1;
-            x1 = Math.Abs(x - xObj);
-            y1 = Math.Abs(y - yObj);
+            x1 = Math.Abs(x - pos.Item1);
+            y1 = Math.Abs(y - pos.Item2);
 
             return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
         }
@@ -702,8 +739,8 @@ namespace EvolutionSimulation.Entities
         public int GetNextCostOnPath()
         {
             // TODO Hay que tener en cuenta el path sea de longuitud 0
-            if (path == null || path.Length == 0)
-                return 0;
+            if (path == null || path.Length == 0 || pathIterator == path.Length) // TODO: que los estados tengan cuidado de cuando el coste que les dan es -1
+                return -1;
 
             int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
             int speed;

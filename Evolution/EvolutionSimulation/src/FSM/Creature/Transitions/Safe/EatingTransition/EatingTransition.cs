@@ -22,25 +22,17 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         {
             //Close to a fruit
             if(creature.stats.Diet == Genetics.Diet.Herbivore )
-            {
-                return creature.GetClosestFruit() != null
-                  && Math.Abs(creature.GetClosestFruit().x - creature.x) < 1
-                  && Math.Abs(creature.GetClosestFruit().y - creature.y) < 1;
-            }
+                return creature.GetClosestFruitPosition() != null && creature.DistanceToObjective(creature.GetClosestFruitPosition()) <= 1;
+
             //Close to a corpse
             if (creature.stats.Diet == Genetics.Diet.Carnivore )
-            {
-                return creature.GetClosestCorpse() != null
-                  && Math.Abs(creature.GetClosestCorpse().x - creature.x) < 1
-                  && Math.Abs(creature.GetClosestCorpse().y - creature.y) < 1;
-            }
+                return creature.GetClosestCorpsePosition() != null && creature.DistanceToObjective(creature.GetClosestCorpsePosition()) <= 1;
 
-            int distPlant = creature.DistanceToObjective(creature.GetClosestFruit()),
-                distCorpse = creature.DistanceToObjective(creature.GetClosestCorpse());
+            int distPlant = creature.DistanceToObjective(creature.GetClosestFruitPosition()),
+                distCorpse = creature.DistanceToObjective(creature.GetClosestCorpsePosition());
             //Omnivore, close to an eating objective
-            return (creature.GetClosestCorpse() != null && distCorpse <= 1)
-                ||(creature.GetClosestFruit() != null && distPlant <= 1); 
-            
+            return (creature.GetClosestCorpsePosition() != null && distCorpse <= 1) ||
+                (creature.GetClosestFruitPosition() != null && distPlant <= 1); 
         }
 
         public override string ToString()

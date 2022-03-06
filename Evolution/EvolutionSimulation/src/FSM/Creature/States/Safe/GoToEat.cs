@@ -5,6 +5,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 {
     class GoToEat : CreatureState
     {
+        Tuple<int, int> foodPos;
+
         public GoToEat(Entities.Creature c) : base(c) { creature = c; }
 
         public override int GetCost()
@@ -42,30 +44,45 @@ namespace EvolutionSimulation.FSM.Creature.States
             //if (creature.GetClosestFruit() == null && creature.GetClosestCorpse() == null)
             //    return;
 
-            //Carnivore go to a corpse
-            if (creature.stats.Diet == Genetics.Diet.Carnivore && creature.GetClosestCorpse() != null)
+            //Carnivore goes to a corpse
+            if (creature.stats.Diet == Genetics.Diet.Carnivore)
             {
-                creature.SetPath(creature.GetClosestCorpse().x, creature.GetClosestCorpse().y);
-            }//Herbivore go to a fruit
-            else if (creature.stats.Diet == Genetics.Diet.Herbivore && creature.GetClosestFruit() != null)
+                foodPos = creature.GetClosestCorpsePosition();
+                creature.SetPath(foodPos.Item1, foodPos.Item2);
+            }
+            //Herbivore goes to a fruit
+            else if (creature.stats.Diet == Genetics.Diet.Herbivore)
             {
-                creature.SetPath(creature.GetClosestFruit().x, creature.GetClosestFruit().y);
+                foodPos = creature.GetClosestFruitPosition();
+                creature.SetPath(foodPos.Item1, foodPos.Item2);
             }
             else //Omnivore
             {
-                if (creature.GetClosestCorpse() == null)
-                    creature.SetPath(creature.GetClosestFruit().x, creature.GetClosestFruit().y);
-                else if (creature.GetClosestFruit() == null)
-                    creature.SetPath(creature.GetClosestCorpse().x, creature.GetClosestCorpse().y);
+                if (creature.GetClosestCorpsePosition() == null)
+                {
+                    foodPos = creature.GetClosestFruitPosition();
+                    creature.SetPath(foodPos.Item1, foodPos.Item2);
+                }
+                else if (creature.GetClosestFruitPosition() == null)
+                {
+                    foodPos = creature.GetClosestCorpsePosition();
+                    creature.SetPath(foodPos.Item1, foodPos.Item2);
+                }
                 else
                 {
-                    // Go to the closest food (nearestEdiblePlant or Corpse)
+                    // Goes to the closest food (nearestEdiblePlant or Corpse)
                     int distPlant = creature.DistanceToObjective(creature.GetClosestFruit()),
                         distCorpse = creature.DistanceToObjective(creature.GetClosestCorpse());
                     if (distPlant < distCorpse)
-                        creature.SetPath(creature.GetClosestFruit().x, creature.GetClosestFruit().y);
+                    {
+                        foodPos = creature.GetClosestFruitPosition();
+                        creature.SetPath(foodPos.Item1, foodPos.Item2);
+                    }
                     else
-                        creature.SetPath(creature.GetClosestCorpse().x, creature.GetClosestCorpse().y);
+                    {
+                        foodPos = creature.GetClosestCorpsePosition();
+                        creature.SetPath(foodPos.Item1, foodPos.Item2);
+                    }
                 }
             }
         }

@@ -60,7 +60,7 @@ namespace EvolutionSimulation
         public int fleeingTransitionMultiplier = 4;
         public int hidingTransitionMultiplier = 4;
         public float stopEatingTransitionEnergyMultiplier = 1;
-        public float combatTransitionAggressivenessThreshold = 0.5f;
+        //public float combatTransitionAggressivenessThreshold = 0.5f;
         public float combatTransitionHealthThresholdMultiplier = 50;
         public float escapeTransitionAggressivenessThreshold = 0.5f;
         public float escapeTransitionHealthThresholdMultiplier = 50;
@@ -80,6 +80,7 @@ namespace EvolutionSimulation
                 throw new Exception("Cannot find JSON with universe parameters with name: " + UserInfo.DataDirectory + "UniverseParameters.json");
             string file = File.ReadAllText(jsonParameters);
             parameters = JsonConvert.DeserializeObject<UniverseParameters>(file);
+            Validator.Validate(parameters);
         }
 
         public static void WriteDefaultParameters()
