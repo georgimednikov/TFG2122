@@ -114,14 +114,14 @@ namespace EvolutionSimulation.Entities
             Vector3 dirAux = start;
             int ntiles = 0;
             treeDensity = 0;
-            while ((dirAux - end).Length() > 1)
+            while ((dirAux - end).Length() > 0.6f)
             {
                 if (w.isTree((int)Math.Round(dirAux.X), (int)Math.Round(dirAux.Y)))
                     treeDensity++;
                 ntiles++;
                 dirAux += dirN;
             }
-            treeDensity /= ntiles;
+            if(ntiles != 0) treeDensity /= ntiles;
 
             double ret = Math.Max(Math.Abs(dir.X), Math.Abs(dir.Y));
             if ((start.Z == (int)Creature.HeightLayer.Tree || end.Z == (int)Creature.HeightLayer.Tree) && treeBetter) ret *= treeDensity * c.stats.GroundSpeed / c.stats.ArborealSpeed;

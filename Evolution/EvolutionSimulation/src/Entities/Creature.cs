@@ -738,8 +738,8 @@ namespace EvolutionSimulation.Entities
         public int GetNextCostOnPath()
         {
             // TODO Hay que tener en cuenta el path sea de longuitud 0
-            if (path == null || path.Length == 0)
-                return 0;
+            if (path == null || path.Length == 0 || pathIterator == path.Length) // TODO: que los estados tengan cuidado de cuando el coste que les dan es -1
+                return -1;
 
             int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
             int speed;
