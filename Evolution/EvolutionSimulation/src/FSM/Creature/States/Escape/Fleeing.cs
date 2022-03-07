@@ -35,7 +35,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 creature.SetPath(pathX, pathY);
         }
 
-        public override int GetCost()
+        public override int GetCost()   // TODO: con 0 de coste podria funcionar por el cornered
         {
             int cost = creature.GetNextCostOnPath();
             if(cost < 0) {
