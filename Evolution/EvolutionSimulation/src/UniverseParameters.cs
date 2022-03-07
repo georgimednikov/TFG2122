@@ -30,6 +30,9 @@ namespace EvolutionSimulation
         public float mobilityPenalty = 0.7f; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
         public float maxSpeed = 1.5f;
         public float hornIntimidationMultiplier = 1.5f;
+        public float restRegenerationThreshold = 0.7f;
+        public float energyRegenerationThreshold = 0.85f;
+        public float regenerationRate = 0.01f;
 
         // CreatureStats
         public float newbornStatMultiplier = 0.33f; //Starting multiplier of newborns
