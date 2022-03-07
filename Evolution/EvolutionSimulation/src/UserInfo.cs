@@ -66,6 +66,13 @@ namespace EvolutionSimulation
             return true;
         }
 
+        static public void SetInformation(int years, string dataDirectory, string exportDirectory)
+        {
+            Years = years;
+            DataDirectory = dataDirectory;
+            ExportDirectory = exportDirectory;
+        }
+
         /// <summary>
         /// Asks the user where to look for the files containing the different values for the calculation of the chromosme, genes and stats,
         /// as well as the folder in which to save the resulting species. This method uses the program's console to do so.

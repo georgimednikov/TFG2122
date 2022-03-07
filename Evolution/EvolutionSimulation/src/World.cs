@@ -268,7 +268,7 @@ namespace EvolutionSimulation
         private void EntitiesTick()
         {
             // Tick for every entity
-            Creatures.Sort(new Utils.SortByMetabolism()); // TODO: priority queue
+            Creatures.Sort(new Utils.SortByMetabolism());
             Creatures.ForEach(delegate (Creature e) { e.Tick(); });
             StableEntities.ForEach(delegate (StaticEntity e) { e.Tick(); });
 

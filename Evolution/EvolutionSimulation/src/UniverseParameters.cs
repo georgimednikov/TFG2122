@@ -81,6 +81,11 @@ namespace EvolutionSimulation
             Validator.Validate(parameters);
         }
 
+        public static void SetDefaultParameters()
+        {
+           parameters = new UniverseParameters();
+        }
+
         public static void WriteDefaultParameters()
         {
             UniverseParameters export = new UniverseParameters();

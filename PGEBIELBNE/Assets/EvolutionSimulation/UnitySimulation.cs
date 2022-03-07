@@ -11,6 +11,9 @@ namespace UnitySimulation
     {
         public void Init()
         {
+            UniverseParametersManager.ReadJSON();
+            EvolutionSimulation.Genetics.CreatureChromosome.SetChromosome();
+
             world_listeners = new List<IListener<World>>();
             world = new World();
             world.Init(32);
@@ -26,7 +29,7 @@ namespace UnitySimulation
         public void Run()
         {
             int nYears = 0;
-            while (nYears <= yearsToSimulate) { 
+            while (nYears < UserInfo.Years) { 
                 world.Tick();
                 // TODO: No se suma un anio cada tick pero para probar
                 nYears++;
@@ -50,10 +53,10 @@ namespace UnitySimulation
         /// </summary>
         /// <param name="years"> Number of years to simulate </param>
         /// <param name="animals"> Number of animals that are initially created </param>
-        public void SetInitialParameters(int years, int animals)
+        public void SetInitialParameters(int years, string dataDirectory, string exportDirectory, int animals)
         {
-            yearsToSimulate = years;
             initialAnimals = animals;
+            UserInfo.SetInformation(years, dataDirectory, exportDirectory);
         }
 
         public bool Subscribe(IListener<World> listener)
@@ -69,7 +72,6 @@ namespace UnitySimulation
         }
 
         World world;
-        int yearsToSimulate;
         int initialAnimals;
 
         List<IListener<World>> world_listeners;
