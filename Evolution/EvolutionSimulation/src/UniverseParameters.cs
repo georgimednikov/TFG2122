@@ -60,9 +60,7 @@ namespace EvolutionSimulation
         public int fleeingTransitionMultiplier = 4;
         public int hidingTransitionMultiplier = 4;
         public float stopEatingTransitionEnergyMultiplier = 1;
-        public float combatTransitionAggressivenessThreshold = 0.5f;
         public float combatTransitionHealthThresholdMultiplier = 50;
-        public float escapeTransitionAggressivenessThreshold = 0.5f;
         public float escapeTransitionHealthThresholdMultiplier = 50;
         public float safeTransitionAggressivenessThreshold = 1;
 

@@ -16,20 +16,9 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         public override bool Evaluate()
         {
             return (creature.GetClosestCreature() != null || creature.hasBeenHit)
-                && (creature.stats.Aggressiveness < UniverseParametersManager.parameters.escapeTransitionAggressivenessThreshold * 
-                (float)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) ||  // Inferior to 50% equals non-aggresive
+                && (creature.stats.Aggressiveness < creature.GetDanger() ||         // TODO: ajustar valores
                 creature.stats.CurrHealth < creature.stats.MaxHealth * threshold)   // So even an aggresive creature has self-preservation instincts
                 && !creature.cornered;
-            
-            //TODO: revisar entidades vistas y considerar agresividad
-            //return (creature.GetClosestCreatureReachablePosition() != null || creature.hasBeenHit) &&
-            //    creature.stats.Aggressiveness > creature.GetDanger() &&
-            //    creature.stats.CurrHealth >= creature.stats.MaxHealth * threshold;    // So it does not immediately return to combat while fleeing 
-            
-            //return (creature.GetClosestCreaturePosition() != null || creature.hasBeenHit)
-            //    && (creature.stats.Aggressiveness < UniverseParametersManager.parameters.escapeTransitionAggressivenessThreshold * (float)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) ||  // Inferior to 50% equals non-aggresive
-            //    creature.stats.CurrHealth < creature.stats.MaxHealth * threshold);  // So even an aggresive creature has self-preservation instincts
-            //TODO: considerar danger   
         }
 
         public override string ToString()
