@@ -15,7 +15,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            return (creature.GetClosestCreatureReachable() != null || creature.hasBeenHit) 
+            return (creature.GetClosestCreatureReachablePosition() != null || creature.hasBeenHit) 
                 && ((creature.stats.Aggressiveness >= creature.GetDanger()  // TODO: ajustar valor
                 && creature.stats.CurrHealth >= creature.stats.MaxHealth * threshold)   // So it does not immediately return to combat while fleeing
                 || creature.cornered);    // So it fights as a last resort when fleeing

@@ -5,6 +5,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 {
     class GoToDrink : CreatureState
     {
+        Tuple<int, int> posToDrink;
         public GoToDrink(Entities.Creature c) : base(c) { creature = c; }
 
         public override int GetCost()
@@ -16,7 +17,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             //The position of the water mass in which the creature would be most interested in is decided
             //between the closest one and the closest one that has proven to be safe, based on distance.
-            Tuple<int, int> posToDrink;
+            //Tuple<int, int> posToDrink;
             if (creature.GetSafeWaterPosition() == null || 
                 (creature.DistanceToObjective(creature.GetSafeWaterPosition()) >
                 creature.DistanceToObjective(creature.GetClosestWaterPosition()) * UniverseParametersManager.parameters.safePrefferedOverClosestResourceRatio))
@@ -36,7 +37,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             //Half a quadrant of offset to start counting the angle each sector represents from 0.
             degrees += 45.0 / 2;
 
-            int sector = (int)(degrees / 45);
+            int sector = (int)(degrees / 45) % 8;
             Tuple<int, int> finalPosition = SectorToPosition(posToDrink, sector);
             //int cont = 0;
             //while (creature.world.map[finalPosition.Item1, finalPosition.Item2].isWater)
@@ -55,9 +56,10 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void Action()
         {
             Console.WriteLine("Go to water action");
-
             Vector3 nextPos = creature.GetNextPosOnPath();
+            if (nextPos.X < 0) return; //If it is already in the right spot it should not move.
             creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+            Console.WriteLine(creature.x + " " + creature.y + " | " + posToDrink.Item1 + " " + posToDrink.Item2);
         }
 
         public override string ToString()

@@ -52,7 +52,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="treeDensity">Percentage of trees on the path</param>
         public static Vector3[] GetPath(Creature c, World w, Vector3 start, Vector3 end, out double treeDensity)
         {
-            Console.WriteLine("Empieza Astar: " + (end - start));
+            //Console.WriteLine("Empieza Astar: " + (end - start));
             List<GraphNode> path = new List<GraphNode>();
             Utils.PriorityQueue<GraphNode> open = new Utils.PriorityQueue<GraphNode>();
             List<GraphNode> closed = new List<GraphNode>();
@@ -95,7 +95,7 @@ namespace EvolutionSimulation.Entities
             {
                 retPath[i - 1] = path[i].pos;
             }
-            Console.WriteLine("Acaba Astar");
+            //Console.WriteLine("Acaba Astar");
             return retPath;
         }
 

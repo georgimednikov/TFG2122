@@ -305,7 +305,6 @@ namespace EvolutionSimulation
         T CreateEntity<T>() where T : IEntity, new()
         {
             return new T();
-
         }
 
         /// <summary>

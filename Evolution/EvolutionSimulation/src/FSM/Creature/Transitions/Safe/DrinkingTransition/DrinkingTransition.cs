@@ -19,7 +19,8 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            return Math.Abs(creature.GetClosestWaterPosition().Item1 - creature.x) <= 1 && Math.Abs(creature.GetClosestWaterPosition().Item2 - creature.y) <= 1;
+            Console.WriteLine(creature.x + " " + creature.y + " | " + creature.GetClosestWaterPosition() + " | " + (Math.Abs(creature.GetClosestWaterPosition().Item1 - creature.x) <= 1 && Math.Abs(creature.GetClosestWaterPosition().Item2 - creature.y) <= 1));
+            return (Math.Abs(creature.GetClosestWaterPosition().Item1 - creature.x) <= 1 && Math.Abs(creature.GetClosestWaterPosition().Item2 - creature.y) <= 1);
         }
 
         public override string ToString()

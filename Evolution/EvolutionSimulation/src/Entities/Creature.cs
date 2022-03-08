@@ -63,7 +63,7 @@ namespace EvolutionSimulation.Entities
             AddInteraction(Interactions.mate, OnMate);
             AddInteraction(Interactions.stopMate, StopMating);
 
-            Console.WriteLine(mfsm.ExportToDotGraph());
+            //Console.WriteLine(mfsm.ExportToDotGraph());
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(explore, doneExploringTransition, wander);
 
             // TODO queremos esto? si lo dejamos, quitar comprobaciones en las transiciones de si tiene la habilidad o no
-            // Follow Parent
+            //Follow Parent
             if (stats.Paternity > 0)
             {
                 IState followParent = new FollowParent(this);
@@ -325,7 +325,7 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToMate, tryMateTransition, tryMate);
             safeFSM.AddTransition(tryMate, matingTransition, mating);
             safeFSM.AddTransition(tryMate, stopTryMateTransition, wander);
-            safeFSM.AddTransition(mating, stopMatingTransition, wander);           
+            safeFSM.AddTransition(mating, stopMatingTransition, wander);
             safeFSM.AddTransition(goToDrink, matingTransition, mating);
             safeFSM.AddTransition(goToEat, matingTransition, mating);
             safeFSM.AddTransition(goToSafePlace, matingTransition, mating);
@@ -360,19 +360,19 @@ namespace EvolutionSimulation.Entities
             ITransition safeTransition = new SafeTransition(this);
             ITransition combatTransition = new CombatTransition(this);
             aliveFSM.AddTransition(safe, escapeTransition, escape);
-            aliveFSM.AddTransition(safe, combatTransition, combat);            
+            aliveFSM.AddTransition(safe, combatTransition, combat);
             aliveFSM.AddTransition(combat, safeTransition, safe);
-            aliveFSM.AddTransition(combat, escapeTransition, escape);           
+            aliveFSM.AddTransition(combat, escapeTransition, escape);
             aliveFSM.AddTransition(escape, safeTransition, safe);
             aliveFSM.AddTransition(escape, combatTransition, combat);
-            //
+
             IState alive = new CompoundState("Alive", aliveFSM);
             IState dead = new Dead(this);
-            //
+
             mfsm = new Fsm(alive);
             // Transitions
             ITransition dieTransition = new DieTransition(this);
-            mfsm.AddTransition(alive, dieTransition, dead); 
+            mfsm.AddTransition(alive, dieTransition, dead);
         }
 
         #endregion
@@ -510,7 +510,7 @@ namespace EvolutionSimulation.Entities
         /// <returns> True if the creature is hunger </returns>
         public bool IsHungry()
         {
-            return stats.CurrEnergy > stats.hungerThreshold * stats.MaxEnergy;
+            return stats.CurrEnergy <= stats.hungerThreshold * stats.MaxEnergy;
         }
 
         /// <summary>
@@ -519,7 +519,7 @@ namespace EvolutionSimulation.Entities
         /// <returns> True if the creature is very hunger </returns>
         public bool IsVeryHungry()
         {
-            return stats.CurrEnergy > stats.veryHungerThreshold * stats.MaxEnergy;
+            return stats.CurrEnergy <= stats.veryHungerThreshold * stats.MaxEnergy;
         }
 
         /// <summary>
@@ -528,7 +528,7 @@ namespace EvolutionSimulation.Entities
         /// <returns> True if the creature is thirsty </returns>
         public bool IsThirsty()
         {
-            return stats.CurrHydration > stats.thirstyThreshold * stats.MaxHydration;
+            return stats.CurrHydration <= stats.thirstyThreshold * stats.MaxHydration;
         }
 
         /// <summary>
@@ -537,7 +537,7 @@ namespace EvolutionSimulation.Entities
         /// <returns> True if the creature is very thirsty </returns>
         public bool IsVeryThirsty()
         {
-            return stats.CurrHydration > stats.veryThirstyThreshold * stats.MaxHydration;
+            return stats.CurrHydration <= stats.veryThirstyThreshold * stats.MaxHydration;
         }
 
         /// <summary>

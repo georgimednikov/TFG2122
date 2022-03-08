@@ -11,7 +11,7 @@ namespace EvolutionSimulation.Entities
             public int x;
             public int y;
 
-            public int ticksUnchecked;  //Number of ticks since the tile has been seen for the last time.
+            public int ticksToBeForgotten;  //Number of ticks since the tile has been seen for the last time.
             public bool discovered;     //Whether this tile has been discovered by the creature at some point.
 
             public float experienceDanger;  //How dangerous the creature has experienced the tile to be.
@@ -52,7 +52,7 @@ namespace EvolutionSimulation.Entities
         MemoryTileInfo[,] map;
         List<MemoryTileInfo> rememberedTiles;
         MemoryTileComparer comparer;
-        int maxTicksUnchecked;
+        int maxTicksOfMemory;   //Number of ticks that a tile will remain remembered.
         int perceptionRadius;   //Radius around the creature in which it perceives the world.
         int dangerRadius;       //Radius around a tile in which the tile's danger spreads.
 
@@ -68,7 +68,7 @@ namespace EvolutionSimulation.Entities
         public Tuple<int, int> ClosestSafePlacePosition() { return closestSafePlace; }
         public Tuple<int, int> UndiscoveredPlacePosition()
         {
-            if (undiscoveredPlace == null || map[undiscoveredPlace.Item1, undiscoveredPlace.Item2].ticksUnchecked < (maxTicksUnchecked / 2))
+            if (undiscoveredPlace == null || map[undiscoveredPlace.Item1, undiscoveredPlace.Item2].ticksToBeForgotten > (maxTicksOfMemory / 2))
                 GetNewUndiscoveredPlace();
             return undiscoveredPlace;
         }
@@ -138,7 +138,7 @@ namespace EvolutionSimulation.Entities
             safeWaterSource = new List<MemoryTileInfo>();
             comparer = new MemoryTileComparer(thisCreature);
 
-            maxTicksUnchecked = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
+            maxTicksOfMemory = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
             perceptionRadius = /*thisCreature.stats.Perception*/ 5; // TODO: Perception es literalmente 0, eso no vale así que hay que arreglarlo
             dangerRadius = thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness;
         }
@@ -150,8 +150,8 @@ namespace EvolutionSimulation.Entities
             for (int i = 0; i < rememberedTiles.Count; i++)
             {
                 MemoryTileInfo tile = rememberedTiles[i];
-                tile.ticksUnchecked++;
-                if (tile.ticksUnchecked >= maxTicksUnchecked) //If it's time to forget a tile.
+                tile.ticksToBeForgotten--;
+                if (tile.ticksToBeForgotten <= 0) //If it's time to forget a tile.
                 {
                     tile.discovered = false;
                     //If the tile is forgotten the the creature no longer feels danger/fondness of it and its vecinity.
@@ -301,7 +301,7 @@ namespace EvolutionSimulation.Entities
             }
 
             // The tile's tick count gets reseted and its information reassigned.
-            map[x, y].ticksUnchecked = 0;
+            map[x, y].ticksToBeForgotten = maxTicksOfMemory;
             map[x, y].water = world.map[x, y].isWater;
             if (map[x, y].water) return; //If the tile is water there is nothing more to process.
 
@@ -357,13 +357,12 @@ namespace EvolutionSimulation.Entities
             closestWater = null;
             closestSafePlace = null;
 
-            rememberedTiles.Sort(comparer);
+            rememberedTiles.Sort(comparer); //TODO: Mirar esto
             foreach (MemoryTileInfo tile in rememberedTiles)
             {
                 UpdateResources(tile);
                 if (AllResourcesFound()) break; // Stops searching when everything has been found.
             }
-            GetNewUndiscoveredPlace();
         }
 
         /// <summary>
@@ -436,7 +435,7 @@ namespace EvolutionSimulation.Entities
                 num = RandomGenerator.Next(0, maxDistDiameter - minDistDiameter);
                 y = (thisCreature.y + minDistRadius + 1 + num) % maxDistDiameter;
             }
-            while (map[x, y].water && map[x, y].discovered && map[x, y].ticksUnchecked < (maxTicksUnchecked / 2));
+            while (map[x, y].water || map[x, y].ticksToBeForgotten > (maxTicksOfMemory / 2) || GetPositionDanger(x, y) > 0);
             undiscoveredPlace = new Tuple<int, int>(x, y);
         }
 

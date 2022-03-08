@@ -13,7 +13,6 @@ namespace VisualizadorConsola
             if (!UserInfo.AskInfoUsingConsole())
                 return;
 #endif
-            EvolutionSimulation.Genetics.CreatureChromosome.SetChromosome();
             ISimulation s = new ConsoleSimulation();
             s.Init();
             s.Run();
