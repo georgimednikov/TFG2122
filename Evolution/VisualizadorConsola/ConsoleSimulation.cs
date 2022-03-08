@@ -22,12 +22,12 @@ namespace VisualizadorConsola
             Console.WriteLine("\n");
             //WorldToBmp();
 
-            Animal c = world.CreateCreature<Animal>(5, 3);
-            c.stats.Aggressiveness = 0;
+            Animal c = world.CreateCreature<Animal>(5, 4);
+            c.stats.Aggressiveness = 50;
             c.stats.Metabolism = 100;
             Animal d = world.CreateCreature<Animal>(5, 5); // Enemy
             d.stats.Aggressiveness = 50;
-            d.stats.Metabolism = 99;
+            d.stats.Metabolism = 100;
 
             //Corpse c1 = world.CreateStableEntity<Corpse>();
             //c1.Init(c.world, 5, c.x, c.y+1, 0.4f, 0.7f, 5, 5, 80f); // TODO: stats to be derived from creacher

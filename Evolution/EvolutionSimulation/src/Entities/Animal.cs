@@ -92,16 +92,26 @@ namespace EvolutionSimulation.Entities
             stats.MinTemperature = stats.IdealTemperature - chromosome.GetFeature(CreatureFeature.TemperatureRange);
             stats.MaxTemperature = stats.IdealTemperature + chromosome.GetFeature(CreatureFeature.TemperatureRange);
 
+            //int ones = 0;
+            //foreach (bool num in chromosome.GetChromosome())
+            //    if (num) ones++;
+
             stats.MaxEnergy = resourceAmount; // minEnergy + stats.Size / sizeToEnergyRatio; TODO: en teoria es el mismo valor todos los recursos, cambia el gasto
             stats.CurrEnergy = stats.MaxEnergy;
-            stats.EnergyExpense = 1 + stats.Metabolism / (float)chromosome.GetFeatureMax(CreatureFeature.Metabolism);
+            stats.EnergyExpense = (1 + // TODO: Numeros magicos a quitar
+                (stats.Metabolism / (float)chromosome.GetFeatureMax(CreatureFeature.Metabolism) * (stats.Members / 2f)) +
+                (stats.Venom / 2f + stats.Counter / 2f)) * 0.15f;
+                //ones / (float)chromosome.GetChromosome().Length;  Alternativa
+
             stats.MaxHydration = resourceAmount;
             stats.CurrHydration = stats.MaxHydration;
-            stats.HydrationExpense = stats.EnergyExpense;//TODO que sea un poco mayor que EnergyExpense, json
+            stats.HydrationExpense = 0.25f + // TODO: Numeros magicos a quitar  // TODO que sea un poco mayor que EnergyExpense, json
+                (stats.EnergyExpense * 1.05f);
 
             stats.MaxRest = resourceAmount;
             stats.CurrRest = stats.MaxRest;
-            stats.RestExpense = minRestExpense + (maxRestExpense - minRestExpense) * (1 - (float)chromosome.GetFeature(CreatureFeature.Resistance) / chromosome.GetFeatureMax(CreatureFeature.Resistance));
+            stats.RestExpense = minRestExpense + (maxRestExpense - minRestExpense) * // TODO: Numeros arcanos
+                (1 - (float)chromosome.GetFeature(CreatureFeature.Resistance) / chromosome.GetFeatureMax(CreatureFeature.Resistance));
             stats.RestRecovery = stats.RestExpense * exhaustToSleepRatio;
 
             //Environment related stats
