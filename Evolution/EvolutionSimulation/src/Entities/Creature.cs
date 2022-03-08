@@ -71,12 +71,8 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void Tick()
         {
-            //toDie.value = (stats.CurrAge++ >= stats.LifeSpan);
-            //toSleep.value = (stats.CurrRest <= 0.1 * stats.MaxRest);
-            //toWake.value = (stats.CurrRest >= stats.MaxRest);
-
-            stats.CurrRest -= stats.RestExpense;
-
+            // Bodily functions
+            Expend();
             Regen();
 
             FemaleTick();
@@ -162,6 +158,17 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
+        /// Lowers the creature's current energy, rest and hydration
+        /// Amount varies depending on the creature's abilities
+        /// </summary>
+        void Expend()
+        {
+            stats.CurrHydration -= stats.HydrationExpense;
+            stats.CurrRest -= stats.RestExpense;
+            stats.CurrEnergy -= stats.EnergyExpense;
+        }
+
+        /// <summary>
         /// Attempts to regenrate the creature's health
         /// Checks first if it can with current energy and rest
         /// And then regenrates a percentage of the creature's max hp
@@ -169,7 +176,8 @@ namespace EvolutionSimulation.Entities
         void Regen()
         {
             if(stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
-                stats.CurrRest >= (stats.MaxRest * UniverseParametersManager.parameters.restRegenerationThreshold)) {
+                stats.CurrRest >= (stats.MaxRest * UniverseParametersManager.parameters.restRegenerationThreshold) &&
+                stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold)) {
                 stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth);  // TODO: Ver si esto esta bien, ingenieria de valores
                 stats.CurrHealth = Math.Min(stats.CurrHealth, stats.MaxHealth); // So it does not get over-healed
             }
