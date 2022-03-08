@@ -57,8 +57,10 @@ namespace EvolutionSimulation
         public float chaseCostMultiplier = 0.4f;
         public float fleeingCostMultiplier = 0.75f;
         public int drinkingCostMultiplier = 10;
+        public int drinkingMultiplier = 5;
         public int eatingCostMultiplier = 10;
         public int sleepingCostMultiplier = 10;
+        public float mutationChance = 0.1f;
 
         // Transitions
         public int fleeingTransitionMultiplier = 4;
