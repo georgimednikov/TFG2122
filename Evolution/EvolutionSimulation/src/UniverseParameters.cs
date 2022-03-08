@@ -32,6 +32,7 @@ namespace EvolutionSimulation
         public float hornIntimidationMultiplier = 1.5f;
         public float restRegenerationThreshold = 0.7f;
         public float energyRegenerationThreshold = 0.85f;
+        public float hydrationRegenerationThreshold = 0.85f;
         public float regenerationRate = 0.01f;
 
         // CreatureStats
