@@ -22,7 +22,10 @@ namespace EvolutionSimulation.FSM.Creature.States
 
             creature.stats.CurrRest += creature.stats.RestRecovery;
             if (creature.stats.CurrRest > creature.stats.MaxRest)
+            {
                 creature.stats.CurrRest = creature.stats.MaxRest;
+                creature.CreateExperience(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
+            }
         }
 
         public override string ToString()

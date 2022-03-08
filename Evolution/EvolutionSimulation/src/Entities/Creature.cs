@@ -593,7 +593,32 @@ namespace EvolutionSimulation.Entities
             return false;
         }
 
+        /// <summary>
+        /// Returns the danger level of the tile in the map on which the creature is. Danger is calculated based on Intimidation.
+        /// </summary>
         public float GetDanger() { return memory.GetPositionDanger(x, y); }
+        /// <summary>
+        /// Creatres an experience for the creature in the current tile that it is in.
+        /// If its positive, it is a good experience, if it is negative, a bad one.
+        /// </summary>
+        public void CreateExperience(float exp) { memory.CreateExperience(x, y, exp); }
+        /// <summary>
+        /// Saves in memory a safe drinking spot and updates the danger levels around it.
+        /// </summary>
+        public void SafeWaterSpotFound(float exp) { memory.SafeWaterSpotFound(exp); }
+        /// <summary>
+        /// Saves in memory a safe plant to eat and updates the danger levels around it.
+        /// </summary>
+        public void SafePlantFound(float exp) { memory.SafePlantFound(exp); }
+        /// <summary>
+        /// Returns the position of the closest safe water source.
+        /// </summary>
+        public Tuple<int, int> GetSafeWaterPosition() { return memory.SafeWaterPosition(); }
+        /// <summary>
+        /// Returns the position of the closest safe edible plant.
+        /// </summary>
+        public Tuple<int, int> GetSafeFruitPosition() { return memory.SafeFruitPosition(); }
+
 
         /// <summary>
         /// Returns the position of the closest ally the creature remembers.
