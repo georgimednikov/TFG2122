@@ -42,6 +42,8 @@ namespace EvolutionSimulation.Entities
         Tuple<int, int> closestSafePlace;
         Tuple<int, int> undiscoveredPlace;
 
+        List<MemoryTileInfo> safePlants;
+        List<MemoryTileInfo> safeWaterSource;
 
         Creature thisCreature;
         World world;
@@ -101,8 +103,17 @@ namespace EvolutionSimulation.Entities
             return tile.closestFruit;
         }
 
-
-
+        // Positions of the closest static resource the the creature feels is safe.
+        // Once these positions are reached, IN THEORY, ClosestWaterPosition and ClosestFruitPosition will point
+        // to these resources, or other at the same distance, which should make no difference.
+        public Tuple<int, int> SafeWaterPosition() {
+            if (safeWaterSource.Count == 0) return null;
+            return new Tuple<int, int>(safeWaterSource[0].x, safeWaterSource[0].y);
+        }
+        public Tuple<int, int> SafeFruitPosition() {
+            if (safePlants.Count == 0) return null;
+            return new Tuple<int, int>(safePlants[0].x, safePlants[0].y);
+        }
 
 
         public Memory(Creature c, World w)
@@ -115,13 +126,13 @@ namespace EvolutionSimulation.Entities
                     map[i, j] = new MemoryTileInfo();
 
             rememberedTiles = new List<MemoryTileInfo>();
+            safePlants = new List<MemoryTileInfo>();
+            safeWaterSource = new List<MemoryTileInfo>();
             comparer = new MemoryTileComparer(thisCreature);
 
             maxTicksUnchecked = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
             perceptionRadius = /*thisCreature.stats.Perception*/ 5; // TODO: Perception es literalmente 0, eso no vale así que hay que arreglarlo
             dangerRadius = thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness;
-
-            //GetNewUndiscoveredPlace();
         }
 
         public void Update()
@@ -137,11 +148,24 @@ namespace EvolutionSimulation.Entities
                     tile.discovered = false;
                     //If the tile is forgotten the the creature no longer feels danger/fondness of it and its vecinity.
                     //To undo that information, the danger is adjusted with the opposite value.
-                    AdjustDanger(tile.x, tile.y, -tile.tangibleDanger, false);
+                    AdjustDanger(tile.x, tile.y, -tile.tangibleDanger, false); //Esto no va
                     AdjustDanger(tile.x, tile.y, -tile.experienceDanger, true);
                     rememberedTiles.Remove(tile);
+
+                    if (tile.water && safeWaterSource.Contains(tile))
+                        safeWaterSource.Remove(tile);
+                    if (safePlants.Contains(tile))
+                        safePlants.Remove(tile);
                 }
+                // If a once considered safe resource has a danger level it is no longer safe.
+                if (tile.water && safeWaterSource.Contains(tile) && GetPositionDanger(tile.x, tile.y) > 0)
+                    safeWaterSource.Remove(tile);
+                if (safePlants.Contains(tile) && GetPositionDanger(tile.x, tile.y) > 0)
+                    safePlants.Remove(tile);
             }
+            // After removal of tiles no longer fit to be in these lists they are ordered based on distance from the creature.
+            safeWaterSource.Sort(comparer);
+            safePlants.Sort(comparer);
 
             List<Creature> perceivedCreatures = world.PerceiveCreatures(thisCreature, perceptionRadius);
             List<StaticEntity> perceivedEntities = world.PerceiveEntities(thisCreature, perceptionRadius);
@@ -207,12 +231,28 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Sets the creatures "fondness" (positive danger) of a tile and its surroundings, based on an experience, using dangerRadius.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
         /// <param name="value">Value of "fondness" in the tile. It can be negative if it is actually dangerous</param>
         public void CreateExperience(int x, int y, float value)
         {
             AdjustDanger(x, y, -value, true);
+        }
+        /// <summary>
+        /// Saves in memory a drinking spot that has proven to be safe for the creature.
+        /// </summary>
+        public void SafeWaterSpotFound(float exp)
+        {
+            int x = closestWater.Item1, y = closestWater.Item2;
+            safeWaterSource.Add(map[x, y]);
+            CreateExperience(x, y, exp);
+        }
+        /// <summary>
+        /// Saves in memory an edible plant that has proven to be safe for the creature.
+        /// </summary>
+        public void SafePlantFound(float exp)
+        {
+            int x = closestFruit.Item1, y = closestFruit.Item2;
+            safePlants.Add(map[closestFruit.Item1, closestFruit.Item2]);
+            CreateExperience(x, y, exp);
         }
 
         /// <summary>
@@ -232,7 +272,6 @@ namespace EvolutionSimulation.Entities
             tile.closestPossibleMate = null;
             tile.closestCorpse = null;
             tile.closestFruit = null;
-
         }
         private void UpdateMemoryTile(int x, int y, float danger)
         {
@@ -316,28 +355,6 @@ namespace EvolutionSimulation.Entities
         private void UpdateResources(MemoryTileInfo tile)
         {
             Tuple<int, int> thisTile = new Tuple<int, int>(tile.x, tile.y);
-            //If there are creatures unrelated to the creature:
-            //if (tile.creatures.Count > 0)
-            //{
-            //    //The first one is assigned as the closest one if there isn't one already.
-            //    if (closestCreature == null) closestCreature = thisTile;
-            //    //The fist creature reachable is assigned if there isn't one already.
-            //    if (closestCreatureReachable == null)
-            //        foreach (Creature creature in tile.creatures)
-            //            if ((creature.creatureLayer == Creature.HeightLayer.Air && thisCreature.stats.AirReach) ||
-            //                creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach ||
-            //                creature.creatureLayer == Creature.HeightLayer.Ground)
-            //                closestCreatureReachable = thisTile;
-            //}
-
-            //Same everything else.
-            //if (tile.allies.Count > 0)
-            //{
-            //    if (closestAlly == null) closestAlly = thisTile;
-            //    if (closestPossibleMate == null)
-            //        foreach (Creature creature in tile.allies)
-            //            if (creature.wantMate) closestPossibleMate = thisTile;
-            //}
 
             if (closestCreature == null && tile.closestCreature != null)
                 closestCreature = thisTile;
@@ -351,9 +368,9 @@ namespace EvolutionSimulation.Entities
                 closestCorpse = thisTile;
             if (closestFruit == null && tile.closestFruit != null && !tile.closestFruit.eaten)
                 closestFruit = thisTile;
-            if (closestWater == null && tile.water)
+            if (closestWater == null && tile.water && GetPositionDanger(tile.x, tile.y) <= 0)
                 closestWater = thisTile;
-            if (closestSafePlace == null && GetPositionDanger(tile.x, tile.y) == 0)
+            if (closestSafePlace == null && GetPositionDanger(tile.x, tile.y) <= 0)
                 closestSafePlace = thisTile;
         }
 

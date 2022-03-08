@@ -14,9 +14,18 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            Tuple<int, int> posToDrink = creature.GetClosestWaterPosition();
+            //The position of the water mass in which the creature would be most interested in is decided
+            //between the closest one and the closest one that has proven to be safe, based on distance.
+            Tuple<int, int> posToDrink;
+            if (creature.GetSafeWaterPosition() == null || 
+                (creature.DistanceToObjective(creature.GetSafeWaterPosition()) >
+                creature.DistanceToObjective(creature.GetClosestWaterPosition()) * UniverseParametersManager.parameters.safePrefferedOverClosestResourceRatio))
+                posToDrink = creature.GetClosestWaterPosition();
+            else
+                posToDrink = creature.GetSafeWaterPosition();
+
             //Angle between the creatures position and the position of the water from 0 to 180 positive or negative.
-            double degrees = Math.Atan2(creature.y - posToDrink.Item2, creature.x - posToDrink.Item1) * (180 / Math.PI);
+                double degrees = Math.Atan2(creature.y - posToDrink.Item2, creature.x - posToDrink.Item1) * (180 / Math.PI);
 
             //Now the sector has to be accounted for.
 

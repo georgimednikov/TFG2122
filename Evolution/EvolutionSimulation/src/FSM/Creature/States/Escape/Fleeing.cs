@@ -33,6 +33,8 @@ namespace EvolutionSimulation.FSM.Creature.States
                 creature.cornered = true;
             else
                 creature.SetPath(pathX, pathY);
+
+            creature.CreateExperience(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
         }
 
         public override int GetCost()   // TODO: con 0 de coste podria funcionar por el cornered

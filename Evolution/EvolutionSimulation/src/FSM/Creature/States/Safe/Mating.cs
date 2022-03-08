@@ -59,6 +59,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                             child.parentToFollow = child.mother;
                     }
                     creature.timeToBeInHeat = -1;
+                    creature.CreateExperience(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
                 }                
             }
         }

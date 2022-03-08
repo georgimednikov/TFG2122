@@ -25,13 +25,17 @@ namespace EvolutionSimulation.FSM.Creature.States
             else if(creature.stats.Diet == Genetics.Diet.Herbivore)
             {
                 EatPlant();
+                creature.SafePlantFound(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
             }
             else//Omnivore
             {
                 if (creature.GetClosestCorpse() != null)
                     EatCorpse();
                 else if (creature.GetClosestFruit() != null)
+                {
                     EatPlant();
+                    creature.SafePlantFound(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
+                }
             }
         }
 
