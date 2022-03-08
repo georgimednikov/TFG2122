@@ -184,6 +184,7 @@
   <PropertyGroup>
     <PostBuildEvent>if not exist assets\ mkdir assets\
 xcopy ..\assets assets\ /H /E /Y
-xcopy *.dll ..\..\..\PGEBIELBNE\Assets\Plugins /Y</PostBuildEvent>
+xcopy EvolutionSimulation.dll ..\..\..\PGEBIELBNE\Assets\Plugins /Y
+xcopy ..\..\ProgramData\ ..\..\..\PGEBIELBNE\Assets\ProgramData\ /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>

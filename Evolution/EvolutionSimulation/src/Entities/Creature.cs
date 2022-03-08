@@ -77,6 +77,8 @@ namespace EvolutionSimulation.Entities
 
             stats.CurrRest -= stats.RestExpense;
 
+            Regen();
+
             FemaleTick();
 
             memory.Update();
@@ -158,6 +160,21 @@ namespace EvolutionSimulation.Entities
                 else wantMate = true;
             }
         }
+
+        /// <summary>
+        /// Attempts to regenrate the creature's health
+        /// Checks first if it can with current energy and rest
+        /// And then regenrates a percentage of the creature's max hp
+        /// </summary>
+        void Regen()
+        {
+            if(stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
+                stats.CurrRest >= (stats.MaxRest * UniverseParametersManager.parameters.restRegenerationThreshold)) {
+                stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth);  // TODO: Ver si esto esta bien, ingenieria de valores
+                stats.CurrHealth = Math.Min(stats.CurrHealth, stats.MaxHealth); // So it does not get over-healed
+            }
+        }
+
         #region Genetics and Taxonomy
         // Taxonomy
         public string speciesName;
