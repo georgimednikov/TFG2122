@@ -4,7 +4,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 {
     /// <summary>
     /// Checks if a creature needs to find a safe and does not know where to go
-    /// Wander -> Explore
+    /// Explore -> Wander
     /// </summary>
     class DoneExploringTransition : CreatureTransition
     {
@@ -25,7 +25,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override string ToString()
         {
-            return "MateExploreTransition";
+            return "DoneExploringTransition";
         }
 
     }

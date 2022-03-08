@@ -63,7 +63,7 @@ namespace EvolutionSimulation.Entities
             AddInteraction(Interactions.mate, OnMate);
             AddInteraction(Interactions.stopMate, StopMating);
 
-            Console.WriteLine(mfsm.ExportToDotGraph());
+            //Console.WriteLine(mfsm.ExportToDotGraph());
         }
 
         /// <summary>

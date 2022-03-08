@@ -15,7 +15,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             Console.WriteLine("Drinking action");
 
-            creature.stats.CurrHydration += creature.stats.HydrationExpense * 5;
+            creature.stats.CurrHydration += creature.stats.HydrationExpense * UniverseParametersManager.parameters.drinkingMultiplier;
             if (creature.stats.CurrHydration > creature.stats.MaxHydration)
             {
                 creature.stats.CurrHydration = creature.stats.MaxHydration;
