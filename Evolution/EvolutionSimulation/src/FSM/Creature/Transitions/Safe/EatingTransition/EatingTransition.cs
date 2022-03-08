@@ -20,19 +20,30 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         /// <returns> True if close the an eating objective</returns>
         public override bool Evaluate()
         {
-            //Close to a fruit
-            if(creature.stats.Diet == Genetics.Diet.Herbivore )
+            //Herbivore
+            if(creature.stats.Diet == Genetics.Diet.Herbivore)
                 return creature.GetClosestFruitPosition() != null && creature.DistanceToObjective(creature.GetClosestFruitPosition()) <= 1;
 
-            //Close to a corpse
-            if (creature.stats.Diet == Genetics.Diet.Carnivore )
-                return creature.GetClosestCorpsePosition() != null && creature.DistanceToObjective(creature.GetClosestCorpsePosition()) <= 1;
+            //Carnivore
+            if (creature.stats.Diet == Genetics.Diet.Carnivore)
+            {
+                if (creature.GetClosestCorpsePosition() != null && creature.DistanceToObjective(creature.GetClosestCorpsePosition()) <= 1)
+                    return true;
+                else if (creature.GetClosestRottenCorpsePosition() != null && creature.DistanceToObjective(creature.GetClosestRottenCorpsePosition()) <= 1)
+                    return true;
+                return false;
+            }
 
-            int distPlant = creature.DistanceToObjective(creature.GetClosestFruitPosition()),
-                distCorpse = creature.DistanceToObjective(creature.GetClosestCorpsePosition());
-            //Omnivore, close to an eating objective
-            return (creature.GetClosestCorpsePosition() != null && distCorpse <= 1) ||
-                (creature.GetClosestFruitPosition() != null && distPlant <= 1); 
+            if (creature.GetClosestCorpsePosition() != null && creature.GetClosestFruitPosition() != null)
+            {
+                int distPlant = creature.DistanceToObjective(creature.GetClosestFruitPosition()),
+                    distCorpse = creature.DistanceToObjective(creature.GetClosestCorpsePosition());
+                //Omnivore, close to an eating objective
+                return (creature.GetClosestCorpsePosition() != null && distCorpse <= 1) ||
+                    (creature.GetClosestFruitPosition() != null && distPlant <= 1);
+            }
+
+            return creature.DistanceToObjective(creature.GetClosestRottenCorpsePosition()) <= 1;
         }
 
         public override string ToString()

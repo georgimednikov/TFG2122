@@ -21,12 +21,13 @@ namespace EvolutionSimulation.Entities
 
             // Actual pointers to resources, to use only when already next to them, which is calculated
             // using the positions as remembered by the creature, see below.
-            public Creature closestCreature;
-            public Creature closestCreatureReachable;
-            public Creature closestAlly;
-            public Creature closestPossibleMate;
-            public Corpse closestCorpse;
-            public EdiblePlant closestFruit;
+            public Creature enemyCreature;
+            public Creature enemyCreatureReachable;
+            public Creature ally;
+            public Creature possibleMate;
+            public Corpse edibleCorpse;
+            public Corpse rottenCorpse;
+            public EdiblePlant fruit;
         }
 
         // The resources' positions, as remembered by the creature
@@ -37,6 +38,7 @@ namespace EvolutionSimulation.Entities
         Tuple<int, int> closestAlly;
         Tuple<int, int> closestPossibleMate;
         Tuple<int, int> closestCorpse;
+        Tuple<int, int> closestRottenCorpse;
         Tuple<int, int> closestFruit;
         Tuple<int, int> closestWater;
         Tuple<int, int> closestSafePlace;
@@ -60,6 +62,7 @@ namespace EvolutionSimulation.Entities
         public Tuple<int, int> ClosestAllyPosition() { return closestAlly; }
         public Tuple<int, int> ClosestPossibleMatePosition() { return closestPossibleMate; }
         public Tuple<int, int> ClosestCorpsePosition() { return closestCorpse; }
+        public Tuple<int, int> ClosestRottenCorpsePosition() { return closestRottenCorpse; }
         public Tuple<int, int> ClosestFruitPosition() { return closestFruit; }
         public Tuple<int, int> ClosestWaterPosition() { return closestWater; }
         public Tuple<int, int> ClosestSafePlacePosition() { return closestSafePlace; }
@@ -74,33 +77,38 @@ namespace EvolutionSimulation.Entities
         {
             MemoryTileInfo tile = map[closestCreature.Item1, closestCreature.Item2];
             //if (tile.ticksUnchecked == 0)
-            return tile.closestCreature;
+            return tile.enemyCreature;
             //return null;
         }
         public Creature ClosestCreatureReachable()
         {
             MemoryTileInfo tile = map[closestCreatureReachable.Item1, closestCreatureReachable.Item2];
-            return tile.closestCreatureReachable;
+            return tile.enemyCreatureReachable;
         }
         public Creature ClosestAlly()
         {
             MemoryTileInfo tile = map[closestAlly.Item1, closestAlly.Item2];
-            return tile.closestAlly;
+            return tile.ally;
         }
         public Creature ClosestPossibleMate()
         {
             MemoryTileInfo tile = map[closestPossibleMate.Item1, closestPossibleMate.Item2];
-            return tile.closestPossibleMate;
+            return tile.possibleMate;
         }
         public Corpse ClosestCorpse()
         {
             MemoryTileInfo tile = map[closestCorpse.Item1, closestCorpse.Item2];
-            return tile.closestCorpse;
+            return tile.edibleCorpse;
+        }
+        public Corpse ClosestRottenCorpse()
+        {
+            MemoryTileInfo tile = map[closestRottenCorpse.Item1, closestRottenCorpse.Item2];
+            return tile.edibleCorpse;
         }
         public EdiblePlant ClosestFruit()
         {
             MemoryTileInfo tile = map[closestFruit.Item1, closestFruit.Item2];
-            return tile.closestFruit;
+            return tile.fruit;
         }
 
         // Positions of the closest static resource the the creature feels is safe.
@@ -193,16 +201,16 @@ namespace EvolutionSimulation.Entities
                                 creature.progenitorSpeciesName == thisCreature.speciesName ||
                                 creature.speciesName == thisCreature.progenitorSpeciesName)
                             {
-                                map[x + i, y + j].closestAlly = creature;
+                                map[x + i, y + j].ally = creature;
                             }
                             //Else they have no relation
                             else
                             {
-                                map[x + i, y + j].closestCreature = creature;
+                                map[x + i, y + j].enemyCreature = creature;
                                 if ((creature.creatureLayer == Creature.HeightLayer.Air && thisCreature.stats.AirReach) ||
                                     creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach ||
                                     creature.creatureLayer == Creature.HeightLayer.Ground)
-                                    map[x + i, y + j].closestCreatureReachable = creature;
+                                    map[x + i, y + j].enemyCreatureReachable = creature;
 
                                 tileDanger += creature.stats.Intimidation;
                             }
@@ -214,13 +222,21 @@ namespace EvolutionSimulation.Entities
                     //Saves the corpses in a tile and throws away the rest.
                     foreach (StaticEntity entity in perceivedEntities)
                     {
-                        if (!(entity is Corpse)) perceivedEntities.Remove(entity);
+                        if (!(entity is Corpse)) continue;
                         else if (entity.x == x + i && entity.y == y + j)
                         {
-                            Corpse corpse = entity as Corpse;
-                            if (thisCreature.stats.Scavenger > 0 || corpse.Edible)
-                                map[x + i, y + j].closestCorpse = corpse;
-                            break;
+                            Corpse newCorpse = entity as Corpse;
+                            MemoryTileInfo tile = map[x + i, y + j];
+                            if (thisCreature.stats.Scavenger > 0 || newCorpse.Edible)
+                            {
+                                if (tile.edibleCorpse == null)
+                                    tile.edibleCorpse = newCorpse;
+                            }
+                            else
+                            {
+                                if (tile.rottenCorpse == null)
+                                    tile.rottenCorpse = newCorpse;
+                            }
                         }
                     }
                 }
@@ -266,12 +282,13 @@ namespace EvolutionSimulation.Entities
         private void ResetMemoryTilePointers(int x, int y)
         {
             MemoryTileInfo tile = map[x, y];
-            tile.closestCreature = null;
-            tile.closestCreatureReachable = null;
-            tile.closestAlly = null;
-            tile.closestPossibleMate = null;
-            tile.closestCorpse = null;
-            tile.closestFruit = null;
+            tile.enemyCreature = null;
+            tile.enemyCreatureReachable = null;
+            tile.ally = null;
+            tile.possibleMate = null;
+            tile.edibleCorpse = null;
+            tile.rottenCorpse = null;
+            tile.fruit = null;
         }
         private void UpdateMemoryTile(int x, int y, float danger)
         {
@@ -291,7 +308,7 @@ namespace EvolutionSimulation.Entities
             //There is fruit if the plant is edible and it hasn't been eaten.
             //TODO: Hierba si es herbivoro deberia contar
             if (world.map[x, y].plant is EdiblePlant)// && !(world.map[x, y].plant as EdiblePlant).eaten)
-                map[x, y].closestFruit = world.map[x, y].plant as EdiblePlant;
+                map[x, y].fruit = world.map[x, y].plant as EdiblePlant;
 
             AdjustDanger(x, y, danger, false);
         }
@@ -335,6 +352,7 @@ namespace EvolutionSimulation.Entities
             closestAlly = null;
             closestPossibleMate = null;
             closestCorpse = null;
+            closestRottenCorpse = null;
             closestFruit = null;
             closestWater = null;
             closestSafePlace = null;
@@ -356,17 +374,19 @@ namespace EvolutionSimulation.Entities
         {
             Tuple<int, int> thisTile = new Tuple<int, int>(tile.x, tile.y);
 
-            if (closestCreature == null && tile.closestCreature != null)
+            if (closestCreature == null && tile.enemyCreature != null)
                 closestCreature = thisTile;
-            if (closestCreatureReachable == null && tile.closestCreatureReachable != null)
+            if (closestCreatureReachable == null && tile.enemyCreatureReachable != null)
                 closestCreatureReachable = thisTile;
-            if (closestAlly == null && tile.closestAlly != null)
+            if (closestAlly == null && tile.ally != null)
                 closestAlly = thisTile;
-            if (closestPossibleMate == null && tile.closestPossibleMate != null)
+            if (closestPossibleMate == null && tile.possibleMate != null)
                 closestPossibleMate = thisTile;
-            if (closestCorpse == null && tile.closestCorpse != null)
+            if (closestCorpse == null && tile.edibleCorpse != null)
                 closestCorpse = thisTile;
-            if (closestFruit == null && tile.closestFruit != null && !tile.closestFruit.eaten)
+            if (closestRottenCorpse == null && tile.rottenCorpse != null)
+                closestRottenCorpse = thisTile;
+            if (closestFruit == null && tile.fruit != null && !tile.fruit.eaten)
                 closestFruit = thisTile;
             if (closestWater == null && tile.water && GetPositionDanger(tile.x, tile.y) <= 0)
                 closestWater = thisTile;
@@ -384,6 +404,7 @@ namespace EvolutionSimulation.Entities
                     closestAlly != null &&
                     closestPossibleMate != null &&
                     closestCorpse != null &&
+                    closestRottenCorpse != null &&
                     closestFruit != null &&
                     closestWater != null &&
                     closestSafePlace != null;

@@ -19,6 +19,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             if (creature.IsThirsty() && creature.GetClosestWaterPosition() == null) return false;
             if (creature.IsTired() && creature.GetClosestSafePlacePosition() == null) return false;
             if (creature.IsHungry() && !creature.HasEatingObjective()) return false;
+            if (creature.IsVeryHungry() && !creature.CanEatRottenCorpse()) return false;
             return true;
         }
 

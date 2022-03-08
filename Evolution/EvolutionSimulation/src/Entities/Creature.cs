@@ -584,6 +584,17 @@ namespace EvolutionSimulation.Entities
 
             return false;
         }
+        /// <summary>
+        /// Check if the creature can eat a rotten corpse as an alternative to a good food source.
+        /// </summary>
+        /// <returns>True if the creature knows where to eat </returns>
+        public bool CanEatRottenCorpse()
+        {
+            if (stats.Diet == Diet.Herbivore)
+                return false;
+
+            return GetClosestRottenCorpsePosition() != null;
+        }
 
         /// <summary>
         /// Returns the danger level of the tile in the map on which the creature is. Danger is calculated based on Intimidation.
@@ -632,6 +643,10 @@ namespace EvolutionSimulation.Entities
         /// Returns the position of the closest corpse the creature remembers.
         /// </summary>
         public Tuple<int, int> GetClosestCorpsePosition() { return memory.ClosestCorpsePosition(); }
+        /// <summary>
+        /// Returns the position of the closest corpse the creature remembers.
+        /// </summary>
+        public Tuple<int, int> GetClosestRottenCorpsePosition() { return memory.ClosestRottenCorpsePosition(); }
         /// <summary>
         /// Returns the position of the closest edible plant the creature remembers.
         /// </summary>
