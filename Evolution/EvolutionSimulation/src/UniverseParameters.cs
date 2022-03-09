@@ -63,6 +63,7 @@ namespace EvolutionSimulation
         public int eatingCostMultiplier = 10;
         public int sleepingCostMultiplier = 10;
         public float mutationChance = 0.1f;
+        public int adjacentLength = 1;
 
         // Transitions
         public int fleeingTransitionMultiplier = 4;

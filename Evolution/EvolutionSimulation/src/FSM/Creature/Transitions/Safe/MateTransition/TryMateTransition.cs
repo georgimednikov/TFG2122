@@ -19,8 +19,8 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
                 return false;
 
             return creature.GetClosestPossibleMate() != null
-               && Math.Abs(creature.GetClosestPossibleMate().x - creature.x) < 1
-               && Math.Abs(creature.GetClosestPossibleMate().y - creature.y) < 1;
+               && Math.Abs(creature.GetClosestPossibleMate().x - creature.x) < UniverseParametersManager.parameters.adjacentLength
+               && Math.Abs(creature.GetClosestPossibleMate().y - creature.y) < UniverseParametersManager.parameters.adjacentLength;
         }
 
         public override string ToString()
