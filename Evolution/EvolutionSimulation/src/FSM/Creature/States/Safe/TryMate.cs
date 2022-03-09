@@ -22,7 +22,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             Console.WriteLine("Try to mate");
 
             if (creature.GetClosestPossibleMatePosition() != null &&
-                creature.DistanceToObjective(creature.GetClosestPossibleMatePosition()) <= 1) //TODO quitar este 1
+                creature.DistanceToObjective(creature.GetClosestPossibleMatePosition()) <= UniverseParametersManager.parameters.adjacentLength)
                 creature.GetClosestPossibleMate().ReceiveInteraction(creature, Entities.Interactions.mate);
         }
 

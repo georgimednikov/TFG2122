@@ -17,9 +17,9 @@
                 distCorpse = creature.DistanceToObjective(creature.GetClosestCorpsePosition());
 
             return creature.stats.CurrEnergy >= UniverseParametersManager.parameters.stopEatingTransitionEnergyMultiplier * creature.stats.MaxEnergy         // no hunger
-                || (distCorpse > 1 && distPlant > 1)                                    // Both eating objective are far
-                || (distPlant > 1 && creature.stats.Diet == Genetics.Diet.Herbivore)    // hervibore and plant objective is far
-                || (distCorpse > 1 && creature.stats.Diet == Genetics.Diet.Carnivore);  // carnivore and corpse objective is far
+                || (distCorpse > UniverseParametersManager.parameters.adjacentLength && distPlant > UniverseParametersManager.parameters.adjacentLength)                                    // Both eating objective are far
+                || (distPlant > UniverseParametersManager.parameters.adjacentLength && creature.stats.Diet == Genetics.Diet.Herbivore)    // hervibore and plant objective is far
+                || (distCorpse > UniverseParametersManager.parameters.adjacentLength && creature.stats.Diet == Genetics.Diet.Carnivore);  // carnivore and corpse objective is far
         }
 
         public override string ToString()

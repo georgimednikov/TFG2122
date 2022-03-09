@@ -503,7 +503,7 @@ namespace EvolutionSimulation
         {
             if (parameters.baseActionCost <= 0 || parameters.venomCostMultiplier <= 0 || parameters.chaseCostMultiplier <= 0 || parameters.fleeingCostMultiplier <= 0 ||
                 parameters.drinkingCostMultiplier <= 0 || parameters.eatingCostMultiplier <= 0 || parameters.sleepingCostMultiplier <= 0|| parameters.mutationChance <= 0 ||
-                 parameters.drinkingMultiplier <= 0) 
+                 parameters.drinkingMultiplier <= 0 || parameters.adjacentLength <= 0) 
                 throw new UniverseParameterIsZeroException("The provided state parameters must be positive");
             if (parameters.mutationChance > 1)
                 throw new PercentageOverOneException("The provided state percentages are over one");
