@@ -50,6 +50,8 @@ namespace EvolutionSimulation
 
         // Memory
         public int knowledgeTickMultiplier = 500;
+        public float perceptionToRadiusMultiplier = 0.15f;
+        public float aggressivenessToRadiusMultiplier = 0.33f;
 
         // States
         public int baseActionCost = 1000;

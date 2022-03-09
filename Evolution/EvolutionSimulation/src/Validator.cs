@@ -495,7 +495,7 @@ namespace EvolutionSimulation
 
         static void ValidateMemory(UniverseParameters parameters)
         {
-            if (parameters.knowledgeTickMultiplier <= 0) 
+            if (parameters.knowledgeTickMultiplier <= 0 || parameters.perceptionToRadiusMultiplier <= 0 || parameters.aggressivenessToRadiusMultiplier <= 0) 
                 throw new UniverseParameterIsZeroException("The provided tree parameters must be positive");
         }
 

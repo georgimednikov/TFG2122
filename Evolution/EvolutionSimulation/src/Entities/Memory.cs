@@ -14,6 +14,8 @@ namespace EvolutionSimulation.Entities
             public int ticksToBeForgotten;  //Number of ticks since the tile has been seen for the last time.
             public bool discovered;     //Whether this tile has been discovered by the creature at some point.
 
+            public float totalDanger;    //The tiles danger in total, taking into account the others around it.
+            //Dangers originating from the tile, separated from the total to be able to undo them when the tile is forgotten.
             public float experienceDanger;  //How dangerous the creature has experienced the tile to be.
             public float tangibleDanger;    //How dangerous the creature rekons the tile is.
 
@@ -139,8 +141,8 @@ namespace EvolutionSimulation.Entities
             comparer = new MemoryTileComparer(thisCreature);
 
             maxTicksOfMemory = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
-            perceptionRadius = /*thisCreature.stats.Perception*/ 5; // TODO: Perception es literalmente 0, eso no vale así que hay que arreglarlo
-            dangerRadius = thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness;
+            perceptionRadius = (int)(thisCreature.stats.Perception * UniverseParametersManager.parameters.perceptionToRadiusMultiplier);
+            dangerRadius = (int)((thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness) * UniverseParametersManager.parameters.aggressivenessToRadiusMultiplier);
         }
 
         public void Update()
@@ -156,8 +158,9 @@ namespace EvolutionSimulation.Entities
                     tile.discovered = false;
                     //If the tile is forgotten the the creature no longer feels danger/fondness of it and its vecinity.
                     //To undo that information, the danger is adjusted with the opposite value.
-                    AdjustDanger(tile.x, tile.y, -tile.tangibleDanger, false); //Esto no va
-                    AdjustDanger(tile.x, tile.y, -tile.experienceDanger, true);
+                    AdjustDanger(tile.x, tile.y, -tile.tangibleDanger);
+                    AdjustDanger(tile.x, tile.y, -tile.experienceDanger);
+                    tile.tangibleDanger = tile.experienceDanger = 0;
                     rememberedTiles.Remove(tile);
 
                     if (tile.water && safeWaterSource.Contains(tile))
@@ -250,7 +253,8 @@ namespace EvolutionSimulation.Entities
         /// <param name="value">Value of "fondness" in the tile. It can be negative if it is actually dangerous</param>
         public void CreateExperience(int x, int y, float value)
         {
-            AdjustDanger(x, y, -value, true);
+            AdjustDanger(x, y, -value);
+            map[x, y].experienceDanger = -value;
         }
         /// <summary>
         /// Saves in memory a drinking spot that has proven to be safe for the creature.
@@ -276,7 +280,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public float GetPositionDanger(int x, int y)
         {
-            return map[x, y].experienceDanger + map[x, y].tangibleDanger;
+            return map[x, y].totalDanger;
         }
 
         private void ResetMemoryTilePointers(int x, int y)
@@ -310,7 +314,8 @@ namespace EvolutionSimulation.Entities
             if (world.map[x, y].plant is EdiblePlant)// && !(world.map[x, y].plant as EdiblePlant).eaten)
                 map[x, y].fruit = world.map[x, y].plant as EdiblePlant;
 
-            AdjustDanger(x, y, danger, false);
+            AdjustDanger(x, y, danger);
+            map[x, y].tangibleDanger = danger;
         }
 
         /// <summary>
@@ -320,7 +325,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="y"></param>
         /// <param name="danger">Level of danger</param>
         /// <param name="experience">If the danger comes from experience or perception</param>
-        private void AdjustDanger(int x, int y, float danger, bool experience)
+        private void AdjustDanger(int x, int y, float danger)
         {
             //The danger in a tile is calculated by adding up all the intimidation stats of the creatures in it.
             //Then, the danger is increased in the vecinity in a radius, dividing the original danger
@@ -334,8 +339,7 @@ namespace EvolutionSimulation.Entities
                 {
                     if (IsOutOfBounds(x + i, y + j)) continue;
                     float tileDanger = danger / (float)Math.Pow(2, Math.Max(i, j));
-                    if (experience) map[x + i, y + j].experienceDanger = tileDanger; // If it's experience danger it is reseted.
-                    else map[x + i, y + j].tangibleDanger += tileDanger; //If not, dangers can stack in a single tile.
+                    map[x + i, y + j].totalDanger += tileDanger; //If not, dangers can stack in a single tile.
                 }
             }
         }

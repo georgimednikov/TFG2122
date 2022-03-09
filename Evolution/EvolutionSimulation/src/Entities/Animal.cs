@@ -121,7 +121,7 @@ namespace EvolutionSimulation.Entities
             stats.Perception = (int)((float)chromosome.GetFeature(CreatureFeature.Perception) / maxPerception * (maxPerception - minPerception)) + minPerception;
 
             //A percentage equal to nightPerceptionPenalty of the max perception is lost at night
-            stats.NightDebuff = chromosome.GetFeatureMax(CreatureFeature.Perception) * nightPerceptionPenalty;
+            stats.NightDebuff = maxPerception * nightPerceptionPenalty;
             //If the creature can see in the dark, that penalty is reduced the better sight it has
             if (HasAbility(CreatureFeature.NightVision, abilityUnlock))
                 stats.NightDebuff *= 1 - ((float)chromosome.GetFeature(CreatureFeature.NightVision) / chromosome.GetFeatureMax(CreatureFeature.NightVision));
