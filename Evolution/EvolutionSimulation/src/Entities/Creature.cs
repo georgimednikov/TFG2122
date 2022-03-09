@@ -624,53 +624,53 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Returns the position of the closest safe water source.
         /// </summary>
-        public Tuple<int, int> GetSafeWaterPosition() { return memory.SafeWaterPosition(); }
+        public Vector2Int GetSafeWaterPosition() { return memory.SafeWaterPosition(); }
         /// <summary>
         /// Returns the position of the closest safe edible plant.
         /// </summary>
-        public Tuple<int, int> GetSafeFruitPosition() { return memory.SafeFruitPosition(); }
+        public Vector2Int GetSafeFruitPosition() { return memory.SafeFruitPosition(); }
 
 
         /// <summary>
         /// Returns the position of the closest ally the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestAllyPosition() { return memory.ClosestAllyPosition(); }
+        public Vector2Int GetClosestAllyPosition() { return memory.ClosestAllyPosition(); }
         /// <summary>
         /// Returns the position of the closest possible mate the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestPossibleMatePosition() { return memory.ClosestPossibleMatePosition(); }
+        public Vector2Int GetClosestPossibleMatePosition() { return memory.ClosestPossibleMatePosition(); }
         /// <summary>
         /// Returns the position of the closest not allied creature the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestCreaturePosition() { return memory.ClosestCreaturePosition(); }
+        public Vector2Int GetClosestCreaturePosition() { return memory.ClosestCreaturePosition(); }
         /// <summary>
         /// Returns the position of the closest rechable creature the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestCreatureReachablePosition() { return memory.ClosestCreatureReachablePosition(); }
+        public Vector2Int GetClosestCreatureReachablePosition() { return memory.ClosestCreatureReachablePosition(); }
         /// <summary>
         /// Returns the position of the closest corpse the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestCorpsePosition() { return memory.ClosestCorpsePosition(); }
+        public Vector2Int GetClosestCorpsePosition() { return memory.ClosestCorpsePosition(); }
         /// <summary>
         /// Returns the position of the closest corpse the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestRottenCorpsePosition() { return memory.ClosestRottenCorpsePosition(); }
+        public Vector2Int GetClosestRottenCorpsePosition() { return memory.ClosestRottenCorpsePosition(); }
         /// <summary>
         /// Returns the position of the closest edible plant the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestFruitPosition() { return memory.ClosestFruitPosition(); }
+        public Vector2Int GetClosestFruitPosition() { return memory.ClosestFruitPosition(); }
         /// <summary>
         /// Returns the position of the closest mass of water the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestWaterPosition() { return memory.ClosestWaterPosition(); }
+        public Vector2Int GetClosestWaterPosition() { return memory.ClosestWaterPosition(); }
         /// <summary>
         /// Returns the position of the closest safe place the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestSafePlacePosition() { return memory.ClosestSafePlacePosition(); }
+        public Vector2Int GetClosestSafePlacePosition() { return memory.ClosestSafePlacePosition(); }
         /// <summary>
         /// Returns the position of a random place the creature barely remembers or does not remember at all.
         /// </summary>
-        public Tuple<int, int> GetUndiscoveredPlacePosition() { return memory.UndiscoveredPlacePosition(); }
+        public Vector2Int GetUndiscoveredPlacePosition() { return memory.UndiscoveredPlacePosition(); }
 
         public Creature GetClosestAlly() { return memory.ClosestAlly(); }
         public Creature GetClosestPossibleMate() { return memory.ClosestPossibleMate(); }
@@ -749,13 +749,13 @@ namespace EvolutionSimulation.Entities
         /// Calculate the distance between the creature and the given pos
         /// </summary>
         /// <returns> Distance between creature and pos. intMaxValue if out of the map </returns>
-        public int DistanceToObjective(Tuple<int, int> pos)
+        public int DistanceToObjective(Vector2Int pos)
         {
-            if (!world.checkBounds(pos.Item1, pos.Item2)) return int.MaxValue;
+            if (!world.checkBounds(pos.x, pos.y)) return int.MaxValue;
 
             int x1, y1;
-            x1 = Math.Abs(x - pos.Item1);
-            y1 = Math.Abs(y - pos.Item2);
+            x1 = Math.Abs(x - pos.x);
+            y1 = Math.Abs(y - pos.y);
 
             return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
         }

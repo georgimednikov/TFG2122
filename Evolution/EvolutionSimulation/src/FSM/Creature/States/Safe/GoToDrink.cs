@@ -5,7 +5,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 {
     class GoToDrink : CreatureState
     {
-        Tuple<int, int> posToDrink;
+        Vector2Int posToDrink;
         public GoToDrink(Entities.Creature c) : base(c) { creature = c; }
 
         public override int GetCost()
@@ -26,7 +26,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 posToDrink = creature.GetSafeWaterPosition();
 
             //Angle between the creatures position and the position of the water from 0 to 180 positive or negative.
-                double degrees = Math.Atan2(creature.y - posToDrink.Item2, creature.x - posToDrink.Item1) * (180 / Math.PI);
+                double degrees = Math.Atan2(creature.y - posToDrink.x, creature.x - posToDrink.y) * (180 / Math.PI);
 
             //Now the sector has to be accounted for.
 
@@ -59,7 +59,6 @@ namespace EvolutionSimulation.FSM.Creature.States
             Vector3 nextPos = creature.GetNextPosOnPath();
             if (nextPos.X < 0) return; //If it is already in the right spot it should not move.
             creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-            Console.WriteLine(creature.x + " " + creature.y + " | " + posToDrink.Item1 + " " + posToDrink.Item2);
         }
 
         public override string ToString()
@@ -67,26 +66,26 @@ namespace EvolutionSimulation.FSM.Creature.States
             return "GoToDrinkState";
         }
 
-        private Tuple<int, int> SectorToPosition(Tuple<int, int> pos, int sector)
+        private Tuple<int, int> SectorToPosition(Vector2Int pos, int sector)
         {
             switch (sector)
             {
                 case 0:
-                    return new Tuple<int, int>(pos.Item1 + 1, pos.Item2);
+                    return new Tuple<int, int>(pos.x + 1, pos.y);
                 case 1:
-                    return new Tuple<int, int>(pos.Item1 + 1, pos.Item2 + 1);
+                    return new Tuple<int, int>(pos.x + 1, pos.y + 1);
                 case 2:
-                    return new Tuple<int, int>(pos.Item1, pos.Item2 + 1);
+                    return new Tuple<int, int>(pos.x, pos.y + 1);
                 case 3:
-                    return new Tuple<int, int>(pos.Item1 - 1, pos.Item2 + 1);
+                    return new Tuple<int, int>(pos.x - 1, pos.y + 1);
                 case 4:
-                    return new Tuple<int, int>(pos.Item1 - 1, pos.Item2);
+                    return new Tuple<int, int>(pos.x - 1, pos.y);
                 case 5:
-                    return new Tuple<int, int>(pos.Item1 - 1, pos.Item2 - 1);
+                    return new Tuple<int, int>(pos.x - 1, pos.y - 1);
                 case 6:
-                    return new Tuple<int, int>(pos.Item1, pos.Item2 - 1);
+                    return new Tuple<int, int>(pos.x, pos.y - 1);
                 case 7:
-                    return new Tuple<int, int>(pos.Item1 + 1, pos.Item2 - 1);
+                    return new Tuple<int, int>(pos.x + 1, pos.y - 1);
                 default:
                     throw new Exception("Error calculating closest position to water in GoToDrink");
             }

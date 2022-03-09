@@ -35,16 +35,16 @@ namespace EvolutionSimulation.Entities
         // The resources' positions, as remembered by the creature
         // Use these when going to a place it remembers, and if it gets there
         // and the resource is no more, it will be automatically updated.
-        Tuple<int, int> closestCreature;
-        Tuple<int, int> closestCreatureReachable;
-        Tuple<int, int> closestAlly;
-        Tuple<int, int> closestPossibleMate;
-        Tuple<int, int> closestCorpse;
-        Tuple<int, int> closestRottenCorpse;
-        Tuple<int, int> closestFruit;
-        Tuple<int, int> closestWater;
-        Tuple<int, int> closestSafePlace;
-        Tuple<int, int> undiscoveredPlace;
+        Vector2Int closestCreature;
+        Vector2Int closestCreatureReachable;
+        Vector2Int closestAlly;
+        Vector2Int closestPossibleMate;
+        Vector2Int closestCorpse;
+        Vector2Int closestRottenCorpse;
+        Vector2Int closestFruit;
+        Vector2Int closestWater;
+        Vector2Int closestSafePlace;
+        Vector2Int undiscoveredPlace;
 
         List<MemoryTileInfo> safePlants;
         List<MemoryTileInfo> safeWaterSource;
@@ -59,70 +59,70 @@ namespace EvolutionSimulation.Entities
         int dangerRadius;       //Radius around a tile in which the tile's danger spreads.
 
 
-        public Tuple<int, int> ClosestCreaturePosition() { return closestCreature; }
-        public Tuple<int, int> ClosestCreatureReachablePosition() { return closestCreatureReachable; }
-        public Tuple<int, int> ClosestAllyPosition() { return closestAlly; }
-        public Tuple<int, int> ClosestPossibleMatePosition() { return closestPossibleMate; }
-        public Tuple<int, int> ClosestCorpsePosition() { return closestCorpse; }
-        public Tuple<int, int> ClosestRottenCorpsePosition() { return closestRottenCorpse; }
-        public Tuple<int, int> ClosestFruitPosition() { return closestFruit; }
-        public Tuple<int, int> ClosestWaterPosition() { return closestWater; }
-        public Tuple<int, int> ClosestSafePlacePosition() { return closestSafePlace; }
-        public Tuple<int, int> UndiscoveredPlacePosition()
+        public Vector2Int ClosestCreaturePosition() { return closestCreature; }
+        public Vector2Int ClosestCreatureReachablePosition() { return closestCreatureReachable; }
+        public Vector2Int ClosestAllyPosition() { return closestAlly; }
+        public Vector2Int ClosestPossibleMatePosition() { return closestPossibleMate; }
+        public Vector2Int ClosestCorpsePosition() { return closestCorpse; }
+        public Vector2Int ClosestRottenCorpsePosition() { return closestRottenCorpse; }
+        public Vector2Int ClosestFruitPosition() { return closestFruit; }
+        public Vector2Int ClosestWaterPosition() { return closestWater; }
+        public Vector2Int ClosestSafePlacePosition() { return closestSafePlace; }
+        public Vector2Int UndiscoveredPlacePosition()
         {
-            if (undiscoveredPlace == null || map[undiscoveredPlace.Item1, undiscoveredPlace.Item2].ticksToBeForgotten > (maxTicksOfMemory / 2))
+            if (undiscoveredPlace == null || map[undiscoveredPlace.x, undiscoveredPlace.y].ticksToBeForgotten > (maxTicksOfMemory / 2))
                 GetNewUndiscoveredPlace();
             return undiscoveredPlace;
         }
 
         public Creature ClosestCreature()
         {
-            MemoryTileInfo tile = map[closestCreature.Item1, closestCreature.Item2];
+            MemoryTileInfo tile = map[closestCreature.x, closestCreature.y];
             //if (tile.ticksUnchecked == 0)
             return tile.enemyCreature;
             //return null;
         }
         public Creature ClosestCreatureReachable()
         {
-            MemoryTileInfo tile = map[closestCreatureReachable.Item1, closestCreatureReachable.Item2];
+            MemoryTileInfo tile = map[closestCreatureReachable.x, closestCreatureReachable.y];
             return tile.enemyCreatureReachable;
         }
         public Creature ClosestAlly()
         {
-            MemoryTileInfo tile = map[closestAlly.Item1, closestAlly.Item2];
+            MemoryTileInfo tile = map[closestAlly.x, closestAlly.y];
             return tile.ally;
         }
         public Creature ClosestPossibleMate()
         {
-            MemoryTileInfo tile = map[closestPossibleMate.Item1, closestPossibleMate.Item2];
+            MemoryTileInfo tile = map[closestPossibleMate.x, closestPossibleMate.y];
             return tile.possibleMate;
         }
         public Corpse ClosestCorpse()
         {
-            MemoryTileInfo tile = map[closestCorpse.Item1, closestCorpse.Item2];
+            MemoryTileInfo tile = map[closestCorpse.x, closestCorpse.y];
             return tile.edibleCorpse;
         }
         public Corpse ClosestRottenCorpse()
         {
-            MemoryTileInfo tile = map[closestRottenCorpse.Item1, closestRottenCorpse.Item2];
+            MemoryTileInfo tile = map[closestRottenCorpse.x, closestRottenCorpse.y];
             return tile.edibleCorpse;
         }
         public EdiblePlant ClosestFruit()
         {
-            MemoryTileInfo tile = map[closestFruit.Item1, closestFruit.Item2];
+            MemoryTileInfo tile = map[closestFruit.x, closestFruit.y];
             return tile.fruit;
         }
 
         // Positions of the closest static resource the the creature feels is safe.
         // Once these positions are reached, IN THEORY, ClosestWaterPosition and ClosestFruitPosition will point
         // to these resources, or other at the same distance, which should make no difference.
-        public Tuple<int, int> SafeWaterPosition() {
+        public Vector2Int SafeWaterPosition() {
             if (safeWaterSource.Count == 0) return null;
-            return new Tuple<int, int>(safeWaterSource[0].x, safeWaterSource[0].y);
+            return new Vector2Int(safeWaterSource[0].x, safeWaterSource[0].y);
         }
-        public Tuple<int, int> SafeFruitPosition() {
+        public Vector2Int SafeFruitPosition() {
             if (safePlants.Count == 0) return null;
-            return new Tuple<int, int>(safePlants[0].x, safePlants[0].y);
+            return new Vector2Int(safePlants[0].x, safePlants[0].y);
         }
 
 
@@ -261,7 +261,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void SafeWaterSpotFound(float exp)
         {
-            int x = closestWater.Item1, y = closestWater.Item2;
+            int x = closestWater.x, y = closestWater.y;
             safeWaterSource.Add(map[x, y]);
             CreateExperience(x, y, exp);
         }
@@ -270,8 +270,8 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void SafePlantFound(float exp)
         {
-            int x = closestFruit.Item1, y = closestFruit.Item2;
-            safePlants.Add(map[closestFruit.Item1, closestFruit.Item2]);
+            int x = closestFruit.x, y = closestFruit.y;
+            safePlants.Add(map[closestFruit.x, closestFruit.y]);
             CreateExperience(x, y, exp);
         }
 
@@ -375,7 +375,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         private void UpdateResources(MemoryTileInfo tile)
         {
-            Tuple<int, int> thisTile = new Tuple<int, int>(tile.x, tile.y);
+            Vector2Int thisTile = new Vector2Int(tile.x, tile.y);
 
             if (closestCreature == null && tile.enemyCreature != null)
                 closestCreature = thisTile;
@@ -440,7 +440,7 @@ namespace EvolutionSimulation.Entities
                 y = (thisCreature.y + minDistRadius + 1 + num) % maxDistDiameter;
             }
             while (map[x, y].water || map[x, y].ticksToBeForgotten > (maxTicksOfMemory / 2) || GetPositionDanger(x, y) > 0);
-            undiscoveredPlace = new Tuple<int, int>(x, y);
+            undiscoveredPlace = new Vector2Int(x, y);
         }
 
         /// <summary>

@@ -8,7 +8,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     /// </summary>
     class GoToSafePlace : CreatureState
     {
-        Tuple<int, int> safePos;
+        Vector2Int safePos;
 
         public GoToSafePlace(Entities.Creature c) : base(c) { creature = c; }
 
@@ -20,7 +20,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void OnEntry()
         {
             safePos = creature.GetClosestSafePlacePosition();
-            creature.SetPath(safePos.Item1, safePos.Item2);
+            creature.SetPath(safePos.x, safePos.y);
         }
 
         public override void Action()
@@ -32,7 +32,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (safePos != creature.GetClosestSafePlacePosition())
             {
                 safePos = creature.GetClosestSafePlacePosition();
-                creature.SetPath(safePos.Item1, safePos.Item2);
+                creature.SetPath(safePos.x, safePos.y);
             }
         }
 

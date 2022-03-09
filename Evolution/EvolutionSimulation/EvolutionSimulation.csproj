@@ -161,6 +161,7 @@
     <Compile Include="src\Utils\SortByDistance.cs" />
     <Compile Include="src\Utils\SortByMetabolism.cs" />
     <Compile Include="src\UserInfo.cs" />
+    <Compile Include="src\Vector2Int.cs" />
     <Compile Include="src\World.cs" />
     <Compile Include="src\Simulation.cs" />
     <Compile Include="src\Entities\IEntity.cs" />

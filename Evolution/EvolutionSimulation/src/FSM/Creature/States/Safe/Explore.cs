@@ -25,8 +25,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            Tuple<int, int> posToDiscover = creature.GetUndiscoveredPlacePosition();
-            creature.SetPath(posToDiscover.Item1, posToDiscover.Item2);
+            Vector2Int posToDiscover = creature.GetUndiscoveredPlacePosition();
+            creature.SetPath(posToDiscover.x, posToDiscover.y);
         }
 
         public override void Action()
@@ -36,8 +36,8 @@ namespace EvolutionSimulation.FSM.Creature.States
             Vector3 nextPos = creature.GetNextPosOnPath();
             if (nextPos.X < 0 || nextPos.Y < 0)
             {
-                Tuple<int, int> posToDiscover = creature.GetUndiscoveredPlacePosition();
-                creature.SetPath(posToDiscover.Item1, posToDiscover.Item2);
+                Vector2Int posToDiscover = creature.GetUndiscoveredPlacePosition();
+                creature.SetPath(posToDiscover.x, posToDiscover.y);
                 nextPos = creature.GetNextPosOnPath();
             }
             creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);

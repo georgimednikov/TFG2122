@@ -5,8 +5,6 @@ namespace EvolutionSimulation.FSM.Creature.States
 {
     class GoToEat : CreatureState
     {
-        Tuple<int, int> foodPos;
-
         public GoToEat(Entities.Creature c) : base(c) { creature = c; }
 
         public override int GetCost()
@@ -46,11 +44,13 @@ namespace EvolutionSimulation.FSM.Creature.States
 
             //The position of the fruit in which the creature would be most interested in is decided
             //between the closest one and the closest one that has proven to be safe, based on distance.
-            Tuple<int, int> fruitPos;
+            Vector2Int fruitPos;
             if (ClosestOverSafeFruit())
                 fruitPos = creature.GetClosestFruitPosition();
             else
                 fruitPos = creature.GetSafeFruitPosition();
+
+            Vector2Int foodPos;
 
             //Herbivore goes to a fruit
             if (creature.stats.Diet == Genetics.Diet.Herbivore)
@@ -97,7 +97,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 else
                     foodPos = creature.GetClosestRottenCorpsePosition();
             }
-            creature.SetPath(foodPos.Item1, foodPos.Item2);
+            creature.SetPath(foodPos.x, foodPos.y);
         }
 
         private bool ClosestOverSafeFruit()
