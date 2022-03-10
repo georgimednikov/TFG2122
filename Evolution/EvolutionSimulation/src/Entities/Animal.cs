@@ -95,18 +95,18 @@ namespace EvolutionSimulation.Entities
             //int ones = 0;
             //foreach (bool num in chromosome.GetChromosome())
             //    if (num) ones++;
+            //float ratio = ones / (float)chromosome.GetChromosome().Length;
 
             stats.MaxEnergy = resourceAmount; // minEnergy + stats.Size / sizeToEnergyRatio; TODO: en teoria es el mismo valor todos los recursos, cambia el gasto
             stats.CurrEnergy = stats.MaxEnergy;
-            stats.EnergyExpense = (1 + // TODO: Numeros magicos a quitar
-                (stats.Metabolism / (float)chromosome.GetFeatureMax(CreatureFeature.Metabolism) * (stats.Members / 2f)) +
-                (stats.Venom / 2f + stats.Counter / 2f)) * 0.15f;
-                //ones / (float)chromosome.GetChromosome().Length;  Alternativa
+            stats.EnergyExpense = (stats.MaxEnergy / (8 * World.ticksHour)) *   // TODO: Numeros magicos a quitar
+            (stats.Metabolism / (float)chromosome.GetFeatureMax(CreatureFeature.Metabolism) * (stats.Members / 2f) +
+            (stats.Venom / 2f + stats.Counter / 2f) * 0.5f);
+            //(stats.MaxEnergy / (8 * World.ticksHour)) * ((float)Math.Pow(ratio, 2) / (float)Math.Pow(0.5, 2));
 
             stats.MaxHydration = resourceAmount;
             stats.CurrHydration = stats.MaxHydration;
-            stats.HydrationExpense = 0.25f + // TODO: Numeros magicos a quitar  // TODO que sea un poco mayor que EnergyExpense, json
-                (stats.EnergyExpense * 1.05f);
+            stats.HydrationExpense = (stats.EnergyExpense * 1.2f); // TODO: Numeros magicos a quitar  // TODO que sea un poco mayor que EnergyExpense, json
 
             stats.MaxRest = resourceAmount;
             stats.CurrRest = stats.MaxRest;
