@@ -131,7 +131,7 @@ namespace EvolutionSimulation
                 heightWaves[1] = new Wave();
                 heightWaves[1].seed = RandomGenerator.Next(0, 10000);
                 heightWaves[1].frequency = 20f;
-                heightWaves[1].amplitude = 10;
+                heightWaves[1].amplitude = 0;
             }
 
 

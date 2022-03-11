@@ -52,7 +52,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="treeDensity">Percentage of trees on the path</param>
         public static Vector3[] GetPath(Creature c, World w, Vector3 start, Vector3 end, out double treeDensity)
         {
-            //Console.WriteLine("Empieza Astar: " + (end - start));
+            Console.WriteLine("Empieza Astar: " + start + " " + end);
             List<GraphNode> path = new List<GraphNode>();
             Utils.PriorityQueue<GraphNode> open = new Utils.PriorityQueue<GraphNode>();
             List<GraphNode> closed = new List<GraphNode>();
@@ -124,8 +124,8 @@ namespace EvolutionSimulation.Entities
             if(ntiles != 0) treeDensity /= ntiles;
 
             double ret = Math.Max(Math.Abs(dir.X), Math.Abs(dir.Y));
-            if ((start.Z == (int)Creature.HeightLayer.Tree || end.Z == (int)Creature.HeightLayer.Tree) && treeBetter) ret *= treeDensity * c.stats.GroundSpeed / c.stats.ArborealSpeed;
-            else ret *= (2 - Tree.movementPenalty) * treeDensity * c.stats.ArborealSpeed / c.stats.GroundSpeed;
+            if ((start.Z == (int)Creature.HeightLayer.Tree || end.Z == (int)Creature.HeightLayer.Tree) && treeBetter) ret *= c.stats.GroundSpeed / c.stats.ArborealSpeed;
+            else ret *= c.stats.ArborealSpeed / c.stats.GroundSpeed;
             return ret;
         }
 
