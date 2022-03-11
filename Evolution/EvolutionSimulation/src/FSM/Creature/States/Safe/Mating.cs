@@ -25,8 +25,6 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override void Action()
         {
-            Console.WriteLine("Mating action");
-
             time--;
             if (time == 0)
             {
@@ -59,7 +57,10 @@ namespace EvolutionSimulation.FSM.Creature.States
                             child.parentToFollow = child.mother;
                     }
                     creature.timeToBeInHeat = -1;
-                    creature.CreateExperience(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
+                    creature.CreateExperience(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * 
+                        UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
+                    Entities.Creature mate = creature.GetClosestPossibleMate();
+                    Console.WriteLine(creature.speciesName + "MATES WITH " + mate.speciesName + " AT (" + mate.x + ", " + mate.y + ")");
                 }                
             }
         }

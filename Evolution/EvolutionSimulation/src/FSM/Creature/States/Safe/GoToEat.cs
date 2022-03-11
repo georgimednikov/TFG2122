@@ -19,11 +19,11 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
-            Console.WriteLine("GoToEat action");
             Vector3 nextPos = creature.GetNextPosOnPath();
             if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             SetPath();
+            Console.WriteLine(creature.speciesName + " GOES TO EAT (" + creature.x + ", " + creature.y + ")");
         }
 
         public override string ToString()

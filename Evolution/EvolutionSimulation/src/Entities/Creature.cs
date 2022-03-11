@@ -355,13 +355,13 @@ namespace EvolutionSimulation.Entities
             // Escape-state Configuration
             // States
             IState fleeing = new Fleeing(this);
-            IState hide = new Hide(this);
+            //IState hide = new Hide(this);
             Fsm escapeFSM = new Fsm(fleeing);
             // Transitions
             ITransition fleeTransition = new FleeTransition(this);
-            ITransition hideTranistion = new HideTransition(this);
-            escapeFSM.AddTransition(fleeing, hideTranistion, hide);
-            escapeFSM.AddTransition(hide, fleeTransition, fleeing);
+            //ITransition hideTranistion = new HideTransition(this);
+            //escapeFSM.AddTransition(fleeing, hideTranistion, hide);
+            //escapeFSM.AddTransition(hide, fleeTransition, fleeing);
             IState escape = new CompoundState("Escape", escapeFSM);
 
             // Combat-state Configuration
@@ -474,7 +474,7 @@ namespace EvolutionSimulation.Entities
         private void RetalliateDamage(Creature interacter)
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
-            Console.WriteLine(speciesName + "(" + x + "," + y + ") devuelve " + stats.Counter + " de daño");
+            Console.WriteLine(speciesName + " RETURNS " + stats.Counter + " DMG");
         }
 
         /// <summary>
@@ -591,7 +591,6 @@ namespace EvolutionSimulation.Entities
             return unlock <= f / mF;
         }
 
-
         #region Memory
         // Memory related information
         public Memory memory;
@@ -614,6 +613,7 @@ namespace EvolutionSimulation.Entities
 
             return false;
         }
+
         /// <summary>
         /// Check if the creature can eat a rotten corpse as an alternative to a good food source.
         /// </summary>
@@ -651,7 +651,6 @@ namespace EvolutionSimulation.Entities
         /// Returns the position of the closest safe edible plant.
         /// </summary>
         public Vector2Int GetSafeFruitPosition() { return memory.SafeFruitPosition(); }
-
 
         /// <summary>
         /// Returns the position of the closest ally the creature remembers.

@@ -28,7 +28,6 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override void Action()
         {
-            Console.WriteLine("GoToMate action");
             Vector3 nextPos = creature.GetNextPosOnPath();
             if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
@@ -38,6 +37,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 matePos = creature.GetClosestPossibleMatePosition();
                 creature.SetPath(matePos.x, matePos.y);
             }
+            Console.WriteLine(creature.speciesName + " GOES TO MATE (" + creature.x + ", " + creature.y + ")");
         }
 
         public override string ToString()

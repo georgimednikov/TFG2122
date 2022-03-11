@@ -17,7 +17,6 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
-            Console.WriteLine("Eating action");
             if(creature.stats.Diet == Genetics.Diet.Carnivore )
             {
                 EatCorpse();
@@ -50,7 +49,9 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         protected void EatPlant()
         {
-            creature.stats.CurrEnergy += creature.GetClosestFruit().Eat();
+            Entities.EdiblePlant closest = creature.GetClosestFruit();
+            creature.stats.CurrEnergy += closest.Eat();
+            Console.WriteLine(creature.speciesName + " EATS FRUIT AT (" + closest.x + ", " + closest.y + ")");
         }
 
         /// <summary>
@@ -59,7 +60,9 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         protected void EatCorpse()
         {
-            creature.GetClosestCorpse().ReceiveInteraction(creature, Entities.Interactions.eat);
+            Entities.Corpse closest = creature.GetClosestCorpse();
+            closest.ReceiveInteraction(creature, Entities.Interactions.eat);
+            Console.WriteLine(creature.speciesName + " EATS CORPSE AT (" + closest.x + ", " + closest.y + ")");
         }
     }
 }

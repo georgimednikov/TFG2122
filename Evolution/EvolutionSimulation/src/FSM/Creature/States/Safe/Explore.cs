@@ -31,8 +31,6 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
-            Console.WriteLine("Explore action");
-
             Vector3 nextPos = creature.GetNextPosOnPath();
             if (nextPos.X < 0 || nextPos.Y < 0)
             {
@@ -41,6 +39,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 nextPos = creature.GetNextPosOnPath();
             }
             creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+            Console.WriteLine(creature.speciesName + " EXPLORES (" + creature.x + ", " + creature.y + ")");
         }
 
         public override string ToString()
