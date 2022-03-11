@@ -18,7 +18,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            creature.SetPath(creature.parentToFollow.x, creature.parentToFollow.y);
+            creature.SetPath(creature.GetParentToFollowPosition().x, creature.GetParentToFollowPosition().y);
         }
 
         /// <summary>
@@ -30,7 +30,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             Vector3 nextPos = creature.GetNextPosOnPath();
             if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-            creature.SetPath(creature.parentToFollow.x, creature.parentToFollow.y);
+            creature.SetPath(creature.GetParentToFollowPosition().x, creature.GetParentToFollowPosition().y);
         }
 
         public override string ToString()

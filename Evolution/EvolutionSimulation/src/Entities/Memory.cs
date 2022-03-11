@@ -26,6 +26,8 @@ namespace EvolutionSimulation.Entities
             public Creature enemyCreature;
             public Creature enemyCreatureReachable;
             public Creature ally;
+            public Creature father;
+            public Creature mother;
             public Creature possibleMate;
             public Corpse edibleCorpse;
             public Corpse rottenCorpse;
@@ -38,6 +40,8 @@ namespace EvolutionSimulation.Entities
         Vector2Int closestCreature;
         Vector2Int closestCreatureReachable;
         Vector2Int closestAlly;
+        Vector2Int motherPosition;
+        Vector2Int fatherPosition;
         Vector2Int closestPossibleMate;
         Vector2Int closestCorpse;
         Vector2Int closestRottenCorpse;
@@ -48,6 +52,7 @@ namespace EvolutionSimulation.Entities
 
         List<MemoryTileInfo> safePlants;
         List<MemoryTileInfo> safeWaterSource;
+
 
         Creature thisCreature;
         World world;
@@ -68,6 +73,8 @@ namespace EvolutionSimulation.Entities
         public Vector2Int ClosestFruitPosition() { return closestFruit; }
         public Vector2Int ClosestWaterPosition() { return closestWater; }
         public Vector2Int ClosestSafePlacePosition() { return closestSafePlace; }
+        public Vector2Int MotherPosition() { return motherPosition; }
+        public Vector2Int FatherPosition() { return fatherPosition; }
         public Vector2Int UndiscoveredPlacePosition()
         {
             if (undiscoveredPlace == null || map[undiscoveredPlace.x, undiscoveredPlace.y].ticksToBeForgotten > (maxTicksOfMemory / 2))
@@ -91,6 +98,16 @@ namespace EvolutionSimulation.Entities
         {
             MemoryTileInfo tile = map[closestAlly.x, closestAlly.y];
             return tile.ally;
+        }
+        public Creature Father()
+        {
+            MemoryTileInfo tile = map[fatherPosition.x, fatherPosition.y];
+            return tile.father;
+        }
+        public Creature Mother()
+        {
+            MemoryTileInfo tile = map[motherPosition.x, motherPosition.y];
+            return tile.mother;
         }
         public Creature ClosestPossibleMate()
         {
@@ -178,6 +195,7 @@ namespace EvolutionSimulation.Entities
             safeWaterSource.Sort(comparer);
             safePlants.Sort(comparer);
 
+            fatherPosition = motherPosition = null;
             List<Creature> perceivedCreatures = world.PerceiveCreatures(thisCreature, perceptionRadius);
             List<StaticEntity> perceivedEntities = world.PerceiveEntities(thisCreature, perceptionRadius);
 
@@ -205,6 +223,8 @@ namespace EvolutionSimulation.Entities
                                 creature.speciesName == thisCreature.progenitorSpeciesName)
                             {
                                 map[x + i, y + j].ally = creature;
+                                if (creature == thisCreature.father) map[x + i, y + j].father = creature;
+                                else if (creature == thisCreature.mother) map[x + i, y + j].mother = creature;
                             }
                             //Else they have no relation
                             else
@@ -289,6 +309,8 @@ namespace EvolutionSimulation.Entities
             tile.enemyCreature = null;
             tile.enemyCreatureReachable = null;
             tile.ally = null;
+            tile.father = null;
+            tile.mother = null;
             tile.possibleMate = null;
             tile.edibleCorpse = null;
             tile.rottenCorpse = null;
@@ -354,6 +376,8 @@ namespace EvolutionSimulation.Entities
             closestCreature = null;
             closestCreatureReachable = null;
             closestAlly = null;
+            fatherPosition = null;
+            motherPosition = null;
             closestPossibleMate = null;
             closestCorpse = null;
             closestRottenCorpse = null;
@@ -383,6 +407,10 @@ namespace EvolutionSimulation.Entities
                 closestCreatureReachable = thisTile;
             if (closestAlly == null && tile.ally != null)
                 closestAlly = thisTile;
+            if (fatherPosition == null && tile.father != null)
+                fatherPosition = thisTile;
+            if (motherPosition == null && tile.mother != null)
+                motherPosition = thisTile;
             if (closestPossibleMate == null && tile.possibleMate != null)
                 closestPossibleMate = thisTile;
             if (closestCorpse == null && tile.edibleCorpse != null)
@@ -405,6 +433,8 @@ namespace EvolutionSimulation.Entities
             return closestCreature != null &&
                     closestCreatureReachable != null &&
                     closestAlly != null &&
+                    fatherPosition != null &&
+                    motherPosition != null &&
                     closestPossibleMate != null &&
                     closestCorpse != null &&
                     closestRottenCorpse != null &&
