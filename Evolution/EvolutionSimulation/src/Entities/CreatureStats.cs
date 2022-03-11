@@ -309,7 +309,7 @@ namespace EvolutionSimulation.Entities
         #endregion
 
         #region Methods
-        public bool IsNewBorn() { return LifeSpan * adulthoodThreshold < CurrAge; }
+        public bool IsNewBorn() { return LifeSpan * adulthoodThreshold > CurrAge; }
 
         /// <summary>
         /// Modifies the given stat based on age

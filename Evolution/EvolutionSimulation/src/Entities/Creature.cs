@@ -111,23 +111,30 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// When a creature dies calls this method to notify its children
         /// that the creature has died
+        /// If the child is following this parent and remember where is his 
+        /// other parent, the child start following it, otherwise, he doesnt follow no one
         /// </summary>
         /// <param name="parent"> The parent of the creature that has died</param>
-        // TODO si quien muere no sabe donde esta (no lo recuerda), no hacer nada. hay que modificar memory
-        // lo mismo al reves, si muere el padre pero no sabe donde esta la madre, no cambiar la referencia
         public void ParentDead(Creature parent)
         {
             if (parent == father)
             {
-                father = null;
+                if(GetFatherPosition() != null)
+                    father = null;
+                //the creature knows the position of his mother and it is not following her
+                if (GetMotherPosition() != null && parentToFollow != mother)
+                    parentToFollow = GetMother();
+                else parentToFollow = null;
             }
             else
             {
-                mother = null;
+                if (GetMotherPosition() != null)
+                    mother = null;
+                //the creature knows the position of his father and it is not following him
+                if (GetFatherPosition() != null && parentToFollow != father)
+                    parentToFollow = GetFather();
+                else parentToFollow = null;
             }
-            
-            //change reference to follow
-            parentToFollow = parent == father ? mother : father;
         }
 
         /// <summary>
@@ -651,6 +658,25 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public Vector2Int GetClosestAllyPosition() { return memory.ClosestAllyPosition(); }
         /// <summary>
+        /// Returns the position of the father the creature remembers.
+        /// </summary>
+        public Vector2Int GetFatherPosition() { return memory.FatherPosition(); }
+        /// <summary>
+        /// Returns the position of the mother the creature remembers.
+        /// </summary>
+        public Vector2Int GetMotherPosition() { return memory.MotherPosition(); }
+        /// <summary>
+        /// Returns the position of the parent who is following that the creature remembers.
+        /// Returns null if the creature does not remember the position of any of his parents
+        /// </summary>
+        public Vector2Int GetParentToFollowPosition() {
+            if (parentToFollow == null || (memory.Father() == null && memory.Mother() == null))
+                return null;
+            if (parentToFollow == memory.Father())
+                return memory.FatherPosition();
+            return memory.MotherPosition(); 
+        }
+        /// <summary>
         /// Returns the position of the closest possible mate the creature remembers.
         /// </summary>
         public Vector2Int GetClosestPossibleMatePosition() { return memory.ClosestPossibleMatePosition(); }
@@ -688,6 +714,8 @@ namespace EvolutionSimulation.Entities
         public Vector2Int GetUndiscoveredPlacePosition() { return memory.UndiscoveredPlacePosition(); }
 
         public Creature GetClosestAlly() { return memory.ClosestAlly(); }
+        public Creature GetFather() { return memory.Father(); }
+        public Creature GetMother() { return memory.Mother(); }
         public Creature GetClosestPossibleMate() { return memory.ClosestPossibleMate(); }
         public Creature GetClosestCreature() { return memory.ClosestCreature(); }
         public Creature GetClosestCreatureReachable() { return memory.ClosestCreatureReachable(); }

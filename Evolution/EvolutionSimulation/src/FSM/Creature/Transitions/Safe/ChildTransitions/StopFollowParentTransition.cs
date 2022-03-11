@@ -18,7 +18,8 @@
         public override bool Evaluate()
         {
             //TODO que la distancia a dejar de seguir al padre dependa de algo (nivel de paternity, peligro...)
-            if (!creature.stats.IsNewBorn() || creature.parentToFollow == null || creature.DistanceToObjective(creature.parentToFollow) < 3)
+            if (!creature.stats.IsNewBorn() || creature.parentToFollow == null || creature.GetParentToFollowPosition() == null
+                || creature.DistanceToObjective(creature.parentToFollow) < 3)
                 return true;
 
             return false;
