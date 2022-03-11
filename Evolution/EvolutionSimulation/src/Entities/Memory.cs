@@ -133,11 +133,13 @@ namespace EvolutionSimulation.Entities
         // Positions of the closest static resource the the creature feels is safe.
         // Once these positions are reached, IN THEORY, ClosestWaterPosition and ClosestFruitPosition will point
         // to these resources, or other at the same distance, which should make no difference.
-        public Vector2Int SafeWaterPosition() {
+        public Vector2Int SafeWaterPosition()
+        {
             if (safeWaterSource.Count == 0) return null;
             return new Vector2Int(safeWaterSource[0].x, safeWaterSource[0].y);
         }
-        public Vector2Int SafeFruitPosition() {
+        public Vector2Int SafeFruitPosition()
+        {
             if (safePlants.Count == 0) return null;
             return new Vector2Int(safePlants[0].x, safePlants[0].y);
         }
@@ -286,7 +288,8 @@ namespace EvolutionSimulation.Entities
             map[x, y].experienceDanger = -value;
         }
         /// <summary>
-        /// Saves in memory a drinking spot that has proven to be safe for the creature.
+        /// Saves in memory a drinking spot that has proven to be safe for the creature. This happens when the creatures
+        /// finishes eating it and no other creature attack it during it.
         /// </summary>
         public void SafeWaterSpotFound(float exp)
         {
@@ -295,13 +298,23 @@ namespace EvolutionSimulation.Entities
             CreateExperience(x, y, exp);
         }
         /// <summary>
-        /// Saves in memory an edible plant that has proven to be safe for the creature.
+        /// Saves in memory an edible plant that has proven to be safe for the creature. This happens when the creatures
+        /// finishes eating it and no other creature attack it during it.
         /// </summary>
         public void SafePlantFound(float exp)
         {
-            int x = closestFruit.x, y = closestFruit.y;
-            safePlants.Add(map[closestFruit.x, closestFruit.y]);
-            CreateExperience(x, y, exp);
+            //This for looks for the first adjacent tile with the resource.
+            //It may not be the one consumed, but since the entire area is remembered
+            //positively, it does not matter. The reason why this is done this way is because
+            //since the plant was eaten, it is no longer saved in memory as the closest edible plant.
+            int x = thisCreature.x, y = thisCreature.y;
+            for (int i = -1; i <= 1; i += 2)
+                for (int j = -1; j <= 1; j += 2)
+                    if (world.map[x + i, y + j].plant is EdiblePlant)
+                    {
+                        safePlants.Add(map[x + i, y + j]);
+                        CreateExperience(x + i, y + j, exp);
+                    }
         }
 
         /// <summary>
