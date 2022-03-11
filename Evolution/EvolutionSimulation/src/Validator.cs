@@ -462,12 +462,16 @@ namespace EvolutionSimulation
         {
             if (parameters.abilityUnlockPercentage <= 0 || parameters.minHealth <= 0 || parameters.healthGainMultiplier <= 0 || 
                 parameters.healthRegeneration <= 0 || parameters.maxLimbs <= 0 || parameters.minRestExpense <= 0 || parameters.maxRestExpense <= 0 ||
-                parameters.resourceAmount <= 0 || parameters.minLifeSpan <= 0 || parameters.exhaustToSleepRatio <= 0 || parameters.nightPerceptionPenalty <= 0 ||
-                parameters.minMobilityMedium <= 0 || parameters.mobilityPenalty <= 0 || parameters.maxSpeed <= 0 || parameters.hornIntimidationMultiplier <= 0) 
+                parameters.resourceAmount <= 0 || parameters.minLifeSpan <= 0 || parameters.exhaustToSleepRatio <= 0 || parameters.perceptionWithoutNightVision <= 0 || parameters.minPerceptionWithNightVision <= 0 ||
+                parameters.minMobilityMedium <= 0 || parameters.mobilityPenalty <= 0 || parameters.maxSpeed <= 0 || parameters.hornIntimidationMultiplier <= 0 ||
+                parameters.restRegenerationThreshold <= 0 || parameters.energyRegenerationThreshold <= 0 || parameters.hydrationRegenerationThreshold <= 0 || 
+                parameters.regenerationRate <= 0) 
                 throw new UniverseParameterIsZeroException("The provided creature parameters must be positive");
             if (parameters.maxRestExpense < parameters.minRestExpense)
                 throw new MinMaxValueSwappedException("The maximum amount of rest expense is lower than the minimium");
-            if (parameters.abilityUnlockPercentage > 1 || parameters.nightPerceptionPenalty > 1 || parameters.minMobilityMedium > 1 || parameters.mobilityPenalty > 1)
+            if (parameters.abilityUnlockPercentage > 1 || parameters.perceptionWithoutNightVision > 1 || parameters.minPerceptionWithNightVision > 1 || parameters.minMobilityMedium > 1 || parameters.mobilityPenalty > 1 || 
+                parameters.restRegenerationThreshold > 1 || parameters.energyRegenerationThreshold > 1 || parameters.hydrationRegenerationThreshold > 1 || 
+                parameters.regenerationRate > 1)
                 throw new PercentageOverOneException("The provided creature percentages are over one");
         }
 
@@ -491,25 +495,26 @@ namespace EvolutionSimulation
 
         static void ValidateMemory(UniverseParameters parameters)
         {
-            if (parameters.knowledgeTickMultiplier <= 0) 
+            if (parameters.knowledgeTickMultiplier <= 0 || parameters.perceptionToRadiusMultiplier <= 0 || parameters.aggressivenessToRadiusMultiplier <= 0) 
                 throw new UniverseParameterIsZeroException("The provided tree parameters must be positive");
         }
 
         static void ValidateCreatureStates(UniverseParameters parameters)
         {
             if (parameters.baseActionCost <= 0 || parameters.venomCostMultiplier <= 0 || parameters.chaseCostMultiplier <= 0 || parameters.fleeingCostMultiplier <= 0 ||
-                parameters.drinkingCostMultiplier <= 0 || parameters.eatingCostMultiplier <= 0|| parameters.sleepingCostMultiplier <= 0) 
+                parameters.drinkingCostMultiplier <= 0 || parameters.eatingCostMultiplier <= 0 || parameters.sleepingCostMultiplier <= 0|| parameters.mutationChance <= 0 ||
+                 parameters.drinkingMultiplier <= 0 || parameters.adjacentLength <= 0) 
                 throw new UniverseParameterIsZeroException("The provided state parameters must be positive");
+            if (parameters.mutationChance > 1)
+                throw new PercentageOverOneException("The provided state percentages are over one");
         }
 
         static void ValidateCreatureTransitions(UniverseParameters parameters)
         {
             if (parameters.fleeingTransitionMultiplier <= 0 || parameters.hidingTransitionMultiplier <= 0 || parameters.stopEatingTransitionEnergyMultiplier <= 0 || 
-                parameters.combatTransitionHealthThresholdMultiplier <= 0 || parameters.escapeTransitionAggressivenessThreshold <= 0 || 
-                parameters.escapeTransitionHealthThresholdMultiplier <= 0|| parameters.safeTransitionAggressivenessThreshold <= 0) 
+                parameters.combatTransitionHealthThresholdMultiplier <= 0 || parameters.escapeTransitionHealthThresholdMultiplier <= 0 || 
+                parameters.safeTransitionAggressivenessThreshold <= 0 || parameters.experienceMaxAggresivenessMultiplier <= 0 || parameters.safePrefferedOverClosestResourceRatio <= 0) 
                 throw new UniverseParameterIsZeroException("The provided transition parameters must be positive");
-            if (parameters.escapeTransitionAggressivenessThreshold > 1)
-                throw new PercentageOverOneException("The provided transition percentages are over one");
         }
 
         static void ValidateCorpse(UniverseParameters parameters)

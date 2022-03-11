@@ -331,7 +331,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &848237403
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -529,7 +529,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!154 &1277125819
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -620,5 +620,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SimulationYears: 0
+  DataDirectory: ProgramData
+  ExportDirectory: ExportData
   InitalAnimals: 10
   worldCreatureManager: {fileID: 1277125822}

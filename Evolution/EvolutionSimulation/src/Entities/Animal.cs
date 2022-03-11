@@ -20,7 +20,8 @@ namespace EvolutionSimulation.Entities
             int minPerception = UniverseParametersManager.parameters.minPerception;
             float minLifeSpan = UniverseParametersManager.parameters.minLifeSpan; // Minimum years alive
             float exhaustToSleepRatio = UniverseParametersManager.parameters.exhaustToSleepRatio; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
-            float nightPerceptionPenalty = UniverseParametersManager.parameters.nightPerceptionPenalty; //Percentage of the max Perception lost at night
+            float perceptionWithoutNightVision = UniverseParametersManager.parameters.perceptionWithoutNightVision; //Percentage of perception at night when the creature does not have night vision.
+            float minPerceptionWithNightVision = UniverseParametersManager.parameters.minPerceptionWithNightVision; //Minimum percentage of perception at night when the creature has night vision.
             float minMobilityMedium = UniverseParametersManager.parameters.minMobilityMedium; //When moving through a special medium the slowest speed possible is its mobility * (0.6 - 1.0) depending on proficiency
             float mobilityPenalty = UniverseParametersManager.parameters.mobilityPenalty; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
                                           //A ground creature moves fast on the ground, but cannot move throught the air/trees
@@ -92,16 +93,26 @@ namespace EvolutionSimulation.Entities
             stats.MinTemperature = stats.IdealTemperature - chromosome.GetFeature(CreatureFeature.TemperatureRange);
             stats.MaxTemperature = stats.IdealTemperature + chromosome.GetFeature(CreatureFeature.TemperatureRange);
 
+            //int ones = 0;
+            //foreach (bool num in chromosome.GetChromosome())
+            //    if (num) ones++;
+            //float ratio = ones / (float)chromosome.GetChromosome().Length;
+
             stats.MaxEnergy = resourceAmount; // minEnergy + stats.Size / sizeToEnergyRatio; TODO: en teoria es el mismo valor todos los recursos, cambia el gasto
             stats.CurrEnergy = stats.MaxEnergy;
-            stats.EnergyExpense = 1 + stats.Metabolism / (float)chromosome.GetFeatureMax(CreatureFeature.Metabolism);
+            stats.EnergyExpense = (stats.MaxEnergy / (8 * World.ticksHour)) *   // TODO: Numeros magicos a quitar
+            (stats.Metabolism / (float)chromosome.GetFeatureMax(CreatureFeature.Metabolism) * (stats.Members / 2f) +
+            (stats.Venom / 2f + stats.Counter / 2f) * 0.5f);
+            //(stats.MaxEnergy / (8 * World.ticksHour)) * ((float)Math.Pow(ratio, 2) / (float)Math.Pow(0.5, 2));
+
             stats.MaxHydration = resourceAmount;
             stats.CurrHydration = stats.MaxHydration;
-            stats.HydrationExpense = stats.EnergyExpense;//TODO que sea un poco mayor que EnergyExpense, json
+            stats.HydrationExpense = (stats.EnergyExpense * 1.2f); // TODO: Numeros magicos a quitar  // TODO que sea un poco mayor que EnergyExpense, json
 
             stats.MaxRest = resourceAmount;
             stats.CurrRest = stats.MaxRest;
-            stats.RestExpense = minRestExpense + (maxRestExpense - minRestExpense) * (1 - (float)chromosome.GetFeature(CreatureFeature.Resistance) / chromosome.GetFeatureMax(CreatureFeature.Resistance));
+            stats.RestExpense = minRestExpense + (maxRestExpense - minRestExpense) * // TODO: Numeros arcanos
+                (1 - (float)chromosome.GetFeature(CreatureFeature.Resistance) / chromosome.GetFeatureMax(CreatureFeature.Resistance));
             stats.RestRecovery = stats.RestExpense * exhaustToSleepRatio;
 
             //Environment related stats
@@ -110,11 +121,27 @@ namespace EvolutionSimulation.Entities
             int maxPerception = chromosome.GetFeatureMax(CreatureFeature.Perception);
             stats.Perception = (int)((float)chromosome.GetFeature(CreatureFeature.Perception) / maxPerception * (maxPerception - minPerception)) + minPerception;
 
-            //A percentage equal to nightPerceptionPenalty of the max perception is lost at night
-            stats.NightDebuff = chromosome.GetFeatureMax(CreatureFeature.Perception) * nightPerceptionPenalty;
+            //If the creature does not have the feature night vision then its perception will be the lowest posible,
+            //So instead of Perception * 1 it will be Perception * minNightVision
+            if (!HasAbility(CreatureFeature.NightVision, abilityUnlock))
+                stats.NightPenalty = perceptionWithoutNightVision;
+
+            //Else it is calculated what percentage of the ability the creature has unlocked, removing the minimum value needed to have the ability per se,
+            //and then depending on that percentage the creature has a NightPenalty that goes from minNightVision to 1.
+            else
+            {
+                int maxNightVisionGene = chromosome.GetFeatureMax(CreatureFeature.NightVision);
+                int offset = (int)(abilityUnlock * maxNightVisionGene);
+                float percentageOfNightVision = (float)(chromosome.GetFeature(CreatureFeature.NightVision) - offset) / (chromosome.GetFeatureMax(CreatureFeature.NightVision) - offset);
+                stats.NightPenalty = minPerceptionWithNightVision + (1 - minPerceptionWithNightVision) * percentageOfNightVision;
+            }
+
+            //Value that multiplies perception when it is being gotten
+            stats.CurrentVision = world.day ? 1 : stats.NightPenalty;
+
             //If the creature can see in the dark, that penalty is reduced the better sight it has
             if (HasAbility(CreatureFeature.NightVision, abilityUnlock))
-                stats.NightDebuff *= 1 - ((float)chromosome.GetFeature(CreatureFeature.NightVision) / chromosome.GetFeatureMax(CreatureFeature.NightVision));
+                stats.CurrentVision *= 1 - ((float)chromosome.GetFeature(CreatureFeature.NightVision) / chromosome.GetFeatureMax(CreatureFeature.NightVision));
 
 
             //Behaviour related stats

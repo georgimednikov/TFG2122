@@ -9,16 +9,22 @@ namespace EvolutionSimulation.FSM.Creature.States
         private float modifier;
         // Position of the objective
         int objX, objY;
+        // In case the chase ends and it does not end up attacking
+        bool brake = false;
 
         public ChaseEnemy(Entities.Creature c) : base(c) 
         { 
             creature = c;
-            modifier = 1.1f - (c.stats.Aggressiveness / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness)) * UniverseParametersManager.parameters.chaseCostMultiplier; // TODO: Modificador que dependa bien, ahora mismo a mas agresividad mejor persigue
+            modifier = 1.1f - (c.stats.Aggressiveness / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness)); // TODO: Modificador que dependa bien, ahora mismo a mas agresividad mejor persigue
         }
 
         public override int GetCost()
         {
-            return (int)(creature.GetNextCostOnPath() * modifier);
+            int cost = creature.GetNextCostOnPath();
+            if (cost < 0) {
+                brake = true;
+                return UniverseParametersManager.parameters.baseActionCost;
+            } else return (int)(creature.GetNextCostOnPath() * modifier);
         }
 
         public override void OnEntry()
@@ -31,8 +37,10 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
-            Vector3 nextPos = creature.GetNextPosOnPath();  // Follow the specified path
-            creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+            if (!brake) {
+                Vector3 nextPos = creature.GetNextPosOnPath();  // Follow the specified path
+                creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+            }
 
             Entities.Creature objective = creature.GetClosestCreatureReachable();   // This is NOT cached because objective can change to another creature
             if (objX != objective.x ||  // If objective is somewhere else,
@@ -42,9 +50,17 @@ namespace EvolutionSimulation.FSM.Creature.States
                 objY = objective.y;
                 creature.SetPath(objX, objY);   // Set the path the creature must follow
             }
+            Console.WriteLine(creature.speciesName + " CHASES " + objective.speciesName);
             // All of this is done AFTER the action due to the fact that GetCost reflects the cost of the older path
             // Were it to be changed BEFORE, the new position's cost may not be the same as the one returned before
+            brake = false;
         }
+
+        //// No longer cornered, as combat is done
+        //public override void OnExit()
+        //{
+        //    creature.cornered = false;
+        //}
 
         public override string ToString()
         {

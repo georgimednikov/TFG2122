@@ -8,7 +8,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     /// </summary>
     class GoToMate : CreatureState
     {
-        Tuple<int, int> matePos;
+        Vector2Int matePos;
 
         public GoToMate(Entities.Creature c) : base(c) { creature = c; }
 
@@ -20,7 +20,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void OnEntry()
         {
             matePos = creature.GetClosestPossibleMatePosition();
-            creature.SetPath(matePos.Item1, matePos.Item2);
+            creature.SetPath(matePos.x, matePos.y);
         }
 
         /// <summary>
@@ -36,7 +36,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (matePos != creature.GetClosestPossibleMatePosition())
             {
                 matePos = creature.GetClosestPossibleMatePosition();
-                creature.SetPath(matePos.Item1, matePos.Item2);
+                creature.SetPath(matePos.x, matePos.y);
             }
         }
 

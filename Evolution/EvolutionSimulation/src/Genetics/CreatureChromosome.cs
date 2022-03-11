@@ -98,7 +98,7 @@ namespace EvolutionSimulation.Genetics
         /// The current value of each gene
         /// It is ordered by CreatureFeatures 
         /// </summary>
-        public int[] geneValues;
+        int[] geneValues;
 
         /// <summary>
         /// Sets the chromosome structure reading the values of the given JSON file.

@@ -25,11 +25,16 @@ namespace EvolutionSimulation
         public int minPerception = 5;
         public float minLifeSpan = 0.5f; // Minimum years alive
         public float exhaustToSleepRatio = 3; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
-        public float nightPerceptionPenalty = 0.4f; //Percentage of the max Perception lost at night
+        public float perceptionWithoutNightVision = 0.5f; //Percentage of the max Perception lost at night
+        public float minPerceptionWithNightVision = 0.7f; //Percentage of the max Perception lost at night
         public float minMobilityMedium = 0.6f; //When moving through a special medium the slowest speed possible is its mobility * (0.6 - 1.0) depending on proficiency
         public float mobilityPenalty = 0.7f; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
         public float maxSpeed = 1.5f;
         public float hornIntimidationMultiplier = 1.5f;
+        public float restRegenerationThreshold = 0.7f;
+        public float energyRegenerationThreshold = 0.85f;
+        public float hydrationRegenerationThreshold = 0.85f;
+        public float regenerationRate = 0.01f;
 
         // CreatureStats
         public float newbornStatMultiplier = 0.33f; //Starting multiplier of newborns
@@ -46,6 +51,8 @@ namespace EvolutionSimulation
 
         // Memory
         public int knowledgeTickMultiplier = 500;
+        public float perceptionToRadiusMultiplier = 0.15f;
+        public float aggressivenessToRadiusMultiplier = 0.33f;
 
         // States
         public int baseActionCost = 1000;
@@ -53,18 +60,21 @@ namespace EvolutionSimulation
         public float chaseCostMultiplier = 0.4f;
         public float fleeingCostMultiplier = 0.75f;
         public int drinkingCostMultiplier = 10;
+        public int drinkingMultiplier = 5;
         public int eatingCostMultiplier = 10;
         public int sleepingCostMultiplier = 10;
+        public float mutationChance = 0.1f;
+        public int adjacentLength = 1;
 
         // Transitions
         public int fleeingTransitionMultiplier = 4;
         public int hidingTransitionMultiplier = 4;
         public float stopEatingTransitionEnergyMultiplier = 1;
-        //public float combatTransitionAggressivenessThreshold = 0.5f;
         public float combatTransitionHealthThresholdMultiplier = 50;
-        public float escapeTransitionAggressivenessThreshold = 0.5f;
         public float escapeTransitionHealthThresholdMultiplier = 50;
         public float safeTransitionAggressivenessThreshold = 1;
+        public float experienceMaxAggresivenessMultiplier = 0.2f; //Percentage of the max aggressiveness used to create experiences
+        public float safePrefferedOverClosestResourceRatio = 1.25f; //Acceptable max distance of the closest safe resource compared to the closest
 
         // Corpse
         public float rotStartMultiplier = 0.01f;
@@ -81,6 +91,11 @@ namespace EvolutionSimulation
             string file = File.ReadAllText(jsonParameters);
             parameters = JsonConvert.DeserializeObject<UniverseParameters>(file);
             Validator.Validate(parameters);
+        }
+
+        public static void SetDefaultParameters()
+        {
+           parameters = new UniverseParameters();
         }
 
         public static void WriteDefaultParameters()

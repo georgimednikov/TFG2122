@@ -29,19 +29,26 @@ namespace EvolutionSimulation.FSM.Creature.States
             pathX = 0;
             pathY = 0;
             positionAwayFromMe(ref pathX, ref pathY);
-            creature.SetPath(pathX, pathY);   // This MUST be set up for the cost of the action to work
+            if (pathX == creature.x && pathY == creature.y)
+                creature.cornered = true;
+            else
+                creature.SetPath(pathX, pathY);
+
+            creature.CreateExperience(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
         }
 
-        public override int GetCost()
+        public override int GetCost()   // TODO: con 0 de coste podria funcionar por el cornered
         {
-            return (int)(creature.GetNextCostOnPath() * modifier);
+            int cost = creature.GetNextCostOnPath();
+            if(cost < 0) {
+                creature.cornered = true;
+                return UniverseParametersManager.parameters.baseActionCost;
+            } else return creature.cornered? UniverseParametersManager.parameters.baseActionCost : (int)(cost * modifier);
         }
 
         // TODO: Esto no deberia estar aqui!!!
         public void positionAwayFromMe(ref int fX, ref int fY)
         {
-            Console.WriteLine("Fleeing");
-
             // If the creature is in a different tile, simpli get away from it
             int deltaX = dngX - creature.x,       // Direction of opposite movement
                 deltaY = dngY - creature.y;
@@ -55,10 +62,10 @@ namespace EvolutionSimulation.FSM.Creature.States
                     normY = RandomGenerator.Next(-1, 2);
                 } while (normX == 0 && normY == 0);
 
-            int xSum = 0, ySum = 0;
-            while (creature.world.canMove(creature.x + xSum - normX, creature.y + ySum - normY))  // Attempts to find the point furthest aay from attacker
+            int xSum = 0, ySum = 0; // TODO: Debe depender de vision
+            while (creature.world.canMove(creature.x + xSum - normX, creature.y + ySum - normY))  // Attempts to find the point furthest away from attacker
             {
-                xSum -= normX;
+                xSum -= normX; 
                 ySum -= normY;
             }
 
@@ -68,9 +75,12 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
-            Vector3 nextPos = creature.GetNextPosOnPath();
-            if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
-                creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+            if (!creature.cornered)
+            {
+                Vector3 nextPos = creature.GetNextPosOnPath();
+                if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
+                    creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+            }
 
             // Attempts to see if the escape route has changed
             Entities.Creature objective = creature.GetClosestCreature();
@@ -79,8 +89,12 @@ namespace EvolutionSimulation.FSM.Creature.States
                 dngX = objective.x;
                 dngY = objective.y;
                 positionAwayFromMe(ref pathX, ref pathY);
-                creature.SetPath(pathX, pathY);
+                if (pathX == creature.x && pathY == creature.y)
+                    creature.cornered = true;
+                else
+                    creature.SetPath(pathX, pathY);
             }
+            Console.WriteLine(creature.speciesName + " FLEES (" + creature.x + ", " + creature.y + ")");
         }
 
         public override string ToString()

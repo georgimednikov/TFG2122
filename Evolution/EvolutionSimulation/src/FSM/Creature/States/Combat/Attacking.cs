@@ -23,12 +23,20 @@ namespace EvolutionSimulation.FSM.Creature.States
         // Increases current rest
         public override void Action()
         {
-            if (creature.GetClosestCreatureReachable() == null) return;
+            Entities.Creature objective = creature.GetClosestCreatureReachable();
+            if (objective == null) return;
             
+            Console.WriteLine(creature.speciesName + " ATTACKS " + objective.speciesName);
             if(poison)
-                creature.GetClosestCreatureReachable().ReceiveInteraction(creature, Entities.Interactions.poison);
-            creature.GetClosestCreatureReachable().ReceiveInteraction(creature, Entities.Interactions.attack);
+                objective.ReceiveInteraction(creature, Entities.Interactions.poison);
+            objective.ReceiveInteraction(creature, Entities.Interactions.attack);
         }
+
+        //// No longer cornered, as combat is done
+        //public override void OnExit()
+        //{
+        //    creature.cornered = false;
+        //}
 
         public override string ToString()
         {

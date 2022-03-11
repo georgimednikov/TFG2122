@@ -11,9 +11,11 @@ namespace EvolutionSimulation.Entities
             public int x;
             public int y;
 
-            public int ticksUnchecked;  //Number of ticks since the tile has been seen for the last time.
+            public int ticksToBeForgotten;  //Number of ticks since the tile has been seen for the last time.
             public bool discovered;     //Whether this tile has been discovered by the creature at some point.
 
+            public float totalDanger;    //The tiles danger in total, taking into account the others around it.
+            //Dangers originating from the tile, separated from the total to be able to undo them when the tile is forgotten.
             public float experienceDanger;  //How dangerous the creature has experienced the tile to be.
             public float tangibleDanger;    //How dangerous the creature rekons the tile is.
 
@@ -21,26 +23,35 @@ namespace EvolutionSimulation.Entities
 
             // Actual pointers to resources, to use only when already next to them, which is calculated
             // using the positions as remembered by the creature, see below.
-            public Creature closestCreature;
-            public Creature closestCreatureReachable;
-            public Creature closestAlly;
-            public Creature closestPossibleMate;
-            public Corpse closestCorpse;
-            public EdiblePlant closestFruit;
+            public Creature enemyCreature;
+            public Creature enemyCreatureReachable;
+            public Creature ally;
+            public Creature father;
+            public Creature mother;
+            public Creature possibleMate;
+            public Corpse edibleCorpse;
+            public Corpse rottenCorpse;
+            public EdiblePlant fruit;
         }
 
         // The resources' positions, as remembered by the creature
         // Use these when going to a place it remembers, and if it gets there
         // and the resource is no more, it will be automatically updated.
-        Tuple<int, int> closestCreature;
-        Tuple<int, int> closestCreatureReachable;
-        Tuple<int, int> closestAlly;
-        Tuple<int, int> closestPossibleMate;
-        Tuple<int, int> closestCorpse;
-        Tuple<int, int> closestFruit;
-        Tuple<int, int> closestWater;
-        Tuple<int, int> closestSafePlace;
-        Tuple<int, int> undiscoveredPlace;
+        Vector2Int closestCreature;
+        Vector2Int closestCreatureReachable;
+        Vector2Int closestAlly;
+        Vector2Int motherPosition;
+        Vector2Int fatherPosition;
+        Vector2Int closestPossibleMate;
+        Vector2Int closestCorpse;
+        Vector2Int closestRottenCorpse;
+        Vector2Int closestFruit;
+        Vector2Int closestWater;
+        Vector2Int closestSafePlace;
+        Vector2Int undiscoveredPlace;
+
+        List<MemoryTileInfo> safePlants;
+        List<MemoryTileInfo> safeWaterSource;
 
 
         Creature thisCreature;
@@ -48,61 +59,90 @@ namespace EvolutionSimulation.Entities
         MemoryTileInfo[,] map;
         List<MemoryTileInfo> rememberedTiles;
         MemoryTileComparer comparer;
-        int maxTicksUnchecked;
+        int maxTicksOfMemory;   //Number of ticks that a tile will remain remembered.
         int perceptionRadius;   //Radius around the creature in which it perceives the world.
         int dangerRadius;       //Radius around a tile in which the tile's danger spreads.
 
 
-        public Tuple<int, int> ClosestCreaturePosition() { return closestCreature; }
-        public Tuple<int, int> ClosestCreatureReachablePosition() { return closestCreatureReachable; }
-        public Tuple<int, int> ClosestAllyPosition() { return closestAlly; }
-        public Tuple<int, int> ClosestPossibleMatePosition() { return closestPossibleMate; }
-        public Tuple<int, int> ClosestCorpsePosition() { return closestCorpse; }
-        public Tuple<int, int> ClosestFruitPosition() { return closestFruit; }
-        public Tuple<int, int> ClosestWaterPosition() { return closestWater; }
-        public Tuple<int, int> ClosestSafePlacePosition() { return closestSafePlace; }
-        public Tuple<int, int> UndiscoveredPlacePosition()
+        public Vector2Int ClosestCreaturePosition() { return closestCreature; }
+        public Vector2Int ClosestCreatureReachablePosition() { return closestCreatureReachable; }
+        public Vector2Int ClosestAllyPosition() { return closestAlly; }
+        public Vector2Int ClosestPossibleMatePosition() { return closestPossibleMate; }
+        public Vector2Int ClosestCorpsePosition() { return closestCorpse; }
+        public Vector2Int ClosestRottenCorpsePosition() { return closestRottenCorpse; }
+        public Vector2Int ClosestFruitPosition() { return closestFruit; }
+        public Vector2Int ClosestWaterPosition() { return closestWater; }
+        public Vector2Int ClosestSafePlacePosition() { return closestSafePlace; }
+        public Vector2Int MotherPosition() { return motherPosition; }
+        public Vector2Int FatherPosition() { return fatherPosition; }
+        public Vector2Int UndiscoveredPlacePosition()
         {
-            if (undiscoveredPlace == null || map[undiscoveredPlace.Item1, undiscoveredPlace.Item2].ticksUnchecked < (maxTicksUnchecked / 2))
+            if (undiscoveredPlace == null || map[undiscoveredPlace.x, undiscoveredPlace.y].ticksToBeForgotten > (maxTicksOfMemory / 2))
                 GetNewUndiscoveredPlace();
             return undiscoveredPlace;
         }
 
         public Creature ClosestCreature()
         {
-            MemoryTileInfo tile = map[closestCreature.Item1, closestCreature.Item2];
+            MemoryTileInfo tile = map[closestCreature.x, closestCreature.y];
             //if (tile.ticksUnchecked == 0)
-            return tile.closestCreature;
+            return tile.enemyCreature;
             //return null;
         }
         public Creature ClosestCreatureReachable()
         {
-            MemoryTileInfo tile = map[closestCreatureReachable.Item1, closestCreatureReachable.Item2];
-            return tile.closestCreatureReachable;
+            MemoryTileInfo tile = map[closestCreatureReachable.x, closestCreatureReachable.y];
+            return tile.enemyCreatureReachable;
         }
         public Creature ClosestAlly()
         {
-            MemoryTileInfo tile = map[closestAlly.Item1, closestAlly.Item2];
-            return tile.closestAlly;
+            MemoryTileInfo tile = map[closestAlly.x, closestAlly.y];
+            return tile.ally;
+        }
+        public Creature Father()
+        {
+            MemoryTileInfo tile = map[fatherPosition.x, fatherPosition.y];
+            return tile.father;
+        }
+        public Creature Mother()
+        {
+            MemoryTileInfo tile = map[motherPosition.x, motherPosition.y];
+            return tile.mother;
         }
         public Creature ClosestPossibleMate()
         {
-            MemoryTileInfo tile = map[closestPossibleMate.Item1, closestPossibleMate.Item2];
-            return tile.closestPossibleMate;
+            MemoryTileInfo tile = map[closestPossibleMate.x, closestPossibleMate.y];
+            return tile.possibleMate;
         }
         public Corpse ClosestCorpse()
         {
-            MemoryTileInfo tile = map[closestCorpse.Item1, closestCorpse.Item2];
-            return tile.closestCorpse;
+            MemoryTileInfo tile = map[closestCorpse.x, closestCorpse.y];
+            return tile.edibleCorpse;
+        }
+        public Corpse ClosestRottenCorpse()
+        {
+            MemoryTileInfo tile = map[closestRottenCorpse.x, closestRottenCorpse.y];
+            return tile.edibleCorpse;
         }
         public EdiblePlant ClosestFruit()
         {
-            MemoryTileInfo tile = map[closestFruit.Item1, closestFruit.Item2];
-            return tile.closestFruit;
+            MemoryTileInfo tile = map[closestFruit.x, closestFruit.y];
+            return tile.fruit;
         }
 
-
-
+        // Positions of the closest static resource the the creature feels is safe.
+        // Once these positions are reached, IN THEORY, ClosestWaterPosition and ClosestFruitPosition will point
+        // to these resources, or other at the same distance, which should make no difference.
+        public Vector2Int SafeWaterPosition()
+        {
+            if (safeWaterSource.Count == 0) return null;
+            return new Vector2Int(safeWaterSource[0].x, safeWaterSource[0].y);
+        }
+        public Vector2Int SafeFruitPosition()
+        {
+            if (safePlants.Count == 0) return null;
+            return new Vector2Int(safePlants[0].x, safePlants[0].y);
+        }
 
 
         public Memory(Creature c, World w)
@@ -115,13 +155,13 @@ namespace EvolutionSimulation.Entities
                     map[i, j] = new MemoryTileInfo();
 
             rememberedTiles = new List<MemoryTileInfo>();
+            safePlants = new List<MemoryTileInfo>();
+            safeWaterSource = new List<MemoryTileInfo>();
             comparer = new MemoryTileComparer(thisCreature);
 
-            maxTicksUnchecked = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
-            perceptionRadius = /*thisCreature.stats.Perception*/ 5; // TODO: Perception es literalmente 0, eso no vale así que hay que arreglarlo
-            dangerRadius = thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness;
-
-            //GetNewUndiscoveredPlace();
+            maxTicksOfMemory = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
+            dangerRadius = (int)((thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness) * UniverseParametersManager.parameters.aggressivenessToRadiusMultiplier);
+            UpdatePerceptionRadius();
         }
 
         public void Update()
@@ -131,18 +171,33 @@ namespace EvolutionSimulation.Entities
             for (int i = 0; i < rememberedTiles.Count; i++)
             {
                 MemoryTileInfo tile = rememberedTiles[i];
-                tile.ticksUnchecked++;
-                if (tile.ticksUnchecked >= maxTicksUnchecked) //If it's time to forget a tile.
+                tile.ticksToBeForgotten--;
+                if (tile.ticksToBeForgotten <= 0) //If it's time to forget a tile.
                 {
                     tile.discovered = false;
                     //If the tile is forgotten the the creature no longer feels danger/fondness of it and its vecinity.
                     //To undo that information, the danger is adjusted with the opposite value.
-                    AdjustDanger(tile.x, tile.y, -tile.tangibleDanger, false);
-                    AdjustDanger(tile.x, tile.y, -tile.experienceDanger, true);
+                    AdjustDanger(tile.x, tile.y, -tile.tangibleDanger);
+                    AdjustDanger(tile.x, tile.y, -tile.experienceDanger);
+                    tile.tangibleDanger = tile.experienceDanger = 0;
                     rememberedTiles.Remove(tile);
-                }
-            }
 
+                    if (tile.water && safeWaterSource.Contains(tile))
+                        safeWaterSource.Remove(tile);
+                    if (safePlants.Contains(tile))
+                        safePlants.Remove(tile);
+                }
+                // If a once considered safe resource has a danger level it is no longer safe.
+                if (tile.water && safeWaterSource.Contains(tile) && GetPositionDanger(tile.x, tile.y) > 0)
+                    safeWaterSource.Remove(tile);
+                if (safePlants.Contains(tile) && GetPositionDanger(tile.x, tile.y) > 0)
+                    safePlants.Remove(tile);
+            }
+            // After removal of tiles no longer fit to be in these lists they are ordered based on distance from the creature.
+            safeWaterSource.Sort(comparer);
+            safePlants.Sort(comparer);
+
+            fatherPosition = motherPosition = null;
             List<Creature> perceivedCreatures = world.PerceiveCreatures(thisCreature, perceptionRadius);
             List<StaticEntity> perceivedEntities = world.PerceiveEntities(thisCreature, perceptionRadius);
 
@@ -169,16 +224,18 @@ namespace EvolutionSimulation.Entities
                                 creature.progenitorSpeciesName == thisCreature.speciesName ||
                                 creature.speciesName == thisCreature.progenitorSpeciesName)
                             {
-                                map[x + i, y + j].closestAlly = creature;
+                                map[x + i, y + j].ally = creature;
+                                if (creature == thisCreature.father) map[x + i, y + j].father = creature;
+                                else if (creature == thisCreature.mother) map[x + i, y + j].mother = creature;
                             }
                             //Else they have no relation
                             else
                             {
-                                map[x + i, y + j].closestCreature = creature;
+                                map[x + i, y + j].enemyCreature = creature;
                                 if ((creature.creatureLayer == Creature.HeightLayer.Air && thisCreature.stats.AirReach) ||
                                     creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach ||
                                     creature.creatureLayer == Creature.HeightLayer.Ground)
-                                    map[x + i, y + j].closestCreatureReachable = creature;
+                                    map[x + i, y + j].enemyCreatureReachable = creature;
 
                                 tileDanger += creature.stats.Intimidation;
                             }
@@ -190,13 +247,21 @@ namespace EvolutionSimulation.Entities
                     //Saves the corpses in a tile and throws away the rest.
                     foreach (StaticEntity entity in perceivedEntities)
                     {
-                        if (!(entity is Corpse)) perceivedEntities.Remove(entity);
+                        if (!(entity is Corpse)) continue;
                         else if (entity.x == x + i && entity.y == y + j)
                         {
-                            Corpse corpse = entity as Corpse;
-                            if (thisCreature.stats.Scavenger > 0 || corpse.Edible)
-                                map[x + i, y + j].closestCorpse = corpse;
-                            break;
+                            Corpse newCorpse = entity as Corpse;
+                            MemoryTileInfo tile = map[x + i, y + j];
+                            if (thisCreature.stats.Scavenger > 0 || newCorpse.Edible)
+                            {
+                                if (tile.edibleCorpse == null)
+                                    tile.edibleCorpse = newCorpse;
+                            }
+                            else
+                            {
+                                if (tile.rottenCorpse == null)
+                                    tile.rottenCorpse = newCorpse;
+                            }
                         }
                     }
                 }
@@ -205,14 +270,51 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
+        /// This method has to be called when day changed to night nad vice versa, to update the radius the creature sees based on the
+        /// new perception value, which changes at night.
+        /// </summary>
+        public void UpdatePerceptionRadius()
+        {
+            perceptionRadius = (int)(thisCreature.stats.Perception * UniverseParametersManager.parameters.perceptionToRadiusMultiplier);
+        }
+
+        /// <summary>
         /// Sets the creatures "fondness" (positive danger) of a tile and its surroundings, based on an experience, using dangerRadius.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
         /// <param name="value">Value of "fondness" in the tile. It can be negative if it is actually dangerous</param>
         public void CreateExperience(int x, int y, float value)
         {
-            AdjustDanger(x, y, -value, true);
+            AdjustDanger(x, y, -value);
+            map[x, y].experienceDanger = -value;
+        }
+        /// <summary>
+        /// Saves in memory a drinking spot that has proven to be safe for the creature. This happens when the creatures
+        /// finishes eating it and no other creature attack it during it.
+        /// </summary>
+        public void SafeWaterSpotFound(float exp)
+        {
+            int x = closestWater.x, y = closestWater.y;
+            safeWaterSource.Add(map[x, y]);
+            CreateExperience(x, y, exp);
+        }
+        /// <summary>
+        /// Saves in memory an edible plant that has proven to be safe for the creature. This happens when the creatures
+        /// finishes eating it and no other creature attack it during it.
+        /// </summary>
+        public void SafePlantFound(float exp)
+        {
+            //This for looks for the first adjacent tile with the resource.
+            //It may not be the one consumed, but since the entire area is remembered
+            //positively, it does not matter. The reason why this is done this way is because
+            //since the plant was eaten, it is no longer saved in memory as the closest edible plant.
+            int x = thisCreature.x, y = thisCreature.y;
+            for (int i = -1; i <= 1; i += 2)
+                for (int j = -1; j <= 1; j += 2)
+                    if (world.map[x + i, y + j].plant is EdiblePlant)
+                    {
+                        safePlants.Add(map[x + i, y + j]);
+                        CreateExperience(x + i, y + j, exp);
+                    }
         }
 
         /// <summary>
@@ -220,19 +322,21 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public float GetPositionDanger(int x, int y)
         {
-            return map[x, y].experienceDanger + map[x, y].tangibleDanger;
+            return map[x, y].totalDanger;
         }
 
         private void ResetMemoryTilePointers(int x, int y)
         {
             MemoryTileInfo tile = map[x, y];
-            tile.closestCreature = null;
-            tile.closestCreatureReachable = null;
-            tile.closestAlly = null;
-            tile.closestPossibleMate = null;
-            tile.closestCorpse = null;
-            tile.closestFruit = null;
-
+            tile.enemyCreature = null;
+            tile.enemyCreatureReachable = null;
+            tile.ally = null;
+            tile.father = null;
+            tile.mother = null;
+            tile.possibleMate = null;
+            tile.edibleCorpse = null;
+            tile.rottenCorpse = null;
+            tile.fruit = null;
         }
         private void UpdateMemoryTile(int x, int y, float danger)
         {
@@ -245,16 +349,17 @@ namespace EvolutionSimulation.Entities
             }
 
             // The tile's tick count gets reseted and its information reassigned.
-            map[x, y].ticksUnchecked = 0;
+            map[x, y].ticksToBeForgotten = maxTicksOfMemory;
             map[x, y].water = world.map[x, y].isWater;
             if (map[x, y].water) return; //If the tile is water there is nothing more to process.
 
             //There is fruit if the plant is edible and it hasn't been eaten.
             //TODO: Hierba si es herbivoro deberia contar
             if (world.map[x, y].plant is EdiblePlant)// && !(world.map[x, y].plant as EdiblePlant).eaten)
-                map[x, y].closestFruit = world.map[x, y].plant as EdiblePlant;
+                map[x, y].fruit = world.map[x, y].plant as EdiblePlant;
 
-            AdjustDanger(x, y, danger, false);
+            AdjustDanger(x, y, danger);
+            map[x, y].tangibleDanger = danger;
         }
 
         /// <summary>
@@ -264,7 +369,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="y"></param>
         /// <param name="danger">Level of danger</param>
         /// <param name="experience">If the danger comes from experience or perception</param>
-        private void AdjustDanger(int x, int y, float danger, bool experience)
+        private void AdjustDanger(int x, int y, float danger)
         {
             //The danger in a tile is calculated by adding up all the intimidation stats of the creatures in it.
             //Then, the danger is increased in the vecinity in a radius, dividing the original danger
@@ -278,8 +383,7 @@ namespace EvolutionSimulation.Entities
                 {
                     if (IsOutOfBounds(x + i, y + j)) continue;
                     float tileDanger = danger / (float)Math.Pow(2, Math.Max(i, j));
-                    if (experience) map[x + i, y + j].experienceDanger = tileDanger; // If it's experience danger it is reseted.
-                    else map[x + i, y + j].tangibleDanger += tileDanger; //If not, dangers can stack in a single tile.
+                    map[x + i, y + j].totalDanger += tileDanger; //If not, dangers can stack in a single tile.
                 }
             }
         }
@@ -294,19 +398,21 @@ namespace EvolutionSimulation.Entities
             closestCreature = null;
             closestCreatureReachable = null;
             closestAlly = null;
+            fatherPosition = null;
+            motherPosition = null;
             closestPossibleMate = null;
             closestCorpse = null;
+            closestRottenCorpse = null;
             closestFruit = null;
             closestWater = null;
             closestSafePlace = null;
 
-            rememberedTiles.Sort(comparer);
+            rememberedTiles.Sort(comparer); //TODO: Mirar esto
             foreach (MemoryTileInfo tile in rememberedTiles)
             {
                 UpdateResources(tile);
                 if (AllResourcesFound()) break; // Stops searching when everything has been found.
             }
-            GetNewUndiscoveredPlace();
         }
 
         /// <summary>
@@ -315,45 +421,29 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         private void UpdateResources(MemoryTileInfo tile)
         {
-            Tuple<int, int> thisTile = new Tuple<int, int>(tile.x, tile.y);
-            //If there are creatures unrelated to the creature:
-            //if (tile.creatures.Count > 0)
-            //{
-            //    //The first one is assigned as the closest one if there isn't one already.
-            //    if (closestCreature == null) closestCreature = thisTile;
-            //    //The fist creature reachable is assigned if there isn't one already.
-            //    if (closestCreatureReachable == null)
-            //        foreach (Creature creature in tile.creatures)
-            //            if ((creature.creatureLayer == Creature.HeightLayer.Air && thisCreature.stats.AirReach) ||
-            //                creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach ||
-            //                creature.creatureLayer == Creature.HeightLayer.Ground)
-            //                closestCreatureReachable = thisTile;
-            //}
+            Vector2Int thisTile = new Vector2Int(tile.x, tile.y);
 
-            //Same everything else.
-            //if (tile.allies.Count > 0)
-            //{
-            //    if (closestAlly == null) closestAlly = thisTile;
-            //    if (closestPossibleMate == null)
-            //        foreach (Creature creature in tile.allies)
-            //            if (creature.wantMate) closestPossibleMate = thisTile;
-            //}
-
-            if (closestCreature == null && tile.closestCreature != null)
+            if (closestCreature == null && tile.enemyCreature != null)
                 closestCreature = thisTile;
-            if (closestCreatureReachable == null && tile.closestCreatureReachable != null)
+            if (closestCreatureReachable == null && tile.enemyCreatureReachable != null)
                 closestCreatureReachable = thisTile;
-            if (closestAlly == null && tile.closestAlly != null)
+            if (closestAlly == null && tile.ally != null)
                 closestAlly = thisTile;
-            if (closestPossibleMate == null && tile.closestPossibleMate != null)
+            if (fatherPosition == null && tile.father != null)
+                fatherPosition = thisTile;
+            if (motherPosition == null && tile.mother != null)
+                motherPosition = thisTile;
+            if (closestPossibleMate == null && tile.possibleMate != null)
                 closestPossibleMate = thisTile;
-            if (closestCorpse == null && tile.closestCorpse != null)
+            if (closestCorpse == null && tile.edibleCorpse != null)
                 closestCorpse = thisTile;
-            if (closestFruit == null && tile.closestFruit != null && !tile.closestFruit.eaten)
+            if (closestRottenCorpse == null && tile.rottenCorpse != null)
+                closestRottenCorpse = thisTile;
+            if (closestFruit == null && tile.fruit != null && !tile.fruit.eaten)
                 closestFruit = thisTile;
-            if (closestWater == null && tile.water)
+            if (closestWater == null && tile.water && GetPositionDanger(tile.x, tile.y) <= 0)
                 closestWater = thisTile;
-            if (closestSafePlace == null && GetPositionDanger(tile.x, tile.y) == 0)
+            if (closestSafePlace == null && GetPositionDanger(tile.x, tile.y) <= 0)
                 closestSafePlace = thisTile;
         }
 
@@ -365,8 +455,11 @@ namespace EvolutionSimulation.Entities
             return closestCreature != null &&
                     closestCreatureReachable != null &&
                     closestAlly != null &&
+                    fatherPosition != null &&
+                    motherPosition != null &&
                     closestPossibleMate != null &&
                     closestCorpse != null &&
+                    closestRottenCorpse != null &&
                     closestFruit != null &&
                     closestWater != null &&
                     closestSafePlace != null;
@@ -398,8 +491,8 @@ namespace EvolutionSimulation.Entities
                 num = RandomGenerator.Next(0, maxDistDiameter - minDistDiameter);
                 y = (thisCreature.y + minDistRadius + 1 + num) % maxDistDiameter;
             }
-            while (map[x, y].water && map[x, y].discovered && map[x, y].ticksUnchecked < (maxTicksUnchecked / 2));
-            undiscoveredPlace = new Tuple<int, int>(x, y);
+            while (map[x, y].water || map[x, y].ticksToBeForgotten > (maxTicksOfMemory / 2) || GetPositionDanger(x, y) > 0);
+            undiscoveredPlace = new Vector2Int(x, y);
         }
 
         /// <summary>

@@ -41,7 +41,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                         // Crossover with male and female chromosomes
                         Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(creature.matingCreature.chromosome, creature.chromosome);
                         // Mutate the chromosome
-                        Genetics.GeneticFunctions.UniformMutation(ref childC, 0.1f);// TODO que la probabilidad la coja de algun sitio
+                        Genetics.GeneticFunctions.UniformMutation(ref childC, UniverseParametersManager.parameters.mutationChance);
                         // The new creature's pos (near to the parents)
                         int nx = creature.x + RandomGenerator.Next(-1, 2);
                         int ny = creature.y + RandomGenerator.Next(-1, 2);
@@ -59,6 +59,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                             child.parentToFollow = child.mother;
                     }
                     creature.timeToBeInHeat = -1;
+                    creature.CreateExperience(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
                 }                
             }
         }

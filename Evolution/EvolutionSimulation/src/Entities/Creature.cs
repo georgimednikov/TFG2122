@@ -50,6 +50,7 @@ namespace EvolutionSimulation.Entities
             this.y = y;
             timeToBeInHeat = stats.TimeBetweenHeats;
             memory = new Memory(this, world);
+
             ConfigureStateMachine();
             // Attack
             AddInteraction(Interactions.attack, ReceiveDamage);
@@ -63,7 +64,7 @@ namespace EvolutionSimulation.Entities
             AddInteraction(Interactions.mate, OnMate);
             AddInteraction(Interactions.stopMate, StopMating);
 
-            Console.WriteLine(mfsm.ExportToDotGraph());
+            //Console.WriteLine(mfsm.ExportToDotGraph());
         }
 
         /// <summary>
@@ -71,11 +72,9 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void Tick()
         {
-            //toDie.value = (stats.CurrAge++ >= stats.LifeSpan);
-            //toSleep.value = (stats.CurrRest <= 0.1 * stats.MaxRest);
-            //toWake.value = (stats.CurrRest >= stats.MaxRest);
-
-            stats.CurrRest -= stats.RestExpense;
+            // Bodily functions
+            Expend();
+            Regen();
 
             FemaleTick();
 
@@ -96,26 +95,46 @@ namespace EvolutionSimulation.Entities
             Clear();
         }
 
+        public void CycleDayNight()
+        {
+            //If the creature sees normally (1 = 100% of its vision) it was day and now is night.
+            if (stats.CurrentVision == 1)
+                stats.CurrentVision = stats.NightPenalty; //Instead of 1 now it sees from minNightVision to 1 depending on its feature.
+
+            //Else it was night now it is day again and begins to see normally.
+            else
+                stats.CurrentVision = 1;
+
+            memory.UpdatePerceptionRadius();
+        }
+
         /// <summary>
         /// When a creature dies calls this method to notify its children
         /// that the creature has died
+        /// If the child is following this parent and remember where is his 
+        /// other parent, the child start following it, otherwise, he doesnt follow no one
         /// </summary>
         /// <param name="parent"> The parent of the creature that has died</param>
-        // TODO si quien muere no sabe donde esta (no lo recuerda), no hacer nada. hay que modificar memory
-        // lo mismo al reves, si muere el padre pero no sabe donde esta la madre, no cambiar la referencia
         public void ParentDead(Creature parent)
         {
             if (parent == father)
             {
-                father = null;
+                if(GetFatherPosition() != null)
+                    father = null;
+                //the creature knows the position of his mother and it is not following her
+                if (GetMotherPosition() != null && parentToFollow != mother)
+                    parentToFollow = GetMother();
+                else parentToFollow = null;
             }
             else
             {
-                mother = null;
+                if (GetMotherPosition() != null)
+                    mother = null;
+                //the creature knows the position of his father and it is not following him
+                if (GetFatherPosition() != null && parentToFollow != father)
+                    parentToFollow = GetFather();
+                else parentToFollow = null;
             }
-            
-            //change reference to follow
-            parentToFollow = parent == father ? mother : father;
         }
 
         /// <summary>
@@ -158,7 +177,35 @@ namespace EvolutionSimulation.Entities
                 else wantMate = true;
             }
         }
+
+        /// <summary>
+        /// Lowers the creature's current energy, rest and hydration
+        /// Amount varies depending on the creature's abilities
+        /// </summary>
+        void Expend()
+        {
+            stats.CurrHydration -= stats.HydrationExpense;
+            stats.CurrRest -= stats.RestExpense;
+            stats.CurrEnergy -= stats.EnergyExpense;
+        }
+
+        /// <summary>
+        /// Attempts to regenrate the creature's health
+        /// Checks first if it can with current energy and rest
+        /// And then regenrates a percentage of the creature's max hp
+        /// </summary>
+        void Regen()
+        {
+            if(stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
+                stats.CurrRest >= (stats.MaxRest * UniverseParametersManager.parameters.restRegenerationThreshold) &&
+                stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold)) {
+                stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth);  // TODO: Ver si esto esta bien, ingenieria de valores
+                stats.CurrHealth = Math.Min(stats.CurrHealth, stats.MaxHealth); // So it does not get over-healed
+            }
+        }
+
         #region Genetics and Taxonomy
+
         // Taxonomy
         public string speciesName;
         public string progenitorSpeciesName;
@@ -230,14 +277,14 @@ namespace EvolutionSimulation.Entities
             IState goToSafePlace = new GoToSafePlace(this);
             IState sleep = new Sleeping(this);
             Fsm safeFSM = new Fsm(wander);
-            IState safe = new CompoundState("Safe", safeFSM);
+            IState safe = new CalmState("Safe", safeFSM, this);
 
             // Done exploring
             ITransition doneExploringTransition = new DoneExploringTransition(this);
             safeFSM.AddTransition(explore, doneExploringTransition, wander);
 
             // TODO queremos esto? si lo dejamos, quitar comprobaciones en las transiciones de si tiene la habilidad o no
-            // Follow Parent
+            //Follow Parent
             if (stats.Paternity > 0)
             {
                 IState followParent = new FollowParent(this);
@@ -300,7 +347,7 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToMate, tryMateTransition, tryMate);
             safeFSM.AddTransition(tryMate, matingTransition, mating);
             safeFSM.AddTransition(tryMate, stopTryMateTransition, wander);
-            safeFSM.AddTransition(mating, stopMatingTransition, wander);           
+            safeFSM.AddTransition(mating, stopMatingTransition, wander);
             safeFSM.AddTransition(goToDrink, matingTransition, mating);
             safeFSM.AddTransition(goToEat, matingTransition, mating);
             safeFSM.AddTransition(goToSafePlace, matingTransition, mating);
@@ -335,19 +382,19 @@ namespace EvolutionSimulation.Entities
             ITransition safeTransition = new SafeTransition(this);
             ITransition combatTransition = new CombatTransition(this);
             aliveFSM.AddTransition(safe, escapeTransition, escape);
-            aliveFSM.AddTransition(safe, combatTransition, combat);            
+            aliveFSM.AddTransition(safe, combatTransition, combat);
             aliveFSM.AddTransition(combat, safeTransition, safe);
-            aliveFSM.AddTransition(combat, escapeTransition, escape);           
+            aliveFSM.AddTransition(combat, escapeTransition, escape);
             aliveFSM.AddTransition(escape, safeTransition, safe);
             aliveFSM.AddTransition(escape, combatTransition, combat);
-            //
+
             IState alive = new CompoundState("Alive", aliveFSM);
             IState dead = new Dead(this);
-            //
+
             mfsm = new Fsm(alive);
             // Transitions
             ITransition dieTransition = new DieTransition(this);
-            mfsm.AddTransition(alive, dieTransition, dead); 
+            mfsm.AddTransition(alive, dieTransition, dead);
         }
 
         #endregion
@@ -485,7 +532,7 @@ namespace EvolutionSimulation.Entities
         /// <returns> True if the creature is hunger </returns>
         public bool IsHungry()
         {
-            return stats.CurrEnergy > stats.hungerThreshold * stats.MaxEnergy;
+            return stats.CurrEnergy <= stats.hungerThreshold * stats.MaxEnergy;
         }
 
         /// <summary>
@@ -494,7 +541,7 @@ namespace EvolutionSimulation.Entities
         /// <returns> True if the creature is very hunger </returns>
         public bool IsVeryHungry()
         {
-            return stats.CurrEnergy > stats.veryHungerThreshold * stats.MaxEnergy;
+            return stats.CurrEnergy <= stats.veryHungerThreshold * stats.MaxEnergy;
         }
 
         /// <summary>
@@ -503,7 +550,7 @@ namespace EvolutionSimulation.Entities
         /// <returns> True if the creature is thirsty </returns>
         public bool IsThirsty()
         {
-            return stats.CurrHydration > stats.thirstyThreshold * stats.MaxHydration;
+            return stats.CurrHydration <= stats.thirstyThreshold * stats.MaxHydration;
         }
 
         /// <summary>
@@ -512,7 +559,7 @@ namespace EvolutionSimulation.Entities
         /// <returns> True if the creature is very thirsty </returns>
         public bool IsVeryThirsty()
         {
-            return stats.CurrHydration > stats.veryThirstyThreshold * stats.MaxHydration;
+            return stats.CurrHydration <= stats.veryThirstyThreshold * stats.MaxHydration;
         }
 
         /// <summary>
@@ -567,47 +614,108 @@ namespace EvolutionSimulation.Entities
 
             return false;
         }
+        /// <summary>
+        /// Check if the creature can eat a rotten corpse as an alternative to a good food source.
+        /// </summary>
+        /// <returns>True if the creature knows where to eat </returns>
+        public bool CanEatRottenCorpse()
+        {
+            if (stats.Diet == Diet.Herbivore)
+                return false;
 
+            return GetClosestRottenCorpsePosition() != null;
+        }
+
+        /// <summary>
+        /// Returns the danger level of the tile in the map on which the creature is. Danger is calculated based on Intimidation.
+        /// </summary>
         public float GetDanger() { return memory.GetPositionDanger(x, y); }
+        /// <summary>
+        /// Creatres an experience for the creature in the current tile that it is in.
+        /// If its positive, it is a good experience, if it is negative, a bad one.
+        /// </summary>
+        public void CreateExperience(float exp) { memory.CreateExperience(x, y, exp); }
+        /// <summary>
+        /// Saves in memory a safe drinking spot and updates the danger levels around it.
+        /// </summary>
+        public void SafeWaterSpotFound(float exp) { memory.SafeWaterSpotFound(exp); }
+        /// <summary>
+        /// Saves in memory a safe plant to eat and updates the danger levels around it.
+        /// </summary>
+        public void SafePlantFound(float exp) { memory.SafePlantFound(exp); }
+        /// <summary>
+        /// Returns the position of the closest safe water source.
+        /// </summary>
+        public Vector2Int GetSafeWaterPosition() { return memory.SafeWaterPosition(); }
+        /// <summary>
+        /// Returns the position of the closest safe edible plant.
+        /// </summary>
+        public Vector2Int GetSafeFruitPosition() { return memory.SafeFruitPosition(); }
+
 
         /// <summary>
         /// Returns the position of the closest ally the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestAllyPosition() { return memory.ClosestAllyPosition(); }
+        public Vector2Int GetClosestAllyPosition() { return memory.ClosestAllyPosition(); }
+        /// <summary>
+        /// Returns the position of the father the creature remembers.
+        /// </summary>
+        public Vector2Int GetFatherPosition() { return memory.FatherPosition(); }
+        /// <summary>
+        /// Returns the position of the mother the creature remembers.
+        /// </summary>
+        public Vector2Int GetMotherPosition() { return memory.MotherPosition(); }
+        /// <summary>
+        /// Returns the position of the parent who is following that the creature remembers.
+        /// Returns null if the creature does not remember the position of any of his parents
+        /// </summary>
+        public Vector2Int GetParentToFollowPosition() {
+            if (parentToFollow == null || (memory.Father() == null && memory.Mother() == null))
+                return null;
+            if (parentToFollow == memory.Father())
+                return memory.FatherPosition();
+            return memory.MotherPosition(); 
+        }
         /// <summary>
         /// Returns the position of the closest possible mate the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestPossibleMatePosition() { return memory.ClosestPossibleMatePosition(); }
+        public Vector2Int GetClosestPossibleMatePosition() { return memory.ClosestPossibleMatePosition(); }
         /// <summary>
         /// Returns the position of the closest not allied creature the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestCreaturePosition() { return memory.ClosestCreaturePosition(); }
+        public Vector2Int GetClosestCreaturePosition() { return memory.ClosestCreaturePosition(); }
         /// <summary>
         /// Returns the position of the closest rechable creature the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestCreatureReachablePosition() { return memory.ClosestCreatureReachablePosition(); }
+        public Vector2Int GetClosestCreatureReachablePosition() { return memory.ClosestCreatureReachablePosition(); }
         /// <summary>
         /// Returns the position of the closest corpse the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestCorpsePosition() { return memory.ClosestCorpsePosition(); }
+        public Vector2Int GetClosestCorpsePosition() { return memory.ClosestCorpsePosition(); }
+        /// <summary>
+        /// Returns the position of the closest corpse the creature remembers.
+        /// </summary>
+        public Vector2Int GetClosestRottenCorpsePosition() { return memory.ClosestRottenCorpsePosition(); }
         /// <summary>
         /// Returns the position of the closest edible plant the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestFruitPosition() { return memory.ClosestFruitPosition(); }
+        public Vector2Int GetClosestFruitPosition() { return memory.ClosestFruitPosition(); }
         /// <summary>
         /// Returns the position of the closest mass of water the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestWaterPosition() { return memory.ClosestWaterPosition(); }
+        public Vector2Int GetClosestWaterPosition() { return memory.ClosestWaterPosition(); }
         /// <summary>
         /// Returns the position of the closest safe place the creature remembers.
         /// </summary>
-        public Tuple<int, int> GetClosestSafePlacePosition() { return memory.ClosestSafePlacePosition(); }
+        public Vector2Int GetClosestSafePlacePosition() { return memory.ClosestSafePlacePosition(); }
         /// <summary>
         /// Returns the position of a random place the creature barely remembers or does not remember at all.
         /// </summary>
-        public Tuple<int, int> GetUndiscoveredPlacePosition() { return memory.UndiscoveredPlacePosition(); }
+        public Vector2Int GetUndiscoveredPlacePosition() { return memory.UndiscoveredPlacePosition(); }
 
         public Creature GetClosestAlly() { return memory.ClosestAlly(); }
+        public Creature GetFather() { return memory.Father(); }
+        public Creature GetMother() { return memory.Mother(); }
         public Creature GetClosestPossibleMate() { return memory.ClosestPossibleMate(); }
         public Creature GetClosestCreature() { return memory.ClosestCreature(); }
         public Creature GetClosestCreatureReachable() { return memory.ClosestCreatureReachable(); }
@@ -637,6 +745,7 @@ namespace EvolutionSimulation.Entities
         Vector3[] path;
         int pathIterator;
 
+        public bool cornered { get; set; }  // This determines if the creature cannot flee fruther and must fight back
 
         /// <summary>
         /// Moves a creature a specified amount
@@ -683,13 +792,13 @@ namespace EvolutionSimulation.Entities
         /// Calculate the distance between the creature and the given pos
         /// </summary>
         /// <returns> Distance between creature and pos. intMaxValue if out of the map </returns>
-        public int DistanceToObjective(Tuple<int, int> pos)
+        public int DistanceToObjective(Vector2Int pos)
         {
-            if (!world.checkBounds(pos.Item1, pos.Item2)) return int.MaxValue;
+            if (!world.checkBounds(pos.x, pos.y)) return int.MaxValue;
 
             int x1, y1;
-            x1 = Math.Abs(x - pos.Item1);
-            y1 = Math.Abs(y - pos.Item2);
+            x1 = Math.Abs(x - pos.x);
+            y1 = Math.Abs(y - pos.y);
 
             return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
         }

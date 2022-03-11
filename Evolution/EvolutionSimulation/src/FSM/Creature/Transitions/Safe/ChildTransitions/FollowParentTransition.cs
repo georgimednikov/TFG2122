@@ -3,7 +3,7 @@
 namespace EvolutionSimulation.FSM.Creature.Transitions
 {
     /// <summary>
-    /// Checks if the creature is a child, has paternity ability and is far from his parent
+    /// Checks if the creature is a child and is far from his parent
     /// Wander -> FollowParent
     /// </summary>
     class FollowParentTransition : CreatureTransition
@@ -20,7 +20,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         /// <returns> True if is far from his parent </returns>
         public override bool Evaluate()
         {
-            if (!creature.stats.IsNewBorn() || creature.parentToFollow == null)
+            if (!creature.stats.IsNewBorn() || creature.parentToFollow == null || creature.GetParentToFollowPosition() == null)
                 return false;
 
             //TODO que la distancia a empezar a seguir al padre dependa de algo (nivel de paternity, peligro...)

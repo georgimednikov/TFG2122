@@ -9,8 +9,17 @@ namespace UnitySimulation
 {
     public class WorldCreaturesManager : MonoBehaviour, IListener<World>
     {
+        [Serializable]
+        public struct SpawnRadius
+        {
+            public float positionX;
+            public float positionZ;
+            public float positionRadius;
+        } 
+
         public GameObject creaturePrefab;
-        public CreatureSpawn[] creatureDistribution;
+        public SpawnRadius spawn;
+
         Dictionary<Creature, GameObject> _creatures = new Dictionary<Creature, GameObject>();
 
         public void OnNotify(World info)
@@ -54,7 +63,6 @@ namespace UnitySimulation
             Terrain terrain = GetComponent<Terrain>();
             System.Random rnd = new System.Random();
             // TODO: ahora se escoge un spawn random de los que haya y solo se instancia uno
-            CreatureSpawn spawn = creatureDistribution[rnd.Next(0, creatureDistribution.Length)];
 
             if (spawn.positionRadius < 0 || spawn.positionRadius > 1)
                 throw new Exception("The radius for the spawn of creatures cannot surpass the size of the world in neither the axis X or Z");

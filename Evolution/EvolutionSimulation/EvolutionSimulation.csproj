@@ -86,6 +86,7 @@
     <Compile Include="src\Entities\Tree.cs" />
     <Compile Include="src\FSM\CompoundState.cs" />
     <Compile Include="src\FSM\Creature\States\Combat\ChaseEnemy.cs" />
+    <Compile Include="src\FSM\Creature\States\CalmState.cs" />
     <Compile Include="src\FSM\Creature\States\Dead.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\FollowParent.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\GoToMate.cs" />
@@ -160,6 +161,7 @@
     <Compile Include="src\Utils\SortByDistance.cs" />
     <Compile Include="src\Utils\SortByMetabolism.cs" />
     <Compile Include="src\UserInfo.cs" />
+    <Compile Include="src\Vector2Int.cs" />
     <Compile Include="src\World.cs" />
     <Compile Include="src\Simulation.cs" />
     <Compile Include="src\Entities\IEntity.cs" />
@@ -183,6 +185,7 @@
   <PropertyGroup>
     <PostBuildEvent>if not exist assets\ mkdir assets\
 xcopy ..\assets assets\ /H /E /Y
-xcopy *.dll ..\..\..\PGEBIELBNE\Assets\Plugins /Y</PostBuildEvent>
+xcopy EvolutionSimulation.dll ..\..\..\PGEBIELBNE\Assets\Plugins /Y
+xcopy ..\..\ProgramData\ ..\..\..\PGEBIELBNE\Assets\ProgramData\ /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>

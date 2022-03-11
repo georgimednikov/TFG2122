@@ -22,7 +22,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override void Action()
         {
-            Console.WriteLine("Dead");
+            Console.WriteLine(creature.speciesName + " DIES");
             creature.world.Destroy(creature);
             Entities.Corpse corpse = creature.world.CreateStableEntity<Entities.Corpse>();
             corpse.Init(creature.world,

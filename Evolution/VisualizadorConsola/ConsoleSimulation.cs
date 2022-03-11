@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Numerics;
 using System.Threading;
 using EvolutionSimulation;
 using EvolutionSimulation.Entities;
-using EvolutionSimulation.Entities.Status;
+using EvolutionSimulation.Genetics;
 
 namespace VisualizadorConsola
 {
@@ -16,43 +17,65 @@ namespace VisualizadorConsola
     {
         public void Init()
         {
+            CreatureChromosome.SetChromosome();
             UniverseParametersManager.ReadJSON();
             world = new World();
-            world.Init(512);
-            Console.WriteLine("\n");
-            WorldToBmp();
+            world.Init(UserInfo.Size);
 
-            Animal c = world.CreateCreature<Animal>(5, 3);
-            c.stats.Aggressiveness = 0;
-            c.stats.Metabolism = 200;
-            Animal d = world.CreateCreature<Animal>(5, 5); // Enemy
-            d.stats.Aggressiveness = 50;
-            d.stats.Metabolism = 50;
-            world.ExportContent();
+            //A minimum distance to leave in between species spawn points to give them some room.
+            //Calculated based on the world size and amount of species to spawn, and then reduced by
+            //a value to give room in the world and not fill it in a homogenous manner.
+            int minSpawnDist = UserInfo.Size / UserInfo.Species / 5;
 
-            //Corpse c1 = world.CreateStableEntity<Corpse>();
-            //c1.Init(c.world, 5, c.x, c.y+1, 0.4f, 0.7f, 5, 5, 80f); // TODO: stats to be derived from creacher
+            //List with previous spawn positions, to know if a new spot is too close to another one used.
+            List<Tuple<int, int>> spawnPositions = new List<Tuple<int, int>>();
+            int x, y;
 
-            //EvolutionSimulation.Genetics.CreatureChromosome cc = EvolutionSimulation.Genetics.GeneticFunctions.UniformCrossover(c.chromosome, c2.chromosome);
-            //EvolutionSimulation.Genetics.GeneticFunctions.UniformMutation(ref cc, 0.95f);
-            //Animal c3 = world.CreateCreature<Animal>(4, 4, cc, c.speciesName);
-            //c.AddStatus(new Poison(20, 5));
-            //for (int i = 0; i < 4; i++)
-            //{
-            //    Animal c = world.CreateCreature<Animal>(5, 5);
-            //}
+            for (int i = 0; i < UserInfo.Species; i++)
+            {
+                bool validPosition = true;
+                do
+                {
+                    x = RandomGenerator.Next(0, UserInfo.Size);
+                    y = RandomGenerator.Next(0, UserInfo.Size);
+
+                    foreach (Tuple<int, int> p in spawnPositions)
+                    {
+                        Vector2Int dist = new Vector2Int(x - p.Item1, y - p.Item2);
+                        if (world.map[x, y].isWater || dist.Magnitude() < minSpawnDist)
+                        {
+                            validPosition = false;
+                            break;
+                        }
+                    }
+                }
+                while (!validPosition);
+
+                //The specified amount of individuals of each species is created.
+                Animal a = world.CreateCreature<Animal>(x, y);
+                for (int j = 1; j < UserInfo.Individuals; j++)
+                {
+                    world.CreateCreature<Animal>(x, y, a.chromosome, a.speciesName);
+                }
+
+                //The new position is added to the list of used.
+                spawnPositions.Add(new Tuple<int, int>(x, y));
+            }
+
+            Console.WriteLine("Simulation Init done");
         }
-
 
         public void Run()
         {
             //WorldToBmp();
-            while (true)
+            int ticks = world.YearToTick(UserInfo.Years);
+            for (int i = 0; i < ticks; i++)
             {
                 world.Tick();
                 //Render();
                 Thread.Sleep(1000);
             }
+            world.ExportContent();
         }
 
         /// <summary>
@@ -165,113 +188,7 @@ namespace VisualizadorConsola
         //    //Console.SetCursorPosition(world.map.GetLength(0), world.map.GetLength(0));
         //}
 
-        public void WorldToBmp()
-        {
-            int scale = 4;
-            Bitmap treeMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            Bitmap floraMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            Bitmap heightMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            Bitmap tempMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            Bitmap hMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            double val;
-            for (int i = 0; i < world.map.GetLength(0) * scale; i += scale)
-            {
-                for (int j = 0; j < world.map.GetLength(1) * scale; j += scale)
-                {
-                    val = world.map[j / scale, i / scale].height;
-                    //*
-                    if (val < 0.3) SetPixel(j, i, Color.DarkBlue, heightMap, scale);
-                    else if (val < 0.5) SetPixel(j, i, Color.Blue, heightMap, scale);
-                    else if (val == 0.5) SetPixel(j, i, Color.DarkGreen, heightMap, scale);
-                    else if (val < 0.6) SetPixel(j, i, Color.Green, heightMap, scale);
-                    else if (val < 0.7) SetPixel(j, i, Color.Yellow, heightMap, scale);
-                    else if (val < 0.8) SetPixel(j, i, Color.LightYellow, heightMap, scale);
-                    else SetPixel(j, i, Color.White, heightMap, scale);
-                    /*/
-                    val = (Math.Truncate(val * 10) / 10);
-                    SetPixel(j, i, Color.FromArgb((int)(0 * 255), (int)(val * 255), (int)((1 - Math.Pow(val, 2)) * 255 / 2)), heightMap, scale);
-                    //*/
-                    val = world.map[j / scale, i / scale].humidity;
 
-                    //*
-                    if (val < 0.3) SetPixel(j, i, Color.DarkRed, hMap, scale);
-                    else if (val < 0.4) SetPixel(j, i, Color.Red, hMap, scale);
-                    else if (val < 0.5) SetPixel(j, i, Color.IndianRed, hMap, scale);
-                    else if (val < 0.6) SetPixel(j, i, Color.MediumVioletRed, hMap, scale);
-                    else if (val < 0.8) SetPixel(j, i, Color.Blue, hMap, scale);
-                    else if (val < 1) SetPixel(j, i, Color.DarkBlue, hMap, scale);
-                    /*/
-                    val = (Math.Truncate(val * 10) / 10);
-                    SetPixel(j, i, Color.FromArgb((int)((1 - val) * 255 / 2), (int)((0) * 255), (int)((val) * 255)), hMap, scale);
-                    //*/
-
-                    val = world.map[j / scale, i / scale].temperature;
-                    //*
-                    if (val < 0.2) SetPixel(j, i, Color.DarkBlue, tempMap, scale);
-                    else if (val < 0.3) SetPixel(j, i, Color.Blue, tempMap, scale);
-                    else if (val < 0.5) SetPixel(j, i, Color.Yellow, tempMap, scale);
-                    else if (val < 0.6) SetPixel(j, i, Color.Orange, tempMap, scale);
-                    else if (val < 0.8) SetPixel(j, i, Color.OrangeRed, tempMap, scale);
-                    else SetPixel(j, i, Color.Red, tempMap, scale);
-                    /*/
-                    val = (Math.Truncate(val * 10) / 10);
-                    SetPixel(j, i, Color.FromArgb((int)(val * 255), (int)((1 - val) * 255 / 2), (int)((1 - val) * 255)), tempMap, scale);
-                    //*/
-
-                    val = world.map[j / scale, i / scale].flora;
-                    //int aux = 0;
-                    if (val == 0)
-                        if (world.map[j / scale, i / scale].isWater)
-                        {
-                            SetPixel(j, i, Color.DarkBlue, treeMap, scale);
-                            SetPixel(j, i, Color.DarkBlue, floraMap, scale);
-                            //aux = 1;
-                        }
-                        else SetPixel(j, i, Color.Black, floraMap, scale);
-                    //*
-                    else if (val < 0.1) SetPixel(j, i, Color.DarkRed, floraMap, scale);
-                    else if (val < 0.2) SetPixel(j, i, Color.Red, floraMap, scale);
-                    else if (val < 0.3) SetPixel(j, i, Color.OrangeRed, floraMap, scale);
-                    else if (val < 0.4) SetPixel(j, i, Color.Orange, floraMap, scale);
-                    else if (val < 0.5) SetPixel(j, i, Color.Yellow, floraMap, scale);
-                    else if (val < 0.7) SetPixel(j, i, Color.YellowGreen, floraMap, scale);
-                    else if (val < 1) SetPixel(j, i, Color.Green, floraMap, scale);
-                    else SetPixel(j, i, Color.White, floraMap, scale);
-                    /*/
-                    val = (Math.Truncate(val * 10) / 10);
-                    SetPixel(j, i, Color.FromArgb((int)(((1 - val) * (1 - aux)) * 255 / 2), (int)((val - (val * aux )) * 255), (int)((aux) * 255/2)), floraMap, scale);
-                    //*/
-
-                    Plant plant = world.map[j / scale, i / scale].plant;
-                    if (plant as Grass != null)
-                        SetPixel(j, i, Color.DarkOliveGreen, treeMap, scale);
-                    else if (plant as Bush != null)
-                        SetPixel(j, i, Color.ForestGreen, treeMap, scale);
-                    else if (plant as Tree != null)
-                        SetPixel(j, i, Color.LawnGreen, treeMap, scale);
-                    else if (plant as EdibleTree != null)
-                        SetPixel(j, i, Color.Red, treeMap, scale);
-                    //else SetPixel(j, i, Color.Black, treeMap, scale);
-                }
-            }
-
-            treeMap.Save("treeTest.png");
-            floraMap.Save("flora.bmp");
-            heightMap.Save("height.bmp");
-            tempMap.Save("temp.bmp");
-            hMap.Save("humidity.bmp");
-        }
-
-        void SetPixel(int x, int y, Color color, Bitmap bitmap, int scale = 2)
-        {
-            for (int i = 0; i < scale; i++)
-            {
-                for (int j = 0; j < scale; j++)
-                {
-                    bitmap.SetPixel(x + i, y + j, color);
-                }
-            }
-        }
 
         World world;
     }
