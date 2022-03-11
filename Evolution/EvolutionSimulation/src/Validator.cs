@@ -465,7 +465,7 @@ namespace EvolutionSimulation
                 parameters.resourceAmount <= 0 || parameters.minLifeSpan <= 0 || parameters.exhaustToSleepRatio <= 0 || parameters.perceptionWithoutNightVision <= 0 || parameters.minPerceptionWithNightVision <= 0 ||
                 parameters.minMobilityMedium <= 0 || parameters.mobilityPenalty <= 0 || parameters.maxSpeed <= 0 || parameters.hornIntimidationMultiplier <= 0 ||
                 parameters.restRegenerationThreshold <= 0 || parameters.energyRegenerationThreshold <= 0 || parameters.hydrationRegenerationThreshold <= 0 || 
-                parameters.regenerationRate <= 0) 
+                parameters.regenerationRate <= 0 || parameters.hoursTilStarvation <= 0 || parameters.exhaustToSleepRatio) 
                 throw new UniverseParameterIsZeroException("The provided creature parameters must be positive");
             if (parameters.maxRestExpense < parameters.minRestExpense)
                 throw new MinMaxValueSwappedException("The maximum amount of rest expense is lower than the minimium");

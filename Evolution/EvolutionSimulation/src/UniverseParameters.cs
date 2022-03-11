@@ -35,6 +35,8 @@ namespace EvolutionSimulation
         public float energyRegenerationThreshold = 0.85f;
         public float hydrationRegenerationThreshold = 0.85f;
         public float regenerationRate = 0.01f;
+        public float hoursTilStarvation = 24f;
+        public float thirstToHungerRatio = 3f;
 
         // CreatureStats
         public float newbornStatMultiplier = 0.33f; //Starting multiplier of newborns
