@@ -13,6 +13,7 @@ namespace EvolutionSimulation.Entities
 
             public int ticksToBeForgotten;  //Number of ticks since the tile has been seen for the last time.
             public bool discovered;     //Whether this tile has been discovered by the creature at some point.
+            public bool dangerousTemperature; //If the tile has a dangerous temperature AND the danger has already been calculated.
 
             public float totalDanger;    //The tiles danger in total, taking into account the others around it.
             //Dangers originating from the tile, separated from the total to be able to undo them when the tile is forgotten.
@@ -286,6 +287,19 @@ namespace EvolutionSimulation.Entities
         {
             AdjustDanger(x, y, -value);
             map[x, y].experienceDanger = -value;
+        }
+        /// <summary>
+        /// Saves in memory a drinking spot that has proven to be safe for the creature. This happens when the creatures
+        /// finishes eating it and no other creature attack it during it.
+        /// </summary>
+        public void DangerousTemperature(float exp)
+        {
+            int x = thisCreature.x, y = thisCreature.y;
+
+            //If this tile has already been processed because of its dangerous temperature, it does not happen again.
+            if (map[x, y].dangerousTemperature) return;
+            map[x, y].dangerousTemperature = true;
+            AdjustDanger(x, y, exp); //This danger is not tied to experience or tangible danger, so it is not reset/overwritten.
         }
         /// <summary>
         /// Saves in memory a drinking spot that has proven to be safe for the creature. This happens when the creatures

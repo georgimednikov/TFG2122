@@ -75,7 +75,7 @@ namespace EvolutionSimulation.Entities
             // Bodily functions
             Expend();
             Regen();
-
+            CheckTemperature();
             FemaleTick();
 
             memory.Update();
@@ -135,6 +135,32 @@ namespace EvolutionSimulation.Entities
                     parentToFollow = GetFather();
                 else parentToFollow = null;
             }
+        }
+
+        void CheckTemperature()
+        {
+            double tileTemperature = world.map[x, y].temperature;
+            double difference = 0;
+
+            //The difference between the extreme acceptable temperature an the tile temperature is calculated.
+            if (tileTemperature < stats.MinTemperature)
+                difference = stats.MinTemperature - tileTemperature;
+            else if (tileTemperature > stats.MaxTemperature)
+                difference = tileTemperature - stats.MaxTemperature;
+            //If the creature is confortable nothing happens.
+            else
+                return;
+
+            //A range from 0 to 1 is calculated based on the difference of temperature and a max value for it.
+            double range = Math.Min(difference / UniverseParametersManager.parameters.maxTemperatureDifference, 1);
+            //The base damage of being in an area with a temperature that cannot be stand is a porcentage of the max health each tick.
+            //To that, another instance of damage is added depending on how much this temperature supasses that acceptable for the creature.
+            double damage = stats.MaxHealth * 
+                (UniverseParametersManager.parameters.maxHealthTemperatureDamage - UniverseParametersManager.parameters.minHealthTemperatureDamage) +
+                UniverseParametersManager.parameters.minHealthTemperatureDamage;
+            stats.CurrHealth -= (float)damage;
+            double danger = stats.Aggressiveness * UniverseParametersManager.parameters.maxTemperatureAggressivenessPercentage;
+            memory.CreateExperience(x, y, -(float)danger);
         }
 
         /// <summary>
@@ -526,6 +552,10 @@ namespace EvolutionSimulation.Entities
 
         // Stats related information
 
+        public bool IsInDangerousPosition()
+        {
+            return memory.GetPositionDanger(x, y) > 0;
+        }
         /// <summary>
         /// Check if the creature is hunger (need to eat)
         /// </summary>

@@ -37,6 +37,10 @@ namespace EvolutionSimulation
         public float regenerationRate = 0.01f;
         public float hoursTilStarvation = 24f;
         public float thirstToHungerRatio = 3f;
+        public float maxTemperatureAggressivenessPercentage = 0.5f; //Max percentage of the creature's aggressiveness that is used as danger in tiles with extreme temperature
+        public float maxTemperatureDifference = 10; //How many degrees over the limit influence the damage until it reaches the limit.
+        public double minHealthTemperatureDamage = 0.01; //Minimum max health damage for being in extreme temperatures.
+        public double maxHealthTemperatureDamage = 0.02; //Maximum max health damage for being in extreme temperatures.
 
         // CreatureStats
         public float newbornStatMultiplier = 0.33f; //Starting multiplier of newborns
