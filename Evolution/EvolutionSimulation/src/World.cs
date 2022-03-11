@@ -211,10 +211,8 @@ namespace EvolutionSimulation
         /// </summary>
         public void Tick()
         {
+            CycleDayNight();
             EntitiesTick();
-            step++;
-            day = (step % (ticksHour * hoursDay) >= (morning * ticksHour) &&
-                step % (ticksHour * hoursDay) <= (night * ticksHour));
         }
 
 
@@ -261,41 +259,6 @@ namespace EvolutionSimulation
             SEntitiesToDelete.Add(entity);
         }
 
-        /// <summary>
-        /// Performs a tick of the simulation of every entity.
-        /// Deletes all entities that need to be destroyed after the tick
-        /// </summary>
-        private void EntitiesTick()
-        {
-            // Tick for every entity
-            Creatures.Sort(new Utils.SortByMetabolism());
-            Creatures.ForEach(delegate (Creature e) { e.Tick(); });
-            StableEntities.ForEach(delegate (StaticEntity e) { e.Tick(); });
-
-            // Entity deletion
-            CreaturesToDelete.ForEach(delegate (IEntity e)
-            {
-                Creature tmp = e as Creature;
-                Creatures.Remove(tmp);
-                // Destroy the reference of itself on it children
-                tmp.childs.ForEach(delegate (Creature c)
-                {
-                    c.ParentDead(tmp);
-                });
-                e = null;
-                //foreach (Creature c in Creatures)
-                //    if (c.objective == e) c.objective = null;   // TODO URGENTE: Esto no deberia hacerse, pero ni poniendolo en null se quita la referencia al objetivo de la criatura
-            });
-            SEntitiesToDelete.ForEach(delegate (IEntity e)
-            {
-                StableEntities.Remove(e as StaticEntity);
-                e = null;
-                //foreach (Creature c in Creatures)
-                //    if (c.objective == e) c.objective = null;
-            });
-            CreaturesToDelete.Clear();
-            SEntitiesToDelete.Clear();
-        }
 
         /// <summary>
         /// Adds an entity to the list
@@ -623,10 +586,59 @@ namespace EvolutionSimulation
             System.IO.File.WriteAllText(UserInfo.ExportDirectory + "World.json", word);
         }
 
+        /// <summary>
+        /// Performs a tick of the simulation of every entity.
+        /// Deletes all entities that need to be destroyed after the tick
+        /// </summary>
+        private void EntitiesTick()
+        {
+            // Tick for every entity
+            Creatures.Sort(new Utils.SortByMetabolism());
+            Creatures.ForEach(delegate (Creature e) { e.Tick(); });
+            StableEntities.ForEach(delegate (StaticEntity e) { e.Tick(); });
+
+            // Entity deletion
+            CreaturesToDelete.ForEach(delegate (IEntity e)
+            {
+                Creature tmp = e as Creature;
+                Creatures.Remove(tmp);
+                // Destroy the reference of itself on it children
+                tmp.childs.ForEach(delegate (Creature c)
+                {
+                    c.ParentDead(tmp);
+                });
+                e = null;
+                //foreach (Creature c in Creatures)
+                //    if (c.objective == e) c.objective = null;   // TODO URGENTE: Esto no deberia hacerse, pero ni poniendolo en null se quita la referencia al objetivo de la criatura
+            });
+            SEntitiesToDelete.ForEach(delegate (IEntity e)
+            {
+                StableEntities.Remove(e as StaticEntity);
+                e = null;
+                //foreach (Creature c in Creatures)
+                //    if (c.objective == e) c.objective = null;
+            });
+            CreaturesToDelete.Clear();
+            SEntitiesToDelete.Clear();
+        }
+
+        private void CycleDayNight()
+        {
+            bool prevState = day;
+            day = step % (ticksHour * hoursDay) >= (morning * ticksHour) && step % (ticksHour * hoursDay) <= (night * ticksHour);
+
+            if (day != prevState)
+                Creatures.ForEach(delegate (Creature e) { e.CycleDayNight(); });
+
+            step++;
+        }
+
+
+
         // Map with physical properties
         public MapData[,] map { get; private set; }
         int mapSize;
-        bool day;
+        public bool day;
         public uint step;
         // 50 steps equals and hour, and 24 hours equal a day. 365 days equal a year
         public static int ticksHour, hoursDay, daysYear;

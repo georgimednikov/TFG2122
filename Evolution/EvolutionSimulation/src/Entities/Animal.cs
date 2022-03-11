@@ -20,7 +20,8 @@ namespace EvolutionSimulation.Entities
             int minPerception = UniverseParametersManager.parameters.minPerception;
             float minLifeSpan = UniverseParametersManager.parameters.minLifeSpan; // Minimum years alive
             float exhaustToSleepRatio = UniverseParametersManager.parameters.exhaustToSleepRatio; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
-            float nightPerceptionPenalty = UniverseParametersManager.parameters.nightPerceptionPenalty; //Percentage of the max Perception lost at night
+            float perceptionWithoutNightVision = UniverseParametersManager.parameters.perceptionWithoutNightVision; //Percentage of perception at night when the creature does not have night vision.
+            float minPerceptionWithNightVision = UniverseParametersManager.parameters.minPerceptionWithNightVision; //Minimum percentage of perception at night when the creature has night vision.
             float minMobilityMedium = UniverseParametersManager.parameters.minMobilityMedium; //When moving through a special medium the slowest speed possible is its mobility * (0.6 - 1.0) depending on proficiency
             float mobilityPenalty = UniverseParametersManager.parameters.mobilityPenalty; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
                                           //A ground creature moves fast on the ground, but cannot move throught the air/trees
@@ -120,11 +121,27 @@ namespace EvolutionSimulation.Entities
             int maxPerception = chromosome.GetFeatureMax(CreatureFeature.Perception);
             stats.Perception = (int)((float)chromosome.GetFeature(CreatureFeature.Perception) / maxPerception * (maxPerception - minPerception)) + minPerception;
 
-            //A percentage equal to nightPerceptionPenalty of the max perception is lost at night
-            stats.NightDebuff = maxPerception * nightPerceptionPenalty;
+            //If the creature does not have the feature night vision then its perception will be the lowest posible,
+            //So instead of Perception * 1 it will be Perception * minNightVision
+            if (!HasAbility(CreatureFeature.NightVision, abilityUnlock))
+                stats.NightPenalty = perceptionWithoutNightVision;
+
+            //Else it is calculated what percentage of the ability the creature has unlocked, removing the minimum value needed to have the ability per se,
+            //and then depending on that percentage the creature has a NightPenalty that goes from minNightVision to 1.
+            else
+            {
+                int maxNightVisionGene = chromosome.GetFeatureMax(CreatureFeature.NightVision);
+                int offset = (int)(abilityUnlock * maxNightVisionGene);
+                float percentageOfNightVision = (float)(chromosome.GetFeature(CreatureFeature.NightVision) - offset) / (chromosome.GetFeatureMax(CreatureFeature.NightVision) - offset);
+                stats.NightPenalty = minPerceptionWithNightVision + (1 - minPerceptionWithNightVision) * percentageOfNightVision;
+            }
+
+            //Value that multiplies perception when it is being gotten
+            stats.CurrentVision = world.day ? 1 : stats.NightPenalty;
+
             //If the creature can see in the dark, that penalty is reduced the better sight it has
             if (HasAbility(CreatureFeature.NightVision, abilityUnlock))
-                stats.NightDebuff *= 1 - ((float)chromosome.GetFeature(CreatureFeature.NightVision) / chromosome.GetFeatureMax(CreatureFeature.NightVision));
+                stats.CurrentVision *= 1 - ((float)chromosome.GetFeature(CreatureFeature.NightVision) / chromosome.GetFeatureMax(CreatureFeature.NightVision));
 
 
             //Behaviour related stats

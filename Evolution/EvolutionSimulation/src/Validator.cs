@@ -462,14 +462,14 @@ namespace EvolutionSimulation
         {
             if (parameters.abilityUnlockPercentage <= 0 || parameters.minHealth <= 0 || parameters.healthGainMultiplier <= 0 || 
                 parameters.healthRegeneration <= 0 || parameters.maxLimbs <= 0 || parameters.minRestExpense <= 0 || parameters.maxRestExpense <= 0 ||
-                parameters.resourceAmount <= 0 || parameters.minLifeSpan <= 0 || parameters.exhaustToSleepRatio <= 0 || parameters.nightPerceptionPenalty <= 0 ||
+                parameters.resourceAmount <= 0 || parameters.minLifeSpan <= 0 || parameters.exhaustToSleepRatio <= 0 || parameters.perceptionWithoutNightVision <= 0 || parameters.minPerceptionWithNightVision <= 0 ||
                 parameters.minMobilityMedium <= 0 || parameters.mobilityPenalty <= 0 || parameters.maxSpeed <= 0 || parameters.hornIntimidationMultiplier <= 0 ||
                 parameters.restRegenerationThreshold <= 0 || parameters.energyRegenerationThreshold <= 0 || parameters.hydrationRegenerationThreshold <= 0 || 
                 parameters.regenerationRate <= 0) 
                 throw new UniverseParameterIsZeroException("The provided creature parameters must be positive");
             if (parameters.maxRestExpense < parameters.minRestExpense)
                 throw new MinMaxValueSwappedException("The maximum amount of rest expense is lower than the minimium");
-            if (parameters.abilityUnlockPercentage > 1 || parameters.nightPerceptionPenalty > 1 || parameters.minMobilityMedium > 1 || parameters.mobilityPenalty > 1 || 
+            if (parameters.abilityUnlockPercentage > 1 || parameters.perceptionWithoutNightVision > 1 || parameters.minPerceptionWithNightVision > 1 || parameters.minMobilityMedium > 1 || parameters.mobilityPenalty > 1 || 
                 parameters.restRegenerationThreshold > 1 || parameters.energyRegenerationThreshold > 1 || parameters.hydrationRegenerationThreshold > 1 || 
                 parameters.regenerationRate > 1)
                 throw new PercentageOverOneException("The provided creature percentages are over one");

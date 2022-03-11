@@ -171,14 +171,18 @@ namespace EvolutionSimulation.Entities
         }
         public int Perception
         {
-            get { return baseStats.Perception; }
+            get { return (int)(baseStats.Perception * CurrentVision); }
             set { baseStats.Perception = value; }
         }
-        public float NightDebuff
+        public float CurrentVision
         {
-            get { return baseStats.NightDebuff; }
-            set { baseStats.NightDebuff = value; }
+            get { return baseStats.CurrentVision; }
+            set { baseStats.CurrentVision = value; }
         }
+        /// <summary>
+        /// Auxiliary variable to set the night penalty when it is dark.
+        /// </summary>
+        public float NightPenalty { get; set; }
 
         //Physique related stats
         public int Size
@@ -374,7 +378,7 @@ namespace EvolutionSimulation.Entities
         public int Aggressiveness;
         public int Intimidation;
         public int Perception;
-        public float NightDebuff;
+        public float CurrentVision;
 
         //Physique related stats
         public int Size;

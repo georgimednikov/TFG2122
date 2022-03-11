@@ -141,8 +141,8 @@ namespace EvolutionSimulation.Entities
             comparer = new MemoryTileComparer(thisCreature);
 
             maxTicksOfMemory = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
-            perceptionRadius = (int)(thisCreature.stats.Perception * UniverseParametersManager.parameters.perceptionToRadiusMultiplier);
             dangerRadius = (int)((thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness) * UniverseParametersManager.parameters.aggressivenessToRadiusMultiplier);
+            UpdatePerceptionRadius();
         }
 
         public void Update()
@@ -245,6 +245,15 @@ namespace EvolutionSimulation.Entities
                 }
             }
             SearchResources();
+        }
+
+        /// <summary>
+        /// This method has to be called when day changed to night nad vice versa, to update the radius the creature sees based on the
+        /// new perception value, which changes at night.
+        /// </summary>
+        public void UpdatePerceptionRadius()
+        {
+            perceptionRadius = (int)(thisCreature.stats.Perception * UniverseParametersManager.parameters.perceptionToRadiusMultiplier);
         }
 
         /// <summary>

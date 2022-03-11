@@ -41,8 +41,8 @@ namespace VisualizadorConsola
 
                     foreach (Tuple<int, int> p in spawnPositions)
                     {
-                        Vector3 dist = new Vector3(x - p.Item1, y - p.Item2, 0);
-                        if (world.map[x, y].isWater || dist.Length() < minSpawnDist)
+                        Vector2Int dist = new Vector2Int(x - p.Item1, y - p.Item2);
+                        if (world.map[x, y].isWater || dist.Magnitude() < minSpawnDist)
                         {
                             validPosition = false;
                             break;

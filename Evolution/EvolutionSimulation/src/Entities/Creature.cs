@@ -50,6 +50,7 @@ namespace EvolutionSimulation.Entities
             this.y = y;
             timeToBeInHeat = stats.TimeBetweenHeats;
             memory = new Memory(this, world);
+
             ConfigureStateMachine();
             // Attack
             AddInteraction(Interactions.attack, ReceiveDamage);
@@ -92,6 +93,19 @@ namespace EvolutionSimulation.Entities
                 ActionPoints -= cost; 
             }
             Clear();
+        }
+
+        public void CycleDayNight()
+        {
+            //If the creature sees normally (1 = 100% of its vision) it was day and now is night.
+            if (stats.CurrentVision == 1)
+                stats.CurrentVision = stats.NightPenalty; //Instead of 1 now it sees from minNightVision to 1 depending on its feature.
+
+            //Else it was night now it is day again and begins to see normally.
+            else
+                stats.CurrentVision = 1;
+
+            memory.UpdatePerceptionRadius();
         }
 
         /// <summary>
@@ -184,6 +198,7 @@ namespace EvolutionSimulation.Entities
         }
 
         #region Genetics and Taxonomy
+
         // Taxonomy
         public string speciesName;
         public string progenitorSpeciesName;
