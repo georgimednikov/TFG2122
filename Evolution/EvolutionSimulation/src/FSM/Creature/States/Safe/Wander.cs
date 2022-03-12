@@ -11,13 +11,13 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override int GetCost()
         {
-            return (int)(UniverseParametersManager.parameters.baseActionCost * ((creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) - creature.stats.GroundSpeed) / (creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) / 2)));
+            return (int)(UniverseParametersManager.parameters.baseActionCost * 
+                ((creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) - creature.stats.GroundSpeed) / 
+                (creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) / 2f)));
         }
 
         public override void Action()
         {
-            Console.WriteLine("Wander");
-
             int nX, nY;
             do
             {
@@ -29,6 +29,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 creature.Place(nX, nY);
             }
+            Console.WriteLine(creature.speciesName + " WANDERS (" + creature.x + ", " + creature.y + ")");
         }
 
         public override string ToString()

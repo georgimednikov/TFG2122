@@ -13,8 +13,6 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
-            Console.WriteLine("Drinking action");
-
             creature.stats.CurrHydration += creature.stats.HydrationExpense * UniverseParametersManager.parameters.drinkingMultiplier;
             if (creature.stats.CurrHydration > creature.stats.MaxHydration)
             {
@@ -22,6 +20,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 //TODO: Mirar los valores cuando se llama a SafeWaterSpotFound SafePlantFound y CreateExperience
                 creature.SafeWaterSpotFound(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
             }
+            Console.WriteLine(creature.speciesName + " DRINKS (" + creature.x + ", " + creature.y + ")");
         }
 
         public override string ToString()

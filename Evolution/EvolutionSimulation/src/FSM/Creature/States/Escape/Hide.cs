@@ -18,7 +18,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()    // TODO: Que es esconderse?
         {
-            Console.WriteLine("Hide action");
+            Console.WriteLine(creature.speciesName + " HIDES");
         }
 
         public override string ToString()

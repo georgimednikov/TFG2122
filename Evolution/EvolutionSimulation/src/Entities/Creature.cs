@@ -75,7 +75,7 @@ namespace EvolutionSimulation.Entities
             // Bodily functions
             Expend();
             Regen();
-
+            CheckTemperature();
             FemaleTick();
 
             memory.Update();
@@ -135,6 +135,32 @@ namespace EvolutionSimulation.Entities
                     parentToFollow = GetFather();
                 else parentToFollow = null;
             }
+        }
+
+        void CheckTemperature()
+        {
+            double tileTemperature = world.map[x, y].temperature;
+            double difference = 0;
+
+            //The difference between the extreme acceptable temperature an the tile temperature is calculated.
+            if (tileTemperature < stats.MinTemperature)
+                difference = stats.MinTemperature - tileTemperature;
+            else if (tileTemperature > stats.MaxTemperature)
+                difference = tileTemperature - stats.MaxTemperature;
+            //If the creature is confortable nothing happens.
+            else
+                return;
+
+            //A range from 0 to 1 is calculated based on the difference of temperature and a max value for it.
+            double range = Math.Min(difference / UniverseParametersManager.parameters.maxTemperatureDifference, 1);
+            //The base damage of being in an area with a temperature that cannot be stand is a porcentage of the max health each tick.
+            //To that, another instance of damage is added depending on how much this temperature supasses that acceptable for the creature.
+            double damage = stats.MaxHealth * 
+                (UniverseParametersManager.parameters.maxHealthTemperatureDamage - UniverseParametersManager.parameters.minHealthTemperatureDamage) +
+                UniverseParametersManager.parameters.minHealthTemperatureDamage;
+            stats.CurrHealth -= (float)damage;
+            double danger = stats.Aggressiveness * UniverseParametersManager.parameters.maxTemperatureAggressivenessPercentage;
+            memory.CreateExperience(x, y, -(float)danger);
         }
 
         /// <summary>
@@ -355,13 +381,13 @@ namespace EvolutionSimulation.Entities
             // Escape-state Configuration
             // States
             IState fleeing = new Fleeing(this);
-            IState hide = new Hide(this);
+            //IState hide = new Hide(this);
             Fsm escapeFSM = new Fsm(fleeing);
             // Transitions
             ITransition fleeTransition = new FleeTransition(this);
-            ITransition hideTranistion = new HideTransition(this);
-            escapeFSM.AddTransition(fleeing, hideTranistion, hide);
-            escapeFSM.AddTransition(hide, fleeTransition, fleeing);
+            //ITransition hideTranistion = new HideTransition(this);
+            //escapeFSM.AddTransition(fleeing, hideTranistion, hide);
+            //escapeFSM.AddTransition(hide, fleeTransition, fleeing);
             IState escape = new CompoundState("Escape", escapeFSM);
 
             // Combat-state Configuration
@@ -474,7 +500,7 @@ namespace EvolutionSimulation.Entities
         private void RetalliateDamage(Creature interacter)
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
-            Console.WriteLine(speciesName + "(" + x + "," + y + ") devuelve " + stats.Counter + " de daño");
+            Console.WriteLine(speciesName + " RETURNS " + stats.Counter + " DMG");
         }
 
         /// <summary>
@@ -526,6 +552,10 @@ namespace EvolutionSimulation.Entities
 
         // Stats related information
 
+        public bool IsInDangerousPosition()
+        {
+            return memory.GetPositionDanger(x, y) > 0;
+        }
         /// <summary>
         /// Check if the creature is hunger (need to eat)
         /// </summary>
@@ -591,7 +621,6 @@ namespace EvolutionSimulation.Entities
             return unlock <= f / mF;
         }
 
-
         #region Memory
         // Memory related information
         public Memory memory;
@@ -614,6 +643,7 @@ namespace EvolutionSimulation.Entities
 
             return false;
         }
+
         /// <summary>
         /// Check if the creature can eat a rotten corpse as an alternative to a good food source.
         /// </summary>
@@ -651,7 +681,6 @@ namespace EvolutionSimulation.Entities
         /// Returns the position of the closest safe edible plant.
         /// </summary>
         public Vector2Int GetSafeFruitPosition() { return memory.SafeFruitPosition(); }
-
 
         /// <summary>
         /// Returns the position of the closest ally the creature remembers.

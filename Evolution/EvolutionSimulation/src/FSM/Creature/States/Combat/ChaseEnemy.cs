@@ -15,7 +15,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         public ChaseEnemy(Entities.Creature c) : base(c) 
         { 
             creature = c;
-            modifier = 1.1f - (c.stats.Aggressiveness / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness)); // TODO: Modificador que dependa bien, ahora mismo a mas agresividad mejor persigue
+            modifier = 1.1f - // TODO: Modificador que dependa bien, ahora mismo a mas agresividad mejor persigue
+                (c.stats.Aggressiveness / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * 0.4f);  // TODO: PASAR A UNIVERSAL
         }
 
         public override int GetCost()

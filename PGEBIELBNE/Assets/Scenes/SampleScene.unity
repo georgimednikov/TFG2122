@@ -617,8 +617,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26cfca4c6af99564691be0bd5c22bf72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SimulationYears: 0
-  DataDirectory: 
-  ExportDirectory: 
-  InitalAnimals: 10
+  MapSize: 32
+  EvolutionYears: 0
+  SpeciesNumber: 2
+  IndividualsNumber: 2
+  DataDirectory: ProgramData
+  ExportDirectory: ExportData
   worldCreatureManager: {fileID: 1277125822}

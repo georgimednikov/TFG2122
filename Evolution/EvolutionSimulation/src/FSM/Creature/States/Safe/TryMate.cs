@@ -19,11 +19,10 @@ namespace EvolutionSimulation.FSM.Creature.States
         // Increases current rest
         public override void Action()
         {
-            Console.WriteLine("Try to mate");
-
             if (creature.GetClosestPossibleMatePosition() != null &&
                 creature.DistanceToObjective(creature.GetClosestPossibleMatePosition()) <= UniverseParametersManager.parameters.adjacentLength)
                 creature.GetClosestPossibleMate().ReceiveInteraction(creature, Entities.Interactions.mate);
+            Console.WriteLine(creature.speciesName + " TRIES TO MATE");
         }
 
         public override string ToString()
