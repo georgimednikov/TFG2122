@@ -56,7 +56,7 @@ namespace UnitySimulation
         public void SetInitialParameters(int years, string dataDirectory, string exportDirectory, int animals)
         {
             initialAnimals = animals;
-            UserInfo.SetInformation(years, dataDirectory, exportDirectory);
+            //UserInfo.SetInformation(years, dataDirectory, exportDirectory);
         }
 
         public bool Subscribe(IListener<World> listener)

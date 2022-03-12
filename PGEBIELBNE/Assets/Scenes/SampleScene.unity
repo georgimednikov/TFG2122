@@ -331,7 +331,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &848237403
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -373,7 +373,7 @@ Terrain:
   serializedVersion: 6
   m_TerrainData: {fileID: 15600000, guid: 793bafd693a01df4b82ea4414a07e193, type: 2}
   m_TreeDistance: 5000
-  m_TreeBillboardDistance: 200
+  m_TreeBillboardDistance: 500
   m_TreeCrossFadeLength: 5
   m_TreeMaximumFullLODCount: 50
   m_DetailObjectDistance: 50
@@ -424,7 +424,7 @@ MonoBehaviour:
   tree: {fileID: 7215003794570563780, guid: 4e1c44e509b540547ab68d5d6463c028, type: 3}
   edibleTree: {fileID: 7215003794570563780, guid: a80435e13b4f66b4cb1cb9a775e80d01, type: 3}
   bush: {fileID: 2221076612237865628, guid: 50700cfc970973e43b5b4440cd19e996, type: 3}
-  grass: {fileID: 2221076612237865628, guid: 1fb1f5518d2acb549aadd6ad80df0fb9, type: 3}
+  grass: {fileID: 7752484149740102972, guid: 1fb1f5518d2acb549aadd6ad80df0fb9, type: 3}
   world: {fileID: 4900000, guid: 0127c2171d5132b4fb5231b6ac57feae, type: 3}
   heightMultiplier: 1
 --- !u!1 &963194225
@@ -529,7 +529,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!154 &1277125819
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -601,12 +601,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   creaturePrefab: {fileID: 7305408888903237956, guid: a715dea8e9efb7d4da42974b682f6dab, type: 3}
-  creatureDistribution:
-  - species: {fileID: 4900000, guid: e6721f3caec42b24a849ee09108a1384, type: 3}
-    amount: 10
-    positionX: 0.5
-    positionZ: 0.5
-    positionRadius: 0.2
+  spawn:
+    positionX: 0
+    positionZ: 0
+    positionRadius: 0
 --- !u!114 &1277125823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -620,7 +618,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   SimulationYears: 0
-  DataDirectory: ProgramData
-  ExportDirectory: ExportData
+  DataDirectory: 
+  ExportDirectory: 
   InitalAnimals: 10
   worldCreatureManager: {fileID: 1277125822}
