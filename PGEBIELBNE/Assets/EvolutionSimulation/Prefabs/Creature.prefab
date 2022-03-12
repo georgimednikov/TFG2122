@@ -45,9 +45,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   body: {fileID: 7887754594758098477, guid: d72611e8dd38e8f4c920d190d6db3bdf, type: 3}
   legs:
-  - {fileID: 919132149155446097, guid: b888f2836c9ad3744ad5b866daa577d4, type: 3}
-  - {fileID: 919132149155446097, guid: dbcd1670b667cb94ca3ecee1d8934f34, type: 3}
-  - {fileID: 919132149155446097, guid: fc7205d6997f6e047bb092c35a5c73f3, type: 3}
+  - {fileID: 4034878705743064208, guid: 364cf2f43b5dbbd47aa4213cb465b02d, type: 3}
   mouths:
   - {fileID: 919132149155446097, guid: 9b741b14d19f8534ea81b31067a9ebce, type: 3}
   - {fileID: 919132149155446097, guid: 9e1164c7bd2eec440868c02e34a7cfe0, type: 3}
