@@ -486,12 +486,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   creaturePrefab: {fileID: 7305408888903237956, guid: a715dea8e9efb7d4da42974b682f6dab, type: 3}
-  creatureDistribution:
-  - species: {fileID: 4900000, guid: e6721f3caec42b24a849ee09108a1384, type: 3}
-    amount: 10
-    positionX: 0.5
-    positionZ: 0.5
-    positionRadius: 0.2
+  spawn:
+    positionX: 0
+    positionZ: 0
+    positionRadius: 0
 --- !u!114 &1277125823
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -504,8 +502,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26cfca4c6af99564691be0bd5c22bf72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SimulationYears: 0
+  MapSize: 32
+  EvolutionYears: 0
+  SpeciesNumber: 2
+  IndividualsNumber: 2
   DataDirectory: ProgramData
   ExportDirectory: ExportData
-  InitalAnimals: 10
   worldCreatureManager: {fileID: 1277125822}
