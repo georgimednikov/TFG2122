@@ -21,7 +21,10 @@ namespace EvolutionSimulation.Entities
         /// </param>
         public void Init(World w, int lifeTime, int x, int y,  float putridStart, float poisonProb, int poisonDuration, float poisonTickDamage, float maxNutritionPoints)
         {
-            base.Init(w, lifeTime, x, y);
+            base.Init(w, x, y);
+
+            this.lifeTime = lifeTime;
+
 
             // Clamp
             this.poisonProb = Math.Min(1.0f, Math.Max(0.0f, poisonProb));
@@ -29,7 +32,7 @@ namespace EvolutionSimulation.Entities
             this.poisonTickDamage = poisonTickDamage;
 
             this.maxNutritionPoints = maxNutritionPoints;
-            // Corpse starts putrefying when the corpse reaches the 'putridStart' part of its duration
+            // Corpse starts putrifying when the corpse reaches the 'putridStart' part of its duration
             putridTime = (int)(lifeTime * putridStart);
             Console.WriteLine("Corpse created at " + x + ", " + y + ".");
         }
@@ -63,11 +66,12 @@ namespace EvolutionSimulation.Entities
             }                      
         }
 
-        public new void Tick()
+        public override void Tick()
         {
+            lifeTime--;
             Edible = lifeTime > putridTime;
 
-            Console.WriteLine("Ticks to corpe disappearance: " + lifeTime);
+            Console.WriteLine("Ticks to corpse disappearance: " + lifeTime);
 
             if (lifeTime <= 0)
                 world.Destroy(this);
@@ -85,5 +89,7 @@ namespace EvolutionSimulation.Entities
         float poisonTickDamage;
         // Time when the corpse starts putrefying
         int putridTime;
+        // Remaining life time of this entity
+        public int lifeTime { get; protected set; }
     }
 }

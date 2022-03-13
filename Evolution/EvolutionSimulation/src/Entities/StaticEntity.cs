@@ -8,7 +8,7 @@ namespace EvolutionSimulation.Entities
 {
     /// <summary>
     /// Entities that don't evolve and have simple behaviours (i.e. Plants and Corpses).
-    /// Everything that it's not a Creature. They stay the same during all its LifeTime. 
+    /// Everything that it's not a Creature. They stay the same. 
     /// </summary>
     public abstract class StaticEntity : IEntity
     {
@@ -19,20 +19,19 @@ namespace EvolutionSimulation.Entities
         /// <param name="lifeTime"> LifeTime in Ticks of the Entity </param>
         /// <param name="x"> X World position </param>
         /// <param name="y"> Y World position </param>
-        protected void Init(World w, int lifeTime, int x, int y)
+        protected void Init(World w, int x, int y)
         {
             world = w;
-            this.lifeTime = lifeTime;
             this.x = x;
             this.y = y;
         }
 
         /// <summary>
-        /// Stable Entities progressively die every tick
+        /// Stable Entities tick every world tick
         /// </summary>
-        public void Tick()
+        virtual public void Tick()
         {
-            lifeTime--;
+
         }
 
         // World tile position
@@ -40,7 +39,5 @@ namespace EvolutionSimulation.Entities
         public int y { get; protected set; }
         // World in which the entity resides
         public World world { get; protected set; }
-        // Remaining life time of this entity
-        public int lifeTime { get; protected set; }
     }
 }
