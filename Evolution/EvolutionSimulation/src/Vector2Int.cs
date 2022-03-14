@@ -3,9 +3,7 @@
 namespace EvolutionSimulation
 {
     public class Vector2Int
-    {
-        static double PI = 3.14159265358979323846264338327950288;
-
+    {        
         public Vector2Int() { x = y = 0; }
         public Vector2Int(int xv, int yv) { x = xv; y = yv; }
 
@@ -26,9 +24,14 @@ namespace EvolutionSimulation
             double a1 = Math.Atan2(x, y);
             double sign = a1 > a2 ? 1 : -1;
             double angle = a1 - a2;
-            double K = -sign * PI * 2;
+            double K = -sign * Math.PI * 2;
             angle = (Math.Abs(K + angle) < Math.Abs(angle)) ? K + angle : angle;
-            return angle * 180f / PI;
+            return angle * 180f / Math.PI;
+        }
+
+        public override string ToString()
+        {
+            return "< " + x + ", " + y + " >";
         }
     }
 }

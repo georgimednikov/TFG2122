@@ -275,7 +275,21 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public string GetState()
         {
-            return mfsm.CurrentState.ToString();
+            IState state = mfsm.CurrentState;
+            while (state is CompoundState)
+                state = (state as CompoundState).stateMachine.CurrentState;
+            return state.ToString();
+        }
+
+        /// <summary>
+        /// Returns specific information about the current state
+        /// </summary>
+        public string GetStateInfo()
+        {
+            IState state = mfsm.CurrentState;
+            while (state is CompoundState)
+                state = (state as CompoundState).stateMachine.CurrentState;
+            return state.GetInfo();
         }
 
         /// <summary>

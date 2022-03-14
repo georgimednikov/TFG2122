@@ -60,6 +60,10 @@ namespace EvolutionSimulation.FSM.Creature.States
             creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             Console.WriteLine(creature.speciesName + " GOES TO DRINK (" + creature.x + ", " + creature.y + ")");
         }
+        public override string GetInfo()
+        {
+            return posToDrink.ToString();
+        }
 
         public override string ToString()
         {

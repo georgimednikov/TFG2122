@@ -14,7 +14,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             creature.stats.ActionPerceptionPercentage = UniverseParametersManager.parameters.actionPerceptionPercentage;
         }
 
-        // This move is energy netural, costing the same nergy that is obtained in a tick
+        // This move is energy netural, costing the same energy that is obtained in a tick
         public override int GetCost()
         {
             return UniverseParametersManager.parameters.sleepingCostMultiplier * creature.stats.Metabolism;

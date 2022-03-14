@@ -97,6 +97,11 @@ namespace EvolutionSimulation.FSM.Creature.States
             Console.WriteLine(creature.speciesName + " FLEES (" + creature.x + ", " + creature.y + ")");
         }
 
+        public override string GetInfo()
+        {
+            return "Objective: " + pathX + ", " + pathY;
+        }
+
         public override string ToString()
         {
             return "FleeingState";

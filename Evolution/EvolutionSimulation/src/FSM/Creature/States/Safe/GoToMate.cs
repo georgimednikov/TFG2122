@@ -40,6 +40,11 @@ namespace EvolutionSimulation.FSM.Creature.States
             Console.WriteLine(creature.speciesName + " GOES TO MATE (" + creature.x + ", " + creature.y + ")");
         }
 
+
+        public override string GetInfo()
+        {
+            return matePos.ToString();
+        }
         public override string ToString()
         {
             return "GoToMateState";

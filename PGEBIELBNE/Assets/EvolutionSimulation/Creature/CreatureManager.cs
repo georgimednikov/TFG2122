@@ -116,7 +116,7 @@ namespace UnitySimulation
                 go = Instantiate(legs[legIndex], legParent.transform);
                 go.transform.rotation = Quaternion.Euler(-90, -i * deltaAngle / Mathf.PI * 180, -90);
             }
-            if (creature.stats.Members % 2 == 1) legParent.transform.Rotate(new Vector3(0, 90, 0));
+            if (creature.stats.Members % 2 == 1) legParent.transform.Rotate(new Vector3(0, -90, 0));
         }
 
         private void InstantiateSpikes(SpeciesExport creature)

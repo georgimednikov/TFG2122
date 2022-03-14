@@ -5,6 +5,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 {
     class GoToEat : CreatureState
     {
+        Vector2Int foodPos;
+
         public GoToEat(Entities.Creature c) : base(c) { creature = c; }
 
         public override int GetCost()
@@ -30,6 +32,10 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             return "GoToEatState";
         }
+        public override string GetInfo()
+        {
+            return foodPos.ToString();
+        }
 
         /// <summary>
         /// Set the path of the creature depending on his diet and the closest 
@@ -42,7 +48,6 @@ namespace EvolutionSimulation.FSM.Creature.States
             //if (creature.GetClosestFruit() == null && creature.GetClosestCorpse() == null)
             //    return;
 
-            Vector2Int foodPos;
 
             //Herbivore goes to a fruit
             if (creature.stats.Diet == Genetics.Diet.Herbivore)

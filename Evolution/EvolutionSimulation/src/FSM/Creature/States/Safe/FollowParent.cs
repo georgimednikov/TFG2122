@@ -32,6 +32,10 @@ namespace EvolutionSimulation.FSM.Creature.States
             creature.SetPath(creature.GetParentToFollowPosition().x, creature.GetParentToFollowPosition().y);
             Console.WriteLine(creature.speciesName + " FOLLOWS PARENT (" + creature.x + ", " + creature.y + ")");
         }
+        public override string GetInfo()
+        {
+            return creature.GetParentToFollowPosition().ToString();
+        }
 
         public override string ToString()
         {

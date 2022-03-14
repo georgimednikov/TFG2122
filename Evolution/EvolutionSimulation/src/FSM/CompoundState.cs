@@ -48,6 +48,11 @@ namespace EvolutionSimulation.FSM
             return name;
         }
 
+        public virtual string GetInfo()
+        {
+            return "";
+        }
+
         string name;
         public Fsm stateMachine { get; private set; }
     }

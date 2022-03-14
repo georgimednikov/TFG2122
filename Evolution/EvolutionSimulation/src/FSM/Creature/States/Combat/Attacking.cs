@@ -42,5 +42,10 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             return "AttackingState";
         }
+
+        public override string GetInfo()
+        {
+            return creature.GetClosestCreatureReachablePosition().ToString();
+        }
     }
 }

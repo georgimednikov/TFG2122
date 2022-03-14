@@ -63,6 +63,11 @@ namespace EvolutionSimulation.FSM.Creature.States
         //    creature.cornered = false;
         //}
 
+        public override string GetInfo()
+        {
+            return "Objective: " + objX + ", " + objY;
+        }
+
         public override string ToString()
         {
             return "ChaseEnemyState";

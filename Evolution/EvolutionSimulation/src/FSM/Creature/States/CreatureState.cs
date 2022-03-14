@@ -22,5 +22,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public virtual void OnEntry() {}
 
         public virtual void OnExit() {}
+
+        public virtual string GetInfo() { return ""; }
     }
 }

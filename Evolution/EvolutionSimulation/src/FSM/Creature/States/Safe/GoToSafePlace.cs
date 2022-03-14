@@ -36,6 +36,11 @@ namespace EvolutionSimulation.FSM.Creature.States
             Console.WriteLine(creature.speciesName + " GOES TO SAFE PLACE (" + creature.x + ", " + creature.y + ")");
         }
 
+
+        public override string GetInfo()
+        {
+            return safePos.ToString();
+        }
         public override string ToString()
         {
             return "GoToSafePlaceState";

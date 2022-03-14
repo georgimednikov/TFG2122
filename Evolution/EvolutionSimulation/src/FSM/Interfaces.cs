@@ -32,6 +32,11 @@ namespace EvolutionSimulation.FSM
         /// Action executed when the state transitions to other
         /// </summary>
         void OnExit();
+
+        /// <summary>
+        /// Additional information about this state
+        /// </summary>
+        string GetInfo();
     }
 
     /// <summary>
