@@ -20,27 +20,27 @@ namespace EvolutionSimulation
         /// <returns></returns>
         static public bool AskInfoUsingWindows()
         {
-            //FolderBrowserDialog browser = new FolderBrowserDialog();
-            //browser.Description = "Choose the folder where the program will search for the data files. " +
-            //    "After this window a new one will open; if it does not show, minimize any other application open.";
-            //browser.SelectedPath = Path.GetFullPath("../../ProgramData");
-            //DialogResult result = browser.ShowDialog();
-            //DataDirectory = browser.SelectedPath + "\\";
+            FolderBrowserDialog browser = new FolderBrowserDialog();
+            browser.Description = "Choose the folder where the program will search for the data files. " +
+                "After this window a new one will open; if it does not show, minimize any other application open.";
+            browser.SelectedPath = Path.GetFullPath("../../ProgramData");
+            DialogResult result = browser.ShowDialog();
+            DataDirectory = browser.SelectedPath + "\\";
 
-            //if (result == DialogResult.OK)
-            //    DataDirectory = browser.SelectedPath + "\\";
-            //else
-            //    return false;
+            if (result == DialogResult.OK)
+                DataDirectory = browser.SelectedPath + "\\";
+            else
+                return false;
 
-            //browser.Description = "Choose the folder where the program will save the program's resulting data.";
-            //browser.SelectedPath = Path.GetFullPath("../../ResultingSpecies");
-            //result = browser.ShowDialog();
-            //ExportDirectory = browser.SelectedPath + "\\";
+            browser.Description = "Choose the folder where the program will save the program's resulting data.";
+            browser.SelectedPath = Path.GetFullPath("../../ResultingSpecies");
+            result = browser.ShowDialog();
+            ExportDirectory = browser.SelectedPath + "\\";
 
-            //if (result == DialogResult.OK)
-            //    ExportDirectory = browser.SelectedPath + "\\";
-            //else
-            //    return false;
+            if (result == DialogResult.OK)
+                ExportDirectory = browser.SelectedPath + "\\";
+            else
+                return false;
 
             do
             {

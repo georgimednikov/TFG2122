@@ -9,6 +9,11 @@ namespace EvolutionSimulation.FSM.Creature.States
     {
         public Sleeping(Entities.Creature c) : base(c) { creature = c; }
 
+        public override void OnEntry()
+        {
+            creature.stats.ActionPerceptionPercentage = UniverseParametersManager.parameters.actionPerceptionPercentage;
+        }
+
         // This move is energy netural, costing the same nergy that is obtained in a tick
         public override int GetCost()
         {
@@ -25,6 +30,11 @@ namespace EvolutionSimulation.FSM.Creature.States
                 creature.CreateExperience(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
             }
             Console.WriteLine(creature.speciesName + " SLEEPS");
+        }
+
+        public override void OnExit()
+        {
+            creature.stats.ActionPerceptionPercentage = 1;
         }
 
         public override string ToString()

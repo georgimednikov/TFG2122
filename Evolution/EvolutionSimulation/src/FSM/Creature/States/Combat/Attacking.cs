@@ -23,7 +23,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         // Increases current rest
         public override void Action()
         {
-            Entities.Creature objective = creature.GetClosestCreatureReachable();
+            Entities.Creature objective = creature.GetEnemy();
             if (objective == null) return;
             
             Console.WriteLine(creature.speciesName + " ATTACKS " + objective.speciesName);

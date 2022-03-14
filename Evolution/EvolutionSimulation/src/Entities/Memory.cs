@@ -15,6 +15,7 @@ namespace EvolutionSimulation.Entities
             public bool discovered;     //Whether this tile has been discovered by the creature at some point.
             public bool dangerousTemperature; //If the tile has a dangerous temperature AND the danger has already been calculated.
 
+            public int timesVisitedSafely; //Number of times that the creature has visited the tile to consume a resource and has done so safely.
             public float totalDanger;    //The tiles danger in total, taking into account the others around it.
             //Dangers originating from the tile, separated from the total to be able to undo them when the tile is forgotten.
             public float experienceDanger;  //How dangerous the creature has experienced the tile to be.
@@ -22,11 +23,11 @@ namespace EvolutionSimulation.Entities
 
             public bool water;
 
-            // Actual pointers to resources, to use only when already next to them, which is calculated
+            // Actual pointers to resources, to use only when already next to them, which is calculated.
             // using the positions as remembered by the creature, see below.
             public Creature enemyCreature;
-            public Creature enemyCreatureReachable;
-            public Creature ally;
+            public Creature prey;
+            public Creature ally; //May seem redundant having a list of allies in sight but this saves a sort each tick.
             public Creature father;
             public Creature mother;
             public Creature possibleMate;
@@ -39,7 +40,7 @@ namespace EvolutionSimulation.Entities
         // Use these when going to a place it remembers, and if it gets there
         // and the resource is no more, it will be automatically updated.
         Vector2Int closestCreature;
-        Vector2Int closestCreatureReachable;
+        Vector2Int closestPreyPosition;
         Vector2Int closestAlly;
         Vector2Int motherPosition;
         Vector2Int fatherPosition;
@@ -53,7 +54,8 @@ namespace EvolutionSimulation.Entities
 
         List<MemoryTileInfo> safePlants;
         List<MemoryTileInfo> safeWaterSource;
-
+        List<Creature> nearbyAllies;
+        Creature enemy;
 
         Creature thisCreature;
         World world;
@@ -63,10 +65,12 @@ namespace EvolutionSimulation.Entities
         int maxTicksOfMemory;   //Number of ticks that a tile will remain remembered.
         int perceptionRadius;   //Radius around the creature in which it perceives the world.
         int dangerRadius;       //Radius around a tile in which the tile's danger spreads.
+        float safety;           //Amount of safety that is used to indicate negative danger when
+                                //eating a plant/drinking in a place proves to be safe. 
 
 
         public Vector2Int ClosestCreaturePosition() { return closestCreature; }
-        public Vector2Int ClosestCreatureReachablePosition() { return closestCreatureReachable; }
+        public Vector2Int ClosestPreyPosition() { return closestPreyPosition; }
         public Vector2Int ClosestAllyPosition() { return closestAlly; }
         public Vector2Int ClosestPossibleMatePosition() { return closestPossibleMate; }
         public Vector2Int ClosestCorpsePosition() { return closestCorpse; }
@@ -86,14 +90,13 @@ namespace EvolutionSimulation.Entities
         public Creature ClosestCreature()
         {
             MemoryTileInfo tile = map[closestCreature.x, closestCreature.y];
-            //if (tile.ticksUnchecked == 0)
             return tile.enemyCreature;
-            //return null;
         }
-        public Creature ClosestCreatureReachable()
+        public Creature Enemy()
         {
-            MemoryTileInfo tile = map[closestCreatureReachable.x, closestCreatureReachable.y];
-            return tile.enemyCreatureReachable;
+            if (enemy != null) return enemy;
+            MemoryTileInfo tile = map[closestPreyPosition.x, closestPreyPosition.y];
+            return tile.prey;
         }
         public Creature ClosestAlly()
         {
@@ -144,7 +147,8 @@ namespace EvolutionSimulation.Entities
             if (safePlants.Count == 0) return null;
             return new Vector2Int(safePlants[0].x, safePlants[0].y);
         }
-
+        public List<Creature> GetNearbyAllies() { return nearbyAllies; }
+        public bool HasEnemy() { return enemy != null; }
 
         public Memory(Creature c, World w)
         {
@@ -158,16 +162,23 @@ namespace EvolutionSimulation.Entities
             rememberedTiles = new List<MemoryTileInfo>();
             safePlants = new List<MemoryTileInfo>();
             safeWaterSource = new List<MemoryTileInfo>();
+            nearbyAllies = new List<Creature>();
             comparer = new MemoryTileComparer(thisCreature);
 
             maxTicksOfMemory = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
             dangerRadius = (int)((thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness) * UniverseParametersManager.parameters.aggressivenessToRadiusMultiplier);
+            safety = thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier;
             UpdatePerceptionRadius();
         }
 
         public void Update()
         {
             int x = thisCreature.x, y = thisCreature.y;
+
+            //TODO: Check if dead
+            //If there is a creature targeted as the enemy and this creature loses sight or the creature dies the pointer is reset.
+            if (enemy != null && thisCreature.DistanceToObjective(enemy) > perceptionRadius)
+                enemy = null;
 
             for (int i = 0; i < rememberedTiles.Count; i++)
             {
@@ -183,22 +194,37 @@ namespace EvolutionSimulation.Entities
                     tile.tangibleDanger = tile.experienceDanger = 0;
                     rememberedTiles.Remove(tile);
 
+                    // When what was once considered a safe resource is forgotten, so does the safety the creature felt in the area.
                     if (tile.water && safeWaterSource.Contains(tile))
+                    {
                         safeWaterSource.Remove(tile);
+                        ResetSafeSpot(tile);
+                    }
                     if (safePlants.Contains(tile))
+                    {
                         safePlants.Remove(tile);
+                        ResetSafeSpot(tile);
+                    }
                 }
-                // If a once considered safe resource has a danger level it is no longer safe.
+                // If a once considered safe resource has a danger level it is no longer safe and therefore.
+                // The safe tiles that have been forgotten have already been removed from the list and therefore no longer processed.
                 if (tile.water && safeWaterSource.Contains(tile) && GetPositionDanger(tile.x, tile.y) > 0)
+                {
                     safeWaterSource.Remove(tile);
+                    ResetSafeSpot(tile);
+                }
                 if (safePlants.Contains(tile) && GetPositionDanger(tile.x, tile.y) > 0)
+                {
                     safePlants.Remove(tile);
+                    ResetSafeSpot(tile);
+                }
             }
             // After removal of tiles no longer fit to be in these lists they are ordered based on distance from the creature.
             safeWaterSource.Sort(comparer);
             safePlants.Sort(comparer);
 
             fatherPosition = motherPosition = null;
+            nearbyAllies.Clear();
             List<Creature> perceivedCreatures = world.PerceiveCreatures(thisCreature, perceptionRadius);
             List<StaticEntity> perceivedEntities = world.PerceiveEntities(thisCreature, perceptionRadius);
 
@@ -213,6 +239,7 @@ namespace EvolutionSimulation.Entities
                     ResetMemoryTilePointers(x + i, y + j);
 
                     float tileDanger = 0;
+                    int creatureIntimidation = 0;
                     //The list of creatures is also needed to calculate danger so it is done here too.
                     foreach (Creature creature in perceivedCreatures)
                     {
@@ -226,17 +253,27 @@ namespace EvolutionSimulation.Entities
                                 creature.speciesName == thisCreature.progenitorSpeciesName)
                             {
                                 map[x + i, y + j].ally = creature;
+                                nearbyAllies.Add(creature);
                                 if (creature == thisCreature.father) map[x + i, y + j].father = creature;
                                 else if (creature == thisCreature.mother) map[x + i, y + j].mother = creature;
                             }
                             //Else they have no relation
                             else
                             {
-                                map[x + i, y + j].enemyCreature = creature;
+                                //If there is no enemy assigned in that tile yet or if it is more dangerous than the previous one it is saved.
+                                if (map[x + i, y + j].enemyCreature == null || creature.stats.Intimidation > creatureIntimidation)
+                                {
+                                    map[x + i, y + j].enemyCreature = creature;
+                                    creatureIntimidation = creature.stats.Intimidation;
+                                }
+
+                                //If the creature is reachable and not considered too dangerous it is considered possible prey.
+                                float creatureDanger = GetPositionDanger(x + i, y + j);
                                 if ((creature.creatureLayer == Creature.HeightLayer.Air && thisCreature.stats.AirReach) ||
                                     creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach ||
-                                    creature.creatureLayer == Creature.HeightLayer.Ground)
-                                    map[x + i, y + j].enemyCreatureReachable = creature;
+                                    creature.creatureLayer == Creature.HeightLayer.Ground &&
+                                    creatureDanger <= thisCreature.stats.Aggressiveness)
+                                    map[x + i, y + j].prey = creature;
 
                                 tileDanger += creature.stats.Intimidation;
                             }
@@ -292,10 +329,8 @@ namespace EvolutionSimulation.Entities
         /// Saves in memory a drinking spot that has proven to be safe for the creature. This happens when the creatures
         /// finishes eating it and no other creature attack it during it.
         /// </summary>
-        public void DangerousTemperature(float exp)
+        public void DangerousTemperature(int x, int y, float exp)
         {
-            int x = thisCreature.x, y = thisCreature.y;
-
             //If this tile has already been processed because of its dangerous temperature, it does not happen again.
             if (map[x, y].dangerousTemperature) return;
             map[x, y].dangerousTemperature = true;
@@ -303,19 +338,29 @@ namespace EvolutionSimulation.Entities
         }
         /// <summary>
         /// Saves in memory a drinking spot that has proven to be safe for the creature. This happens when the creatures
-        /// finishes eating it and no other creature attack it during it.
+        /// finishes eating it and no other creature attack it during it. The more times it drinks there the safer the creature
+        /// considers the area.
+        /// 
         /// </summary>
-        public void SafeWaterSpotFound(float exp)
+        public void SafeWaterSpotFound()
         {
             int x = closestWater.x, y = closestWater.y;
             safeWaterSource.Add(map[x, y]);
-            CreateExperience(x, y, exp);
+            CreateExperience(x, y, safety);
+            map[x, y].timesVisitedSafely++;
         }
+        private void ResetSafeSpot(MemoryTileInfo tile)
+        {
+            CreateExperience(tile.x, tile.y, -safety * tile.timesVisitedSafely);
+            tile.timesVisitedSafely = 0;
+        }
+
         /// <summary>
         /// Saves in memory an edible plant that has proven to be safe for the creature. This happens when the creatures
-        /// finishes eating it and no other creature attack it during it.
+        /// finishes eating it and no other creature attack it during it. The more times it eats there the safer the creature
+        /// considers the area.
         /// </summary>
-        public void SafePlantFound(float exp)
+        public void SafePlantFound()
         {
             //This for looks for the first adjacent tile with the resource.
             //It may not be the one consumed, but since the entire area is remembered
@@ -327,8 +372,14 @@ namespace EvolutionSimulation.Entities
                     if (world.map[x + i, y + j].plant is EdiblePlant)
                     {
                         safePlants.Add(map[x + i, y + j]);
-                        CreateExperience(x + i, y + j, exp);
+                        CreateExperience(x + i, y + j, safety);
+                        map[x + i, y + j].timesVisitedSafely++;
                     }
+        }
+
+        public void TargetEnemy(Creature creature)
+        {
+            enemy = creature;
         }
 
         /// <summary>
@@ -343,7 +394,7 @@ namespace EvolutionSimulation.Entities
         {
             MemoryTileInfo tile = map[x, y];
             tile.enemyCreature = null;
-            tile.enemyCreatureReachable = null;
+            tile.prey = null;
             tile.ally = null;
             tile.father = null;
             tile.mother = null;
@@ -410,7 +461,7 @@ namespace EvolutionSimulation.Entities
         {
             //Values reset to know if a resource hasn't been found
             closestCreature = null;
-            closestCreatureReachable = null;
+            closestPreyPosition = null;
             closestAlly = null;
             fatherPosition = null;
             motherPosition = null;
@@ -439,8 +490,8 @@ namespace EvolutionSimulation.Entities
 
             if (closestCreature == null && tile.enemyCreature != null)
                 closestCreature = thisTile;
-            if (closestCreatureReachable == null && tile.enemyCreatureReachable != null)
-                closestCreatureReachable = thisTile;
+            if (closestPreyPosition == null && tile.prey != null)
+                closestPreyPosition = thisTile;
             if (closestAlly == null && tile.ally != null)
                 closestAlly = thisTile;
             if (fatherPosition == null && tile.father != null)
@@ -467,7 +518,7 @@ namespace EvolutionSimulation.Entities
         private bool AllResourcesFound()
         {
             return closestCreature != null &&
-                    closestCreatureReachable != null &&
+                    closestPreyPosition != null &&
                     closestAlly != null &&
                     fatherPosition != null &&
                     motherPosition != null &&

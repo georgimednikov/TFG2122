@@ -4,21 +4,35 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 {
     class CombatTransition : CreatureTransition
     {
-        /// Health threshold above which the creature will fight
-        private float threshold;
-
         public CombatTransition(Entities.Creature creature)
         {
             this.creature = creature;
-            threshold = 0.25f - (creature.stats.Aggressiveness / UniverseParametersManager.parameters.combatTransitionHealthThresholdMultiplier); // TODO: A mayor agresividad mas se arriesga, revisar cifras
         }
 
         public override bool Evaluate()
         {
-            return (creature.GetClosestCreatureReachablePosition() != null || creature.hasBeenHit) 
-                && ((creature.stats.Aggressiveness >= creature.GetDanger()  // TODO: ajustar valor
-                && creature.stats.CurrHealth >= creature.stats.MaxHealth * threshold)   // So it does not immediately return to combat while fleeing
-                || creature.cornered);    // So it fights as a last resort when fleeing
+            // If it has not been attacked and has no creature to hunt it does not engage in combat.
+            if (creature.GetPreyPosition() == null && !creature.HasBeenAttacked()) return false;
+
+            // Else if attacked it considers its nearby allies in combat.
+            if (creature.HasBeenAttacked() &&
+                (creature.AbleToFight() ||   // So it does not immediately return to combat while fleeing
+                creature.cornered))    // So it fights as a last resort when fleeing
+                return true;
+
+            // Else it is trying to hunt
+            if (creature.stats.Diet != Genetics.Diet.Herbivore && creature.GetPreyPosition() != null && creature.IsHungry() &&
+                creature.stats.Aggressiveness >= creature.GetDanger(creature.GetPreyPosition().x, creature.GetPreyPosition().y) &&  // TODO: ajustar valor
+                creature.AbleToFight())
+            {
+                if (creature.stats.Diet != Genetics.Diet.Carnivore)
+                    return true;
+
+                else if (creature.GetFruitPosition() == null || creature.DistanceToObjective(creature.GetFruitPosition()) > creature.DistanceToObjective(creature.GetPreyPosition()))
+                    return true;
+            }
+
+            return false;
         }
 
         public override string ToString()
