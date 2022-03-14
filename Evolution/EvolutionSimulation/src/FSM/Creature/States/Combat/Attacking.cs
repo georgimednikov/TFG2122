@@ -45,7 +45,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override string GetInfo()
         {
-            return creature.GetClosestCreatureReachablePosition().ToString();
+            return creature.GetEnemy().ToString();
         }
     }
 }
