@@ -147,7 +147,7 @@ namespace EvolutionSimulation
         static public void SetDebugInfo()
         {
             Years = 10;
-            Size = 150;
+            Size = 512;
             Species = 10;
             Individuals = 10;
             DataDirectory = "../../ProgramData/";

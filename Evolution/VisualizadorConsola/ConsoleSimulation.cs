@@ -21,6 +21,8 @@ namespace VisualizadorConsola
             UniverseParametersManager.ReadJSON();
             world = new World();
             world.Init(UserInfo.Size);
+            world.ExportContent();
+            WorldToBmp();
             //A minimum distance to leave in between species spawn points to give them some room.
             //Calculated based on the world size and amount of species to spawn, and then reduced by
             //a value to give room in the world and not fill it in a homogenous manner.
@@ -77,10 +79,12 @@ namespace VisualizadorConsola
             world.ExportContent();
         }
 
+
         public void WorldToBmp()
         {
-            int scale = 1;
+            int scale = 4;
             Bitmap treeMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap floraMapMask = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap floraMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap heightMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap tempMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -153,6 +157,18 @@ namespace VisualizadorConsola
                     val = (Math.Truncate(val * 10) / 10);
                     SetPixel(j, i, Color.FromArgb((int)(((1 - val) * (1 - aux)) * 255 / 2), (int)((val - (val * aux )) * 255), (int)((aux) * 255/2)), floraMap, scale);
                     //*/
+                    float thres = 1.0f, thres2 = 0.7f;
+                    if (val >= thres) SetPixel(j, i, Color.FromArgb(0, 255, 0), floraMapMask, scale);
+                    else SetPixel(j, i, Color.FromArgb((int)(150 * (thres - val)), (int)(90 + (val * 165f / thres)), 0), floraMapMask, scale);
+
+                    double h = world.map[j / scale, i / scale].height;
+
+                    if (h >= thres2)
+                    {
+                        Color c = floraMapMask.GetPixel(j, i);
+                        //SetPixel(j, i, Color.FromArgb(255, 255, 255), floraMapMask, scale);
+                        SetPixel(j, i, Color.FromArgb((int)(c.R + ((h - thres2) / (1 - thres2) * (1 - (c.R / 255f))) * 255), (int)(c.G + ((h - thres2) / (1 - thres2) * (1 - (c.G / 255f))) * 255), (int)(c.B + ((h - thres2) / (1 - thres2) * (1 - (c.B / 255f)))) * 255), floraMapMask, scale);
+                    }
 
                     Plant plant = world.map[j / scale, i / scale].plant;
                     if (plant as Grass != null)
@@ -169,6 +185,7 @@ namespace VisualizadorConsola
 
             treeMap.Save("treeTest.png");
             floraMap.Save("flora.bmp");
+            floraMapMask.Save("floraMask.bmp");
             heightMap.Save("height.bmp");
             tempMap.Save("temp.bmp");
             hMap.Save("humidity.bmp");
@@ -294,8 +311,6 @@ namespace VisualizadorConsola
         //    }
         //    //Console.SetCursorPosition(world.map.GetLength(0), world.map.GetLength(0));
         //}
-
-
 
         World world;
     }
