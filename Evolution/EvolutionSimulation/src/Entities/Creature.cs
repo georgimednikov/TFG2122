@@ -43,6 +43,7 @@ namespace EvolutionSimulation.Entities
             }
             speciesName = name;
             stats = new CreatureStats();
+            childs = new List<Creature>();
             //TODO: Los parametros de abajo no se donde ponerlos xd
             //speciesName = "None";
             SetStats();
