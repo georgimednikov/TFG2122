@@ -7,7 +7,6 @@ namespace UnitySimulation
     [RequireComponent(typeof(Terrain))]
     public class GenerateWorld : MonoBehaviour
     {
-        public GameObject tree, edibleTree, bush, grass;
         public TextAsset world;
         public float heightMultiplier;
         World.MapData[,] map;
@@ -33,14 +32,13 @@ namespace UnitySimulation
             int grassDensity = terrain.detailResolution;
             int[,] newMap = new int[grassDensity, grassDensity];
 
-            for (int z = 0; z < tileDepth; z++)
-                for (int x = 0; x < tileWidth; x++)
+            for (int z = 0; z < tileWidth; z++)
+                for (int x = 0; x < tileDepth; x++)
                 {
-                    for (int i = 0; i < grassDensity / tileDepth; i++)
-                        for (int j = 0; j < grassDensity / tileWidth; j++)
+                    for (int i = 0; i < grassDensity / tileWidth; i++)
+                        for (int j = 0; j < grassDensity / tileDepth; j++)
                             if (Random.Range(0f, 1f) < heightMap[x, z].flora)
-                                newMap[(grassDensity / tileDepth) * x + i, (grassDensity / tileWidth) * z + j] = (int)(Mathf.Round(1f + (float)heightMap[x, z].flora * 2));
-
+                                newMap[grassDensity - 1 - ((grassDensity / tileWidth) * z + i), ((grassDensity / tileDepth * x) + j)] = (int)(Mathf.Round(1f + (float)heightMap[x, z].flora * 2));
                     if (heightMap[z, x].plant == null) continue;
 
                     TreeInstance tree = new TreeInstance();
@@ -66,9 +64,9 @@ namespace UnitySimulation
 
                     tree.color = Color.white;
                     tree.lightmapColor = Color.white;
-                    tree.heightScale = 1;
-                    tree.widthScale = 1;
-                    tree.position = new Vector3((x + 0.5f) / (float)tileDepth, 0, (z + 0.5f) / (float)tileWidth);
+                    tree.heightScale = 1;// Random.Range(0.5f, 2f);
+                    tree.widthScale = 1;//Random.Range(0.5f, 1f);
+                    tree.position = new Vector3((z + 0.5f + Random.Range(-0.5f, 0.5f)) / (float)tileWidth, 0, 1 - (x + 0.5f + Random.Range(-0.5f, 0.5f)) / (float)tileDepth);
                     Debug.Log("Pongo una puta planta en: " + tree.position);
                     trees.Add(tree);
                 }
@@ -90,7 +88,7 @@ namespace UnitySimulation
                 for (int xIndex = 0; xIndex < size; xIndex++)
                 {
                     World.MapData tile = heightMap[(int)(zIndex * (float)tileDepth / size), (int)(xIndex * (float)tileWidth / size)];
-                    h[zIndex, xIndex] = (float)tile.height * heightMultiplier;
+                    h[size - 1 - xIndex, zIndex] = (float)tile.height * heightMultiplier;
                 }
             terrain.SetHeights(0, 0, h);
         }
