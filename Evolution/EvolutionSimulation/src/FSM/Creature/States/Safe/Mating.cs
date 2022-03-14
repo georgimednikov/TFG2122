@@ -13,6 +13,11 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public Mating(Entities.Creature c, int time) : base(c){ this.time = time; startTime = time; }
 
+        public override void OnEntry()
+        {
+            creature.stats.ActionPerceptionPercentage = UniverseParametersManager.parameters.actionPerceptionPercentage;
+        }
+
         // This move is energy netural, costing the same energy that is obtained in a tick
         public override int GetCost()
         {
@@ -73,6 +78,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             time = startTime;
             creature.matingCreature.ReceiveInteraction(creature, Entities.Interactions.stopMate);
+            creature.stats.ActionPerceptionPercentage = 1;
         }
 
         public override string ToString()

@@ -480,10 +480,12 @@ namespace EvolutionSimulation
         static void ValidateCreatureStats(UniverseParameters parameters)
         {
             if (parameters.newbornStatMultiplier <= 0 || parameters.adulthoodThreshold <= 0 || parameters.tiredThreshold <= 0 || parameters.exhaustThreshold <= 0 ||
-                parameters.hungryThreshold <= 0 || parameters.veryHungryThreshold <= 0 || parameters.thirstyThreshold <= 0 || parameters.veryThirstyThreshold <= 0) 
+                parameters.hungryThreshold <= 0 || parameters.veryHungryThreshold <= 0 || parameters.thirstyThreshold <= 0 || parameters.veryThirstyThreshold <= 0 ||
+                parameters.actionPerceptionPercentage <= 0) 
                 throw new UniverseParameterIsZeroException("The provided stat parameters must be positive");
             if (parameters.newbornStatMultiplier > 1 || parameters.adulthoodThreshold > 1 || parameters.tiredThreshold > 1 || parameters.exhaustThreshold > 1 ||
-                parameters.hungryThreshold > 1 || parameters.veryHungryThreshold > 1 || parameters.thirstyThreshold > 1 || parameters.veryThirstyThreshold > 1)
+                parameters.hungryThreshold > 1 || parameters.veryHungryThreshold > 1 || parameters.thirstyThreshold > 1 || parameters.veryThirstyThreshold > 1 ||
+                parameters.actionPerceptionPercentage > 1)
                 throw new PercentageOverOneException("The provided stat percentages are over one");
         }
 

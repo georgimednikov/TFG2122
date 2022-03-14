@@ -30,7 +30,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            Entities.Creature objective = creature.GetClosestCreatureReachable();
+            Entities.Creature objective = creature.GetEnemy();
             objX = objective.x;
             objY = objective.y; 
             creature.SetPath(objX, objY);   // This MUST be set up for the cost of the action to work
@@ -43,7 +43,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             }
 
-            Entities.Creature objective = creature.GetClosestCreatureReachable();   // This is NOT cached because objective can change to another creature
+            Entities.Creature objective = creature.GetEnemy();   // This is NOT cached because objective can change to another creature
             if (objX != objective.x ||  // If objective is somewhere else,
                 objY != objective.y)    // adjust path accordingly
             {

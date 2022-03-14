@@ -22,7 +22,7 @@ namespace EvolutionSimulation.Entities
         {
             InteractionsDict = new Dictionary<Interactions, List<Action<Creature>>>();
             activeStatus = new List<Status.Status>();
-            removedStatus = new List<Status.Status>();          
+            removedStatus = new List<Status.Status>();
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace EvolutionSimulation.Entities
         {
             world = w;
 
-            if(chromosome == null)
+            if (chromosome == null)
             {
                 this.chromosome = new CreatureChromosome();
             }
@@ -84,13 +84,13 @@ namespace EvolutionSimulation.Entities
 
             // Action points added every tick 
             ActionPoints += stats.Metabolism * (int)Math.Ceiling((float)UniverseParametersManager.parameters.baseActionCost / (chromosome.GetFeatureMax(CreatureFeature.Metabolism) / 2));
-            
+
             // Executes the state action if the creature has enough Action Points
             int cost = 0;
             while ((cost = mfsm.EvaluateCost()) <= ActionPoints)
             {
                 mfsm.CurrentState.Action();
-                ActionPoints -= cost; 
+                ActionPoints -= cost;
             }
             Clear();
         }
@@ -99,7 +99,7 @@ namespace EvolutionSimulation.Entities
         {
             //If the creature sees normally (1 = 100% of its vision) it was day and now is night.
             if (stats.CurrentVision == 1)
-                stats.CurrentVision = stats.NightPenalty; //Instead of 1 now it sees from minNightVision to 1 depending on its feature.
+                stats.CurrentVision = stats.NightPerceptionPercentage; //Instead of 1 now it sees from minNightVision to 1 depending on its feature.
 
             //Else it was night now it is day again and begins to see normally.
             else
@@ -119,7 +119,7 @@ namespace EvolutionSimulation.Entities
         {
             if (parent == father)
             {
-                if(GetFatherPosition() != null)
+                if (GetFatherPosition() != null)
                     father = null;
                 //the creature knows the position of his mother and it is not following her
                 if (GetMotherPosition() != null && parentToFollow != mother)
@@ -140,7 +140,7 @@ namespace EvolutionSimulation.Entities
         void CheckTemperature()
         {
             double tileTemperature = world.map[x, y].temperature;
-            double difference = 0;
+            double difference;
 
             //The difference between the extreme acceptable temperature an the tile temperature is calculated.
             if (tileTemperature < stats.MinTemperature)
@@ -155,12 +155,12 @@ namespace EvolutionSimulation.Entities
             double range = Math.Min(difference / UniverseParametersManager.parameters.maxTemperatureDifference, 1);
             //The base damage of being in an area with a temperature that cannot be stand is a porcentage of the max health each tick.
             //To that, another instance of damage is added depending on how much this temperature supasses that acceptable for the creature.
-            double damage = stats.MaxHealth * 
-                (UniverseParametersManager.parameters.maxHealthTemperatureDamage - UniverseParametersManager.parameters.minHealthTemperatureDamage) +
-                UniverseParametersManager.parameters.minHealthTemperatureDamage;
+            double damage = stats.MaxHealth *
+                ((range * (UniverseParametersManager.parameters.maxHealthTemperatureDamage - UniverseParametersManager.parameters.minHealthTemperatureDamage)) +
+                UniverseParametersManager.parameters.minHealthTemperatureDamage);
             stats.CurrHealth -= (float)damage;
             double danger = stats.Aggressiveness * UniverseParametersManager.parameters.maxTemperatureAggressivenessPercentage;
-            memory.CreateExperience(x, y, -(float)danger);
+            memory.DangerousTemperature(x, y, -(float)danger);
         }
 
         /// <summary>
@@ -168,8 +168,6 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         void Clear()
         {
-            hasBeenHit = false; // TODO: Reset flags en general
-
             // Clears the statuses marked for deletion
             foreach (Status.Status s in removedStatus)
                 activeStatus.Remove(s);
@@ -222,9 +220,10 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         void Regen()
         {
-            if(stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
+            if (stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
                 stats.CurrRest >= (stats.MaxRest * UniverseParametersManager.parameters.restRegenerationThreshold) &&
-                stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold)) {
+                stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold))
+            {
                 stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth);  // TODO: Ver si esto esta bien, ingenieria de valores
                 stats.CurrHealth = Math.Min(stats.CurrHealth, stats.MaxHealth); // So it does not get over-healed
             }
@@ -255,8 +254,6 @@ namespace EvolutionSimulation.Entities
 
         // State related attributes
 
-        public bool hasBeenHit;
-
         public Creature matingCreature;
 
         /// <summary>
@@ -286,7 +283,7 @@ namespace EvolutionSimulation.Entities
         /// TODO: We are forcefully cramming these states down the FSM's throat
         /// </summary>
         void ConfigureStateMachine()
-        {       
+        {
             // Alive state configuration
             // States
             // Safe-state configuration
@@ -437,7 +434,7 @@ namespace EvolutionSimulation.Entities
         public void ReceiveInteraction(Creature interacter, Interactions type)
         {
             if (InteractionsDict.ContainsKey(type))
-                foreach(Action<Creature> response in InteractionsDict[type])
+                foreach (Action<Creature> response in InteractionsDict[type])
                     response(interacter);
         }
 
@@ -451,7 +448,7 @@ namespace EvolutionSimulation.Entities
                 InteractionsDict[type] = new List<Action<Creature>>();
             InteractionsDict[type].Add(response);
         }
-        
+
         /// <summary>
         /// Removes a response to an interaction type, given the
         /// creature that interacts with this. 
@@ -468,6 +465,17 @@ namespace EvolutionSimulation.Entities
                 InteractionsDict.Remove(type);
         }
 
+        /// <summary>
+        /// Determines whether the creature has enough health to fight or if it's too weak.
+        /// </summary>
+        /// <returns></returns>
+        public bool AbleToFight()
+        {
+            // Health threshold above which the creature will fight
+            float threshold = 0.25f - (stats.Aggressiveness / UniverseParametersManager.parameters.combatTransitionHealthThresholdMultiplier); // TODO: A mayor agresividad mas se arriesga, revisar cifras
+            return stats.CurrHealth >= stats.MaxHealth * threshold;
+        }
+
         // Standard reactions to interactions
 
         /// <summary>
@@ -475,9 +483,9 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         /// <param name="dmg">Incoming damage</param>
         /// <param name="pen">Damage penetratione</param>
-        public float ComputeDamage(float dmg, float pen)
+        private float ComputeDamage(float dmg, float pen)
         {
-            float amount = 0;
+            float amount;
             amount = (dmg) - Math.Max((stats.Armor - pen), 0);
             amount = Math.Max(0, amount);
             amount = Math.Min(amount, stats.CurrHealth);
@@ -490,8 +498,22 @@ namespace EvolutionSimulation.Entities
         private void ReceiveDamage(Creature interacter)
         {
             stats.CurrHealth -= ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
-            //TODO: Cambiar target aunque normalmente sera el mas cercano asi que tampoco es tan urgente
-            hasBeenHit = true;
+
+            //If the creature has enough allies to put up a fight the gank him together.
+            List<Creature> allies = memory.GetNearbyAllies();
+            List<Creature> fighters = new List<Creature>();
+            foreach (Creature ally in allies)
+            {
+                if (ally.AbleToFight())
+                    fighters.Add(ally);
+            }
+
+            // If the pack is aggressive enought they will fight, else nothing happens.
+            if (stats.Aggressiveness * (fighters.Count + (AbleToFight() ? 1 : 0)) >= GetDanger(GetEnemy().x, GetEnemy().y))
+                foreach (Creature fighter in fighters)
+                {
+                    fighter.TargetEnemy(interacter);
+                }
         }
 
         /// <summary>
@@ -657,9 +679,19 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
+        /// Gives the creature an enemy to target in combat related activities.
+        /// </summary>
+        /// <param name="creature">Creature to consider an enemy</param>
+        public void TargetEnemy(Creature creature) { memory.TargetEnemy(creature); }
+        /// <summary>
+        /// Returns true if this creature or an ally in sight has been attacked;
+        /// </summary>
+        public bool HasBeenAttacked() { return memory.HasEnemy(); }
+
+        /// <summary>
         /// Returns the danger level of the tile in the map on which the creature is. Danger is calculated based on Intimidation.
         /// </summary>
-        public float GetDanger() { return memory.GetPositionDanger(x, y); }
+        public float GetDanger(int x, int y) { return memory.GetPositionDanger(x, y); }
         /// <summary>
         /// Creatres an experience for the creature in the current tile that it is in.
         /// If its positive, it is a good experience, if it is negative, a bad one.
@@ -668,11 +700,11 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Saves in memory a safe drinking spot and updates the danger levels around it.
         /// </summary>
-        public void SafeWaterSpotFound(float exp) { memory.SafeWaterSpotFound(exp); }
+        public void SafeWaterSpotFound() { memory.SafeWaterSpotFound(); }
         /// <summary>
         /// Saves in memory a safe plant to eat and updates the danger levels around it.
         /// </summary>
-        public void SafePlantFound(float exp) { memory.SafePlantFound(exp); }
+        public void SafePlantFound() { memory.SafePlantFound(); }
         /// <summary>
         /// Returns the position of the closest safe water source.
         /// </summary>
@@ -698,12 +730,13 @@ namespace EvolutionSimulation.Entities
         /// Returns the position of the parent who is following that the creature remembers.
         /// Returns null if the creature does not remember the position of any of his parents
         /// </summary>
-        public Vector2Int GetParentToFollowPosition() {
+        public Vector2Int GetParentToFollowPosition()
+        {
             if (parentToFollow == null || (memory.Father() == null && memory.Mother() == null))
                 return null;
             if (parentToFollow == memory.Father())
                 return memory.FatherPosition();
-            return memory.MotherPosition(); 
+            return memory.MotherPosition();
         }
         /// <summary>
         /// Returns the position of the closest possible mate the creature remembers.
@@ -716,7 +749,7 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Returns the position of the closest rechable creature the creature remembers.
         /// </summary>
-        public Vector2Int GetClosestCreatureReachablePosition() { return memory.ClosestCreatureReachablePosition(); }
+        public Vector2Int GetPreyPosition() { return memory.ClosestPreyPosition(); }
         /// <summary>
         /// Returns the position of the closest corpse the creature remembers.
         /// </summary>
@@ -728,7 +761,14 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Returns the position of the closest edible plant the creature remembers.
         /// </summary>
-        public Vector2Int GetClosestFruitPosition() { return memory.ClosestFruitPosition(); }
+        public Vector2Int GetFruitPosition()
+        {
+            if (GetSafeFruitPosition() == null) return memory.ClosestFruitPosition();
+            if (DistanceToObjective(GetSafeFruitPosition()) > DistanceToObjective(memory.ClosestFruitPosition()) * UniverseParametersManager.parameters.safePrefferedOverClosestResourceRatio)
+                return memory.ClosestFruitPosition();
+            else
+                return GetSafeFruitPosition();
+        }
         /// <summary>
         /// Returns the position of the closest mass of water the creature remembers.
         /// </summary>
@@ -742,14 +782,20 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public Vector2Int GetUndiscoveredPlacePosition() { return memory.UndiscoveredPlacePosition(); }
 
+        /// <summary>
+        /// Returns a pointer to the creature's "enemy". That is another creature that has attacked it, or if there is none,
+        /// the closest reachable creature of a different species (not including the species from which this one spawned) as this one.
+        /// </summary>
+        public Creature GetEnemy() { return memory.Enemy(); }
+        public Creature GetClosestCreature() { return memory.ClosestCreature(); }
         public Creature GetClosestAlly() { return memory.ClosestAlly(); }
         public Creature GetFather() { return memory.Father(); }
         public Creature GetMother() { return memory.Mother(); }
         public Creature GetClosestPossibleMate() { return memory.ClosestPossibleMate(); }
-        public Creature GetClosestCreature() { return memory.ClosestCreature(); }
-        public Creature GetClosestCreatureReachable() { return memory.ClosestCreatureReachable(); }
         public Corpse GetClosestCorpse() { return memory.ClosestCorpse(); }
-        public EdiblePlant GetClosestFruit() { return memory.ClosestFruit(); }
+        public Corpse GetClosestRottenCorpse() { return memory.ClosestRottenCorpse(); }
+        // Does not matter if it went to a safe plant or the closest, by the time this method is called both will be the same.
+        public EdiblePlant GetFruit() { return memory.ClosestFruit(); }
         #endregion
 
         // Parents

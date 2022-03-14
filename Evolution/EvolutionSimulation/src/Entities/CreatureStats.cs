@@ -171,18 +171,21 @@ namespace EvolutionSimulation.Entities
         }
         public int Perception
         {
-            get { return (int)(baseStats.Perception * CurrentVision); }
+            get { return (int)(baseStats.Perception * CurrentVision * ActionPerceptionPercentage); }
             set { baseStats.Perception = value; }
         }
-        public float CurrentVision
-        {
-            get { return baseStats.CurrentVision; }
-            set { baseStats.CurrentVision = value; }
-        }
         /// <summary>
-        /// Auxiliary variable to set the night penalty when it is dark.
+        /// Percentage of the creature's perception at a given moment: 1 if it is day, NightPenalty if it is night.
         /// </summary>
-        public float NightPenalty { get; set; }
+        public float CurrentVision { get; set; }
+        /// <summary>
+        /// Percentage of the creature's perception that remains when performing an action.
+        /// </summary>
+        public float ActionPerceptionPercentage { get; set; }
+        /// <summary>
+        /// Percentage of the creature's perception that remains when at night.
+        /// </summary>
+        public float NightPerceptionPercentage { get; set; }
 
         //Physique related stats
         public int Size
@@ -378,7 +381,6 @@ namespace EvolutionSimulation.Entities
         public int Aggressiveness;
         public int Intimidation;
         public int Perception;
-        public float CurrentVision;
 
         //Physique related stats
         public int Size;

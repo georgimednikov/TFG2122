@@ -42,19 +42,11 @@ namespace EvolutionSimulation.FSM.Creature.States
             //if (creature.GetClosestFruit() == null && creature.GetClosestCorpse() == null)
             //    return;
 
-            //The position of the fruit in which the creature would be most interested in is decided
-            //between the closest one and the closest one that has proven to be safe, based on distance.
-            Vector2Int fruitPos;
-            if (ClosestOverSafeFruit())
-                fruitPos = creature.GetClosestFruitPosition();
-            else
-                fruitPos = creature.GetSafeFruitPosition();
-
             Vector2Int foodPos;
 
             //Herbivore goes to a fruit
             if (creature.stats.Diet == Genetics.Diet.Herbivore)
-                foodPos = fruitPos;
+                foodPos = creature.GetFruitPosition();
 
             //If there is a fresh corpse, that will be the objective of a carnivorous/omnivorous creature.
             //Because of how the creature memory works, if the creature is a scavenger the closest corpse will be considered fresh,
@@ -73,22 +65,22 @@ namespace EvolutionSimulation.FSM.Creature.States
             else //Omnivore
             {
                 //If there is a fresh corpse and no plant, then it goes to the corpse.
-                if (creature.GetClosestCorpsePosition() != null && fruitPos == null)
+                if (creature.GetClosestCorpsePosition() != null && creature.GetFruitPosition() == null)
                     foodPos = creature.GetClosestCorpsePosition();
 
                 //If there is a plant and no fresh corpse, it goes to a plant.
-                else if (creature.GetClosestCorpsePosition() == null && fruitPos != null)
-                    foodPos = fruitPos;
+                else if (creature.GetClosestCorpsePosition() == null && creature.GetFruitPosition() != null)
+                    foodPos = creature.GetFruitPosition();
 
                 //If there is a corpse and a plant, it goes to the closest one.
-                else if (creature.GetClosestCorpsePosition() != null && fruitPos != null)
+                else if (creature.GetClosestCorpsePosition() != null && creature.GetFruitPosition() != null)
                 {
                     // Goes to the closest food source
-                    int distPlant = creature.DistanceToObjective(fruitPos),
+                    int distPlant = creature.DistanceToObjective(creature.GetFruitPosition()),
                         distCorpse = creature.DistanceToObjective(creature.GetClosestCorpsePosition());
 
                     if (distPlant < distCorpse)
-                        foodPos = fruitPos;
+                        foodPos = creature.GetFruitPosition();
 
                     else
                         foodPos = creature.GetClosestCorpsePosition();
@@ -98,13 +90,6 @@ namespace EvolutionSimulation.FSM.Creature.States
                     foodPos = creature.GetClosestRottenCorpsePosition();
             }
             creature.SetPath(foodPos.x, foodPos.y);
-        }
-
-        private bool ClosestOverSafeFruit()
-        {
-            return creature.GetSafeFruitPosition() == null ||
-                (creature.DistanceToObjective(creature.GetSafeFruitPosition()) >
-                 creature.DistanceToObjective(creature.GetClosestFruitPosition()) * UniverseParametersManager.parameters.safePrefferedOverClosestResourceRatio);
         }
     }
 }

@@ -22,7 +22,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         {
             //Herbivore
             if(creature.stats.Diet == Genetics.Diet.Herbivore)
-                return creature.GetClosestFruitPosition() != null && creature.DistanceToObjective(creature.GetClosestFruitPosition()) <= UniverseParametersManager.parameters.adjacentLength;
+                return creature.GetFruitPosition() != null && creature.DistanceToObjective(creature.GetFruitPosition()) <= UniverseParametersManager.parameters.adjacentLength;
 
             //Carnivore
             if (creature.stats.Diet == Genetics.Diet.Carnivore)
@@ -34,13 +34,13 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
                 return false;
             }
 
-            if (creature.GetClosestCorpsePosition() != null && creature.GetClosestFruitPosition() != null)
+            if (creature.GetClosestCorpsePosition() != null && creature.GetFruitPosition() != null)
             {
-                int distPlant = creature.DistanceToObjective(creature.GetClosestFruitPosition()),
+                int distPlant = creature.DistanceToObjective(creature.GetFruitPosition()),
                     distCorpse = creature.DistanceToObjective(creature.GetClosestCorpsePosition());
                 //Omnivore, close to an eating objective
                 return (creature.GetClosestCorpsePosition() != null && distCorpse <= UniverseParametersManager.parameters.adjacentLength) ||
-                    (creature.GetClosestFruitPosition() != null && distPlant <= UniverseParametersManager.parameters.adjacentLength);
+                    (creature.GetFruitPosition() != null && distPlant <= UniverseParametersManager.parameters.adjacentLength);
             }
 
             return creature.DistanceToObjective(creature.GetClosestRottenCorpsePosition()) <= UniverseParametersManager.parameters.adjacentLength;

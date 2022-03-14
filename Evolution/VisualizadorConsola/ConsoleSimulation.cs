@@ -32,7 +32,7 @@ namespace VisualizadorConsola
 
             for (int i = 0; i < UserInfo.Species; i++)
             {
-                bool validPosition = true;
+                bool validPosition;
                 do
                 {
                     validPosition = true;

@@ -10,6 +10,11 @@ namespace EvolutionSimulation.FSM.Creature.States
     {
         public Eating(Entities.Creature c) : base(c) { creature = c; }
 
+        public override void OnEntry()
+        {
+            creature.stats.ActionPerceptionPercentage = UniverseParametersManager.parameters.actionPerceptionPercentage;
+        }
+
         public override int GetCost()
         {
             return UniverseParametersManager.parameters.eatingCostMultiplier * creature.stats.Metabolism;
@@ -24,18 +29,23 @@ namespace EvolutionSimulation.FSM.Creature.States
             else if(creature.stats.Diet == Genetics.Diet.Herbivore)
             {
                 EatPlant();
-                creature.SafePlantFound(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
+                creature.SafePlantFound();
             }
             else//Omnivore
             {
                 if (creature.GetClosestCorpse() != null)
                     EatCorpse();
-                else if (creature.GetClosestFruit() != null)
+                else if (creature.GetFruit() != null)
                 {
                     EatPlant();
-                    creature.SafePlantFound(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
+                    creature.SafePlantFound();
                 }
             }
+        }
+
+        public override void OnExit()
+        {
+            creature.stats.ActionPerceptionPercentage = 1;
         }
 
         public override string ToString()
@@ -49,7 +59,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         protected void EatPlant()
         {
-            Entities.EdiblePlant closest = creature.GetClosestFruit();
+            Entities.EdiblePlant closest = creature.GetFruit();
             creature.stats.CurrEnergy += closest.Eat();
             Console.WriteLine(creature.speciesName + " EATS FRUIT AT (" + closest.x + ", " + closest.y + ")");
         }
@@ -60,7 +70,11 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         protected void EatCorpse()
         {
-            Entities.Corpse closest = creature.GetClosestCorpse();
+            Entities.Corpse closest;
+            if (creature.GetClosestCorpse() != null)
+                closest = creature.GetClosestCorpse();
+            else
+                closest = creature.GetClosestRottenCorpse();
             closest.ReceiveInteraction(creature, Entities.Interactions.eat);
             Console.WriteLine(creature.speciesName + " EATS CORPSE AT (" + closest.x + ", " + closest.y + ")");
         }

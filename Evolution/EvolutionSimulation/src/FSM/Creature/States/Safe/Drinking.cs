@@ -6,6 +6,11 @@ namespace EvolutionSimulation.FSM.Creature.States
     {
         public Drinking(Entities.Creature c) : base(c) { creature = c; }
 
+        public override void OnEntry()
+        {
+            creature.stats.ActionPerceptionPercentage = UniverseParametersManager.parameters.actionPerceptionPercentage;
+        }
+
         public override int GetCost()
         {
             return UniverseParametersManager.parameters.drinkingCostMultiplier * creature.stats.Metabolism;
@@ -18,9 +23,14 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 creature.stats.CurrHydration = creature.stats.MaxHydration;
                 //TODO: Mirar los valores cuando se llama a SafeWaterSpotFound SafePlantFound y CreateExperience
-                creature.SafeWaterSpotFound(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
+                creature.SafeWaterSpotFound();
             }
             Console.WriteLine(creature.speciesName + " DRINKS (" + creature.x + ", " + creature.y + ")");
+        }
+
+        public override void OnExit()
+        {
+            creature.stats.ActionPerceptionPercentage = 1;
         }
 
         public override string ToString()

@@ -124,7 +124,7 @@ namespace EvolutionSimulation.Entities
             //If the creature does not have the feature night vision then its perception will be the lowest posible,
             //So instead of Perception * 1 it will be Perception * minNightVision
             if (!HasAbility(CreatureFeature.NightVision, abilityUnlock))
-                stats.NightPenalty = perceptionWithoutNightVision;
+                stats.NightPerceptionPercentage = perceptionWithoutNightVision;
 
             //Else it is calculated what percentage of the ability the creature has unlocked, removing the minimum value needed to have the ability per se,
             //and then depending on that percentage the creature has a NightPenalty that goes from minNightVision to 1.
@@ -133,11 +133,11 @@ namespace EvolutionSimulation.Entities
                 int maxNightVisionGene = chromosome.GetFeatureMax(CreatureFeature.NightVision);
                 int offset = (int)(abilityUnlock * maxNightVisionGene);
                 float percentageOfNightVision = (float)(chromosome.GetFeature(CreatureFeature.NightVision) - offset) / (chromosome.GetFeatureMax(CreatureFeature.NightVision) - offset);
-                stats.NightPenalty = minPerceptionWithNightVision + (1 - minPerceptionWithNightVision) * percentageOfNightVision;
+                stats.NightPerceptionPercentage = minPerceptionWithNightVision + (1 - minPerceptionWithNightVision) * percentageOfNightVision;
             }
 
             //Value that multiplies perception when it is being gotten
-            stats.CurrentVision = world.day ? 1 : stats.NightPenalty;
+            stats.CurrentVision = world.day ? 1 : stats.NightPerceptionPercentage;
 
             //If the creature can see in the dark, that penalty is reduced the better sight it has
             if (HasAbility(CreatureFeature.NightVision, abilityUnlock))

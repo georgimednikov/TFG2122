@@ -38,7 +38,7 @@ namespace EvolutionSimulation
         public float hoursTilStarvation = 24f;
         public float thirstToHungerRatio = 3f;
         public float maxTemperatureAggressivenessPercentage = 0.5f; //Max percentage of the creature's aggressiveness that is used as danger in tiles with extreme temperature
-        public float maxTemperatureDifference = 10; //How many degrees over the limit influence the damage until it reaches the limit.
+        public float maxTemperatureDifference = 0.2f; //How many degrees over the limit influence the damage until it reaches the limit.
         public double minHealthTemperatureDamage = 0.01; //Minimum max health damage for being in extreme temperatures.
         public double maxHealthTemperatureDamage = 0.02; //Maximum max health damage for being in extreme temperatures.
 
@@ -71,6 +71,7 @@ namespace EvolutionSimulation
         public int sleepingCostMultiplier = 10;
         public float mutationChance = 0.1f;
         public int adjacentLength = 1;
+        public float actionPerceptionPercentage = 0.75f;
 
         // Transitions
         public int fleeingTransitionMultiplier = 4;
