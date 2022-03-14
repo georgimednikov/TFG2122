@@ -33,7 +33,8 @@ namespace UnitySimulation
 
         void Start()
         {
-
+            if (waterPlaneInstance != null)
+                MapGen();
         }
 
         public void MapGen()
@@ -97,7 +98,7 @@ namespace UnitySimulation
 
                     tree.color = Color.white;
                     tree.lightmapColor = Color.white;
-                    tree.heightScale = 1;// Random.Range(0.5f, 2f);
+                    tree.heightScale = 1;// Random.Range(0.75f, 2.25f);
                     tree.widthScale = 1;//Random.Range(0.5f, 1f);
                     tree.position = new Vector3((z + 0.5f + Random.Range(-0.5f, 0.5f)) / (float)tileWidth, 0, 1 - (x + 0.5f + Random.Range(-0.5f, 0.5f)) / (float)tileDepth);
                     Debug.Log("Pongo una puta planta en: " + tree.position);
