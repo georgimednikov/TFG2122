@@ -466,7 +466,8 @@ namespace EvolutionSimulation
                 parameters.minMobilityMedium <= 0 || parameters.mobilityPenalty <= 0 || parameters.maxSpeed <= 0 || parameters.hornIntimidationMultiplier <= 0 ||
                 parameters.restRegenerationThreshold <= 0 || parameters.energyRegenerationThreshold <= 0 || parameters.hydrationRegenerationThreshold <= 0 || 
                 parameters.regenerationRate <= 0 || parameters.hoursTilStarvation <= 0 || parameters.thirstToHungerRatio <= 0 ||
-                parameters.maxTemperatureAggressivenessPercentage <= 0 || parameters.maxTemperatureDifference <= 0 || parameters.minHealthTemperatureDamage <= 0 || parameters.maxHealthTemperatureDamage <= 0) 
+                parameters.maxTemperatureAggressivenessPercentage <= 0 || parameters.maxTemperatureDifference <= 0 || parameters.minHealthTemperatureDamage <= 0 || 
+                parameters.maxHealthTemperatureDamage <= 0 || parameters.hoursTilExhaustion <= 0) 
                 throw new UniverseParameterIsZeroException("The provided creature parameters must be positive");
             if (parameters.maxRestExpense < parameters.minRestExpense)
                 throw new MinMaxValueSwappedException("The maximum amount of rest expense is lower than the minimium");
