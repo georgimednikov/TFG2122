@@ -115,7 +115,7 @@ namespace UnitySimulation
             int size = terrain.heightmapResolution;
             int tileDepth = heightMap.GetLength(0);
             int tileWidth = heightMap.GetLength(1);
-            terrain.size = new Vector3(tileDepth * 2, 200, tileWidth * 2);
+            terrain.size = new Vector3(tileDepth * 2, terrain.size.y, tileWidth * 2);
             float[,] h = terrain.GetHeights(0, 0, size, size);
             Vector3 mapSize = terrain.size;
             for (int zIndex = 0; zIndex < size; zIndex++)
