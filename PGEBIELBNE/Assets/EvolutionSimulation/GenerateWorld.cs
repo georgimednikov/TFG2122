@@ -1,24 +1,57 @@
 using UnityEngine;
 using EvolutionSimulation;
 using System.Collections.Generic;
+using UnityEditor;
 
 namespace UnitySimulation
 {
+#if (UNITY_EDITOR)
+    [CustomEditor(typeof(GenerateWorld))]
+    public class TerrainRegenerator : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            DrawDefaultInspector();
+
+            GenerateWorld myScript = (GenerateWorld)target;
+
+            if (GUILayout.Button("Update"))
+            {
+                myScript.MapGen();
+            }
+        }
+    }
+#endif
+
     [RequireComponent(typeof(Terrain))]
     public class GenerateWorld : MonoBehaviour
     {
         public TextAsset world;
-        public float heightMultiplier;
         World.MapData[,] map;
+        public GameObject waterPlane;
+        GameObject waterPlaneInstance;
 
         void Start()
         {
-            map = Newtonsoft.Json.JsonConvert.DeserializeObject<World.MapData[,]>(world.text);
 
-            //Terrain terrain = GetComponent<Terrain>();
-            //terrain.terrainData.size = new Vector3(map.GetLength(0), terrain.terrainData.size.y, map.GetLength(1));
+        }
+
+        public void MapGen()
+        {
+            map = Newtonsoft.Json.JsonConvert.DeserializeObject<World.MapData[,]>(world.text);
             UpdateMeshVertices(map);
             GenerateFlora(map);
+            SetWaterPlane();
+        }
+
+        private void SetWaterPlane()
+        {
+            if(waterPlaneInstance != null)
+                DestroyImmediate(waterPlaneInstance);
+            
+            TerrainData terrain = GetComponent<Terrain>().terrainData;
+            waterPlaneInstance = Instantiate(waterPlane, new Vector3(terrain.size.x / 2, terrain.size.y / 2 - 0.05f, terrain.size.z / 2), Quaternion.identity, transform);
+            waterPlaneInstance.transform.localScale = new Vector3(terrain.size.x / 10, 1, terrain.size.z / 10);
         }
 
         private void GenerateFlora(World.MapData[,] heightMap)
@@ -88,7 +121,7 @@ namespace UnitySimulation
                 for (int xIndex = 0; xIndex < size; xIndex++)
                 {
                     World.MapData tile = heightMap[(int)(zIndex * (float)tileDepth / size), (int)(xIndex * (float)tileWidth / size)];
-                    h[size - 1 - xIndex, zIndex] = (float)tile.height * heightMultiplier;
+                    h[size - 1 - xIndex, zIndex] = (float)tile.height;
                 }
             terrain.SetHeights(0, 0, h);
         }
