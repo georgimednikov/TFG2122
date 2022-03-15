@@ -134,7 +134,6 @@ namespace EvolutionSimulation
                 heightWaves[1].amplitude = 0;
             }
 
-
             if (config.humidityMap != null) { humidityMap = config.humidityMap; mapSize = humidityMap.GetLength(0); }
             else mapSize = config.mapSize;
 
