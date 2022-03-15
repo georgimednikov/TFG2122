@@ -125,7 +125,7 @@ namespace EvolutionSimulation.Entities
             int maxPerceptionGene = chromosome.GetFeatureMax(CreatureFeature.Perception);
             float range = (float)chromosome.GetFeature(CreatureFeature.Perception) / maxPerceptionGene;
             stats.Perception = (int)(minPerception + (maxPerception - minPerception) * range);
-
+            stats.MaxPerception = minPerception + (maxPerception - minPerception) * 1;
             //If the creature does not have the feature night vision then its perception will be the lowest posible,
             //So instead of Perception * 1 it will be Perception * minNightVision
             if (!HasAbility(CreatureFeature.NightVision, abilityUnlock))
@@ -179,9 +179,11 @@ namespace EvolutionSimulation.Entities
             if (HasAbility(CreatureFeature.Upright, abilityUnlock))
             {
                 float increase = 1.0f + chromosome.GetFeature(CreatureFeature.Upright)
-                                         / (float)chromosome.GetFeatureMax(CreatureFeature.Upright) / 2;
+                                         / (float)chromosome.GetFeatureMax(CreatureFeature.Upright) / 2.0f;
 
                 stats.Perception = (int)(stats.Perception * increase);
+                increase = 1.0f + 1.0f / 2.0f;
+                stats.MaxPerception = (int)(stats.MaxPerception * increase);
             }
 
             //Intimidation has to be calculed here because of modifyStatByAge

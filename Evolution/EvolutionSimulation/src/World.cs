@@ -280,8 +280,22 @@ namespace EvolutionSimulation
             foreach (Creature e in Creatures)
             {
                 if (e == c) continue; // Reference comparison
-                if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius) // Square vision
-                    results.Add(e);
+                if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius)// Square vision
+                {
+                    
+                    float perception = c.stats.Perception / (float)c.stats.MaxPerception;
+                    float camouflage = e.stats.Camouflage / (float)e.chromosome.GetFeatureMax(CreatureFeature.Camouflage);
+                    // Perceive the creature if your perception percentage is greater than him camouflage percentage
+                    if (perception > camouflage)
+                        results.Add(e);
+                    //TODO queremos que haya una probabilidad de que perciba al otro aunque tenga el camuflaje mayor?
+                    //else
+                    //{   //a probability to perceive the other creature
+                    //    int randMax = (int)((camouflage - perception) * 100);
+                    //    if(RandomGenerator.Next(100) > randMax)
+                    //        results.Add(e);
+                    //}
+                }
             }
             return results;
         }
