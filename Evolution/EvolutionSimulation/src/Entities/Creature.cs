@@ -47,10 +47,10 @@ namespace EvolutionSimulation.Entities
             //TODO: Los parametros de abajo no se donde ponerlos xd
             //speciesName = "None";
             SetStats();
+            memory = new Memory(this, world);
             this.x = x;
             this.y = y;
             timeToBeInHeat = stats.TimeBetweenHeats;
-            memory = new Memory(this, world);
 
             ConfigureStateMachine();
             // Attack

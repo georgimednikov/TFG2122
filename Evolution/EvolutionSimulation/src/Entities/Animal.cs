@@ -18,6 +18,7 @@ namespace EvolutionSimulation.Entities
             //int sizeToEnergyRatio = 2; //The creature gains 1 point of max energy for every sizeToEnergyRatio of Size
             int resourceAmount = UniverseParametersManager.parameters.resourceAmount; //Max amount of /*energy/*/sleep/hydration
             int minPerception = UniverseParametersManager.parameters.minPerception;
+            int maxPerception = UniverseParametersManager.parameters.maxPerception;
             float minLifeSpan = UniverseParametersManager.parameters.minLifeSpan; // Minimum years alive
             float exhaustToSleepRatio = UniverseParametersManager.parameters.exhaustToSleepRatio; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
             float perceptionWithoutNightVision = UniverseParametersManager.parameters.perceptionWithoutNightVision; //Percentage of perception at night when the creature does not have night vision.
@@ -121,8 +122,9 @@ namespace EvolutionSimulation.Entities
             //Environment related stats
             stats.Camouflage = chromosome.GetFeature(CreatureFeature.Camouflage);
             stats.Aggressiveness = chromosome.GetFeature(CreatureFeature.Aggressiveness);
-            int maxPerception = chromosome.GetFeatureMax(CreatureFeature.Perception);
-            stats.Perception = (int)((float)chromosome.GetFeature(CreatureFeature.Perception) / maxPerception * (maxPerception - minPerception)) + minPerception;
+            int maxPerceptionGene = chromosome.GetFeatureMax(CreatureFeature.Perception);
+            float range = (float)chromosome.GetFeature(CreatureFeature.Perception) / maxPerceptionGene;
+            stats.Perception = (int)(minPerception + (maxPerception - minPerception) * range);
 
             //If the creature does not have the feature night vision then its perception will be the lowest posible,
             //So instead of Perception * 1 it will be Perception * minNightVision
@@ -141,6 +143,7 @@ namespace EvolutionSimulation.Entities
 
             //Value that multiplies perception when it is being gotten
             stats.CurrentVision = world.day ? 1 : stats.NightPerceptionPercentage;
+            stats.ActionPerceptionPercentage = 1;
 
             //If the creature can see in the dark, that penalty is reduced the better sight it has
             if (HasAbility(CreatureFeature.NightVision, abilityUnlock))

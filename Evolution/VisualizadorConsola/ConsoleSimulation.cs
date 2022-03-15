@@ -26,7 +26,7 @@ namespace VisualizadorConsola
             //A minimum distance to leave in between species spawn points to give them some room.
             //Calculated based on the world size and amount of species to spawn, and then reduced by
             //a value to give room in the world and not fill it in a homogenous manner.
-            int minSpawnDist = UserInfo.Size / UserInfo.Species / 5;
+            int minSpawnDist = UserInfo.Size / UserInfo.Species / 15;
 
             //List with previous spawn positions, to know if a new spot is too close to another one used.
             List<Tuple<int, int>> spawnPositions = new List<Tuple<int, int>>();

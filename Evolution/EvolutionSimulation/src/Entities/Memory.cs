@@ -313,7 +313,8 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void UpdatePerceptionRadius()
         {
-            perceptionRadius = (int)(thisCreature.stats.Perception * UniverseParametersManager.parameters.perceptionToRadiusMultiplier);
+            perceptionRadius = thisCreature.stats.Perception;
+            //perceptionRadius = (int)(thisCreature.stats.Perception * UniverseParametersManager.parameters.perceptionToRadiusMultiplier);
         }
 
         /// <summary>
@@ -538,25 +539,41 @@ namespace EvolutionSimulation.Entities
         {
             // A min dist so that the place is somewhat far away and the creature has to move for a while,
             // moving through its preferred medium that way.
-            // The radius = perceptionRadius, diameter = radius * 2 + the center, since it is not counted.
-            int minDistRadius = perceptionRadius;
-            int maxDistRadius = (int)(perceptionRadius * 2);
-            int minDistDiameter = minDistRadius * 2 + 1;
-            int maxDistDiameter = maxDistRadius * 2 + 1;
+
+            int minRadius = 4; // A minimum value in case the creature has barely any perception.
+            int minDistRadius = perceptionRadius + minRadius;
+            int maxDistRadius = perceptionRadius * 2 + minRadius;
             int x, y;
             do
             {
-                // The way this formula works is by placing the "cursor" in the X position of the creature first
-                // and then adding the radius + 1 to be located in the first tile past the min dist from the creature.
-                // Then the random number, which can have values up to the number of tiles left outside the area,
-                // is added, and then % size to loop to the left of the creature.
-                int num = RandomGenerator.Next(0, maxDistDiameter - minDistDiameter);
-                x = (thisCreature.x + minDistRadius + 1 + num) % maxDistDiameter;
+                // The position in x is going to be offset a random number within the area created by min and max radius,
+                // plus the min radius to get far enough from the original position +1 to account for the center.
+                int posOffset = 1 + minDistRadius + RandomGenerator.Next(0, maxDistRadius - minDistRadius);
 
-                num = RandomGenerator.Next(0, maxDistDiameter - minDistDiameter);
-                y = (thisCreature.y + minDistRadius + 1 + num) % maxDistDiameter;
+                // With the offset calculated, it can be checked if the new position would exceed the limits of the world.
+                bool exceedLeftBounds = thisCreature.x - posOffset < 0;
+                bool exceedRightBounds = thisCreature.x + posOffset >= map.GetLength(0);
+
+                // By default, the offset translates the position in the positive axis. It is set so it moves along the
+                // negative instead if the new position would be out of bounds on the right or if with a 50% chance it is
+                // decided, as long as it does not go out of bounds on the left.
+                if (exceedRightBounds || (RandomGenerator.Next(0, 2) == 0 && !exceedLeftBounds))
+                    posOffset *= -1;
+
+                x = thisCreature.x + posOffset;
+
+                // Same with y
+                posOffset = 1 + minDistRadius + RandomGenerator.Next(0, maxDistRadius - minDistRadius);
+
+                exceedLeftBounds = thisCreature.y - posOffset < 0;
+                exceedRightBounds = thisCreature.y + posOffset >= map.GetLength(1);
+
+                if (exceedRightBounds || (RandomGenerator.Next(0, 2) == 0 && !exceedLeftBounds))
+                    posOffset *= -1;
+
+                y = thisCreature.y + posOffset;
             }
-            while (map[x, y].water || map[x, y].ticksToBeForgotten > (maxTicksOfMemory / 2) || GetPositionDanger(x, y) > 0);
+            while (world.map[x, y].isWater || map[x, y].ticksToBeForgotten > (maxTicksOfMemory / 2) || GetPositionDanger(x, y) > 0);
             undiscoveredPlace = new Vector2Int(x, y);
         }
 

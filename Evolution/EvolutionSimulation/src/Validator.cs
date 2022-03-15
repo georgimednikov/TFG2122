@@ -480,9 +480,11 @@ namespace EvolutionSimulation
 
         static void ValidateCreatureStats(UniverseParameters parameters)
         {
+            //TODO: MIN PERCEPTION TIENE QUE SER MENOR QUE MAX PERCEPTION Y ESTOY SEGURO DE QUE MÄS VARIABLE NECESITAN ESTA COMPROBACÏÓN
+
             if (parameters.newbornStatMultiplier <= 0 || parameters.adulthoodThreshold <= 0 || parameters.tiredThreshold <= 0 || parameters.exhaustThreshold <= 0 ||
                 parameters.hungryThreshold <= 0 || parameters.veryHungryThreshold <= 0 || parameters.thirstyThreshold <= 0 || parameters.veryThirstyThreshold <= 0 ||
-                parameters.actionPerceptionPercentage <= 0) 
+                parameters.actionPerceptionPercentage <= 0 || parameters.minPerception <= 0 || parameters.maxPerception <= 0) 
                 throw new UniverseParameterIsZeroException("The provided stat parameters must be positive");
             if (parameters.newbornStatMultiplier > 1 || parameters.adulthoodThreshold > 1 || parameters.tiredThreshold > 1 || parameters.exhaustThreshold > 1 ||
                 parameters.hungryThreshold > 1 || parameters.veryHungryThreshold > 1 || parameters.thirstyThreshold > 1 || parameters.veryThirstyThreshold > 1 ||
@@ -500,7 +502,7 @@ namespace EvolutionSimulation
 
         static void ValidateMemory(UniverseParameters parameters)
         {
-            if (parameters.knowledgeTickMultiplier <= 0 || parameters.perceptionToRadiusMultiplier <= 0 || parameters.aggressivenessToRadiusMultiplier <= 0) 
+            if (parameters.knowledgeTickMultiplier <= 0 || /*parameters.perceptionToRadiusMultiplier <= 0 || */parameters.aggressivenessToRadiusMultiplier <= 0) 
                 throw new UniverseParameterIsZeroException("The provided tree parameters must be positive");
         }
 
