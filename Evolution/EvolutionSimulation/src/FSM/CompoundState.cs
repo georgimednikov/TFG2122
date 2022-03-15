@@ -36,6 +36,7 @@ namespace EvolutionSimulation.FSM
 
         public virtual void OnEntry()
         {
+            stateMachine.Reset();
             stateMachine.CurrentState.OnEntry();
         }
 

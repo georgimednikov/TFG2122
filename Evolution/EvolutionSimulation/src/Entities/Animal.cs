@@ -159,7 +159,6 @@ namespace EvolutionSimulation.Entities
             ModifyStatsByAbilities(abilityUnlock);
         }
 
-
         /// <summary>
         /// Modify differents stats depending on the abilities
         /// </summary>

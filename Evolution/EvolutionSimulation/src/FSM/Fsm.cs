@@ -29,7 +29,7 @@ namespace EvolutionSimulation.FSM
         {
             machine = new Dictionary<IState, List<Connection>>();
             machine.Add(initalState, new List<Connection>());
-            CurrentState = initalState;
+            CurrentState = initialState = initalState;
         }
 
         /// <summary>
@@ -72,6 +72,15 @@ namespace EvolutionSimulation.FSM
         }
 
         /// <summary>
+        /// Resets the state machine to the initial state
+        /// </summary>
+        public void Reset()
+        {
+            CurrentState.OnExit();
+            CurrentState = initialState;
+        }
+
+        /// <summary>
         /// Recursive method for exporting the fsm
         /// </summary>
         /// <param name="accum">Accumulated string for recursion</param>
@@ -103,6 +112,7 @@ namespace EvolutionSimulation.FSM
         }
 
         public IState CurrentState { get; private set; }
+        IState initialState;
         Dictionary<IState, List<Connection>> machine;
     }
 }
