@@ -62,15 +62,18 @@ namespace EvolutionSimulation.FSM.Creature.States
                     normY = RandomGenerator.Next(-1, 2);
                 } while (normX == 0 && normY == 0);
 
-            int xSum = 0, ySum = 0; // TODO: Debe depender de vision
-            while (creature.world.canMove(creature.x + xSum - normX, creature.y + ySum - normY))  // Attempts to find the point furthest away from attacker
+            int xSum = 0, ySum = 0;
+            // Attempts to find the point furthest away from attacker
+            while (Math.Abs(xSum) <= creature.stats.Perception && Math.Abs(ySum) <= creature.stats.Perception)
             {
-                xSum -= normX; 
+                if (creature.world.canMove(creature.x + xSum, creature.y + ySum))
+                {
+                    fX = creature.x + xSum;
+                    fY = creature.y + ySum;
+                }
+                xSum -= normX;
                 ySum -= normY;
             }
-
-            fX = creature.x + xSum;
-            fY = creature.y + ySum;
         }
 
         public override void Action()
