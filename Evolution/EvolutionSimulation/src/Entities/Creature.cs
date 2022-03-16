@@ -111,7 +111,7 @@ namespace EvolutionSimulation.Entities
             else
                 stats.CurrentVision = 1;
 
-            memory.UpdatePerceptionRadius();
+            memory.CalculatePerceptionRadius();
         }
 
         /// <summary>

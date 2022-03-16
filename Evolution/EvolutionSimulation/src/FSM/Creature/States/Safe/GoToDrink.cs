@@ -39,17 +39,6 @@ namespace EvolutionSimulation.FSM.Creature.States
 
             int sector = (int)(degrees / 45) % 8;
             finalPosition = SectorToPosition(posToDrink, sector);
-            //int cont = 0;
-            //while (creature.world.map[finalPosition.x, finalPosition.y].isWater)
-            //{
-            //    //The increment has to have the same sign as cont to add their values without possible substractions,
-            //    //but cont's sign has to be mantained to alternate between going "left" or "right" realtive to the current sector.
-            //    int inc = 1; if (cont < 0) inc *= -1;
-            //    cont = (cont + inc) * -1;
-            //    sector = (sector + cont) % 8;
-            //    finalPosition = SectorToPosition(posToDrink, sector);
-            //}
-
             creature.SetPath(finalPosition.x, finalPosition.y);
         }
 

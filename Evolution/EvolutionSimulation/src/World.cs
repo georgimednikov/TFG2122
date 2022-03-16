@@ -231,7 +231,7 @@ namespace EvolutionSimulation
 
         /// <summary>
         /// Creates a creature in the world.
-        /// Creatures are entities with abilities and  'complex' behaviours.
+        /// Creatures are entities with abilities and 'complex' behaviours.
         /// T: Any subclass of Creature i.e. Animal
         /// </summary>
         public T CreateCreature<T>(int x, int y, CreatureChromosome chromosome = null, string name = "None") where T : Creature, new()
