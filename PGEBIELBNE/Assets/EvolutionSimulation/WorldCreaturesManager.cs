@@ -24,7 +24,7 @@ namespace UnitySimulation
 
         public void OnNotify(World info)
         {
-            CheckCreatures(info.Creatures);
+            CheckCreatures(new List<Creature>(info.Creatures.Values));
         }
 
         // TODO: esto es tope de ineficiente mejor luego hacer eventos

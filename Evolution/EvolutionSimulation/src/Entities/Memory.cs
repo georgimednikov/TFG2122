@@ -225,8 +225,8 @@ namespace EvolutionSimulation.Entities
 
             fatherPosition = motherPosition = null;
             nearbyAllies.Clear();
-            List<Creature> perceivedCreatures = world.PerceiveCreatures(thisCreature, perceptionRadius);
-            List<StaticEntity> perceivedEntities = world.PerceiveEntities(thisCreature, perceptionRadius);
+            List<Creature> perceivedCreatures = world.PerceiveCreatures(thisCreature.ID, perceptionRadius);
+            List<StaticEntity> perceivedEntities = world.PerceiveEntities(thisCreature.ID, perceptionRadius);
 
             //This for structure is recurrent all throughtout this class and is explained with the following example:
             //With radius = 3, it goes from -3 inclusive to 3 inclusive in both axis, going through -3, -2, -1, 0, 1, 2, 3
