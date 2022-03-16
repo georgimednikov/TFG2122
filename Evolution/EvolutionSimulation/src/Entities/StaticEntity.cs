@@ -13,14 +13,20 @@ namespace EvolutionSimulation.Entities
     public abstract class StaticEntity : IEntity
     {
         /// <summary>
+        /// ID to identify an entity in the world
+        /// </summary>
+        public int ID { get; protected set; }
+
+        /// <summary>
         /// Initializes the Entity
         /// </summary>
         /// <param name="w"> World in which it'll reside </param>
         /// <param name="lifeTime"> LifeTime in Ticks of the Entity </param>
         /// <param name="x"> X World position </param>
         /// <param name="y"> Y World position </param>
-        protected void Init(World w, int x, int y)
+        virtual public void Init(int ID, World w, int x, int y)
         {
+            this.ID = ID;
             world = w;
             this.x = x;
             this.y = y;

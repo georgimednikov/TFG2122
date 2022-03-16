@@ -112,10 +112,11 @@ namespace EvolutionSimulation
             modifiedHeight = config.heightModifiedByFunction;
             taxonomy = new GeneticTaxonomy();
             taxonomy.Init();
-            Creatures = new List<Creature>();
-            StableEntities = new List<StaticEntity>();
-            CreaturesToDelete = new List<IEntity>();
-            SEntitiesToDelete = new List<IEntity>();
+            Creatures = new Dictionary<int, Creature>();
+            metabolismComparer = new Utils.SortByMetabolism();
+            StaticEntities = new Dictionary<int, StaticEntity>();
+            entitiesToDelete = new List<int>();
+
             p = new Perlin();
             if (config.heightMap != null) { heightMap = config.heightMap; mapSize = heightMap.GetLength(0); }
             else mapSize = config.mapSize;
@@ -206,6 +207,7 @@ namespace EvolutionSimulation
         }
 
         #region EntitiesManagement
+
         /// <summary>
         /// Performs a step of the simulation.
         /// </summary>
@@ -215,6 +217,18 @@ namespace EvolutionSimulation
             EntitiesTick();
         }
 
+        // TODO: que devuelva una criatura no soluciona el problema de la destrucción, a no ser que sea una copia u otro objeto
+        public Creature GetCreature(int creatureID)
+        {
+            if (!Creatures.ContainsKey(creatureID)) return null;
+            return Creatures[creatureID];
+        }
+
+        public StaticEntity GetStaticEntity(int creatureID)
+        {
+            if (!StaticEntities.ContainsKey(creatureID)) return null;
+            return StaticEntities[creatureID];
+        }
 
         /// <summary>
         /// Creates a creature in the world.
@@ -223,11 +237,15 @@ namespace EvolutionSimulation
         /// </summary>
         public T CreateCreature<T>(int x, int y, CreatureChromosome chromosome = null, string name = "None") where T : Creature, new()
         {
-            T ent = CreateEntity<T>();
-            Creatures.Add(ent);
-            ent.Init(this, x, y, chromosome, name);
+            T ent = new T();
+            
+            ent.Init(entitiesID, this, x, y, chromosome, name);
             taxonomy.AddCreatureToSpecies(ent);
 
+            Creatures.Add(entitiesID, ent);
+            entitiesID++;
+
+            // TODO: devolver el id, una copia o un wrap del objeto creado
             return ent;
         }
 
@@ -237,37 +255,66 @@ namespace EvolutionSimulation
         /// and fulfill the same objecive during all their life-time.
         /// T: Any subclass of StableEntites i.e. Plant, Corpse
         /// </summary>
-        public T CreateStableEntity<T>() where T : StaticEntity, new()
+        public T CreateStableEntity<T>(int x, int y) where T : StaticEntity, new()
         {
-            T ent = CreateEntity<T>();
-            StableEntities.Add(ent);
+            T ent = new T();
+            ent.Init(entitiesID, this, x, y);
+            StaticEntities.Add(entitiesID, ent);
+            entitiesID++;
             return ent;
         }
-        /// <summary>
-        /// Designates an entity to be eliminated before the next frame
-        /// </summary>
-        public void Destroy(Creature entity)
-        {
-            CreaturesToDelete.Add(entity);
-        }
 
         /// <summary>
         /// Designates an entity to be eliminated before the next frame
         /// </summary>
-        public void Destroy(StaticEntity entity)
+        public void Destroy(int entityID)
         {
-            SEntitiesToDelete.Add(entity);
+            entitiesToDelete.Add(entityID);
         }
 
+        /// <summary>
+        /// Steps up wolds time and notifies every creature when 
+        /// day or night starts.
+        /// </summary>
+        private void CycleDayNight()
+        {
+            bool prevState = day;
+            day = step % (ticksHour * hoursDay) >= (morning * ticksHour) && step % (ticksHour * hoursDay) <= (night * ticksHour);
+
+            if (day != prevState)
+                foreach (Creature c in Creatures.Values)
+                    c.CycleDayNight();
+            step++;
+        }
 
         /// <summary>
-        /// Adds an entity to the list
+        /// Performs a tick of the simulation of every entity.
+        /// Deletes all entities that need to be destroyed after the tick
         /// </summary>
-        /// <typeparam name="T">Entity type</typeparam>
-        /// <returns>The added entity</returns>
-        T CreateEntity<T>() where T : IEntity, new()
+        private void EntitiesTick()
         {
-            return new T();
+            // Tick for every creature, ordered by metabolism
+            List<Creature> sortedCreatures = new List<Creature>(Creatures.Values);
+            sortedCreatures.Sort(metabolismComparer);
+            sortedCreatures.ForEach(delegate (Creature e) { e.Tick(); });
+
+            // Tick for every static entity
+            foreach (StaticEntity sEnt in StaticEntities.Values)
+                sEnt.Tick();
+            
+            // Entity deletion
+            entitiesToDelete.ForEach(delegate (int id)
+            {
+                if (Creatures.ContainsKey(id))
+                {
+                    Creatures[id].ParentDead(Creatures[id]);
+                    Creatures.Remove(id);
+                }
+                else
+                    StaticEntities.Remove(id);
+            }
+            );
+            entitiesToDelete.Clear();
         }
 
         /// <summary>
@@ -277,7 +324,7 @@ namespace EvolutionSimulation
         public List<Creature> PerceiveCreatures(Creature c, int radius)
         {
             List<Creature> results = new List<Creature>();
-            foreach (Creature e in Creatures)
+            foreach (Creature e in Creatures.Values)
             {
                 if (e == c) continue; // Reference comparison
                 if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius)// Square vision
@@ -307,13 +354,22 @@ namespace EvolutionSimulation
         public List<StaticEntity> PerceiveEntities(Creature c, int radius)
         {
             List<StaticEntity> results = new List<StaticEntity>();
-            foreach (StaticEntity e in StableEntities)
+            foreach (StaticEntity e in StaticEntities.Values)
             {
                 if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius) // Square vision
                     results.Add(e);
             }
             return results;
         }
+
+        static int entitiesID = 0;   // TODO: hacer un id unico para cada entidad con hash?
+        public Dictionary<int, Creature> Creatures { get; private set; }
+        Comparer<Creature> metabolismComparer;
+
+        public Dictionary<int, StaticEntity> StaticEntities { get; private set; }
+
+        List<int> entitiesToDelete;
+
         #endregion
 
         #region Procedural Generation
@@ -600,52 +656,7 @@ namespace EvolutionSimulation
             System.IO.File.WriteAllText(UserInfo.ExportDirectory + "World.json", word);
         }
 
-        /// <summary>
-        /// Performs a tick of the simulation of every entity.
-        /// Deletes all entities that need to be destroyed after the tick
-        /// </summary>
-        private void EntitiesTick()
-        {
-            // Tick for every entity
-            Creatures.Sort(new Utils.SortByMetabolism());
-            Creatures.ForEach(delegate (Creature e) { e.Tick(); });
-            StableEntities.ForEach(delegate (StaticEntity e) { e.Tick(); });
 
-            // Entity deletion
-            CreaturesToDelete.ForEach(delegate (IEntity e)
-            {
-                Creature tmp = e as Creature;
-                Creatures.Remove(tmp);
-                // Destroy the reference of itself on it children
-                tmp.childs.ForEach(delegate (Creature c)
-                {
-                    c.ParentDead(tmp);
-                });
-                e = null;
-                //foreach (Creature c in Creatures)
-                //    if (c.objective == e) c.objective = null;   // TODO URGENTE: Esto no deberia hacerse, pero ni poniendolo en null se quita la referencia al objetivo de la criatura
-            });
-            SEntitiesToDelete.ForEach(delegate (IEntity e)
-            {
-                StableEntities.Remove(e as StaticEntity);
-                e = null;
-                //foreach (Creature c in Creatures)
-                //    if (c.objective == e) c.objective = null;
-            });
-            CreaturesToDelete.Clear();
-            SEntitiesToDelete.Clear();
-        }
-
-        private void CycleDayNight()
-        {
-            bool prevState = day;
-            day = step % (ticksHour * hoursDay) >= (morning * ticksHour) && step % (ticksHour * hoursDay) <= (night * ticksHour);
-
-            if (day != prevState)
-                Creatures.ForEach(delegate (Creature e) { e.CycleDayNight(); });
-
-            step++;
-        }
 
 
 
@@ -661,12 +672,6 @@ namespace EvolutionSimulation
         // Perlin noise generator
         Perlin p;
 
-        // Entities management
-        public List<Creature> Creatures { get; private set; }
-        public List<StaticEntity> StableEntities { get; private set; }
         GeneticTaxonomy taxonomy;
-
-        List<IEntity> CreaturesToDelete;
-        List<IEntity> SEntitiesToDelete;
     }
 }

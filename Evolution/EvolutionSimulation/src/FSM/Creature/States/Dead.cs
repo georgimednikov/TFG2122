@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EvolutionSimulation.FSM.Creature.States
 {
@@ -23,18 +19,9 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void Action()
         {
             Console.WriteLine(creature.speciesName + " DIES");
-            creature.world.Destroy(creature);
-            Entities.Corpse corpse = creature.world.CreateStableEntity<Entities.Corpse>();
-            corpse.Init(creature.world,
-                World.ticksHour + ((creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size) * World.ticksHour * World.hoursDay * 7) - World.ticksHour) 
-                * (creature.stats.Size / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size)),  // From an hour to two weeks of lifetime, depending on size
-                creature.x, creature.y, 
-                creature.stats.MaxHealth * UniverseParametersManager.parameters.rotStartMultiplier,    // The less health, the faster the rot
-                creature.HasAbility(Genetics.CreatureFeature.Venomous, UniverseParametersManager.parameters.abilityUnlockPercentage) ?  
-                (creature.stats.Venom / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Venomous)) : 0,   // If it is venomous it will be more risky to eat 
-                (int)(creature.stats.Venom),
-                creature.stats.Venom * 0.25f, 
-                UniverseParametersManager.parameters.corpseNutritionPointsMultiplier * creature.stats.Size / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size));  // TODO: testiar
+            creature.world.Destroy(creature.ID);
+            Entities.Corpse corpse = creature.world.CreateStableEntity<Entities.Corpse>(creature.x, creature.y);
+            corpse.SetTraits(creature);
         }
 
         public override string ToString()

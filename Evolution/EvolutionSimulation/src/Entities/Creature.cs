@@ -10,10 +10,14 @@ using System.Numerics;
 namespace EvolutionSimulation.Entities
 {
     /// <summary>
-    /// A creature with attributes and behavior
+    /// ID to identify an entity in the world
     /// </summary>
     public abstract class Creature : IEntity, IInteractable<Creature>
     {
+        /// <summary>
+        /// Creature ID to identify a creature in the world
+        /// </summary>
+        public int ID { get; protected set; }
 
         /// <summary>
         /// Constructor for factories
@@ -29,8 +33,9 @@ namespace EvolutionSimulation.Entities
         /// Initializes a creature in a world and position
         /// </summary>
         /// <param name="w">World in which it'll reside</param>
-        public void Init(World w, int x, int y, CreatureChromosome chromosome = default(CreatureChromosome), string name = "None")
+        public void Init(int ID, World w, int x, int y, CreatureChromosome chromosome = default(CreatureChromosome), string name = "None")
         {
+            this.ID = ID;
             world = w;
 
             if (chromosome == null)

@@ -1,11 +1,12 @@
 ﻿using System;
+using EvolutionSimulation;
 
 namespace EvolutionSimulation.Entities
 {
     public class Corpse : StaticEntity, IInteractable<Creature>
     {
         /// <summary>
-        /// Initializes the Corpse
+        /// Sets the corpse traits 
         /// </summary>
         /// <param name="w"> World in which it'll reside </param>
         /// <param name="lifeTime"> LifeTime in Ticks of the Entity </param>
@@ -19,23 +20,46 @@ namespace EvolutionSimulation.Entities
         /// The probability of being poisoned when interacting with the putrid corpse. 
         /// A value between 0 and 1, higher or lower values will be clamped.
         /// </param>
-        public void Init(World w, int lifeTime, int x, int y,  float putridStart, float poisonProb, int poisonDuration, float poisonTickDamage, float maxNutritionPoints)
+        public void SetTraits(int lifeTime, float putridStart, float poisonProb, int poisonDuration, float poisonTickDamage, float maxNutritionPoints)
         {
-            base.Init(w, x, y);
-
             this.lifeTime = lifeTime;
-
-
-            // Clamp
             this.poisonProb = Math.Min(1.0f, Math.Max(0.0f, poisonProb));
             this.poisonDuration = poisonDuration;
             this.poisonTickDamage = poisonTickDamage;
-
             this.maxNutritionPoints = maxNutritionPoints;
             // Corpse starts putrifying when the corpse reaches the 'putridStart' part of its duration
             putridTime = (int)(lifeTime * putridStart);
-            Console.WriteLine("Corpse created at " + x + ", " + y + ".");
         }
+
+        /// <summary>
+        /// Sets the corpse traits based on a creature stats
+        /// </summary>
+        public void SetTraits(Creature creature)
+        {
+            // From an hour to two weeks of lifetime, depending on size
+            lifeTime = World.ticksHour
+                        + ((creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size) * World.ticksHour * World.hoursDay * 7) - World.ticksHour)
+                        * (creature.stats.Size / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size)); 
+
+            // The less health, the faster the rot
+            float putridStart = creature.stats.MaxHealth * UniverseParametersManager.parameters.rotStartMultiplier;   
+            putridTime = (int)(lifeTime * putridStart);
+
+            // If it is venomous it will be more risky to eat 
+            if (creature.HasAbility(Genetics.CreatureFeature.Venomous, UniverseParametersManager.parameters.abilityUnlockPercentage))
+                poisonProb = creature.stats.Venom / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Venomous);
+            else
+                poisonProb = 0;
+
+            poisonDuration = (int)creature.stats.Venom;
+            poisonTickDamage = creature.stats.Venom * 0.25f;    // TODO: Nº magico aqui ojo
+
+            // TODO: testiar
+            maxNutritionPoints = UniverseParametersManager.parameters.corpseNutritionPointsMultiplier 
+                                * creature.stats.Size / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size);  
+        }
+
+        //TODO, hacer un setTraits con parametros default que se saquen del UniverseParametersManager
 
         public void ReceiveInteraction(Creature other, Interactions type)
         {
@@ -74,11 +98,14 @@ namespace EvolutionSimulation.Entities
             Console.WriteLine("Ticks to corpse disappearance: " + lifeTime);
 
             if (lifeTime <= 0)
-                world.Destroy(this);
+                world.Destroy(ID);
         }
 
         // Copse state: it is edible until it starts putrefying
         public bool Edible { get; private set; }
+        // Remaining life time of this entity
+        public int lifeTime { get; protected set; }
+
         // Probability of being poisoned when interacting
         float poisonProb;
         // Nutrition points added to creatures that eat the corpse
@@ -89,7 +116,5 @@ namespace EvolutionSimulation.Entities
         float poisonTickDamage;
         // Time when the corpse starts putrefying
         int putridTime;
-        // Remaining life time of this entity
-        public int lifeTime { get; protected set; }
     }
 }
