@@ -4,7 +4,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
 namespace EvolutionSimulation.Genetics
 {
@@ -100,6 +99,11 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         int[] geneValues;
 
+
+        static Dictionary<CreatureFeature, float> abilityUnlock;
+
+        public static Dictionary<CreatureFeature, float> AbilityUnlock { get => abilityUnlock; set => abilityUnlock = value; }
+
         /// <summary>
         /// Sets the chromosome structure reading the values of the given JSON file.
         /// </summary>
@@ -108,6 +112,7 @@ namespace EvolutionSimulation.Genetics
         {
             //TODO: Actualizar directorios con el nuevo sistema
             string json = UserInfo.DataDirectory + "Chromosome.json";
+            string jsonAbilityUnlock = UserInfo.DataDirectory + "AbilityUnlock.json";
 
             if (!File.Exists(json))
                 throw new Exception("Cannot find JSON with chromosome information");
@@ -115,6 +120,27 @@ namespace EvolutionSimulation.Genetics
             List<Gene> genes = JsonConvert.DeserializeObject<List<Gene>>(file);
             Validator.Validate(genes);
             SetStructure(genes);
+            abilityUnlock = new Dictionary<CreatureFeature, float>();
+            if (!File.Exists(jsonAbilityUnlock))
+            { 
+                //TODO decidir si lanzar excepcion o ponerle valor por defecto
+                //throw new Exception("Cannot find JSON with abilities unlock information");
+                for(CreatureFeature c = CreatureFeature.Arboreal; c < CreatureFeature.Count; ++c)
+                {
+                    abilityUnlock.Add(c, UniverseParametersManager.parameters.abilityUnlockPercentage);
+                }
+            }
+            else
+            {
+                file = File.ReadAllText(jsonAbilityUnlock);
+                Tuple<CreatureFeature, float>[] abUnlock = JsonConvert.DeserializeObject<Tuple<CreatureFeature, float>[]>(file);
+                Validator.ValidateAbUnlock(abUnlock);
+                
+                foreach(Tuple<CreatureFeature,float> ab in abUnlock)
+                {
+                    abilityUnlock.Add(ab.Item1, ab.Item2);
+                }
+            }
         }
 
         /// <summary>

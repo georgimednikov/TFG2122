@@ -388,6 +388,55 @@ namespace EvolutionSimulation
         }
         #endregion
 
+        #region AbilityUnlock
+        public class NotAllAbilitiesUnlockDefinedException : Exception
+        {
+            public NotAllAbilitiesUnlockDefinedException() { }
+            public NotAllAbilitiesUnlockDefinedException(string message) : base(message) { }
+            public NotAllAbilitiesUnlockDefinedException(string message, Exception inner) : base(message, inner) { }
+            protected NotAllAbilitiesUnlockDefinedException(
+              System.Runtime.Serialization.SerializationInfo info,
+              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+        }
+        public class AbilitiesUnlockNotNotInRange : Exception
+        {
+            public AbilitiesUnlockNotNotInRange() { }
+            public AbilitiesUnlockNotNotInRange(string message) : base(message) { }
+            public AbilitiesUnlockNotNotInRange(string message, Exception inner) : base(message, inner) { }
+            protected AbilitiesUnlockNotNotInRange(
+              System.Runtime.Serialization.SerializationInfo info,
+              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+        }
+
+        static public void ValidateAbUnlock(Tuple<CreatureFeature, float>[] abUnlock)
+        {
+            CheckAllAbilitiesUnlockFunc(abUnlock);
+        }
+
+        static void CheckAllAbilitiesUnlockFunc(Tuple<CreatureFeature, float>[] abUnlock)
+        {
+            if (abUnlock.Length != ((int)CreatureFeature.Count - (int)CreatureFeature.Arboreal))
+                throw new NotAllAbilitiesUnlockDefinedException("There must be as many abilities as abilities features listed in 'CreatureFeature', " + ((int)CreatureFeature.Count - (int)CreatureFeature.Arboreal));
+
+            bool[] featuresGiven = new bool[abUnlock.Length]; //Bool default value = false
+            
+            foreach (Tuple<CreatureFeature, float> ab in abUnlock)
+            {
+                featuresGiven[(int)ab.Item1 - (int)CreatureFeature.Arboreal ] = true;
+                if(ab.Item2 < 0 || ab.Item2 > 1)
+                {
+                    throw new AbilitiesUnlockNotNotInRange("The value of " + ab.Item1 + " must be between 0 and 1");
+                }
+            }
+            
+            foreach (bool feat in featuresGiven)
+                if (!feat)
+                    throw new NotAllAbilitiesUnlockDefinedException("Each one of the " + ((int)CreatureFeature.Count - (int)CreatureFeature.Arboreal) + " abilities features declared in 'CreatureFeature' must have an ability unlock value");
+
+            return;
+        }
+        #endregion
+
         #region UniverseParameters
         public class UniverseParameterIsZeroException : Exception
         {
