@@ -819,6 +819,7 @@ namespace EvolutionSimulation.Entities
         #endregion
 
         // Parents
+        // TODO Quitar
         public Creature father { get; set; }
         public Creature mother { get; set; }
         public Creature parentToFollow { get; set; }

@@ -155,7 +155,10 @@ namespace EvolutionSimulation.Entities
                 else
                     enemy.position = new Vector2Int(enemyEntity.x, enemyEntity.y);
             }
-           
+
+            Forget();
+
+
             int safePlaceDist = 0;
             //The list is iterated through from the end to the start to deal with removing elements from it while iterating.
             for (int i = positionsRemembered.Count - 1; i >= 0; i--)
@@ -303,6 +306,7 @@ namespace EvolutionSimulation.Entities
            i_forgor(safeWater);
            i_forgor(plants);
            i_forgor(safePlants);
+            //TODO olvidar padre, madre y demas que no sea una lista
         }
 
         private void i_forgor<T>(List<T> list) where T : Resource
