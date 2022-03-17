@@ -78,42 +78,176 @@ namespace EvolutionSimulation.Entities
 
 
         #region Getters
-        public Creature Rival() { return world.GetCreature(rival.ID); }
-        public Creature Enemy()
+        /// <summary>
+        /// Returns rivals ID, and its last seen position
+        /// </summary>
+        public void Rival(out int id, out Vector2Int position)
         {
-            if (enemy != null) return world.GetCreature(enemy.ID);
-            return world.GetCreature(preys.ID);
+            if (rival == null)
+            {
+                id = -1;
+                position = null;
+            }
+            else
+            {
+                id = rival.ID;
+                position = rival.position;
+            }
         }
-        public Creature Father() { return world.GetCreature(father.ID); }
-        public Vector2Int FatherPosition() { return father.position; }
 
-        public Creature Mother() { return world.GetCreature(mother.ID); }
-        public Creature Mate() { return world.GetCreature(mates.ID); }
-        public Creature Ally() { return world.GetCreature(allies[0].ID); }
-        public Corpse FreshCorpse() { return world.GetStaticEntity(freshCorpses[0].ID) as Corpse; }
-        public Corpse RottenCorpse() { return world.GetCreature(rottenCorpses.ID); }
+        public void Enemy(out int id, out Vector2Int position)
+        {
+            if (enemy == null)
+            {
+                id = -1;
+                position = null;
+            }
+            else
+            {
+                id = enemy.ID;
+                position = enemy.position;
+            }
+        }
+
+        public void Father(out int id, out Vector2Int position)
+        {
+            if (father == null)
+            {
+                id = -1;
+                position = null;
+            }
+            else
+            {
+                id = father.ID;
+                position = father.position;
+            }
+        }
+
+        public void Mother(out int id, out Vector2Int position)
+        {
+            if (mother == null)
+            {
+                id = -1;
+                position = null;
+            }
+            else
+            {
+                id = mother.ID;
+                position = mother.position;
+            }
+        }
+        public void Mate(out int id, out Vector2Int position)
+        {
+            if (mates.Count <= 0)
+            {
+                id = -1;
+                position = null;
+            }
+            else
+            {
+                id = mates[0].ID;
+                position = mates[0].position;
+            }
+        }
+        public void Ally(out int id, out Vector2Int position)
+        {
+            if (nearbyAllies.Count <= 0)
+            {
+                id = -1;
+                position = null;
+            }
+            else
+            {
+                id = rival.ID;
+                position = rival.position;
+            }
+        }
+
+        public void FreshCorpse(out int id, out Vector2Int position)
+        {
+            if (freshCorpses.Count <= 0)
+            {
+                id = -1;
+                position = null;
+            }
+            else
+            {
+                id = freshCorpses[0].ID;
+                position = freshCorpses[0].position;
+            }
+        }
+
+        public void RottenCorpse(out int id, out Vector2Int position)
+        {
+            if (rottenCorpses.Count <= 0)
+            {
+                id = -1;
+                position = null;
+            }
+            else
+            {
+                id = rottenCorpses[0].ID;
+                position = rottenCorpses[0].position;
+            }
+        }
+
         //TODO: Coger agua
         public Vector2Int Water()
         {
-            if (safeWater.Count == 0) return water;
-            int distClose = thisCreature.DistanceToObjective(water);
-            int distSafe = thisCreature.DistanceToObjective(safeWater[0]);
+            if (safeWater.Count <= 0)
+            {
+                if (water.Count > 0)
+                    return water[0].position;
+                return null;
+            }
+            else if (water.Count <= 0)
+                return safeWater[0].position;
+
+            //water and safewater
+            int distClose = thisCreature.DistanceToObjective(water[0].position);
+            int distSafe = thisCreature.DistanceToObjective(safeWater[0].position);
 
             if (distSafe > distClose * UniverseParametersManager.parameters.safePrefferedOverClosestResourceRatio)
-                return water;
+                return water[0].position;
             else
-                return safeWater[0];
+                return safeWater[0].position;
         }
-        public EdiblePlant Plant()
+        public void Plant(out int id, out Vector2Int position)
         {
-            if (safePlants.Count == 0) return plants;
-            int distClose = thisCreature.DistanceToObjective(plants);
-            int distSafe = thisCreature.DistanceToObjective(safePlants[0]);
+            if (safePlants.Count <= 0)
+            {
+                if (plants.Count > 0)
+                {
+                    id = plants[0].ID;
+                    position = plants[0].position;
+                }
+                else
+                {
+                    id = -1;
+                    position = null;
+                }
+                return;
+            }
+            else if (water.Count <= 0)
+            {
+                id = safePlants[0].ID;
+                position = safePlants[0].position;
+                return;
+            }
+
+            int distClose = thisCreature.DistanceToObjective(plants[0].position);
+            int distSafe = thisCreature.DistanceToObjective(safePlants[0].position);
 
             if (distSafe > distClose * UniverseParametersManager.parameters.safePrefferedOverClosestResourceRatio)
-                return plants;
+            {
+                id = plants[0].ID;
+                position = plants[0].position;
+            }
             else
-                return safePlants[0];
+            {
+                id = safePlants[0].ID;
+                position = safePlants[0].position;
+            }
         }
         public Vector2Int SafePlace() { return safePlace; }
         public Vector2Int NewPlace() { return FindNewPlace(); }
@@ -136,7 +270,7 @@ namespace EvolutionSimulation.Entities
             safeWater = new List<Resource>();
             plants = new List<EntityResource>();
             safePlants = new List<EntityResource>();
-           
+
             maxExperienceTicks = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
             dangerRadius = (int)((thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness) * UniverseParametersManager.parameters.aggressivenessToRadiusMultiplier);
             danger = thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier;
@@ -148,7 +282,8 @@ namespace EvolutionSimulation.Entities
             int x = thisCreature.x, y = thisCreature.y;
 
             //If there is a creature targeted as the enemy and this creature loses sight or the creature dies the pointer is reset.
-            if (enemy != null) {
+            if (enemy != null)
+            {
                 Creature enemyEntity = world.GetCreature(enemy.ID);
                 if (enemyEntity == null || thisCreature.DistanceToObjective(enemyEntity) > perceptionRadius)
                     enemy = null;
@@ -157,7 +292,6 @@ namespace EvolutionSimulation.Entities
             }
 
             Forget();
-
 
             int safePlaceDist = 0;
             //The list is iterated through from the end to the start to deal with removing elements from it while iterating.
@@ -275,7 +409,7 @@ namespace EvolutionSimulation.Entities
         // TODO: si tarda mucho hacer priority queue
         private void AdjustLists()
         {
-            preys.Sort(resourceComparer); 
+            preys.Sort(resourceComparer);
             preys.RemoveRange(maxResourcesRemembered, preys.Count);
             mates.Sort(resourceComparer);
             mates.RemoveRange(maxResourcesRemembered, mates.Count);
@@ -297,16 +431,21 @@ namespace EvolutionSimulation.Entities
 
         private void Forget()
         {
-           i_forgor(preys);
-           i_forgor(mates);
-           i_forgor(nearbyAllies);
-           i_forgor(freshCorpses);
-           i_forgor(rottenCorpses);
-           i_forgor(water);
-           i_forgor(safeWater);
-           i_forgor(plants);
-           i_forgor(safePlants);
-            //TODO olvidar padre, madre y demas que no sea una lista
+            i_forgor(preys);
+            i_forgor(mates);
+            i_forgor(nearbyAllies);
+            i_forgor(freshCorpses);
+            i_forgor(rottenCorpses);
+            i_forgor(water);
+            i_forgor(safeWater);
+            i_forgor(plants);
+            i_forgor(safePlants);
+
+            i_forgor_position(ref father);
+            i_forgor_position(ref mother);
+            i_forgor(ref rival);
+            //i_forgor(ref enemy);
+
         }
 
         private void i_forgor<T>(List<T> list) where T : Resource
@@ -318,6 +457,19 @@ namespace EvolutionSimulation.Entities
                     list.RemoveAt(i);
             }
         }
+
+        private void i_forgor<T>(ref T res) where T : Resource
+        {
+            if (--res.ticks == 0) //If it is time to forget.
+                res = null;
+        }
+
+        private void i_forgor_position<T>(ref T res) where T : Resource
+        {
+            if (--res.ticks == 0) //If it is time to forget.
+                res.position = null;
+        }
+
         private Vector2Int FindNewPlace()
         {
             int x = thisCreature.x;
@@ -335,16 +487,64 @@ namespace EvolutionSimulation.Entities
             Vector3 vector = new Vector3(x - averageX, y - averageY, 0);
             vector /= vector.Length();
 
-            //int cont = 0;
-            //while (creature.world.map[finalPosition.x, finalPosition.y].isWater)
-            //{
-            //    //The increment has to have the same sign as cont to add their values without possible substractions,
-            //    //but cont's sign has to be mantained to alternate between going "left" or "right" realtive to the current sector.
-            //    int inc = 1; if (cont < 0) inc *= -1;
-            //    cont = (cont + inc) * -1;
-            //    sector = (sector + cont) % 8;
-            //    finalPosition = SectorToPosition(posToDrink, sector);
-            //}
+            float radius = perceptionRadius;
+            float degreesInc = (float)(Math.PI / 4.0);  // 45 degrees
+            float angle = degreesInc;
+            int inc = 1;
+            Vector2Int targetPosition = new Vector2Int(thisCreature.x + (int)(vector.X * radius), thisCreature.y + (int)(vector.Y * radius));
+            Vector2Int finalPosition = new Vector2Int(targetPosition.x, targetPosition.y);
+            int cont = 0;
+            do
+            {
+                if (!GetPositionsAtRadius(ref finalPosition, degreesInc))
+                {
+                    if (++cont % 2 == 0)
+                    {
+                        degreesInc /= 2;
+                    }
+                    else
+                    {
+                        radius *= 0.75f;
+                        finalPosition = new Vector2Int(thisCreature.x + (int)(vector.X * radius), thisCreature.y + (int)(vector.Y * radius));
+                    }
+                    finalPosition.x = targetPosition.x; finalPosition.y = targetPosition.y;
+                }
+            }
+            while (thisCreature.world.map[finalPosition.x, finalPosition.y].isWater);
+
+            return finalPosition;
+        }
+
+        /// <summary>
+        /// Returns false if search in all directions and always find water
+        /// </summary>
+        /// <param name="finalPosition"></param>
+        /// <param name="angleInc"></param>
+        /// <returns></returns>
+        private bool GetPositionsAtRadius(ref Vector2Int finalPosition, float angleInc)
+        {
+            float angle = angleInc;
+            int inc = 1;
+            //Vector2Int finalPosition = new Vector2Int(thisCreature.x + (int)(vector.X * radius), thisCreature.y + (int)(vector.Y * radius));
+            // int cont = 0;
+            while (thisCreature.world.map[finalPosition.x, finalPosition.y].isWater && angle <= 360)
+            {
+                float actualAngle = angle * inc;
+                Vector2Int old = finalPosition;
+                finalPosition.x = (int)(finalPosition.x * Math.Cos(actualAngle) - finalPosition.y * Math.Sin(actualAngle));
+                finalPosition.y = (int)(old.x * Math.Sin(actualAngle) + old.y * Math.Cos(actualAngle));
+
+                inc *= -1;
+                angle += angleInc;
+
+                //The increment has to have the same sign as cont to add their values without possible substractions,
+                //but cont's sign has to be mantained to alternate between going "left" or "right" realtive to the current sector.
+                //int inc = 1; if (cont < 0) inc *= -1;
+                //cont = (cont + inc) * -1;
+                //sector = (sector + cont) % 8;
+                //finalPosition = SectorToPosition(posToDrink, sector);
+            }
+            return angle <= 360;
         }
         /// <summary>
         /// This method has to be called when day changed to night nad vice versa, to update the radius the creature sees based on the
