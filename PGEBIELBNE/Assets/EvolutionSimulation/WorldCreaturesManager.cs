@@ -97,7 +97,7 @@ namespace UnitySimulation
             gO.transform.position = new Vector3(c.x, gO.transform.position.y, c.y);
             // State visualization
             gO.GetComponent<CreatureManager>().statusBar.GetComponent<StatusBar>().SetStatus(c.GetState());
-            gO.GetComponent<CreatureManager>().statusBar.GetComponent<StatusBar>().SetStatusInfo(c.GetStateInfo());
+            //gO.GetComponent<CreatureManager>().statusBar.GetComponent<StatusBar>().SetStatusInfo(c.GetStateInfo());
         }
 
     }
