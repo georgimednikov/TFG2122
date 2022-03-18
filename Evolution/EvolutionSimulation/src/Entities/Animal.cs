@@ -9,8 +9,8 @@ namespace EvolutionSimulation.Entities
         {
             float abilityUnlock = UniverseParametersManager.parameters.abilityUnlockPercentage;
 
-            int minHealth = UniverseParametersManager.parameters.minHealth; 
-            int healthValue = UniverseParametersManager.parameters.healthGainMultiplier; 
+            int minHealth = UniverseParametersManager.parameters.minHealth;
+            int healthValue = UniverseParametersManager.parameters.healthGainMultiplier;
             int maxLimbs = UniverseParametersManager.parameters.maxLimbs;
             int minRestExpense = UniverseParametersManager.parameters.minRestExpense;
             int maxRestExpense = UniverseParametersManager.parameters.maxRestExpense;
@@ -23,12 +23,12 @@ namespace EvolutionSimulation.Entities
             float exhaustToSleepRatio = UniverseParametersManager.parameters.exhaustToSleepRatio; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
             float perceptionWithoutNightVision = UniverseParametersManager.parameters.perceptionWithoutNightVision; //Percentage of perception at night when the creature does not have night vision.
             float minPerceptionWithNightVision = UniverseParametersManager.parameters.minPerceptionWithNightVision; //Minimum percentage of perception at night when the creature has night vision.
-            float minMobilityMedium = UniverseParametersManager.parameters.minMobilityMedium; //When moving through a special medium the slowest speed possible is its mobility * (0.6 - 1.0) depending on proficiency
+            float minMobilityMedium = UniverseParametersManager.parameters.minMobilityMedium; //The slowest speed possible when moving through a special tile is its mobility * (0.6 - 1.0) depending on proficiency
             float mobilityPenalty = UniverseParametersManager.parameters.mobilityPenalty; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
-                                          //A ground creature moves fast on the ground, but cannot move throught the air/trees
-                                          //An arboreal creature moves fast through trees, but arborealSpeed * mobilityPenalty on the ground
-                                          //An aerial creature moves fast in the air, but arborealSpeed = aerialSpeed * mobilityPenalty and groundSpeed = arborealSpeed * mobilityPenalty
-            
+                                                                                          //A ground creature moves fast on the ground, but cannot move throught the air/trees
+                                                                                          //An arboreal creature moves fast through trees, but arborealSpeed * mobilityPenalty on the ground
+                                                                                          //An aerial creature moves fast in the air, but arborealSpeed = aerialSpeed * mobilityPenalty and groundSpeed = arborealSpeed * mobilityPenalty
+
             //TODO: Poner esto en el cromosoma, tiempo de embarazo, tiempo entre celos, tiempo en celo
             float timeBetweenHeats = 0.8f; //time in years between two heats or give birth and the next heat 
 
@@ -59,24 +59,24 @@ namespace EvolutionSimulation.Entities
             int speed = chromosome.GetFeature(CreatureFeature.Mobility);
             stats.AirReach = wings;
             stats.TreeReach = wings || arboreal || stats.Upright;
-            
+
             stats.AerialSpeed = stats.ArborealSpeed = -1;
             if (wings)
             {
-                stats.AerialSpeed = (int)(speed * (minMobilityMedium + (1 - minMobilityMedium) * ((float)chromosome.GetFeature(CreatureFeature.Wings) / chromosome.GetFeatureMax(CreatureFeature.Wings))));
-                stats.ArborealSpeed = (int)(stats.AerialSpeed * mobilityPenalty);
+                stats.AerialSpeed = (int)((speed * (minMobilityMedium + (1 - minMobilityMedium) * ((float)chromosome.GetFeature(CreatureFeature.Wings) / chromosome.GetFeatureMax(CreatureFeature.Wings)))) - (chromosome.GetFeature(CreatureFeature.Size)/chromosome.GetFeatureMax(CreatureFeature.Size) * stats.MaxSpeed) );
+                stats.ArborealSpeed = (int)((stats.AerialSpeed * mobilityPenalty) - (chromosome.GetFeature(CreatureFeature.Size) / chromosome.GetFeatureMax(CreatureFeature.Size) * stats.MaxSpeed) / 2f);
                 stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
             }
             if (arboreal)
             {
-                stats.ArborealSpeed = (int)(speed * (minMobilityMedium + (1 - minMobilityMedium) * ((float)chromosome.GetFeature(CreatureFeature.Arboreal) / chromosome.GetFeatureMax(CreatureFeature.Arboreal))));
+                stats.ArborealSpeed = (int)((speed * (minMobilityMedium + (1 - minMobilityMedium) * ((float)chromosome.GetFeature(CreatureFeature.Arboreal) / chromosome.GetFeatureMax(CreatureFeature.Arboreal)))) - (chromosome.GetFeature(CreatureFeature.Size) / chromosome.GetFeatureMax(CreatureFeature.Size) * stats.MaxSpeed) / 2f);
                 stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
             }
             if (!wings && !arboreal)
             {
                 stats.GroundSpeed = speed;
             }
-            
+
             //Physique related stats
             stats.Size = chromosome.GetFeature(CreatureFeature.Size);
 
@@ -190,7 +190,8 @@ namespace EvolutionSimulation.Entities
             float intimidation = stats.Size / 2 * ((int)stats.Diet + 1);
 
             //Horns. Increase damage and intimidation
-            if (HasAbility(CreatureFeature.Horns, CreatureChromosome.AbilityUnlock[CreatureFeature.Horns])) { 
+            if (HasAbility(CreatureFeature.Horns, CreatureChromosome.AbilityUnlock[CreatureFeature.Horns]))
+            {
 
                 int hornsValue = chromosome.GetFeature(CreatureFeature.Horns);
                 stats.Damage += hornsValue;
