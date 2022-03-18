@@ -88,8 +88,6 @@ namespace EvolutionSimulation.Entities
 
         ResourcePositionComparer resourceComparer;
 
-        //TODO: Quitar si ya no existe o no tiene comida.
-
         #region Getters
         /// <summary>
         /// Returns rivals ID, and its last seen position
@@ -407,7 +405,9 @@ namespace EvolutionSimulation.Entities
                         UpdateList(rottenCorpses, resource, maxExperienceTicks);
                 }
                 else if (entity is EdiblePlant && !(entity as EdiblePlant).eaten)
+                {
                     UpdateList(plants, resource, maxExperienceTicks);
+                }
             }
             //This for structure is recurrent all throughtout this class and is explained with the following example:
             //With radius = 3, it goes from -3 inclusive to 3 inclusive in both axis, going through -3, -2, -1, 0, 1, 2, 3
@@ -435,71 +435,7 @@ namespace EvolutionSimulation.Entities
                 }
             }
 
-            AdjustLists();
-        }
-
-        // TODO: si tarda mucho hacer priority queue
-        private void AdjustLists()
-        {
-            preys.Sort(resourceComparer);
-            preys.RemoveRange(maxResourcesRemembered, preys.Count);
-            mates.Sort(resourceComparer);
-            mates.RemoveRange(maxResourcesRemembered, mates.Count);
-            nearbyAllies.Sort(resourceComparer);
-            nearbyAllies.RemoveRange(maxResourcesRemembered, nearbyAllies.Count);
-            freshCorpses.Sort(resourceComparer);
-            freshCorpses.RemoveRange(maxResourcesRemembered, freshCorpses.Count);
-            rottenCorpses.Sort(resourceComparer);
-            rottenCorpses.RemoveRange(maxResourcesRemembered, rottenCorpses.Count);
-            water.Sort(resourceComparer);
-            water.RemoveRange(maxResourcesRemembered, water.Count);
-            safeWater.Sort(resourceComparer);
-            safeWater.RemoveRange(maxResourcesRemembered, safeWater.Count);
-            plants.Sort(resourceComparer);
-            plants.RemoveRange(maxResourcesRemembered, plants.Count);
-            safePlants.Sort(resourceComparer);
-            safePlants.RemoveRange(maxResourcesRemembered, safePlants.Count);
-        }
-
-        private void Forget()
-        {
-            i_forgor(preys);
-            i_forgor(mates);
-            i_forgor(nearbyAllies);
-            i_forgor(freshCorpses);
-            i_forgor(rottenCorpses);
-            i_forgor(water);
-            i_forgor(safeWater);
-            i_forgor(plants);
-            i_forgor(safePlants);
-
-            i_forgor_position(ref father);
-            i_forgor_position(ref mother);
-            i_forgor(ref rival);
-            //i_forgor(ref enemy);
-
-        }
-
-        private void i_forgor<T>(List<T> list) where T : Resource
-        {
-            for (int i = list.Count - 1; i >= 0; i--)
-            {
-                T p = list[i];
-                if (--p.ticks <= 0) //If it is time to forget.
-                    list.RemoveAt(i);
-            }
-        }
-
-        private void i_forgor<T>(ref T res) where T : Resource
-        {
-            if (--res.ticks == 0) //If it is time to forget.
-                res = null;
-        }
-
-        private void i_forgor_position<T>(ref T res) where T : Resource
-        {
-            if (--res.ticks == 0) //If it is time to forget.
-                res.position = null;
+            SortAndAdjustLists();
         }
 
         /// <summary>
@@ -516,7 +452,6 @@ namespace EvolutionSimulation.Entities
             if (explorePositionsRemembered.Count > maxPositionsRemembered)
                 explorePositionsRemembered.Dequeue();
         }
-
         /// <summary>
         /// 
         /// </summary>
@@ -573,7 +508,6 @@ namespace EvolutionSimulation.Entities
 
             return finalPosition;
         }
-
         /// <summary>
         /// Find a point to explore given a radius that is not water.
         /// </summary>
@@ -612,6 +546,11 @@ namespace EvolutionSimulation.Entities
         public void TargetEnemy(Creature creature)
         {
             enemy = new EntityResource(creature.x, creature.y, creature.ID, maxExperienceTicks);
+        }
+
+        private void RefreshMemory(Resource r, int ticks)
+        {
+            r.ticks = ticks;
         }
 
         #region Danger
@@ -692,6 +631,103 @@ namespace EvolutionSimulation.Entities
 
         #region Lists
 
+        // TODO: si tarda mucho hacer priority queue
+        private void SortAndAdjustLists()
+        {
+            RemoveFakeInformation(preys);
+            preys.Sort(resourceComparer);
+            preys.RemoveRange(maxResourcesRemembered, preys.Count);
+
+            RemoveFakeInformation(mates);
+            mates.Sort(resourceComparer);
+            mates.RemoveRange(maxResourcesRemembered, mates.Count);
+
+            RemoveFakeInformation(nearbyAllies);
+            nearbyAllies.Sort(resourceComparer);
+            nearbyAllies.RemoveRange(maxResourcesRemembered, nearbyAllies.Count);
+
+            RemoveFakeInformation(freshCorpses);
+            freshCorpses.Sort(resourceComparer);
+            freshCorpses.RemoveRange(maxResourcesRemembered, freshCorpses.Count);
+
+            RemoveFakeInformation(rottenCorpses);
+            rottenCorpses.Sort(resourceComparer);
+            rottenCorpses.RemoveRange(maxResourcesRemembered, rottenCorpses.Count);
+
+            water.Sort(resourceComparer);
+            water.RemoveRange(maxResourcesRemembered, water.Count);
+            safeWater.Sort(resourceComparer);
+            safeWater.RemoveRange(maxResourcesRemembered, safeWater.Count);
+
+            RemoveFruitlessPlants();
+            plants.Sort(resourceComparer);
+            plants.RemoveRange(maxResourcesRemembered, plants.Count);
+            safePlants.Sort(resourceComparer);
+            safePlants.RemoveRange(maxResourcesRemembered, safePlants.Count);
+        }
+
+        private void RemoveFakeInformation(List<EntityResource> list)
+        {
+            for (int i = list.Count - 1; i <= 0; i--)
+            {
+                //If the resource is within sight and yet is has not been updated, that means that it no longer is there, and therefore, lost.
+                if (list[i].ticks < maxExperienceTicks && thisCreature.DistanceToObjective(list[i].position) <= perceptionRadius)
+                    list.RemoveAt(i);
+            }
+        }
+        private void RemoveFruitlessPlants()
+        {
+            for (int i = plants.Count - 1; i <= 0; i--)
+            {
+                EdiblePlant plant = world.GetStaticEntity(plants[i].ID) as EdiblePlant;
+
+                //If the resource is not a plant or is within sight and without fruit, it is worthless for sure, and therefore not worth remembering.
+                if (plant == null || (plant.eaten && thisCreature.DistanceToObjective(plants[i].position) <= perceptionRadius))
+                    plants.RemoveAt(i);
+
+                //TODO: Safe plants que?
+            }
+        }
+
+        private void Forget()
+        {
+            i_forgor(preys);
+            i_forgor(mates);
+            i_forgor(nearbyAllies);
+            i_forgor(freshCorpses);
+            i_forgor(rottenCorpses);
+            i_forgor(water);
+            i_forgor(safeWater);
+            i_forgor(plants);
+            i_forgor(safePlants);
+
+            i_forgor_position(ref father);
+            i_forgor_position(ref mother);
+            i_forgor(ref rival);
+        }
+
+        private void i_forgor<T>(List<T> list) where T : Resource
+        {
+            for (int i = list.Count - 1; i >= 0; i--)
+            {
+                T p = list[i];
+                if (--p.ticks <= 0) //If it is time to forget.
+                    list.RemoveAt(i);
+            }
+        }
+
+        private void i_forgor<T>(ref T res) where T : Resource
+        {
+            if (--res.ticks == 0) //If it is time to forget.
+                res = null;
+        }
+
+        private void i_forgor_position<T>(ref T res) where T : Resource
+        {
+            if (--res.ticks == 0) //If it is time to forget.
+                res.position = null;
+        }
+
         /// <summary>
         /// Given a position, it is searched for and found in positionDangers, and before being returned, it is removed from the list.
         /// </summary>
@@ -729,11 +765,6 @@ namespace EvolutionSimulation.Entities
             safePlants.RemoveAt(index);
         }
 
-        private void RefreshMemory(Resource r, int ticks)
-        {
-            r.ticks = ticks;
-        }
-
         /// <summary>
         /// Add a resource to a given list and reset his ticks if the list already contains the resource
         /// </summary>
@@ -746,11 +777,13 @@ namespace EvolutionSimulation.Entities
                     break;
             }
             if (index < l.Count)
+            {
+                l[index].position = r.position; //TODO Actualizar posicion?
                 RefreshMemory(l[index], maxTicks);
+            }
             else
                 l.Add(r);
         }
-
         #endregion
 
         #region AuxiliaryMethods
@@ -763,6 +796,7 @@ namespace EvolutionSimulation.Entities
         }
         #endregion
 
+        #region Comparator
         /// <summary>
         /// Given a list of edible plants, these are ordered based on distance from it. The shortest goes first.
         /// </summary>
@@ -778,5 +812,6 @@ namespace EvolutionSimulation.Entities
                 return aDist.CompareTo(bDist);
             }
         }
+        #endregion
     }
 }
