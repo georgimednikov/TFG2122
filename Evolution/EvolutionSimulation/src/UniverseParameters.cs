@@ -23,10 +23,11 @@ namespace EvolutionSimulation
         public int maxRestExpense = 5;
         public int resourceAmount = 100; //Max amount of every resource
         public int minPerception = 5;
+        public int maxPerception = 10;
         public float minLifeSpan = 0.5f; // Minimum years alive
         public float exhaustToSleepRatio = 3; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
         public float hoursTilExhaustion = 28; // Hours until the creature falls over exhausted
-        public float perceptionWithoutNightVision = 0.5f; //Percentage of the max Perception lost at night
+        public float perceptionWithoutNightVision = 0.6f; //Percentage of the max Perception lost at night
         public float minPerceptionWithNightVision = 0.7f; //Percentage of the max Perception lost at night
         public float minMobilityMedium = 0.6f; //When moving through a special medium the slowest speed possible is its mobility * (0.6 - 1.0) depending on proficiency
         public float mobilityPenalty = 0.7f; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
@@ -58,7 +59,7 @@ namespace EvolutionSimulation
 
         // Memory
         public int knowledgeTickMultiplier = 500;
-        public float perceptionToRadiusMultiplier = 0.15f;
+        //public float perceptionToRadiusMultiplier = 0.15f;
         public float aggressivenessToRadiusMultiplier = 0.33f;
 
         // States

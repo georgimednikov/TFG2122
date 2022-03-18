@@ -96,7 +96,7 @@ namespace EvolutionSimulation.Genetics
 
             file = File.ReadAllText(jsonSimilarity);
             minGeneticSimilarity = JsonConvert.DeserializeObject<float>(file);
-            Validator.Validate(minGeneticSimilarity);
+            Validator.Validate(minGeneticSimilarity);            
         }
 
 

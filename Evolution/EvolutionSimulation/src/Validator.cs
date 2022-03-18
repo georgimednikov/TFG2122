@@ -388,6 +388,55 @@ namespace EvolutionSimulation
         }
         #endregion
 
+        #region AbilityUnlock
+        public class NotAllAbilitiesUnlockDefinedException : Exception
+        {
+            public NotAllAbilitiesUnlockDefinedException() { }
+            public NotAllAbilitiesUnlockDefinedException(string message) : base(message) { }
+            public NotAllAbilitiesUnlockDefinedException(string message, Exception inner) : base(message, inner) { }
+            protected NotAllAbilitiesUnlockDefinedException(
+              System.Runtime.Serialization.SerializationInfo info,
+              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+        }
+        public class AbilitiesUnlockNotNotInRange : Exception
+        {
+            public AbilitiesUnlockNotNotInRange() { }
+            public AbilitiesUnlockNotNotInRange(string message) : base(message) { }
+            public AbilitiesUnlockNotNotInRange(string message, Exception inner) : base(message, inner) { }
+            protected AbilitiesUnlockNotNotInRange(
+              System.Runtime.Serialization.SerializationInfo info,
+              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+        }
+
+        static public void ValidateAbUnlock(Tuple<CreatureFeature, float>[] abUnlock)
+        {
+            CheckAllAbilitiesUnlockFunc(abUnlock);
+        }
+
+        static void CheckAllAbilitiesUnlockFunc(Tuple<CreatureFeature, float>[] abUnlock)
+        {
+            if (abUnlock.Length != ((int)CreatureFeature.Count - (int)CreatureFeature.Arboreal))
+                throw new NotAllAbilitiesUnlockDefinedException("There must be as many abilities as abilities features listed in 'CreatureFeature', " + ((int)CreatureFeature.Count - (int)CreatureFeature.Arboreal));
+
+            bool[] featuresGiven = new bool[abUnlock.Length]; //Bool default value = false
+            
+            foreach (Tuple<CreatureFeature, float> ab in abUnlock)
+            {
+                featuresGiven[(int)ab.Item1 - (int)CreatureFeature.Arboreal ] = true;
+                if(ab.Item2 < 0 || ab.Item2 > 1)
+                {
+                    throw new AbilitiesUnlockNotNotInRange("The value of " + ab.Item1 + " must be between 0 and 1");
+                }
+            }
+            
+            foreach (bool feat in featuresGiven)
+                if (!feat)
+                    throw new NotAllAbilitiesUnlockDefinedException("Each one of the " + ((int)CreatureFeature.Count - (int)CreatureFeature.Arboreal) + " abilities features declared in 'CreatureFeature' must have an ability unlock value");
+
+            return;
+        }
+        #endregion
+
         #region UniverseParameters
         public class UniverseParameterIsZeroException : Exception
         {
@@ -480,9 +529,11 @@ namespace EvolutionSimulation
 
         static void ValidateCreatureStats(UniverseParameters parameters)
         {
+            //TODO: MIN PERCEPTION TIENE QUE SER MENOR QUE MAX PERCEPTION Y ESTOY SEGURO DE QUE MÄS VARIABLE NECESITAN ESTA COMPROBACÏÓN
+
             if (parameters.newbornStatMultiplier <= 0 || parameters.adulthoodThreshold <= 0 || parameters.tiredThreshold <= 0 || parameters.exhaustThreshold <= 0 ||
                 parameters.hungryThreshold <= 0 || parameters.veryHungryThreshold <= 0 || parameters.thirstyThreshold <= 0 || parameters.veryThirstyThreshold <= 0 ||
-                parameters.actionPerceptionPercentage <= 0) 
+                parameters.actionPerceptionPercentage <= 0 || parameters.minPerception <= 0 || parameters.maxPerception <= 0) 
                 throw new UniverseParameterIsZeroException("The provided stat parameters must be positive");
             if (parameters.newbornStatMultiplier > 1 || parameters.adulthoodThreshold > 1 || parameters.tiredThreshold > 1 || parameters.exhaustThreshold > 1 ||
                 parameters.hungryThreshold > 1 || parameters.veryHungryThreshold > 1 || parameters.thirstyThreshold > 1 || parameters.veryThirstyThreshold > 1 ||
@@ -500,7 +551,7 @@ namespace EvolutionSimulation
 
         static void ValidateMemory(UniverseParameters parameters)
         {
-            if (parameters.knowledgeTickMultiplier <= 0 || parameters.perceptionToRadiusMultiplier <= 0 || parameters.aggressivenessToRadiusMultiplier <= 0) 
+            if (parameters.knowledgeTickMultiplier <= 0 || /*parameters.perceptionToRadiusMultiplier <= 0 || */parameters.aggressivenessToRadiusMultiplier <= 0) 
                 throw new UniverseParameterIsZeroException("The provided tree parameters must be positive");
         }
 

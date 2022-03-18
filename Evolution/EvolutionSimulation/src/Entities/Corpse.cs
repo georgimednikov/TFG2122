@@ -53,7 +53,7 @@ namespace EvolutionSimulation.Entities
                 float actualPoisonProb = Math.Min(1.0f, Math.Max(0.0f, poisonProb + 1.0f - remains));
                 float actualNutritionPoints = maxNutritionPoints * remains;
                 // Having the ability 'Scavenger' reduces the penalties of eating the corpse            
-                if (other.HasAbility(Genetics.CreatureFeature.Scavenger, 0.4f)) // TODO: ahora está puesto el % de unlock a pelo, cambiarlo
+                if (other.HasAbility(Genetics.CreatureFeature.Scavenger, Genetics.CreatureChromosome.AbilityUnlock[Genetics.CreatureFeature.Scavenger])) // TODO: ahora está puesto el % de unlock a pelo, cambiarlo
                 {
                     actualPoisonProb -= other.stats.Scavenger;
                     actualNutritionPoints += (maxNutritionPoints - actualNutritionPoints) * other.stats.Scavenger;

@@ -175,7 +175,17 @@ namespace EvolutionSimulation.Entities
             set { baseStats.Perception = value; }
         }
         /// <summary>
-        /// Percentage of the creature's perception at a given moment: 1 if it is day, NightPenalty if it is night.
+        /// The maximum value of perception. It is used to perceive a creature
+        /// using the percentage of perception that thre creature has.
+        /// </summary>
+        public int MaxPerception
+        {
+            get { return baseStats.MaxPerception; }
+            set { baseStats.MaxPerception = value; }
+        }
+        /// <summary>
+        /// Percentage of the creature's perception at a given moment:
+        /// 1 if it is day, NightPenalty if it is night.
         /// </summary>
         public float CurrentVision { get; set; }
         /// <summary>
@@ -381,6 +391,7 @@ namespace EvolutionSimulation.Entities
         public int Aggressiveness;
         public int Intimidation;
         public int Perception;
+        public int MaxPerception;
 
         //Physique related stats
         public int Size;

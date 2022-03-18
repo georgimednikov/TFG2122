@@ -5,7 +5,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 {
     class GoToDrink : CreatureState
     {
-        Vector2Int posToDrink;
+        Vector2Int finalPosition;
         public GoToDrink(Entities.Creature c) : base(c) { creature = c; }
 
         public override int GetCost()
@@ -17,7 +17,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             //The position of the water mass in which the creature would be most interested in is decided
             //between the closest one and the closest one that has proven to be safe, based on distance.
-            //Tuple<int, int> posToDrink;
+            Vector2Int posToDrink;
             if (creature.GetSafeWaterPosition() == null || 
                 (creature.DistanceToObjective(creature.GetSafeWaterPosition()) >
                 creature.DistanceToObjective(creature.GetClosestWaterPosition()) * UniverseParametersManager.parameters.safePrefferedOverClosestResourceRatio))
@@ -26,7 +26,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 posToDrink = creature.GetSafeWaterPosition();
 
             //Angle between the creatures position and the position of the water from 0 to 180 positive or negative.
-                double degrees = Math.Atan2(creature.y - posToDrink.x, creature.x - posToDrink.y) * (180 / Math.PI);
+                double degrees = Math.Atan2(creature.y - posToDrink.y, creature.x - posToDrink.x) * (180 / Math.PI);
 
             //Now the sector has to be accounted for.
 
@@ -38,19 +38,19 @@ namespace EvolutionSimulation.FSM.Creature.States
             degrees += 45.0 / 2;
 
             int sector = (int)(degrees / 45) % 8;
-            Tuple<int, int> finalPosition = SectorToPosition(posToDrink, sector);
+            finalPosition = SectorToPosition(posToDrink, sector);
             //int cont = 0;
-            //while (creature.world.map[finalPosition.Item1, finalPosition.Item2].isWater)
+            //while (creature.world.map[finalPosition.x, finalPosition.y].isWater)
             //{
             //    //The increment has to have the same sign as cont to add their values without possible substractions,
             //    //but cont's sign has to be mantained to alternate between going "left" or "right" realtive to the current sector.
             //    int inc = 1; if (cont < 0) inc *= -1;
             //    cont = (cont + inc) * -1;
             //    sector = (sector + cont) % 8;
-            //    finalPosition = SectorToPosition(sector);
+            //    finalPosition = SectorToPosition(posToDrink, sector);
             //}
 
-            creature.SetPath(finalPosition.Item1, finalPosition.Item2);
+            creature.SetPath(finalPosition.x, finalPosition.y);
         }
 
         public override void Action()
@@ -62,7 +62,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         }
         public override string GetInfo()
         {
-            return posToDrink.ToString();
+            return finalPosition.ToString();
         }
 
         public override string ToString()
@@ -70,26 +70,26 @@ namespace EvolutionSimulation.FSM.Creature.States
             return "GoToDrinkState";
         }
 
-        private Tuple<int, int> SectorToPosition(Vector2Int pos, int sector)
+        private Vector2Int SectorToPosition(Vector2Int pos, int sector)
         {
             switch (sector)
             {
                 case 0:
-                    return new Tuple<int, int>(pos.x + 1, pos.y);
+                    return new Vector2Int(pos.x + 1, pos.y);
                 case 1:
-                    return new Tuple<int, int>(pos.x + 1, pos.y + 1);
+                    return new Vector2Int(pos.x + 1, pos.y + 1);
                 case 2:
-                    return new Tuple<int, int>(pos.x, pos.y + 1);
+                    return new Vector2Int(pos.x, pos.y + 1);
                 case 3:
-                    return new Tuple<int, int>(pos.x - 1, pos.y + 1);
+                    return new Vector2Int(pos.x - 1, pos.y + 1);
                 case 4:
-                    return new Tuple<int, int>(pos.x - 1, pos.y);
+                    return new Vector2Int(pos.x - 1, pos.y);
                 case 5:
-                    return new Tuple<int, int>(pos.x - 1, pos.y - 1);
+                    return new Vector2Int(pos.x - 1, pos.y - 1);
                 case 6:
-                    return new Tuple<int, int>(pos.x, pos.y - 1);
+                    return new Vector2Int(pos.x, pos.y - 1);
                 case 7:
-                    return new Tuple<int, int>(pos.x + 1, pos.y - 1);
+                    return new Vector2Int(pos.x + 1, pos.y - 1);
                 default:
                     throw new Exception("Error calculating closest position to water in GoToDrink");
             }
