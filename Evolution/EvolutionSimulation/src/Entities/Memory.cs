@@ -344,8 +344,71 @@ namespace EvolutionSimulation.Entities
             List<Creature> perceivedCreatures = world.PerceiveCreatures(thisCreature.ID, perceptionRadius);
             List<StaticEntity> perceivedEntities = world.PerceiveEntities(thisCreature.ID, perceptionRadius);
 
-            //TODO: Dani arregla esto, que no este todo lo de las criaturas en los for
 
+            //The list of creatures is also needed to calculate danger so it is done here too.
+            float[,] intimidationFelt = new float[perceptionRadius, perceptionRadius]; //The danger in each tile seen by the creature caused by other creatures.
+            foreach (Creature creature in perceivedCreatures)
+            {
+                EntityResource resource = new EntityResource(creature.x, creature.y, creature.ID, maxExperienceTicks);
+
+                //If a creature is the same species as this creature or
+                //it belongs to a child species of this creature's or
+                //it belongs to a parent species of this creature's they're allies.
+                if (creature.speciesName == thisCreature.speciesName ||
+                    creature.progenitorSpeciesName == thisCreature.speciesName ||
+                    creature.speciesName == thisCreature.progenitorSpeciesName)
+                {
+                    UpdateList(nearbyAllies, resource, maxExperienceTicks);
+                    if (creature.ID == father.ID)
+                        RefreshMemory(father, maxExperienceTicks);
+                    else if (creature.ID == mother.ID)
+                        RefreshMemory(mother, maxExperienceTicks);
+                    else if (creature.wantMate)
+                        UpdateList(mates, resource, maxExperienceTicks);
+                }
+                //Else they have no relation
+                else
+                {
+                    int dist = thisCreature.DistanceToObjective(creature);
+                    if (creature.stats.Intimidation > thisCreature.stats.Aggressiveness &&
+                        (rival == null || thisCreature.DistanceToObjective(rival.position) >= dist)) //This is equal to update the rival information if it is the same
+                    {
+                        rival = resource;
+                    }
+
+                    //If the creature is reachable and not considered too dangerous it is considered possible prey.
+                    float creatureDanger = GetPositionDanger(creature.x, creature.y);
+                    if ((creature.creatureLayer == Creature.HeightLayer.Air && thisCreature.stats.AirReach) ||
+                        creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach ||
+                        creature.creatureLayer == Creature.HeightLayer.Ground &&
+                        creatureDanger < thisCreature.stats.Aggressiveness)
+                        UpdateList(preys, resource, maxExperienceTicks);
+
+                    //Since it does not make sense to create an array with the size of the world only to save information about a part of it,
+                    //and since using lists complicates the process making it necessary to go through the list with the intimidation levels comparing
+                    //positions every time a new creature is processed to add their values if they share a position, plus when the perception area is
+                    //check the list would have to be iterated every tile, so the solution is an array representing the perception locally,
+                    //and to make the positions positive to save them in the array, the perception radius has to be added now and when reading the value.
+                    int intX = creature.x - x + perceptionRadius;
+                    int intY = creature.y - y + perceptionRadius;
+                    intimidationFelt[intX, intY] += creature.stats.Intimidation;
+                }
+            }
+            //Updates the memory's information about corpses and plants
+            foreach (StaticEntity entity in perceivedEntities)
+            {
+                EntityResource resource = new EntityResource(entity.x, entity.y, entity.ID, maxExperienceTicks);
+                if (entity is Corpse)
+                {
+                    Corpse newCorpse = entity as Corpse;//TODO cambiar 0.4
+                    if (thisCreature.HasAbility(Genetics.CreatureFeature.Scavenger, 0.4f) || newCorpse.Edible)
+                        UpdateList(freshCorpses, resource, maxExperienceTicks);
+                    else
+                        UpdateList(rottenCorpses, resource, maxExperienceTicks);
+                }
+                else if (entity is EdiblePlant && !(entity as EdiblePlant).eaten)
+                    UpdateList(plants, resource, maxExperienceTicks);
+            }
             //This for structure is recurrent all throughtout this class and is explained with the following example:
             //With radius = 3, it goes from -3 inclusive to 3 inclusive in both axis, going through -3, -2, -1, 0, 1, 2, 3
             //This is used to calculate the offsets of the creature's position to go through an area around it.
@@ -353,85 +416,25 @@ namespace EvolutionSimulation.Entities
             {
                 for (int j = -perceptionRadius; j <= perceptionRadius; j++)
                 {
-
                     Vector2Int p = new Vector2Int(x + i, y + j);
                     if (IsOutOfBounds(p)) continue;
 
                     if (world.map[p.x, p.y].isWater)
                         UpdateList(water, new Resource(p, maxExperienceTicks), maxExperienceTicks);
 
-                    bool positionWasUnknown = false;
                     Position position = GetFromPositionDangers(p);
-                    if (position == null)
-                    {
-                        positionWasUnknown = true;
+                    bool positionWasKnown = position == null;
+                    if (!positionWasKnown)
                         position = new Position(p, 0, 0, 0);
-                    }
-                    position.intimidation = 0; //The danger caused by creatures in this position is reset because it is going to be account for again later.
+
                     position.ticks = maxExperienceTicks; //The number of ticks left to be forgotten is reset too.
-
-                    //The list of creatures is also needed to calculate danger so it is done here too.
-                    foreach (Creature creature in perceivedCreatures)
-                    {
-                        EntityResource resource = new EntityResource(creature.x, creature.y, creature.ID, maxExperienceTicks);
-
-                        //If a creature is the same species as this creature or
-                        //it belongs to a child species of this creature's or
-                        //it belongs to a parent species of this creature's they're allies.
-                        if (creature.speciesName == thisCreature.speciesName ||
-                            creature.progenitorSpeciesName == thisCreature.speciesName ||
-                            creature.speciesName == thisCreature.progenitorSpeciesName)
-                        {
-                            UpdateList(nearbyAllies, resource, maxExperienceTicks);
-                            if (creature.ID == father.ID)
-                                RefreshMemory(father, maxExperienceTicks);
-                            else if (creature.ID == mother.ID)
-                                RefreshMemory(mother, maxExperienceTicks);
-                            else if (creature.wantMate)
-                                UpdateList(mates, resource, maxExperienceTicks);
-                        }
-                        //Else they have no relation
-                        else
-                        {
-                            int dist = thisCreature.DistanceToObjective(creature);
-                            if (creature.stats.Intimidation > thisCreature.stats.Aggressiveness &&
-                                (rival == null || thisCreature.DistanceToObjective(rival.position) >= dist)) //This is equal to update the rival information if it is the same
-                            {
-                                rival = resource;
-                            }
-
-                            //If the creature is reachable and not considered too dangerous it is considered possible prey.
-                            float creatureDanger = GetPositionDanger(creature.x, creature.y);
-                            if ((creature.creatureLayer == Creature.HeightLayer.Air && thisCreature.stats.AirReach) ||
-                                creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach ||
-                                creature.creatureLayer == Creature.HeightLayer.Ground &&
-                                creatureDanger < thisCreature.stats.Aggressiveness)
-                                UpdateList(preys, resource, maxExperienceTicks);
-
-                            position.intimidation += creature.stats.Intimidation;
-                        }
-                    }
-
-                    //Saves the corpses in a tile and throws away the rest.
-                    foreach (StaticEntity entity in perceivedEntities)
-                    {
-                        EntityResource resource = new EntityResource(entity.x, entity.y, entity.ID, maxExperienceTicks);
-                        if (entity is Corpse)
-                        {
-                            Corpse newCorpse = entity as Corpse;//TODO cambiar 0.4
-                            if (thisCreature.HasAbility(Genetics.CreatureFeature.Scavenger, 0.4f) || newCorpse.Edible)
-                                UpdateList(freshCorpses, resource, maxExperienceTicks);
-                            else
-                                UpdateList(rottenCorpses, resource, maxExperienceTicks);
-                        }
-                        else if (entity is EdiblePlant && !(entity as EdiblePlant).eaten)
-                            UpdateList(plants, resource, maxExperienceTicks);
-                    }
+                    position.intimidation = intimidationFelt[i + perceptionRadius, j + perceptionRadius];
 
                     //If this position was not remembered and there is valuable information in it (a danger level) it is remembered.
-                    if (positionWasUnknown && position.intimidation != 0) dangersRemembered.Add(position);
+                    if (!positionWasKnown && position.intimidation != 0) dangersRemembered.Add(position);
                 }
             }
+
             AdjustLists();
         }
 
