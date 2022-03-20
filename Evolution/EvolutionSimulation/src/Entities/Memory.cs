@@ -25,263 +25,59 @@ namespace EvolutionSimulation.Entities
             public float Danger() { return intimidation + danger + safety; }
         }
 
-        private class Resource : IEquatable<Resource>
-        {
-            public Vector2Int position;
-            public int ticks;
-
-            public Resource(Vector2Int p, int t) { position = p; ticks = t; }
-
-            public static bool operator ==(Resource eR1, Resource eR2) { return eR1.position == eR2.position; }
-            public static bool operator !=(Resource eR1, Resource eR2) { return eR1.position != eR2.position; }
-            public override bool Equals(object obj) { return Equals(obj as Resource); }
-            public virtual bool Equals(Resource obj) { return this == obj; }
-            public override int GetHashCode() { return base.GetHashCode(); }
-        }
-
-        private class EntityResource : Resource
-        {
-            public int ID;
-
-            public EntityResource(Vector2Int p, int id, int t) : base(p, t) { ID = id; }
-            public EntityResource(int x, int y, int id, int t) : base(new Vector2Int(x, y), t) { ID = id; }
-
-            public static bool operator ==(EntityResource eR1, EntityResource eR2) { return eR1.ID == eR2.ID; }
-            public static bool operator !=(EntityResource eR1, EntityResource eR2) { return eR1.ID != eR2.ID; }
-            public override bool Equals(object obj) { return Equals(obj as EntityResource); }
-            public override bool Equals(Resource obj) { return this == obj as EntityResource; }
-            public override int GetHashCode() { return base.GetHashCode(); }
-        }
-
         Creature thisCreature;
         World world;
+
         int perceptionRadius;
         int dangerRadius;
-        int maxExperienceTicks;
-        int maxResourcesRemembered;
-        int maxPositionsRemembered;
-        int ticksToSavePosition;
-        int ticksElapsed;
+        float danger;                   //Value representing the danger remembered in a position when something bad happens to the creature.
 
-        float danger;
+        int maxExperienceTicks;         //Max number of ticks until the creature forgets.
+        int maxResourcesRemembered;     //Max number of resources of each type that the creature can remember.
+        int maxPositionsRemembered;     //Max number of positions the creature can remember to have their danger in mind.
 
-        EntityResource enemy;                        //Creature that has attacked this creature or an ally of its.
-        EntityResource rival;                        //Closest creature that is not part of the creature's "family" regarding its species.
-        EntityResource father;
-        EntityResource mother;
-        List<EntityResource> preys;                  //Closest reachable creature.
-        List<EntityResource> mates;                  //Closest ally in heat.
-        List<EntityResource> nearbyAllies;
-
-        List<EntityResource> freshCorpses;
-        List<EntityResource> rottenCorpses;
-
-        List<Position> dangersRemembered;            //All the dangers the creature remembers, with their dangers and ticks left.
-        Queue<Vector2Int> explorePositionsRemembered;   //All the dangers the creature remembers, with their dangers and ticks left.
-        Vector2Int safePlace;                        //The closest safe location for the creature.
-
-        List<Resource> water;
-        List<Resource> safeWater;                    //List containing all safe water spots that the creature remembers.
-
-        List<EntityResource> plants;
-        List<EntityResource> safePlants;             //List containing all safe edible plants that the creature remembers.
+        int ticksToSavePosition;        //Amount of ticks after which the current position of the creature (if different to the previous) is saved.
+        int ticksElapsed;               //How many ticks have gone by, used along with ticksToSavePosition.
 
         ResourcePositionComparer resourceComparer;
+        Queue<Vector2Int> explorePositionsRemembered;   //All the dangers the creature remembers, with their dangers and ticks left.
+        List<Position> dangersRemembered;               //All the dangers the creature remembers, with their dangers and ticks left.
 
-        #region Getters
-        /// <summary>
-        /// Returns rivals ID, and its last seen position
-        /// </summary>
-        public void Rival(out int id, out Vector2Int position)
-        {
-            if (rival == null)
-            {
-                id = -1;
-                position = null;
-            }
-            else
-            {
-                id = rival.ID;
-                position = rival.position;
-            }
-        }
+        public EntityResource Enemy { get; private set; }               //Creature that has attacked this creature or an ally of its.
+        public EntityResource Menace { get; private set; }              //Closest creature that is not part of the creature's "family" regarding its species.
+        public EntityResource Father { get; private set; }
+        public EntityResource Mother { get; private set; }
+        public List<EntityResource> Preys { get; private set; }         //Closest reachable creature.
+        public List<EntityResource> NearbyAllies { get; private set; }
+        public List<EntityResource> Mates { get; private set; }         //Closest ally in heat.
+        public List<EntityResource> FreshCorpses { get; private set; }
+        public List<EntityResource> RottenCorpses { get; private set; }
+        public List<Resource> WaterPositions { get; private set; }
+        public List<Resource> SafeWaterPositions { get; private set; }        //List containing all safe water spots that the creature remembers.
+        public List<EntityResource> EdiblePlants { get; private set; }
+        public List<EntityResource> SafeEdiblePlants { get; private set; }  //List containing all safe edible plants that the creature remembers.
+        public Vector2Int SafePosition { get; private set; }            //The closest safe location for the creature.
+        public Vector2Int NewPosition { get => FindNewPosition(); }
 
-        public void Enemy(out int id, out Vector2Int position)
-        {
-            if (enemy == null)
-            {
-                id = -1;
-                position = null;
-            }
-            else
-            {
-                id = enemy.ID;
-                position = enemy.position;
-            }
-        }
 
-        public void Father(out int id, out Vector2Int position)
-        {
-            if (father == null)
-            {
-                id = -1;
-                position = null;
-            }
-            else
-            {
-                id = father.ID;
-                position = father.position;
-            }
-        }
-
-        public void Mother(out int id, out Vector2Int position)
-        {
-            if (mother == null)
-            {
-                id = -1;
-                position = null;
-            }
-            else
-            {
-                id = mother.ID;
-                position = mother.position;
-            }
-        }
-        public void Mate(out int id, out Vector2Int position)
-        {
-            if (mates.Count <= 0)
-            {
-                id = -1;
-                position = null;
-            }
-            else
-            {
-                id = mates[0].ID;
-                position = mates[0].position;
-            }
-        }
-        public void Ally(out int id, out Vector2Int position)
-        {
-            if (nearbyAllies.Count <= 0)
-            {
-                id = -1;
-                position = null;
-            }
-            else
-            {
-                id = rival.ID;
-                position = rival.position;
-            }
-        }
-
-        public void FreshCorpse(out int id, out Vector2Int position)
-        {
-            if (freshCorpses.Count <= 0)
-            {
-                id = -1;
-                position = null;
-            }
-            else
-            {
-                id = freshCorpses[0].ID;
-                position = freshCorpses[0].position;
-            }
-        }
-
-        public void RottenCorpse(out int id, out Vector2Int position)
-        {
-            if (rottenCorpses.Count <= 0)
-            {
-                id = -1;
-                position = null;
-            }
-            else
-            {
-                id = rottenCorpses[0].ID;
-                position = rottenCorpses[0].position;
-            }
-        }
-
-        //TODO: Coger agua
-        public Vector2Int Water()
-        {
-            if (safeWater.Count <= 0)
-            {
-                if (water.Count > 0)
-                    return water[0].position;
-                return null;
-            }
-            else if (water.Count <= 0)
-                return safeWater[0].position;
-
-            //water and safewater
-            int distClose = thisCreature.DistanceToObjective(water[0].position);
-            int distSafe = thisCreature.DistanceToObjective(safeWater[0].position);
-
-            if (distSafe > distClose * UniverseParametersManager.parameters.safePrefferedOverClosestResourceRatio)
-                return water[0].position;
-            else
-                return safeWater[0].position;
-        }
-        public void Plant(out int id, out Vector2Int position)
-        {
-            if (safePlants.Count <= 0)
-            {
-                if (plants.Count > 0)
-                {
-                    id = plants[0].ID;
-                    position = plants[0].position;
-                }
-                else
-                {
-                    id = -1;
-                    position = null;
-                }
-                return;
-            }
-            else if (water.Count <= 0)
-            {
-                id = safePlants[0].ID;
-                position = safePlants[0].position;
-                return;
-            }
-
-            int distClose = thisCreature.DistanceToObjective(plants[0].position);
-            int distSafe = thisCreature.DistanceToObjective(safePlants[0].position);
-
-            if (distSafe > distClose * UniverseParametersManager.parameters.safePrefferedOverClosestResourceRatio)
-            {
-                id = plants[0].ID;
-                position = plants[0].position;
-            }
-            else
-            {
-                id = safePlants[0].ID;
-                position = safePlants[0].position;
-            }
-        }
-        public Vector2Int SafePlace() { return safePlace; }
-        public Vector2Int NewPlace() { return FindNewPlace(); }
-        #endregion
-
-        public Memory(Creature c, World w, Creature f, Creature m)
+        public Memory(Creature c, Creature f, Creature m)
         {
             thisCreature = c;
-            world = w;
-            father = new EntityResource(f.x, f.y, f.ID, maxExperienceTicks);
-            mother = new EntityResource(m.x, m.y, m.ID, maxExperienceTicks);
+            world = c.world;
+            Father = new EntityResource(f.x, f.y, f.ID, maxExperienceTicks);
+            Mother = new EntityResource(m.x, m.y, m.ID, maxExperienceTicks);
 
-            preys = new List<EntityResource>();
-            mates = new List<EntityResource>();
-            nearbyAllies = new List<EntityResource>();
-            freshCorpses = new List<EntityResource>();
-            rottenCorpses = new List<EntityResource>();
+            Preys = new List<EntityResource>();
+            Mates = new List<EntityResource>();
+            NearbyAllies = new List<EntityResource>();
+            FreshCorpses = new List<EntityResource>();
+            RottenCorpses = new List<EntityResource>();
             dangersRemembered = new List<Position>();
             explorePositionsRemembered = new Queue<Vector2Int>();
-            water = new List<Resource>();
-            safeWater = new List<Resource>();
-            plants = new List<EntityResource>();
-            safePlants = new List<EntityResource>();
+            WaterPositions = new List<Resource>();
+            SafeWaterPositions = new List<Resource>();
+            EdiblePlants = new List<EntityResource>();
+            SafeEdiblePlants = new List<EntityResource>();
 
             resourceComparer = new ResourcePositionComparer(c);
 
@@ -306,38 +102,17 @@ namespace EvolutionSimulation.Entities
             }
 
             //If there is a creature targeted as the enemy and this creature loses sight or the creature dies the pointer is reset.
-            if (enemy != null)
+            if (Enemy != null)
             {
-                Creature enemyEntity = world.GetCreature(enemy.ID);
+                Creature enemyEntity = world.GetCreature(Enemy.ID);
                 if (enemyEntity == null || thisCreature.DistanceToObjective(enemyEntity) > perceptionRadius)
-                    enemy = null;
+                    Enemy = null;
                 else
-                    enemy.position = new Vector2Int(enemyEntity.x, enemyEntity.y);
+                    Enemy.position = new Vector2Int(enemyEntity.x, enemyEntity.y);
             }
 
             // If the tile has to be forgotten, it is removed from the creature's memory
             Forget();
-
-            // The following code also forgets, but since it does not deal with entities rather positions and danger
-            // it also serves to assign the safe place of the creature.
-            int safePlaceDist = 0;
-            //The list is iterated through from the end to the start to deal with removing elements from it while iterating.
-            for (int i = dangersRemembered.Count - 1; i >= 0; i--)
-            {
-                Position p = dangersRemembered[i];
-                if (--p.ticks <= 0) //If it is time to forget the position.
-                {
-                    RemoveFromSafeWater(p.position);
-                    RemoveFromSafePlant(p.position);
-                    dangersRemembered.RemoveAt(i);
-                }
-                //If the tile remains in memory, it is safe and no safe place has been assigned or it is closer than the one already found, it is saved.
-                else if (GetPositionDanger(p.position) <= 0 && (safePlace == null || safePlaceDist > thisCreature.DistanceToObjective(p.position)))
-                {
-                    safePlace = p.position;
-                    safePlaceDist = thisCreature.DistanceToObjective(p.position);
-                }
-            }
 
             List<Creature> perceivedCreatures = world.PerceiveCreatures(thisCreature.ID, perceptionRadius);
             List<StaticEntity> perceivedEntities = world.PerceiveEntities(thisCreature.ID, perceptionRadius);
@@ -356,22 +131,22 @@ namespace EvolutionSimulation.Entities
                     creature.progenitorSpeciesName == thisCreature.speciesName ||
                     creature.speciesName == thisCreature.progenitorSpeciesName)
                 {
-                    UpdateList(nearbyAllies, resource, maxExperienceTicks);
-                    if (creature.ID == father.ID)
-                        RefreshMemory(father, maxExperienceTicks);
-                    else if (creature.ID == mother.ID)
-                        RefreshMemory(mother, maxExperienceTicks);
+                    UpdateList(NearbyAllies, resource, maxExperienceTicks);
+                    if (creature.ID == Father.ID)
+                        RefreshMemory(Father, maxExperienceTicks);
+                    else if (creature.ID == Mother.ID)
+                        RefreshMemory(Mother, maxExperienceTicks);
                     else if (creature.wantMate)
-                        UpdateList(mates, resource, maxExperienceTicks);
+                        UpdateList(Mates, resource, maxExperienceTicks);
                 }
                 //Else they have no relation
                 else
                 {
                     int dist = thisCreature.DistanceToObjective(creature);
                     if (creature.stats.Intimidation > thisCreature.stats.Aggressiveness &&
-                        (rival == null || thisCreature.DistanceToObjective(rival.position) >= dist)) //This is equal to update the rival information if it is the same
+                        (Menace == null || thisCreature.DistanceToObjective(Menace.position) >= dist)) //This is equal to update the rival information if it is the same
                     {
-                        rival = resource;
+                        Menace = resource;
                     }
 
                     //If the creature is reachable and not considered too dangerous it is considered possible prey.
@@ -380,7 +155,7 @@ namespace EvolutionSimulation.Entities
                         creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach ||
                         creature.creatureLayer == Creature.HeightLayer.Ground &&
                         creatureDanger < thisCreature.stats.Aggressiveness)
-                        UpdateList(preys, resource, maxExperienceTicks);
+                        UpdateList(Preys, resource, maxExperienceTicks);
 
                     //Since it does not make sense to create an array with the size of the world only to save information about a part of it,
                     //and since using lists complicates the process making it necessary to go through the list with the intimidation levels comparing
@@ -400,13 +175,13 @@ namespace EvolutionSimulation.Entities
                 {
                     Corpse newCorpse = entity as Corpse;//TODO cambiar 0.4
                     if (thisCreature.HasAbility(Genetics.CreatureFeature.Scavenger, 0.4f) || newCorpse.Edible)
-                        UpdateList(freshCorpses, resource, maxExperienceTicks);
+                        UpdateList(FreshCorpses, resource, maxExperienceTicks);
                     else
-                        UpdateList(rottenCorpses, resource, maxExperienceTicks);
+                        UpdateList(RottenCorpses, resource, maxExperienceTicks);
                 }
                 else if (entity is EdiblePlant && !(entity as EdiblePlant).eaten)
                 {
-                    UpdateList(plants, resource, maxExperienceTicks);
+                    UpdateList(EdiblePlants, resource, maxExperienceTicks);
                 }
             }
             //This for structure is recurrent all throughtout this class and is explained with the following example:
@@ -420,7 +195,7 @@ namespace EvolutionSimulation.Entities
                     if (IsOutOfBounds(p)) continue;
 
                     if (world.map[p.x, p.y].isWater)
-                        UpdateList(water, new Resource(p, maxExperienceTicks), maxExperienceTicks);
+                        UpdateList(WaterPositions, new Resource(p, maxExperienceTicks), maxExperienceTicks);
 
                     Position position = GetFromPositionDangers(p);
                     bool positionWasKnown = position == null;
@@ -435,9 +210,32 @@ namespace EvolutionSimulation.Entities
                 }
             }
 
+            // The following code also forgets, but since it does not deal with entities rather positions and danger
+            // it also serves to assign the safe place of the creature.
+            int safePlaceDist = 0;
+            float positionDanger;
+            //The list is iterated through from the end to the start to deal with removing elements from it while iterating.
+            for (int i = dangersRemembered.Count - 1; i >= 0; i--)
+            {
+                Position p = dangersRemembered[i];
+                positionDanger = GetPositionDanger(p.position);
+
+                //If the position is dangerous it is removed from the safe lists.
+                if (positionDanger > 0)
+                {
+                    RemoveFromSafeWater(p.position);
+                    RemoveFromSafePlant(p.position);
+                }
+                //If the tile remains in memory, it is safe and no safe place has been assigned or it is closer than the one already found, it is saved.
+                else if (positionDanger <= 0 && (SafePosition == null || safePlaceDist > thisCreature.DistanceToObjective(p.position)))
+                {
+                    SafePosition = p.position;
+                    safePlaceDist = thisCreature.DistanceToObjective(p.position);
+                }
+            }
+
             SortAndAdjustLists();
         }
-
         /// <summary>
         /// Saves the creature's current position if it is different from the last one in the queue.
         /// If a new position is added and the maximum number of positions saved is surpassed, the
@@ -455,7 +253,7 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// 
         /// </summary>
-        private Vector2Int FindNewPlace()
+        private Vector2Int FindNewPosition()
         {
 
             // The average position of this creature's path so far is calculated and the used as a reference
@@ -545,7 +343,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="creature"></param>
         public void TargetEnemy(Creature creature)
         {
-            enemy = new EntityResource(creature.x, creature.y, creature.ID, maxExperienceTicks);
+            Enemy = new EntityResource(creature.x, creature.y, creature.ID, maxExperienceTicks);
         }
 
         private void RefreshMemory(Resource r, int ticks)
@@ -579,7 +377,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void SafeWater()
         {
-            Position posDanger = GetFromPositionDangers(water[0].position);
+            Position posDanger = GetFromPositionDangers(WaterPositions[0].position);
             if (posDanger != null) //If the position is already in the list it is updated.
             {
                 posDanger.safety -= danger; //It is a safe position, so the danger is negative.
@@ -587,18 +385,18 @@ namespace EvolutionSimulation.Entities
             }
             else //Else it is created and added.
             {
-                posDanger = new Position(water[0].position, 0, -danger, maxExperienceTicks);
+                posDanger = new Position(WaterPositions[0].position, 0, -danger, maxExperienceTicks);
                 dangersRemembered.Add(posDanger);
             }
 
-            safeWater.Add(water[0]);
+            SafeWaterPositions.Add(WaterPositions[0]);
         }
         /// <summary>
         /// Saves the closest edible plant as safe in memory, making the creature prefer it over the closest one, if not too far away.
         /// </summary>
         public void SafePlant()
         {
-            Position posDanger = GetFromPositionDangers(plants[0].position);
+            Position posDanger = GetFromPositionDangers(EdiblePlants[0].position);
             if (posDanger != null) //If the position is already in the list it is updated.
             {
                 posDanger.safety -= danger; //It is a safe position, so the danger is negative.
@@ -606,11 +404,11 @@ namespace EvolutionSimulation.Entities
             }
             else //Else it is created and added.
             {
-                posDanger = new Position(plants[0].position, 0, -danger, maxExperienceTicks);
+                posDanger = new Position(EdiblePlants[0].position, 0, -danger, maxExperienceTicks);
                 dangersRemembered.Add(posDanger);
             }
 
-            safePlants.Add(plants[0]);
+            SafeEdiblePlants.Add(EdiblePlants[0]);
         }
         public void DangerousPosition()
         {
@@ -618,7 +416,7 @@ namespace EvolutionSimulation.Entities
             Position posDanger = GetFromPositionDangers(thisPos);
             if (posDanger != null) //If the position is already in the list it is updated.
             {
-                posDanger.danger += danger; //It is a safe position, so the danger is negative.
+                posDanger.danger += danger;
                 posDanger.ticks = maxExperienceTicks; //The number of ticks until erasure is reset.
             }
             else //Else it is created and added.
@@ -630,40 +428,39 @@ namespace EvolutionSimulation.Entities
         #endregion
 
         #region Lists
-
         // TODO: si tarda mucho hacer priority queue
         private void SortAndAdjustLists()
         {
-            RemoveFakeInformation(preys);
-            preys.Sort(resourceComparer);
-            preys.RemoveRange(maxResourcesRemembered, preys.Count);
+            RemoveFakeInformation(Preys);
+            Preys.Sort(resourceComparer);
+            Preys.RemoveRange(maxResourcesRemembered, Preys.Count);
 
-            RemoveFakeInformation(mates);
-            mates.Sort(resourceComparer);
-            mates.RemoveRange(maxResourcesRemembered, mates.Count);
+            RemoveFakeInformation(Mates); //TODO: Quita bien a uno que deja de estar en celo?
+            Mates.Sort(resourceComparer);
+            Mates.RemoveRange(maxResourcesRemembered, Mates.Count);
 
-            RemoveFakeInformation(nearbyAllies);
-            nearbyAllies.Sort(resourceComparer);
-            nearbyAllies.RemoveRange(maxResourcesRemembered, nearbyAllies.Count);
+            RemoveFakeInformation(NearbyAllies);
+            NearbyAllies.Sort(resourceComparer);
+            NearbyAllies.RemoveRange(maxResourcesRemembered, NearbyAllies.Count);
 
-            RemoveFakeInformation(freshCorpses);
-            freshCorpses.Sort(resourceComparer);
-            freshCorpses.RemoveRange(maxResourcesRemembered, freshCorpses.Count);
+            RemoveFakeInformation(FreshCorpses);
+            FreshCorpses.Sort(resourceComparer);
+            FreshCorpses.RemoveRange(maxResourcesRemembered, FreshCorpses.Count);
 
-            RemoveFakeInformation(rottenCorpses);
-            rottenCorpses.Sort(resourceComparer);
-            rottenCorpses.RemoveRange(maxResourcesRemembered, rottenCorpses.Count);
+            RemoveFakeInformation(RottenCorpses);
+            RottenCorpses.Sort(resourceComparer);
+            RottenCorpses.RemoveRange(maxResourcesRemembered, RottenCorpses.Count);
 
-            water.Sort(resourceComparer);
-            water.RemoveRange(maxResourcesRemembered, water.Count);
-            safeWater.Sort(resourceComparer);
-            safeWater.RemoveRange(maxResourcesRemembered, safeWater.Count);
+            WaterPositions.Sort(resourceComparer);
+            WaterPositions.RemoveRange(maxResourcesRemembered, WaterPositions.Count);
+            SafeWaterPositions.Sort(resourceComparer);
+            SafeWaterPositions.RemoveRange(maxResourcesRemembered, SafeWaterPositions.Count);
 
             RemoveFruitlessPlants();
-            plants.Sort(resourceComparer);
-            plants.RemoveRange(maxResourcesRemembered, plants.Count);
-            safePlants.Sort(resourceComparer);
-            safePlants.RemoveRange(maxResourcesRemembered, safePlants.Count);
+            EdiblePlants.Sort(resourceComparer);
+            EdiblePlants.RemoveRange(maxResourcesRemembered, EdiblePlants.Count);
+            SafeEdiblePlants.Sort(resourceComparer);
+            SafeEdiblePlants.RemoveRange(maxResourcesRemembered, SafeEdiblePlants.Count);
         }
 
         private void RemoveFakeInformation(List<EntityResource> list)
@@ -677,33 +474,48 @@ namespace EvolutionSimulation.Entities
         }
         private void RemoveFruitlessPlants()
         {
-            for (int i = plants.Count - 1; i <= 0; i--)
+            for (int i = EdiblePlants.Count - 1; i <= 0; i--)
             {
-                EdiblePlant plant = world.GetStaticEntity(plants[i].ID) as EdiblePlant;
+                EdiblePlant plant = world.GetStaticEntity(EdiblePlants[i].ID) as EdiblePlant;
 
                 //If the resource is not a plant or is within sight and without fruit, it is worthless for sure, and therefore not worth remembering.
-                if (plant == null || (plant.eaten && thisCreature.DistanceToObjective(plants[i].position) <= perceptionRadius))
-                    plants.RemoveAt(i);
-
-                //TODO: Safe plants que?
+                //The if hungry condition is there so that the creature only forgets fruitless plants when it is looking for fruit. That way, it does not
+                //forget the plant it has eaten from inmediatly after eating its fruit.
+                if (plant == null || (plant.eaten && thisCreature.IsHungry() && thisCreature.DistanceToObjective(EdiblePlants[i].position) <= perceptionRadius))
+                {
+                    EdiblePlants.RemoveAt(i);
+                    RemoveFromSafePlant(EdiblePlants[i].position);
+                }
             }
         }
 
         private void Forget()
         {
-            i_forgor(preys);
-            i_forgor(mates);
-            i_forgor(nearbyAllies);
-            i_forgor(freshCorpses);
-            i_forgor(rottenCorpses);
-            i_forgor(water);
-            i_forgor(safeWater);
-            i_forgor(plants);
-            i_forgor(safePlants);
+            i_forgor(Preys);
+            i_forgor(Mates);
+            i_forgor(NearbyAllies);
+            i_forgor(FreshCorpses);
+            i_forgor(RottenCorpses);
+            i_forgor(WaterPositions);
+            i_forgor(SafeWaterPositions);
+            i_forgor(EdiblePlants);
+            i_forgor(SafeEdiblePlants);
 
-            i_forgor_position(ref father);
-            i_forgor_position(ref mother);
-            i_forgor(ref rival);
+            i_forgor_position(ref Father);
+            i_forgor_position(ref Mother);
+            i_forgor(ref Menace);
+
+            //The list is iterated through from the end to the start to deal with removing elements from it while iterating.
+            for (int i = dangersRemembered.Count - 1; i >= 0; i--)
+            {
+                Position p = dangersRemembered[i];
+                if (--p.ticks <= 0) //If it is time to forget the position.
+                {
+                    RemoveFromSafeWater(p.position);
+                    RemoveFromSafePlant(p.position);
+                    dangersRemembered.RemoveAt(i);
+                }
+            }
         }
 
         private void i_forgor<T>(List<T> list) where T : Resource
@@ -747,22 +559,24 @@ namespace EvolutionSimulation.Entities
         private void RemoveFromSafeWater(Vector2Int pos)
         {
             int index = 0;
-            for (; index < safeWater.Count; index++)
+            for (; index < SafeWaterPositions.Count; index++)
             {
-                if (safeWater[index].position == pos)
+                if (SafeWaterPositions[index].position == pos)
                     break;
             }
-            safeWater.RemoveAt(index);
+            if (index < SafeWaterPositions.Count)
+                SafeWaterPositions.RemoveAt(index);
         }
         private void RemoveFromSafePlant(Vector2Int pos)
         {
             int index = 0;
-            for (; index < safePlants.Count; index++)
+            for (; index < SafeEdiblePlants.Count; index++)
             {
-                if (safePlants[index].position == pos)
+                if (SafeEdiblePlants[index].position == pos)
                     break;
             }
-            safePlants.RemoveAt(index);
+            if (index < SafeEdiblePlants.Count)
+                SafeEdiblePlants.RemoveAt(index);
         }
 
         /// <summary>

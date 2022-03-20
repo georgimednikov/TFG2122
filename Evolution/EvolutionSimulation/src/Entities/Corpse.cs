@@ -90,26 +90,12 @@ namespace EvolutionSimulation.Entities
             }                      
         }
 
-        /// <summary>
-        /// Returns the nutritional value the corpse would have for the given creature.
-        /// </summary>
-        public float NutritionalValue(Creature creature)
-        {
-            if (Edible) return maxNutritionPoints;
-            float actualNutritionPoints = maxNutritionPoints * (lifeTime / (float)putridTime);
-            if (creature.HasAbility(Genetics.CreatureFeature.Scavenger, 0.4f)) // TODO: ahora está puesto el % de unlock a pelo, cambiarlo
-            {
-                actualNutritionPoints += (maxNutritionPoints - actualNutritionPoints) * creature.stats.Scavenger;
-            }
-            return actualNutritionPoints;
-        }
-
         public override void Tick()
         {
             lifeTime--;
             Edible = lifeTime > putridTime;
 
-            Console.WriteLine("Ticks to corpse disappearance: " + lifeTime);
+            Console.WriteLine("Ticks until corpse disappearance: " + lifeTime);
 
             if (lifeTime <= 0)
                 world.Destroy(ID);

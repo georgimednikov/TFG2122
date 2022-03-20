@@ -166,7 +166,7 @@ namespace EvolutionSimulation.Entities
                 UniverseParametersManager.parameters.minHealthTemperatureDamage);
             stats.CurrHealth -= (float)damage;
             double danger = stats.Aggressiveness * UniverseParametersManager.parameters.maxTemperatureAggressivenessPercentage;
-            memory.DangerousTemperature(x, y, -(float)danger);
+            memory.DangerousTemperature();
         }
 
         /// <summary>

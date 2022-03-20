@@ -73,6 +73,7 @@
     <Compile Include="src\Entities\Astar.cs" />
     <Compile Include="src\Entities\Memory.cs" />
     <Compile Include="src\Entities\CreatureStats.cs" />
+    <Compile Include="src\Entities\Mind.cs" />
     <Compile Include="src\Entities\StaticEntity.cs" />
     <Compile Include="src\Entities\Bush.cs" />
     <Compile Include="src\Entities\EdiblePlant.cs" />
