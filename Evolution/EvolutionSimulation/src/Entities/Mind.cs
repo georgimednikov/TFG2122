@@ -163,7 +163,7 @@ namespace EvolutionSimulation.Entities
         public bool Mother(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Mother, out id, out position); }
         public bool Prey(out int id, out Vector2Int position) { return AssignEntityInfo(worthyPrey, out id, out position); }
         public bool Ally(out int id, out Vector2Int position) { return AssignEntityInfo(mem.NearbyAllies[0], out id, out position); }
-        public bool Mate(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Mates[0], out id, out position); }
+        public bool Mate(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Mate, out id, out position); }
         public bool Corpse(out int id, out Vector2Int position) { return AssignEntityInfo(worthyCorpse, out id, out position); }
         public bool Plant(out int id, out Vector2Int position) { return AssignEntityInfo(worthyPlant, out id, out position); }
         public Vector2Int WaterPosition() { return worthyWaterPosition; }

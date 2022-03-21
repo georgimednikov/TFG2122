@@ -50,9 +50,9 @@ namespace EvolutionSimulation.Entities
         private EntityResource father;
         public EntityResource Mother { get => mother; }
         private EntityResource mother;
+        public EntityResource Mate { get; private set; }
         public List<EntityResource> Preys { get; private set; }         //Closest reachable creature.
         public List<EntityResource> NearbyAllies { get; private set; }
-        public List<EntityResource> Mates { get; private set; }         //Closest ally in heat.
         public List<EntityResource> FreshCorpses { get; private set; }
         public List<EntityResource> RottenCorpses { get; private set; }
         public List<Resource> WaterPositions { get; private set; }
@@ -67,11 +67,10 @@ namespace EvolutionSimulation.Entities
         {
             thisCreature = c;
             world = c.world;
-            Father = new EntityResource(f.x, f.y, f.ID, maxExperienceTicks);
-            Mother = new EntityResource(m.x, m.y, m.ID, maxExperienceTicks);
+            father = new EntityResource(f.x, f.y, f.ID, maxExperienceTicks);
+            mother = new EntityResource(m.x, m.y, m.ID, maxExperienceTicks);
 
             Preys = new List<EntityResource>();
-            Mates = new List<EntityResource>();
             NearbyAllies = new List<EntityResource>();
             FreshCorpses = new List<EntityResource>();
             RottenCorpses = new List<EntityResource>();
@@ -139,8 +138,6 @@ namespace EvolutionSimulation.Entities
                         RefreshMemory(Father, maxExperienceTicks);
                     else if (creature.ID == Mother.ID)
                         RefreshMemory(Mother, maxExperienceTicks);
-                    else if (creature.wantMate)
-                        UpdateList(Mates, resource, maxExperienceTicks);
                 }
                 //Else they have no relation
                 else
@@ -149,7 +146,7 @@ namespace EvolutionSimulation.Entities
                     if (creature.stats.Intimidation > thisCreature.stats.Aggressiveness &&
                         (Menace == null || thisCreature.DistanceToObjective(Menace.position) >= dist)) //This is equal to update the rival information if it is the same
                     {
-                        Menace = resource;
+                        menace = resource;
                     }
 
                     //If the creature is reachable and not considered too dangerous it is considered possible prey.
@@ -238,6 +235,28 @@ namespace EvolutionSimulation.Entities
             }
 
             SortAndAdjustLists();
+
+            Mate = null; //By default there is no mate available.
+            for (int i = 0; i < NearbyAllies.Count; i++) //For every ally the creature remembers the following comprobations are done:
+            {
+                Creature ally = world.GetCreature(NearbyAllies[0].ID);
+                if (ally == null || ally.stats.Gender != thisCreature.stats.Gender) //This is done to ignore creatures of the same gender as this one. The gender is
+                    continue;                                                       //checked although the creature might not be in sight, but it is not modified
+                                                                                    //and this way the gender is not saved (which would be inconvinient).
+                if (thisCreature.DistanceToObjective(NearbyAllies[0].position) <= perceptionRadius) //If it can see the ally and therefore exists.
+                {
+                    if (ally.wantMate) //If it wants to mate and is of the opposite danger, it is a match.
+                    {
+                        Mate = NearbyAllies[i];
+                        break;
+                    }
+                }
+                else //If the creature cannot see the next ally, since they are ordered by distance, it goes to the position it remembers.
+                {
+                    Mate = NearbyAllies[i];
+                    break;
+                }
+            }
         }
         /// <summary>
         /// Saves the creature's current position if it is different from the last one in the queue.
@@ -253,6 +272,7 @@ namespace EvolutionSimulation.Entities
             if (explorePositionsRemembered.Count > maxPositionsRemembered)
                 explorePositionsRemembered.Dequeue();
         }
+        //TODO Comentario
         /// <summary>
         /// 
         /// </summary>
@@ -438,10 +458,6 @@ namespace EvolutionSimulation.Entities
             Preys.Sort(resourceComparer);
             Preys.RemoveRange(maxResourcesRemembered, Preys.Count);
 
-            RemoveFakeInformation(Mates); //TODO: Quita bien a uno que deja de estar en celo?
-            Mates.Sort(resourceComparer);
-            Mates.RemoveRange(maxResourcesRemembered, Mates.Count);
-
             RemoveFakeInformation(NearbyAllies);
             NearbyAllies.Sort(resourceComparer);
             NearbyAllies.RemoveRange(maxResourcesRemembered, NearbyAllies.Count);
@@ -495,7 +511,6 @@ namespace EvolutionSimulation.Entities
         private void Forget()
         {
             i_forgor(Preys);
-            i_forgor(Mates);
             i_forgor(NearbyAllies);
             i_forgor(FreshCorpses);
             i_forgor(RottenCorpses);
