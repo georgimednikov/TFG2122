@@ -138,17 +138,18 @@ namespace EvolutionSimulation.Entities
         {
             float aDanger = mem.GetPositionDanger(w1.position);
             float bDanger = mem.GetPositionDanger(w2.position);
-            float sum = Math.Abs(aDanger + bDanger) + 0.000001f;
-            float aRelDanger = aDanger / sum;
-            float bRelDanger = bDanger / sum;
+            float total = Math.Max(Math.Max(aDanger, bDanger), 0.000001f);
+            float aRelDanger = aDanger / total;
+            float bRelDanger = bDanger / total;
 
 
             float aDist = creature.DistanceToObjective(w1.position);
             float bDist = creature.DistanceToObjective(w2.position);
-            float aRelDist = aDist / (aDist + bDist);
-            float bRelDist = bDist / (aDist + bDist);
+            total = Math.Max(Math.Max(aDist, bDist), 0.000001f);
+            float aRelDist = aDist / total;
+            float bRelDist = bDist / total;
 
-            if (aDanger + aDist < bDanger + bDist)
+            if (aRelDanger + aRelDist < bRelDist + bRelDist)
                 return w1;
             else
                 return w2;
