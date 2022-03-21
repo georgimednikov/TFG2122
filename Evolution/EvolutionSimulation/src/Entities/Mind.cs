@@ -73,36 +73,85 @@ namespace EvolutionSimulation.Entities
                 worthyCorpse = mem.FreshCorpses[0];
             }
         }
-        private void UpdateWaterSource() { worthyWaterPosition = BestBetweenCloseAndSafe(mem.WaterPositions, mem.SafeWaterPositions).position; }
-        private void UpdatePlant() { worthyPlant = BestBetweenCloseAndSafe(mem.EdiblePlants, mem.SafeEdiblePlants); }
+        private void UpdateWaterSource()
+        {
+            if (mem.WaterPositions.Count == 0 && mem.SafeWaterPositions.Count == 0)
+            {
+                worthyWaterPosition = null;
+                return;
+            }
+            if (creature.IsVeryThirsty())
+            {
+                if (mem.WaterPositions.Count != 0)
+                    worthyWaterPosition = mem.WaterPositions[0].position;
+                else
+                    worthyWaterPosition = mem.SafeWaterPositions[0].position;
+                return;
+            }
 
-        private T BestBetweenCloseAndSafe<T>(List<T> close, List<T> safe) where T : Resource
+            worthyWaterPosition = BestBetweenCloseAndSafe(mem.WaterPositions, mem.SafeWaterPositions, Criteria).position; 
+        }
+        private void UpdatePlant()
         {
             if (mem.EdiblePlants.Count == 0 && mem.SafeEdiblePlants.Count == 0)
+            {
+                worthyPlant = null;
+                return;
+            }
+            if (creature.IsVeryHungry())
+            {
+                if (mem.EdiblePlants.Count != 0)
+                    worthyPlant = mem.EdiblePlants[0];
+                else
+                    worthyPlant = mem.SafeEdiblePlants[0];
+                return;
+            }
+
+            worthyPlant = BestBetweenCloseAndSafe(mem.EdiblePlants, mem.SafeEdiblePlants, Criteria);
+        }
+        private T BestBetweenCloseAndSafe<T>(List<T> close, List<T> safe, Func<T, T, T> criteria) where T : Resource
+        {
+            if (close.Count == 0 && safe.Count == 0)
                 return null;
 
-            T bestClose = BestResourceInList(close);
-            T bestSafe = BestResourceInList(safe);
-            return BestResource(bestClose, bestSafe);
+            T bestClose = BestResourceInList(close, criteria);
+            T bestSafe = BestResourceInList(safe, criteria);
+            return BestResource(bestClose, bestSafe, criteria);
         }
-        private T BestResourceInList<T>(List<T> l) where T : Resource
+        private T BestResourceInList<T>(List<T> l, Func<T, T, T> criteria) where T : Resource
         {
             if (l.Count == 0) return null;
             T best = l[0];
             for (int i = 1; i < l.Count; i++)
             {
-                best = BestResource(best, l[i]);
+                best = BestResource(best, l[i], criteria);
             }
             return best;
         }
-        private T BestResource<T>(T a, T b) where T : Resource
+        private T BestResource<T>(T a, T b, Func<T, T, T> criteria) where T : Resource
         {
             if (a == null) return b;
             if (b == null) return a;
+            return criteria(a, b);
+        }
+        private T Criteria<T>(T w1, T w2) where T : Resource
+        {
+            float aDanger = mem.GetPositionDanger(w1.position);
+            float bDanger = mem.GetPositionDanger(w2.position);
+            float sum = Math.Abs(aDanger + bDanger) + 0.000001f;
+            float aRelDanger = aDanger / sum;
+            float bRelDanger = bDanger / sum;
 
-            //TODO: Criterio de verdad
-            if (a.position.x < 0) return a;
-            else return b;
+
+            float aDist = creature.DistanceToObjective(w1.position);
+            float bDist = creature.DistanceToObjective(w2.position);
+            float aRelDist = aDist / (aDist + bDist);
+            float bRelDist = bDist / (aDist + bDist);
+
+            if (aDanger + aDist < bDanger + bDist)
+                return w1;
+            else
+                return w2;
         }
         #endregion
 

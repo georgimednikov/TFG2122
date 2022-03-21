@@ -44,9 +44,12 @@ namespace EvolutionSimulation.Entities
         List<Position> dangersRemembered;               //All the dangers the creature remembers, with their dangers and ticks left.
 
         public EntityResource Enemy { get; private set; }               //Creature that has attacked this creature or an ally of its.
-        public EntityResource Menace { get; private set; }              //Closest creature that is not part of the creature's "family" regarding its species.
-        public EntityResource Father { get; private set; }
-        public EntityResource Mother { get; private set; }
+        public EntityResource Menace { get => menace; }              //Closest creature that is not part of the creature's "family" regarding its species.
+        private EntityResource menace;
+        public EntityResource Father { get => father; }
+        private EntityResource father;
+        public EntityResource Mother { get => mother; }
+        private EntityResource mother;
         public List<EntityResource> Preys { get; private set; }         //Closest reachable creature.
         public List<EntityResource> NearbyAllies { get; private set; }
         public List<EntityResource> Mates { get; private set; }         //Closest ally in heat.
@@ -501,9 +504,9 @@ namespace EvolutionSimulation.Entities
             i_forgor(EdiblePlants);
             i_forgor(SafeEdiblePlants);
 
-            i_forgor_position(ref Father);
-            i_forgor_position(ref Mother);
-            i_forgor(ref Menace);
+            i_forgor_position(ref father);
+            i_forgor_position(ref mother);
+            i_forgor(ref menace);
 
             //The list is iterated through from the end to the start to deal with removing elements from it while iterating.
             for (int i = dangersRemembered.Count - 1; i >= 0; i--)
