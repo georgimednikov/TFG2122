@@ -63,13 +63,13 @@ namespace EvolutionSimulation.Entities
             stats.AerialSpeed = stats.ArborealSpeed = -1;
             if (wings)
             {
-                stats.AerialSpeed = (int)((speed * (minMobilityMedium + (1 - minMobilityMedium) * ((float)chromosome.GetFeature(CreatureFeature.Wings) / chromosome.GetFeatureMax(CreatureFeature.Wings)))) - (chromosome.GetFeature(CreatureFeature.Size)/chromosome.GetFeatureMax(CreatureFeature.Size) * stats.MaxSpeed) );
-                stats.ArborealSpeed = (int)((stats.AerialSpeed * mobilityPenalty) - (chromosome.GetFeature(CreatureFeature.Size) / chromosome.GetFeatureMax(CreatureFeature.Size) * stats.MaxSpeed) / 2f);
+                stats.AerialSpeed = Math.Max((int)((speed * (minMobilityMedium + (1 - minMobilityMedium) * ((float)chromosome.GetFeature(CreatureFeature.Wings) / chromosome.GetFeatureMax(CreatureFeature.Wings)))) - (chromosome.GetFeature(CreatureFeature.Size)/chromosome.GetFeatureMax(CreatureFeature.Size) * stats.MaxSpeed)), 0);
+                stats.ArborealSpeed = Math.Max((int)((stats.AerialSpeed * mobilityPenalty) - (chromosome.GetFeature(CreatureFeature.Size) / chromosome.GetFeatureMax(CreatureFeature.Size) * stats.MaxSpeed) / 2f),0);
                 stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
             }
             if (arboreal)
             {
-                stats.ArborealSpeed = (int)((speed * (minMobilityMedium + (1 - minMobilityMedium) * ((float)chromosome.GetFeature(CreatureFeature.Arboreal) / chromosome.GetFeatureMax(CreatureFeature.Arboreal)))) - (chromosome.GetFeature(CreatureFeature.Size) / chromosome.GetFeatureMax(CreatureFeature.Size) * stats.MaxSpeed) / 2f);
+                stats.ArborealSpeed = Math.Max((int)((speed * (minMobilityMedium + (1 - minMobilityMedium) * ((float)chromosome.GetFeature(CreatureFeature.Arboreal) / chromosome.GetFeatureMax(CreatureFeature.Arboreal)))) - (chromosome.GetFeature(CreatureFeature.Size) / chromosome.GetFeatureMax(CreatureFeature.Size) * stats.MaxSpeed) / 2f), 0);
                 stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
             }
             if (!wings && !arboreal)

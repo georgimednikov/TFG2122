@@ -41,5 +41,13 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             return "SleepingState";
         }
+
+        /// <summary>
+        /// Text used to display state in simulation
+        /// </summary>
+        public override string GetInfo()
+        {
+            return "SLEEPING";
+        }
     }
 }

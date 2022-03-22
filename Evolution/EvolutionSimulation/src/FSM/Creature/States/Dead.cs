@@ -34,7 +34,8 @@ namespace EvolutionSimulation.FSM.Creature.States
                 (creature.stats.Venom / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Venomous)) : 0,   // If it is venomous it will be more risky to eat 
                 (int)(creature.stats.Venom),
                 creature.stats.Venom * 0.25f, 
-                UniverseParametersManager.parameters.corpseNutritionPointsMultiplier * creature.stats.Size / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size));  // TODO: testiar
+                UniverseParametersManager.parameters.corpseNutritionPointsMultiplier * creature.stats.Size / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size),  // TODO: testiar
+                creature.stats.MaxHealth);  // TODO: poner que sea un porcentaje de esta vida
         }
 
         public override string ToString()
