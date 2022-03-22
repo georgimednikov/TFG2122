@@ -15,7 +15,12 @@ namespace EvolutionSimulation
         public static Vector2Int operator *(Vector2Int v1, int v) { return new Vector2Int(v1.x * v, v1.y * v); }
         public static Vector2Int operator *(Vector2Int v1, float v) { return new Vector2Int((int)(v1.x * v),(int)( v1.y * v)); }
         public static Vector2Int operator /(Vector2Int v1, Vector2Int v2) { return new Vector2Int(v1.x / v2.x, v1.y / v2.y); }
-        public static bool operator ==(Vector2Int v1, Vector2Int v2) { return v1.x == v2.x && v1.y == v2.y; }
+        public static bool operator ==(Vector2Int v1, Vector2Int v2) 
+        {
+            if (v1 is null)
+                return v2 is null;
+            return v1.x == v2.x && v1.y == v2.y;
+        }
         public static bool operator !=(Vector2Int v1, Vector2Int v2) { return !(v1 == v2); }
 
         public override bool Equals(object obj) { return Equals(obj as Vector2Int); }

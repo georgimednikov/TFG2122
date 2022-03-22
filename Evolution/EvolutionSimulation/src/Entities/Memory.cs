@@ -50,9 +50,9 @@ namespace EvolutionSimulation.Entities
                                        //it can be recognized, but in practice it is the same as returning null until found again.
             get
             {
-                if (father.position.x < 0)
-                    return null;
-                return father;
+                if (father != null && father.position.x >= 0)
+                    return father;
+                return null;
             }
         }
         private EntityResource father;
@@ -61,9 +61,9 @@ namespace EvolutionSimulation.Entities
         {
             get
             {
-                if (mother.position.x < 0)
-                    return null;
-                return mother;
+                if (mother != null && mother.position.x >= 0)
+                    return mother;
+                return null;
             }
         }
         private EntityResource mother;
@@ -88,12 +88,12 @@ namespace EvolutionSimulation.Entities
             if (parent != null)
                 father = new EntityResource(parent.x, parent.y, parent.ID, maxExperienceTicks);
             else
-                father = null; // should not happen
+                father = null; // should only happen with original creatures
             parent = world.GetCreature(mID);
             if (parent != null)
                 father = new EntityResource(parent.x, parent.y, parent.ID, maxExperienceTicks);
             else
-                mother = null;  // should not happen
+                mother = null;  // should only happen with original creatures
             Preys = new List<EntityResource>();
             Allies = new List<EntityResource>();
             FreshCorpses = new List<EntityResource>();
@@ -307,33 +307,47 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         private Vector2Int FindNewPosition()
         {
-
-            // The average position of this creature's path so far is calculated and the used as a reference
-            // to get a direction vector that is used to guide the creature away from places already visited.
-            int x = thisCreature.x;
-            int y = thisCreature.y;
-            int averageX = 0;
-            int averageY = 0;
-
-            // The dangers encountered, whether good or bad, represent positions that the creature does not want
-            // to visit when exploring, either because it is dangerous or because it is a safe place it frequents.
-            foreach (Position p in dangersRemembered)
+            Vector3 vector;
+            if (dangersRemembered.Count > 0 || explorePositionsRemembered.Count > 0)
             {
-                averageX += p.position.x;
-                averageY += p.position.y;
-            }
-            // These positions are used to further avoid positions previously visited, updated every so often
-            // and only when moving as to not stagnate when the creature is static.
-            foreach (Vector2Int p in explorePositionsRemembered)
-            {
-                averageX += p.x;
-                averageY += p.y;
-            }
-            averageX /= dangersRemembered.Count + explorePositionsRemembered.Count;
-            averageY /= dangersRemembered.Count + explorePositionsRemembered.Count;
+                // The average position of this creature's path so far is calculated and the used as a reference
+                // to get a direction vector that is used to guide the creature away from places already visited.
+                int x = thisCreature.x;
+                int y = thisCreature.y;
+                int averageX = 0;
+                int averageY = 0;
 
-            Vector3 vector = new Vector3(x - averageX, y - averageY, 0);
-            vector /= vector.Length();
+                // The dangers encountered, whether good or bad, represent positions that the creature does not want
+                // to visit when exploring, either because it is dangerous or because it is a safe place it frequents.
+                foreach (Position p in dangersRemembered)
+                {
+                    averageX += p.position.x;
+                    averageY += p.position.y;
+                }
+                // These positions are used to further avoid positions previously visited, updated every so often
+                // and only when moving as to not stagnate when the creature is static.
+                foreach (Vector2Int p in explorePositionsRemembered)
+                {
+                    averageX += p.x;
+                    averageY += p.y;
+                }
+                averageX /= dangersRemembered.Count + explorePositionsRemembered.Count;
+                averageY /= dangersRemembered.Count + explorePositionsRemembered.Count;
+                vector = new Vector3(x - averageX, y - averageY, 0);
+                vector /= vector.Length();
+            }
+            else
+            {
+                // If no positions are remebered, the creature chooses a random direction
+                int dirX, dirY;
+                do
+                {
+                    dirX = RandomGenerator.Next(2);
+                    dirY = RandomGenerator.Next(2);
+                }
+                while (dirX == 0 && dirY == 0);
+                vector = new Vector3(dirX, dirY, 0);
+            }
 
             float radius = perceptionRadius;
             float degreesInc = (float)(Math.PI / 4.0);  // 45 degrees
@@ -346,7 +360,7 @@ namespace EvolutionSimulation.Entities
             {
                 if (!GetPositionsAtRadius(ref finalPosition, degreesInc))
                 {
-                    if (++cont % 2 == 0)
+                    if (++cont % 2 == 0)    // TODO: these numbers are magic
                         degreesInc /= 2;
                     else
                         targetPosition *= 0.75f;
@@ -354,7 +368,7 @@ namespace EvolutionSimulation.Entities
                     finalPosition.x = targetPosition.x; finalPosition.y = targetPosition.y;
                 }
             }
-            while (thisCreature.world.map[finalPosition.x, finalPosition.y].isWater);
+            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer));
 
             return finalPosition;
         }
@@ -368,7 +382,7 @@ namespace EvolutionSimulation.Entities
         {
             float angle = angleInc;
             int inc = 1;
-            while (thisCreature.world.map[finalPosition.x, finalPosition.y].isWater && angle <= 360)
+            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) && angle <= 360)
             {
                 float actualAngle = angle * inc;
                 Vector2Int old = finalPosition;

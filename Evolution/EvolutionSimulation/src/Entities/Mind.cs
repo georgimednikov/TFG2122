@@ -224,8 +224,13 @@ namespace EvolutionSimulation.Entities
 
         public Resource(Vector2Int p, int t) { position = p; ticks = t; }
 
-        public static bool operator ==(Resource eR1, Resource eR2) { return eR1.position == eR2.position; }
-        public static bool operator !=(Resource eR1, Resource eR2) { return eR1.position != eR2.position; }
+        public static bool operator ==(Resource eR1, Resource eR2)
+        {
+            if (eR1 is null)
+                return eR2 is null;
+            return eR1.position == eR2.position;
+        }
+        public static bool operator !=(Resource eR1, Resource eR2) { return !(eR1 == eR2); }
         public override bool Equals(object obj) { return Equals(obj as Resource); }
         public virtual bool Equals(Resource obj) { return this == obj; }
         public override int GetHashCode() { return base.GetHashCode(); }
@@ -238,8 +243,13 @@ namespace EvolutionSimulation.Entities
         public EntityResource(Vector2Int p, int id, int t) : base(p, t) { ID = id; }
         public EntityResource(int x, int y, int id, int t) : base(new Vector2Int(x, y), t) { ID = id; }
 
-        public static bool operator ==(EntityResource eR1, EntityResource eR2) { return eR1.ID == eR2.ID; }
-        public static bool operator !=(EntityResource eR1, EntityResource eR2) { return eR1.ID != eR2.ID; }
+        public static bool operator ==(EntityResource eR1, EntityResource eR2)
+        {
+            if (eR1 is null)
+                return eR2 is null;
+            return eR1.ID == eR2.ID;
+        }
+        public static bool operator !=(EntityResource eR1, EntityResource eR2) { return !(eR1 == eR2); }
         public override bool Equals(object obj) { return Equals(obj as EntityResource); }
         public override bool Equals(Resource obj) { return this == obj as EntityResource; }
         public override int GetHashCode() { return base.GetHashCode(); }
