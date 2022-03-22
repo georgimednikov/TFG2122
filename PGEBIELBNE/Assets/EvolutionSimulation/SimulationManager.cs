@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 namespace UnitySimulation
@@ -16,6 +17,8 @@ namespace UnitySimulation
 
         [Tooltip("Number of individuals per species")]
         public int IndividualsNumber;
+
+        public float TimeBetweenSteps = 1;
 
         [Tooltip("Directory where genes, chromosome, world and simulation parameters files are stored")]
         public string DataDirectory;
@@ -40,11 +43,16 @@ namespace UnitySimulation
             simulation.Run();
 
             simulation.Subscribe(worldCreatureManager);
+            StartCoroutine(StepWorld());
         }
 
-        void Update()
+        IEnumerator StepWorld()
         {
-            simulation.Step();
+            while (true)
+            {
+                simulation.Step();
+                yield return new WaitForSeconds(TimeBetweenSteps);
+            }
         }
     }
 }

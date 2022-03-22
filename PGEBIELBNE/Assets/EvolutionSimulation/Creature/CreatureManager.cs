@@ -23,6 +23,7 @@ namespace UnitySimulation
 
         float baseHeight;
 
+
         public void InitalizeCreature(Creature creature)
         {
             SpeciesExport species = new SpeciesExport(creature.speciesName, creature.stats);
