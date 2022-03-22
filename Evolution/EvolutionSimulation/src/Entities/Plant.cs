@@ -20,7 +20,7 @@ namespace EvolutionSimulation.Entities
         public new int x { get; private set; }
         public new int y { get; private set; }
 
-        virtual public new void Tick()
+        override public void Tick()
         {
             throw new NotImplementedException();
         }

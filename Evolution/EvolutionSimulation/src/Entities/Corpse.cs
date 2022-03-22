@@ -79,7 +79,7 @@ namespace EvolutionSimulation.Entities
         /// Destroys the corpse when it reaches the end of its lifetime
         /// or if it is completely eaten
         /// </summary>
-        public override void Tick()
+        override public void Tick()
         {
             lifeTime--;
             Edible = lifeTime > putridTime;
