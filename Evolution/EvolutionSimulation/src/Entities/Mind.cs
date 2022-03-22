@@ -10,7 +10,7 @@ namespace EvolutionSimulation.Entities
         Creature creature;
         World world;
 
-        EntityResource closestParent;
+        EntityResource parentToFollow;
         EntityResource worthyPrey;
         EntityResource worthyCorpse;
         EntityResource worthyPlant;
@@ -21,6 +21,11 @@ namespace EvolutionSimulation.Entities
             this.creature = creature;
             world = creature.world;
             mem = new Memory(creature, father, mother);
+            // Follow randomly the father or the mother
+            if (RandomGenerator.Next(0, 2) == 0)
+                parentToFollow = mem.Father;
+            else
+                parentToFollow = mem.Mother;
         }
 
         #region Memory
@@ -31,6 +36,8 @@ namespace EvolutionSimulation.Entities
         public void TargetEnemy(int cID) { mem.TargetEnemy(world.GetCreature(cID)); }
         public float PositionDanger(int x, int y) { return mem.GetPositionDanger(x, y); }
         public List<int> NearbyAllies() { return mem.NearbyAllies(); }
+        public int FatherID() { return mem.Father.ID; }
+        public int MotherID() { return mem.Mother.ID; }
         #endregion
 
         #region Updates
@@ -40,23 +47,27 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void UpdatePriorities()
         {
-            UpdateParent();
+            //UpdateParent();
             UpdatePrey();
             UpdateCorpse();
             UpdateWaterSource();
             UpdatePlant();
         }
-        private void UpdateParent()
+        /// <summary>
+        /// It is call when a parent dead. Set the parent to follow if the creature is a child
+        /// </summary>
+        /// <param name="parentID"> the ID of the parent that has dead</param>
+        public void UpdateParent(int parentID)
         {
-            //If there is no parent it is null by default.
-            if (mem.Mother == null) closestParent = mem.Father;
-            else if (mem.Father == null) closestParent = mem.Mother;
-            else
+            //The mother has dead 
+            if (mem.Mother != null && mem.Mother.ID == parentID)
+                parentToFollow = mem.Father;
+            //The father has dead 
+            else if (mem.Father != null && mem.Father.ID == parentID ) 
+                parentToFollow = mem.Mother;
+            else//both are dead 
             {
-                float fatherDist = creature.DistanceToObjective(mem.Father.position);
-                float motherDist = creature.DistanceToObjective(mem.Mother.position);
-                if (fatherDist < motherDist) closestParent = mem.Father;
-                else closestParent = mem.Mother;
+                parentToFollow = null;
             }
         }
         private void UpdatePrey()
@@ -183,7 +194,7 @@ namespace EvolutionSimulation.Entities
         #region Getters
         public bool Enemy(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Enemy, out id, out position); }
         public bool Menace(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Menace, out id, out position); }
-        public bool Parent(out int id, out Vector2Int position) { return AssignEntityInfo(closestParent, out id, out position); }
+        public bool Parent(out int id, out Vector2Int position) { return AssignEntityInfo(parentToFollow, out id, out position); }
         public bool Prey(out int id, out Vector2Int position) { return AssignEntityInfo(worthyPrey, out id, out position); }
         public bool Ally(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Allies[0], out id, out position); }
         public bool Mate(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Mate, out id, out position); }

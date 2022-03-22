@@ -8,9 +8,10 @@ namespace EvolutionSimulation.FSM.Creature.States
     /// </summary>
     class FollowParent : CreatureState
     {
+        Vector2Int parentPos;
 
         public FollowParent(Entities.Creature c) : base(c) { creature = c; }
-
+        
         public override int GetCost()
         {
             return creature.GetNextCostOnPath();
@@ -18,7 +19,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            creature.SetPath(creature.GetParentToFollowPosition().x, creature.GetParentToFollowPosition().y);
+            SetPos();
         }
 
         /// <summary>
@@ -29,17 +30,25 @@ namespace EvolutionSimulation.FSM.Creature.States
             Vector3 nextPos = creature.GetNextPosOnPath();
             if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-            creature.SetPath(creature.GetParentToFollowPosition().x, creature.GetParentToFollowPosition().y);
+            SetPos();
             Console.WriteLine(creature.speciesName + " FOLLOWS PARENT (" + creature.x + ", " + creature.y + ")");
         }
         public override string GetInfo()
         {
-            return creature.GetParentToFollowPosition().ToString();
+            return parentPos.ToString();
         }
 
         public override string ToString()
         {
             return "FollowParentState";
+        }
+
+        private void SetPos()
+        {
+            if (creature.Parent(out _, out parentPos))
+                creature.SetPath(parentPos.x, parentPos.y);
+            else//just in case the creature does not have a parent
+                creature.SetPath(creature.x, creature.y);
         }
     }
 }

@@ -35,7 +35,8 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 if (creature.stats.Gender == Genetics.Gender.Female)
                 {
-                    if (creature.GetClosestPossibleMatePosition() == null) return;
+                    // The creature whom it was mating had dead or something
+                    if (!creature.Mate()) return;
                     // Create a random number of childs
                     int numberChilds = RandomGenerator.Next(1, 5);//TODO: que el numero de hijos dependa de algo del cromosoma?
                     for (int i = 0; i < numberChilds; ++i)
@@ -48,27 +49,31 @@ namespace EvolutionSimulation.FSM.Creature.States
                         // The new creature's pos (near to the parents)
                         int nx = creature.x + RandomGenerator.Next(-1, 2);
                         int ny = creature.y + RandomGenerator.Next(-1, 2);
-                        Entities.Animal child = creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName);
+                        Entities.Animal child = creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName, creature.matingCreature.ID, creature.ID);
 
                         // Add the parents to the new creature and the child to the parents
-                        child.father = creature.matingCreature;
-                        child.mother = creature;
+                        //child.father = creature.matingCreature;
+                        //child.mother = creature;
+                        //TODO por que no tiene una lista con los hijos? para avisarles cuando se ha muere
                         creature.matingCreature.childs.Add(child);
                         creature.childs.Add(child);
-                        // Follow randomly the father or the mother
-                        if (RandomGenerator.Next(0, 2) == 0)
-                            child.parentToFollow = child.father;
-                        else
-                            child.parentToFollow = child.mother;
+                        
                     }
                     creature.timeToBeInHeat = -1;
                     creature.CreateDanger();
-                    Entities.Creature mate = creature.GetClosestPossibleMate();
-                    Console.WriteLine(creature.speciesName + "MATES WITH " + mate.speciesName + " AT (" + mate.x + ", " + mate.y + ")");
-                }                
+                }
+                ShowInfo();
             }
         }
 
+        private void ShowInfo()
+        {
+            int id;
+            creature.Mate(out id, out _);
+            Entities.Creature mate = creature.world.GetCreature(id);
+            Console.WriteLine(creature.speciesName + "MATES WITH " + mate.speciesName + " AT (" + mate.x + ", " + mate.y + ")");
+
+        }
         /// <summary>
         /// At the end of the action whatever the reason was, reset the timer
         /// and interact with the mating creature to stop mating
@@ -84,5 +89,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             return "MatingState";
         }
+
+
     }
 }

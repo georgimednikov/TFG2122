@@ -113,6 +113,11 @@ namespace EvolutionSimulation.Entities
             mind.UpdatePerception();
         }
 
+        public void ParentDead(int parentID)
+        {
+            mind.UpdateParent(parentID);
+        }
+
         void CheckTemperature()
         {
             double tileTemperature = world.map[x, y].temperature;

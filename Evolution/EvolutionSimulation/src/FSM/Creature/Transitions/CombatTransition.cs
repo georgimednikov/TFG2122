@@ -11,8 +11,9 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
+            Vector2Int preyPos;
             // If it has not been attacked and has no creature to hunt it does not engage in combat.
-            if (creature.GetPreyPosition() == null && !creature.HasBeenAttacked()) return false;
+            if (!creature.Prey(out _, out preyPos) && !creature.HasBeenAttacked()) return false;
 
             // Else if attacked it considers its nearby allies in combat.
             if (creature.HasBeenAttacked() &&
@@ -21,14 +22,13 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
                 return true;
 
             // Else it is trying to hunt
-            if (creature.stats.Diet != Genetics.Diet.Herbivore && creature.GetPreyPosition() != null && creature.IsHungry() &&
-                creature.stats.Aggressiveness >= creature.PositionDanger(creature.GetPreyPosition().x, creature.GetPreyPosition().y) &&  // TODO: ajustar valor
+            if (!creature.IsHerbivorous() && creature.Prey(out _, out preyPos)  && creature.IsHungry() &&
+                creature.stats.Aggressiveness >= creature.PositionDanger(preyPos.x, preyPos.y) &&  // TODO: ajustar valor
                 creature.AbleToFight())
             {
-                if (creature.stats.Diet != Genetics.Diet.Carnivore)
+                if (creature.IsCarnivorous())
                     return true;
-
-                else if (creature.GetFruitPosition() == null || creature.DistanceToObjective(creature.GetFruitPosition()) > creature.DistanceToObjective(creature.GetPreyPosition()))
+                else if (!creature.Plant(out _, out Vector2Int plantPos) || creature.DistanceToObjective(plantPos) > creature.DistanceToObjective(preyPos))
                     return true;
             }
 

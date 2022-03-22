@@ -19,7 +19,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            safePos = creature.GetClosestSafePlacePosition();
+            safePos = creature.SafePosition();
             creature.SetPath(safePos.x, safePos.y);
         }
 
@@ -28,9 +28,9 @@ namespace EvolutionSimulation.FSM.Creature.States
             Vector3 nextPos = creature.GetNextPosOnPath();
             if(nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-            if (safePos != creature.GetClosestSafePlacePosition())
+            if (safePos != creature.SafePosition())
             {
-                safePos = creature.GetClosestSafePlacePosition();
+                safePos = creature.SafePosition();
                 creature.SetPath(safePos.x, safePos.y);
             }
             Console.WriteLine(creature.speciesName + " GOES TO SAFE PLACE (" + creature.x + ", " + creature.y + ")");

@@ -8,6 +8,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     /// </summary>
     class Eating : CreatureState
     {
+        int foodID;
         public Eating(Entities.Creature c) : base(c) { creature = c; }
 
         public override void OnEntry()
@@ -22,20 +23,20 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
-            if(creature.stats.Diet == Genetics.Diet.Carnivore )
+            if(creature.IsCarnivorous())
             {
                 EatCorpse();
             }
-            else if(creature.stats.Diet == Genetics.Diet.Herbivore)
+            else if(creature.IsHerbivorous())
             {
                 EatPlant();
                 creature.SafeEdiblePlant();
             }
             else//Omnivore
             {
-                if (creature.GetClosestCorpse() != null)
+                if (creature.Corpse())
                     EatCorpse();
-                else if (creature.GetFruit() != null)
+                else if (creature.Plant())
                 {
                     EatPlant();
                     creature.SafeEdiblePlant();
@@ -59,7 +60,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         protected void EatPlant()
         {
-            Entities.EdiblePlant closest = creature.GetFruit();
+            creature.Plant(out foodID, out _);
+            Entities.EdiblePlant closest = creature.world.GetStaticEntity(foodID) as Entities.EdiblePlant;
             creature.stats.CurrEnergy += closest.Eat();
             Console.WriteLine(creature.speciesName + " EATS FRUIT AT (" + closest.x + ", " + closest.y + ")");
         }
@@ -71,10 +73,9 @@ namespace EvolutionSimulation.FSM.Creature.States
         protected void EatCorpse()
         {
             Entities.Corpse closest;
-            if (creature.GetClosestCorpse() != null)
-                closest = creature.GetClosestCorpse();
-            else
-                closest = creature.GetClosestRottenCorpse();
+            creature.Corpse(out foodID, out _);
+            closest = creature.world.GetStaticEntity(foodID) as Entities.Corpse;
+                
             closest.ReceiveInteraction(creature, Entities.Interactions.eat);
             Console.WriteLine(creature.speciesName + " EATS CORPSE AT (" + closest.x + ", " + closest.y + ")");
         }

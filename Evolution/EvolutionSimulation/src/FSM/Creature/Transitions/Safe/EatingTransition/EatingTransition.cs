@@ -20,30 +20,28 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         /// <returns> True if close the an eating objective</returns>
         public override bool Evaluate()
         {
+            Vector2Int pos;
             //Herbivore
-            if(creature.stats.Diet == Genetics.Diet.Herbivore)
-                return creature.GetFruitPosition() != null && creature.DistanceToObjective(creature.GetFruitPosition()) <= UniverseParametersManager.parameters.adjacentLength;
+            if(creature.IsHerbivorous())
+                return creature.Plant(out _, out pos) && creature.DistanceToObjective(pos) <= UniverseParametersManager.parameters.adjacentLength;
 
             //Carnivore
-            if (creature.stats.Diet == Genetics.Diet.Carnivore)
+            if (creature.IsCarnivorous())
             {
-                if (creature.GetClosestCorpsePosition() != null && creature.DistanceToObjective(creature.GetClosestCorpsePosition()) <= UniverseParametersManager.parameters.adjacentLength)
-                    return true;
-                else if (creature.GetClosestRottenCorpsePosition() != null && creature.DistanceToObjective(creature.GetClosestRottenCorpsePosition()) <= UniverseParametersManager.parameters.adjacentLength)
+                if (creature.Corpse(out _, out pos) && creature.DistanceToObjective(pos) <= UniverseParametersManager.parameters.adjacentLength)
                     return true;
                 return false;
             }
-
-            if (creature.GetClosestCorpsePosition() != null && creature.GetFruitPosition() != null)
-            {
-                int distPlant = creature.DistanceToObjective(creature.GetFruitPosition()),
-                    distCorpse = creature.DistanceToObjective(creature.GetClosestCorpsePosition());
-                //Omnivore, close to an eating objective
-                return (creature.GetClosestCorpsePosition() != null && distCorpse <= UniverseParametersManager.parameters.adjacentLength) ||
-                    (creature.GetFruitPosition() != null && distPlant <= UniverseParametersManager.parameters.adjacentLength);
-            }
-
-            return creature.DistanceToObjective(creature.GetClosestRottenCorpsePosition()) <= UniverseParametersManager.parameters.adjacentLength;
+            //Omnivore
+            Vector2Int plantPos;
+            creature.Corpse(out _, out pos);
+            creature.Plant(out _, out plantPos);
+            int distPlant = creature.DistanceToObjective(plantPos),
+                distCorpse = creature.DistanceToObjective(pos);
+            //Omnivore, close to an eating objective
+            return (distCorpse <= UniverseParametersManager.parameters.adjacentLength) ||
+                (distPlant <= UniverseParametersManager.parameters.adjacentLength);
+            
         }
 
         public override string ToString()

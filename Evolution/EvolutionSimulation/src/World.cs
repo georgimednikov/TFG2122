@@ -234,11 +234,11 @@ namespace EvolutionSimulation
         /// Creatures are entities with abilities and 'complex' behaviours.
         /// T: Any subclass of Creature i.e. Animal
         /// </summary>
-        public T CreateCreature<T>(int x, int y, CreatureChromosome chromosome = null, string name = "None") where T : Creature, new()
+        public T CreateCreature<T>(int x, int y, CreatureChromosome chromosome = null, string name = "None", int fatherID = -1, int motherID = -1) where T : Creature, new()
         {
             T ent = new T();
             
-            ent.Init(entitiesID, this, x, y, chromosome, name);
+            ent.Init(entitiesID, this, x, y, chromosome, name, fatherID, motherID);
             taxonomy.AddCreatureToSpecies(ent);
 
             Creatures.Add(entitiesID, ent);
@@ -306,7 +306,7 @@ namespace EvolutionSimulation
             {
                 if (Creatures.ContainsKey(id))
                 {
-                    Creatures[id].ParentDead(Creatures[id]);
+                    Creatures[id].ParentDead(id);
                     Creatures.Remove(id);
                 }
                 else
