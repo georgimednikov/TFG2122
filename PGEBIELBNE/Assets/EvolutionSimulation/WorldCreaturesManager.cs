@@ -88,7 +88,20 @@ namespace UnitySimulation
             Physics.Raycast(new Vector3(xPos, terrain.terrainData.size.y + 10, zPos), Vector3.down, out hit, Mathf.Infinity, LayerMask.GetMask("World"));
             GameObject gO = Instantiate(creaturePrefab, new Vector3(hit.point.x, hit.point.y, hit.point.z), Quaternion.identity);
             gO.GetComponent<CreatureManager>().InitalizeCreature(c);
+            // Subscribes to the event launched when a creature receives an interaction
+            c.ReceiveInteractionEvent += ReceiveInteractionListener;
             return gO;
+        }
+
+        /// <param name="receiver">Which creature received an interaction</param>
+        /// <param name="sender">Which creature sent an interaction</param>
+        /// <param name="type">Which interaction was sent</param>
+        void ReceiveInteractionListener(Creature receiver, Creature sender, Interactions type)
+        {
+            if(type == Interactions.attack)
+            {
+                _creatures[receiver].GetComponent<CreatureEffects>().Bite();
+            }
         }
 
         void UpdateCreature(Creature c, GameObject gO)
@@ -96,7 +109,8 @@ namespace UnitySimulation
             // Position
             gO.GetComponent<CreatureLerpPosition>().LerpToPosition(new Vector3(c.x, gO.transform.position.y, c.y));
             // State visualization
-            gO.GetComponent<CreatureManager>().statusBar.GetComponent<StatusBar>().SetStatus(c.GetState());
+            string state = c.GetState();
+            gO.GetComponent<CreatureManager>().statusBar.GetComponent<StatusBar>().SetStatus(state);
             gO.GetComponent<CreatureManager>().statusBar.GetComponent<StatusBar>().SetStatusInfo(c.GetStateInfo());
         }
 

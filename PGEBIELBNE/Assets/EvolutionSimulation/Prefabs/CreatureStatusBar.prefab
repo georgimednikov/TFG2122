@@ -81,7 +81,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 206671857242264571}
-  m_Text: ExploreState
+  m_Text: WanderState
   m_OffsetZ: 0
   m_CharacterSize: 0.01
   m_LineSpacing: 1
@@ -518,7 +518,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6342307553813194500}
-  m_Text: < 0, 0 >
+  m_Text: WANDER
   m_OffsetZ: 0
   m_CharacterSize: 0.01
   m_LineSpacing: 1
