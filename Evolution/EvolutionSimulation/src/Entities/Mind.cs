@@ -10,17 +10,28 @@ namespace EvolutionSimulation.Entities
         Creature creature;
         World world;
 
+        EntityResource closestParent;
         EntityResource worthyPrey;
         EntityResource worthyCorpse;
         EntityResource worthyPlant;
         Vector2Int worthyWaterPosition;
 
-        public Mind(Creature creature, Creature father, Creature mother)
+        public Mind(Creature creature, int father, int mother)
         {
             this.creature = creature;
             world = creature.world;
             mem = new Memory(creature, father, mother);
         }
+
+        #region Memory
+        public void CreateDanger() { mem.DangerousPosition(); }
+        public void SafeWaterSource() { mem.SafeWaterSource(); }
+        public void SafeEdiblePlant() { mem.SafeEdiblePlant(); }
+        public void UpdatePerception() { mem.CalculatePerceptionRadius(); }
+        public void TargetEnemy(int cID) { mem.TargetEnemy(world.GetCreature(cID)); }
+        public float PositionDanger(int x, int y) { return mem.GetPositionDanger(x, y); }
+        public List<int> NearbyAllies() { return mem.NearbyAllies(); }
+        #endregion
 
         #region Updates
         /// <summary>
@@ -29,12 +40,25 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void UpdatePriorities()
         {
+            UpdateParent();
             UpdatePrey();
             UpdateCorpse();
             UpdateWaterSource();
             UpdatePlant();
         }
-
+        private void UpdateParent()
+        {
+            //If there is no parent it is null by default.
+            if (mem.Mother == null) closestParent = mem.Father;
+            else if (mem.Father == null) closestParent = mem.Mother;
+            else
+            {
+                float fatherDist = creature.DistanceToObjective(mem.Father.position);
+                float motherDist = creature.DistanceToObjective(mem.Mother.position);
+                if (fatherDist < motherDist) closestParent = mem.Father;
+                else closestParent = mem.Mother;
+            }
+        }
         private void UpdatePrey()
         {
             if (mem.Preys.Count == 0) //If there are no preys, null.
@@ -62,7 +86,7 @@ namespace EvolutionSimulation.Entities
                 worthyCorpse = null;
                 return;
             }
-            if (mem.FreshCorpses.Count == 0) //If there are no fresh corpses, it only eats a rotten one (if there is one) if desperate.
+            else if (mem.FreshCorpses.Count == 0) //If there are no fresh corpses, it only eats a rotten one (if there is one) if desperate.
             {
                 if (creature.IsVeryHungry()) worthyCorpse = mem.RottenCorpses[0];
                 else worthyCorpse = null;
@@ -138,18 +162,18 @@ namespace EvolutionSimulation.Entities
         {
             float aDanger = mem.GetPositionDanger(w1.position);
             float bDanger = mem.GetPositionDanger(w2.position);
-            float total = Math.Max(Math.Max(aDanger, bDanger), 0.000001f);
+            float total = Math.Max(Math.Max(aDanger, bDanger), 0.1f);
             float aRelDanger = aDanger / total;
             float bRelDanger = bDanger / total;
 
 
             float aDist = creature.DistanceToObjective(w1.position);
             float bDist = creature.DistanceToObjective(w2.position);
-            total = Math.Max(Math.Max(aDist, bDist), 0.000001f);
+            total = Math.Max(Math.Max(aDist, bDist), 0.1f);
             float aRelDist = aDist / total;
             float bRelDist = bDist / total;
 
-            if (aRelDanger + aRelDist < bRelDist + bRelDist)
+            if (aRelDanger + aRelDist < bRelDanger + bRelDist)
                 return w1;
             else
                 return w2;
@@ -159,10 +183,9 @@ namespace EvolutionSimulation.Entities
         #region Getters
         public bool Enemy(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Enemy, out id, out position); }
         public bool Menace(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Menace, out id, out position); }
-        public bool Father(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Father, out id, out position); }
-        public bool Mother(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Mother, out id, out position); }
+        public bool Parent(out int id, out Vector2Int position) { return AssignEntityInfo(closestParent, out id, out position); }
         public bool Prey(out int id, out Vector2Int position) { return AssignEntityInfo(worthyPrey, out id, out position); }
-        public bool Ally(out int id, out Vector2Int position) { return AssignEntityInfo(mem.NearbyAllies[0], out id, out position); }
+        public bool Ally(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Allies[0], out id, out position); }
         public bool Mate(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Mate, out id, out position); }
         public bool Corpse(out int id, out Vector2Int position) { return AssignEntityInfo(worthyCorpse, out id, out position); }
         public bool Plant(out int id, out Vector2Int position) { return AssignEntityInfo(worthyPlant, out id, out position); }

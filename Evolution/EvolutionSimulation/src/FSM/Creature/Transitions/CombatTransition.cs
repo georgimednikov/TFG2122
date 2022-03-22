@@ -22,7 +22,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
             // Else it is trying to hunt
             if (creature.stats.Diet != Genetics.Diet.Herbivore && creature.GetPreyPosition() != null && creature.IsHungry() &&
-                creature.stats.Aggressiveness >= creature.GetDanger(creature.GetPreyPosition().x, creature.GetPreyPosition().y) &&  // TODO: ajustar valor
+                creature.stats.Aggressiveness >= creature.PositionDanger(creature.GetPreyPosition().x, creature.GetPreyPosition().y) &&  // TODO: ajustar valor
                 creature.AbleToFight())
             {
                 if (creature.stats.Diet != Genetics.Diet.Carnivore)

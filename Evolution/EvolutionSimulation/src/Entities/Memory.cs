@@ -46,13 +46,30 @@ namespace EvolutionSimulation.Entities
         public EntityResource Enemy { get; private set; }               //Creature that has attacked this creature or an ally of its.
         public EntityResource Menace { get => menace; }              //Closest creature that is not part of the creature's "family" regarding its species.
         private EntityResource menace;
-        public EntityResource Father { get => father; }
+        public EntityResource Father { //If the father is forgotten or dead, his position is lost but not his ID so
+                                       //it can be recognized, but in practice it is the same as returning null until found again.
+            get
+            {
+                if (father.position.x < 0)
+                    return null;
+                return father;
+            }
+        }
         private EntityResource father;
-        public EntityResource Mother { get => mother; }
+        public EntityResource Mother //If the mother is forgotten or dead, her position is lost but not her ID so
+                                     //it can be recognized, but in practice it is the same as returning null until found again.
+        {
+            get
+            {
+                if (mother.position.x < 0)
+                    return null;
+                return mother;
+            }
+        }
         private EntityResource mother;
         public EntityResource Mate { get; private set; }
         public List<EntityResource> Preys { get; private set; }         //Closest reachable creature.
-        public List<EntityResource> NearbyAllies { get; private set; }
+        public List<EntityResource> Allies { get; private set; }
         public List<EntityResource> FreshCorpses { get; private set; }
         public List<EntityResource> RottenCorpses { get; private set; }
         public List<Resource> WaterPositions { get; private set; }
@@ -63,15 +80,22 @@ namespace EvolutionSimulation.Entities
         public Vector2Int NewPosition { get => FindNewPosition(); }
 
 
-        public Memory(Creature c, Creature f, Creature m)
+        public Memory(Creature c, int fID, int mID)
         {
             thisCreature = c;
             world = c.world;
-            father = new EntityResource(f.x, f.y, f.ID, maxExperienceTicks);
-            mother = new EntityResource(m.x, m.y, m.ID, maxExperienceTicks);
-
+            Creature parent = world.GetCreature(fID);
+            if (parent != null)
+                father = new EntityResource(parent.x, parent.y, parent.ID, maxExperienceTicks);
+            else
+                father = null; // should not happen
+            parent = world.GetCreature(mID);
+            if (parent != null)
+                father = new EntityResource(parent.x, parent.y, parent.ID, maxExperienceTicks);
+            else
+                mother = null;  // should not happen
             Preys = new List<EntityResource>();
-            NearbyAllies = new List<EntityResource>();
+            Allies = new List<EntityResource>();
             FreshCorpses = new List<EntityResource>();
             RottenCorpses = new List<EntityResource>();
             dangersRemembered = new List<Position>();
@@ -133,18 +157,18 @@ namespace EvolutionSimulation.Entities
                     creature.progenitorSpeciesName == thisCreature.speciesName ||
                     creature.speciesName == thisCreature.progenitorSpeciesName)
                 {
-                    UpdateList(NearbyAllies, resource, maxExperienceTicks);
-                    if (creature.ID == Father.ID)
-                        RefreshMemory(Father, maxExperienceTicks);
-                    else if (creature.ID == Mother.ID)
-                        RefreshMemory(Mother, maxExperienceTicks);
+                    UpdateList(Allies, resource, maxExperienceTicks);
+                    if (creature.ID == father.ID)
+                        RefreshMemory(father, maxExperienceTicks);
+                    else if (creature.ID == mother.ID)
+                        RefreshMemory(mother, maxExperienceTicks);
                 }
                 //Else they have no relation
                 else
                 {
                     int dist = thisCreature.DistanceToObjective(creature);
                     if (creature.stats.Intimidation > thisCreature.stats.Aggressiveness &&
-                        (Menace == null || thisCreature.DistanceToObjective(Menace.position) >= dist)) //This is equal to update the rival information if it is the same
+                        (menace == null || thisCreature.DistanceToObjective(menace.position) >= dist)) //This is equal to update the rival information if it is the same
                     {
                         menace = resource;
                     }
@@ -171,15 +195,15 @@ namespace EvolutionSimulation.Entities
             foreach (StaticEntity entity in perceivedEntities)
             {
                 EntityResource resource = new EntityResource(entity.x, entity.y, entity.ID, maxExperienceTicks);
-                if (entity is Corpse)
+                if (entity is Corpse && !thisCreature.IsHerbivorous())
                 {
-                    Corpse newCorpse = entity as Corpse;//TODO cambiar 0.4
-                    if (thisCreature.HasAbility(Genetics.CreatureFeature.Scavenger, 0.4f) || newCorpse.Edible)
+                    Corpse newCorpse = entity as Corpse;
+                    if (thisCreature.HasAbility(Genetics.CreatureFeature.Scavenger, 0.4f) || newCorpse.Edible) //TODO cambiar 0.4
                         UpdateList(FreshCorpses, resource, maxExperienceTicks);
                     else
                         UpdateList(RottenCorpses, resource, maxExperienceTicks);
                 }
-                else if (entity is EdiblePlant && !(entity as EdiblePlant).eaten)
+                else if (entity is EdiblePlant && !(entity as EdiblePlant).eaten && !thisCreature.IsCarnivorous())
                 {
                     UpdateList(EdiblePlants, resource, maxExperienceTicks);
                 }
@@ -237,23 +261,23 @@ namespace EvolutionSimulation.Entities
             SortAndAdjustLists();
 
             Mate = null; //By default there is no mate available.
-            for (int i = 0; i < NearbyAllies.Count; i++) //For every ally the creature remembers the following comprobations are done:
+            for (int i = 0; i < Allies.Count; i++) //For every ally the creature remembers the following comprobations are done:
             {
-                Creature ally = world.GetCreature(NearbyAllies[0].ID);
+                Creature ally = world.GetCreature(Allies[0].ID);
                 if (ally == null || ally.stats.Gender != thisCreature.stats.Gender) //This is done to ignore creatures of the same gender as this one. The gender is
                     continue;                                                       //checked although the creature might not be in sight, but it is not modified
                                                                                     //and this way the gender is not saved (which would be inconvinient).
-                if (thisCreature.DistanceToObjective(NearbyAllies[0].position) <= perceptionRadius) //If it can see the ally and therefore exists.
+                if (thisCreature.DistanceToObjective(Allies[0].position) <= perceptionRadius) //If it can see the ally and therefore exists.
                 {
                     if (ally.wantMate) //If it wants to mate and is of the opposite danger, it is a match.
                     {
-                        Mate = NearbyAllies[i];
+                        Mate = Allies[i];
                         break;
                     }
                 }
                 else //If the creature cannot see the next ally, since they are ordered by distance, it goes to the position it remembers.
                 {
-                    Mate = NearbyAllies[i];
+                    Mate = Allies[i];
                     break;
                 }
             }
@@ -272,9 +296,14 @@ namespace EvolutionSimulation.Entities
             if (explorePositionsRemembered.Count > maxPositionsRemembered)
                 explorePositionsRemembered.Dequeue();
         }
-        //TODO Comentario
         /// <summary>
-        /// 
+        /// To find a new unexplored position, the creature goes to
+        /// a position following the opposite direction of the average
+        /// of the most recent positions that the creature has visited.
+        /// It takes the furthest position that it can reach in that direction.
+        /// If the position is not reachable, a new position is calculated in a
+        /// circumference, with an angle and/or radius adjustment until 
+        /// a reachable position its achieved.
         /// </summary>
         private Vector2Int FindNewPosition()
         {
@@ -369,6 +398,19 @@ namespace EvolutionSimulation.Entities
             Enemy = new EntityResource(creature.x, creature.y, creature.ID, maxExperienceTicks);
         }
 
+        public List<int> NearbyAllies()
+        {
+            List<int> allies = new List<int>();
+            foreach (EntityResource ally in Allies)
+            {
+                if (thisCreature.DistanceToObjective(ally.position) <= perceptionRadius)
+                    allies.Add(ally.ID);
+                else
+                    break;
+            }
+            return allies;
+        }
+
         private void RefreshMemory(Resource r, int ticks)
         {
             r.ticks = ticks;
@@ -398,7 +440,7 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Saves the closest mass of water as safe in memory, making the creature prefer it over the closest one, if not too far away.
         /// </summary>
-        public void SafeWater()
+        public void SafeWaterSource()
         {
             Position posDanger = GetFromPositionDangers(WaterPositions[0].position);
             if (posDanger != null) //If the position is already in the list it is updated.
@@ -417,7 +459,7 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Saves the closest edible plant as safe in memory, making the creature prefer it over the closest one, if not too far away.
         /// </summary>
-        public void SafePlant()
+        public void SafeEdiblePlant()
         {
             Position posDanger = GetFromPositionDangers(EdiblePlants[0].position);
             if (posDanger != null) //If the position is already in the list it is updated.
@@ -458,9 +500,9 @@ namespace EvolutionSimulation.Entities
             Preys.Sort(resourceComparer);
             Preys.RemoveRange(maxResourcesRemembered, Preys.Count);
 
-            RemoveFakeInformation(NearbyAllies);
-            NearbyAllies.Sort(resourceComparer);
-            NearbyAllies.RemoveRange(maxResourcesRemembered, NearbyAllies.Count);
+            RemoveFakeInformation(Allies);
+            Allies.Sort(resourceComparer);
+            Allies.RemoveRange(maxResourcesRemembered, Allies.Count);
 
             RemoveFakeInformation(FreshCorpses);
             FreshCorpses.Sort(resourceComparer);
@@ -511,7 +553,7 @@ namespace EvolutionSimulation.Entities
         private void Forget()
         {
             i_forgor(Preys);
-            i_forgor(NearbyAllies);
+            i_forgor(Allies);
             i_forgor(FreshCorpses);
             i_forgor(RottenCorpses);
             i_forgor(WaterPositions);

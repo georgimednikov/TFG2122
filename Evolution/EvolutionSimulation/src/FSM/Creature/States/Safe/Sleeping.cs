@@ -27,7 +27,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (creature.stats.CurrRest > creature.stats.MaxRest)
             {
                 creature.stats.CurrRest = creature.stats.MaxRest;
-                creature.CreateExperience(creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier);
+                creature.CreateDanger();
             }
             Console.WriteLine(creature.speciesName + " SLEEPS");
         }

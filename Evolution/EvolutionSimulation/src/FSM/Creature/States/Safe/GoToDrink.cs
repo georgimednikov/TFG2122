@@ -18,12 +18,12 @@ namespace EvolutionSimulation.FSM.Creature.States
             //The position of the water mass in which the creature would be most interested in is decided
             //between the closest one and the closest one that has proven to be safe, based on distance.
             Vector2Int posToDrink;
-            if (creature.GetSafeWaterPosition() == null || 
-                (creature.DistanceToObjective(creature.GetSafeWaterPosition()) >
+            if (creature.WaterPosition() == null || 
+                (creature.DistanceToObjective(creature.WaterPosition()) >
                 creature.DistanceToObjective(creature.GetClosestWaterPosition()) * UniverseParametersManager.parameters.safePrefferedOverClosestResourceRatio))
                 posToDrink = creature.GetClosestWaterPosition();
             else
-                posToDrink = creature.GetSafeWaterPosition();
+                posToDrink = creature.WaterPosition();
 
             //Angle between the creatures position and the position of the water from 0 to 180 positive or negative.
                 double degrees = Math.Atan2(creature.y - posToDrink.y, creature.x - posToDrink.x) * (180 / Math.PI);

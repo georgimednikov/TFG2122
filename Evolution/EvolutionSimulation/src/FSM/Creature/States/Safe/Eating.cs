@@ -29,7 +29,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             else if(creature.stats.Diet == Genetics.Diet.Herbivore)
             {
                 EatPlant();
-                creature.SafePlantFound();
+                creature.SafeEdiblePlant();
             }
             else//Omnivore
             {
@@ -38,7 +38,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 else if (creature.GetFruit() != null)
                 {
                     EatPlant();
-                    creature.SafePlantFound();
+                    creature.SafeEdiblePlant();
                 }
             }
         }

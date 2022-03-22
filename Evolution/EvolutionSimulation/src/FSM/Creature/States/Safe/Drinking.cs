@@ -23,7 +23,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 creature.stats.CurrHydration = creature.stats.MaxHydration;
                 //TODO: Mirar los valores cuando se llama a SafeWaterSpotFound SafePlantFound y CreateExperience
-                creature.SafeWaterSpotFound();
+                creature.SafeWaterSource();
             }
             Console.WriteLine(creature.speciesName + " DRINKS (" + creature.x + ", " + creature.y + ")");
         }

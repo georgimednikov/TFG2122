@@ -33,7 +33,7 @@ namespace EvolutionSimulation.Entities
         /// Initializes a creature in a world and position
         /// </summary>
         /// <param name="w">World in which it'll reside</param>
-        public void Init(int ID, World w, int x, int y, CreatureChromosome chromosome = default(CreatureChromosome), string name = "None")
+        public void Init(int ID, World w, int x, int y, CreatureChromosome chromosome = default(CreatureChromosome), string name = "None", int fatherID = -1, int motherID = -1)
         {
             this.ID = ID;
             world = w;
@@ -48,11 +48,10 @@ namespace EvolutionSimulation.Entities
             }
             speciesName = name;
             stats = new CreatureStats();
-            childs = new List<Creature>();
             //TODO: Los parametros de abajo no se donde ponerlos xd
             //speciesName = "None";
             SetStats();
-            memory = new Memory(this, world);
+            mind = new Mind(this, fatherID, motherID);
             this.x = x;
             this.y = y;
             timeToBeInHeat = stats.TimeBetweenHeats;
@@ -84,7 +83,7 @@ namespace EvolutionSimulation.Entities
             CheckTemperature();
             FemaleTick();
 
-            memory.Update();
+            mind.UpdatePriorities();
             foreach (Status.Status s in activeStatus)   // Activates each status effect
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
 
@@ -111,36 +110,7 @@ namespace EvolutionSimulation.Entities
             else
                 stats.CurrentVision = 1;
 
-            memory.CalculatePerceptionRadius();
-        }
-
-        /// <summary>
-        /// When a creature dies calls this method to notify its children
-        /// that the creature has died
-        /// If the child is following this parent and remember where is his 
-        /// other parent, the child start following it, otherwise, he doesnt follow no one
-        /// </summary>
-        /// <param name="parent"> The parent of the creature that has died</param>
-        public void ParentDead(Creature parent)
-        {
-            if (parent == father)
-            {
-                if (GetFatherPosition() != null)
-                    father = null;
-                //the creature knows the position of his mother and it is not following her
-                if (GetMotherPosition() != null && parentToFollow != mother)
-                    parentToFollow = GetMother();
-                else parentToFollow = null;
-            }
-            else
-            {
-                if (GetMotherPosition() != null)
-                    mother = null;
-                //the creature knows the position of his father and it is not following him
-                if (GetFatherPosition() != null && parentToFollow != father)
-                    parentToFollow = GetFather();
-                else parentToFollow = null;
-            }
+            mind.UpdatePerception();
         }
 
         void CheckTemperature()
@@ -165,8 +135,7 @@ namespace EvolutionSimulation.Entities
                 ((range * (UniverseParametersManager.parameters.maxHealthTemperatureDamage - UniverseParametersManager.parameters.minHealthTemperatureDamage)) +
                 UniverseParametersManager.parameters.minHealthTemperatureDamage);
             stats.CurrHealth -= (float)damage;
-            double danger = stats.Aggressiveness * UniverseParametersManager.parameters.maxTemperatureAggressivenessPercentage;
-            memory.DangerousTemperature();
+            mind.CreateDanger();
         }
 
         /// <summary>
@@ -520,19 +489,21 @@ namespace EvolutionSimulation.Entities
             stats.CurrHealth -= ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
 
             //If the creature has enough allies to put up a fight the gank him together.
-            List<Creature> allies = memory.GetNearbyAllies();
+            List<int> allies = mind.NearbyAllies();
             List<Creature> fighters = new List<Creature>();
-            foreach (Creature ally in allies)
+            foreach (int ally in allies)
             {
-                if (ally.AbleToFight())
-                    fighters.Add(ally);
+                Creature a = world.GetCreature(ally);
+                if (a != null && a.AbleToFight())
+                    fighters.Add(a);
             }
 
             // If the pack is aggressive enought they will fight, else nothing happens.
-            if (stats.Aggressiveness * (fighters.Count + (AbleToFight() ? 1 : 0)) >= GetDanger(GetEnemy().x, GetEnemy().y))
+            Vector2Int enemyPos; Enemy(out _, out enemyPos);
+            if (stats.Aggressiveness * (fighters.Count + (AbleToFight() ? 1 : 0)) >= PositionDanger(enemyPos.x, enemyPos.y))
                 foreach (Creature fighter in fighters)
                 {
-                    fighter.TargetEnemy(interacter);
+                    fighter.TargetEnemy(interacter.ID);
                 }
         }
 
@@ -593,11 +564,9 @@ namespace EvolutionSimulation.Entities
         #region Creature Information
 
         // Stats related information
+        public bool IsCarnivorous() { return stats.Diet == Diet.Carnivore; }
+        public bool IsHerbivorous() { return stats.Diet == Diet.Herbivore; }
 
-        public bool IsInDangerousPosition()
-        {
-            return memory.GetPositionDanger(x, y) > 0;
-        }
         /// <summary>
         /// Check if the creature is hunger (need to eat)
         /// </summary>
@@ -662,10 +631,11 @@ namespace EvolutionSimulation.Entities
             float mF = chromosome.GetFeatureMax(feat);
             return unlock <= f / mF;
         }
+        #endregion
 
-        #region Memory
+        #region Mind
         // Memory related information
-        public Memory memory;
+        Mind mind;
 
         /// <summary>
         /// Check if the eating objective is not null
@@ -673,158 +643,118 @@ namespace EvolutionSimulation.Entities
         /// <returns>True if the creature knows where to eat </returns>
         public bool HasEatingObjective()
         {
-            // Hervibore and not plant objective
-            if (stats.Diet == Diet.Herbivore && memory.ClosestFruitPosition() == null)
-                return true;
-            // Carnivore and not corpse objective
-            if (stats.Diet == Diet.Carnivore && memory.ClosestCorpsePosition() == null)
-                return true;
-            // Omnivore and not plant and corpse objective
-            if (stats.Diet == Diet.Omnivore && memory.ClosestCorpsePosition() == null && memory.ClosestFruitPosition() == null)
-                return true;
-
-            return false;
-        }
-
-        /// <summary>
-        /// Check if the creature can eat a rotten corpse as an alternative to a good food source.
-        /// </summary>
-        /// <returns>True if the creature knows where to eat </returns>
-        public bool CanEatRottenCorpse()
-        {
-            if (stats.Diet == Diet.Herbivore)
-                return false;
-
-            return GetClosestRottenCorpsePosition() != null;
+            return Plant() || Corpse();
         }
 
         /// <summary>
         /// Gives the creature an enemy to target in combat related activities.
         /// </summary>
         /// <param name="creature">Creature to consider an enemy</param>
-        public void TargetEnemy(Creature creature) { memory.TargetEnemy(creature); }
+        public void TargetEnemy(int creature) { mind.TargetEnemy(creature); }
         /// <summary>
         /// Returns true if this creature or an ally in sight has been attacked;
         /// </summary>
-        public bool HasBeenAttacked() { return memory.HasEnemy(); }
+        public bool HasBeenAttacked() { return mind.Enemy(); }
 
         /// <summary>
         /// Returns the danger level of the tile in the map on which the creature is. Danger is calculated based on Intimidation.
         /// </summary>
-        public float GetDanger(int x, int y) { return memory.GetPositionDanger(x, y); }
+        public float PositionDanger(int x, int y) { return mind.PositionDanger(x, y); }
         /// <summary>
         /// Creatres an experience for the creature in the current tile that it is in.
         /// If its positive, it is a good experience, if it is negative, a bad one.
         /// </summary>
-        public void CreateExperience(float exp) { memory.CreateExperience(x, y, exp); }
+        public void CreateDanger() { mind.CreateDanger(); }
         /// <summary>
         /// Saves in memory a safe drinking spot and updates the danger levels around it.
         /// </summary>
-        public void SafeWaterSpotFound() { memory.SafeWaterSpotFound(); }
+        public void SafeWaterSource() { mind.SafeWaterSource(); }
         /// <summary>
         /// Saves in memory a safe plant to eat and updates the danger levels around it.
         /// </summary>
-        public void SafePlantFound() { memory.SafePlantFound(); }
-        /// <summary>
-        /// Returns the position of the closest safe water source.
-        /// </summary>
-        public Vector2Int GetSafeWaterPosition() { return memory.SafeWaterPosition(); }
-        /// <summary>
-        /// Returns the position of the closest safe edible plant.
-        /// </summary>
-        public Vector2Int GetSafeFruitPosition() { return memory.SafeFruitPosition(); }
+        public void SafeEdiblePlant() { mind.SafeEdiblePlant(); }
 
         /// <summary>
-        /// Returns the position of the closest ally the creature remembers.
+        /// Gets the information of the enemy the creature wants engage in combat
         /// </summary>
-        public Vector2Int GetClosestAllyPosition() { return memory.ClosestAllyPosition(); }
+        /// <param name="id"> The enemy ID </param>
+        /// <param name="position"> The enemy position </param>
+        /// <returns> False if it has no enemy, true otherwise </returns>
+        public bool Enemy(out int id, out Vector2Int position) { return mind.Enemy(out id, out position); }
+        public bool Enemy() { return Enemy(out _, out _); }
         /// <summary>
-        /// Returns the position of the father the creature remembers.
+        /// Gets the information of the nearest dangerous creature
         /// </summary>
-        public Vector2Int GetFatherPosition() { return memory.FatherPosition(); }
+        /// <param name="id"> The menace ID </param>
+        /// <param name="position"> The menace position </param>
+        /// <returns> False if it has no menace, true otherwise </returns>
+        public bool Menace(out int id, out Vector2Int position) { return mind.Menace(out id, out position); }
+        public bool Menace() { return Menace(out _, out _); }
         /// <summary>
-        /// Returns the position of the mother the creature remembers.
+        /// Gets the information of the closest parent to the creature
         /// </summary>
-        public Vector2Int GetMotherPosition() { return memory.MotherPosition(); }
+        /// <param name="id"> The parent ID </param>
+        /// <param name="position"> The latest parent position that the creature remembers </param>
+        /// <returns> False if it has no parent, true otherwise </returns>
+        public bool Parent(out int id, out Vector2Int position) { return mind.Parent(out id, out position); }
+        public bool Parent() { return Parent(out _, out _); }
         /// <summary>
-        /// Returns the position of the parent who is following that the creature remembers.
-        /// Returns null if the creature does not remember the position of any of his parents
+        /// Gets the information of the closest prey the creature wants engage in combat
         /// </summary>
-        public Vector2Int GetParentToFollowPosition()
-        {
-            if (parentToFollow == null || (memory.Father() == null && memory.Mother() == null))
-                return null;
-            if (parentToFollow == memory.Father())
-                return memory.FatherPosition();
-            return memory.MotherPosition();
-        }
+        /// <param name="id"> The prey ID </param>
+        /// <param name="position"> The prey position </param>
+        /// <returns> False if it has no prey, true otherwise </returns>
+        public bool Prey(out int id, out Vector2Int position) { return mind.Prey(out id, out position); }
+        public bool Prey() { return Prey(out _, out _); }
         /// <summary>
-        /// Returns the position of the closest possible mate the creature remembers.
+        /// Gets the information of the closest ally to the creature
         /// </summary>
-        public Vector2Int GetClosestPossibleMatePosition() { return memory.ClosestPossibleMatePosition(); }
+        /// <param name="id"> The ally ID </param>
+        /// <param name="position"> The ally position </param>
+        /// <returns> False if it has no ally, true otherwise </returns>
+        public bool Ally(out int id, out Vector2Int position) { return mind.Ally(out id, out position); }
+        public bool Ally() { return Ally(out _, out _); }
         /// <summary>
-        /// Returns the position of the closest not allied creature the creature remembers.
+        /// Gets the information of the closest possible mate the creature has
         /// </summary>
-        public Vector2Int GetClosestCreaturePosition() { return memory.ClosestCreaturePosition(); }
+        /// <param name="id"> The mate ID </param>
+        /// <param name="position"> The mate position </param>
+        /// <returns> False if it has no mate, true otherwise </returns>
+        public bool Mate(out int id, out Vector2Int position) { return mind.Mate(out id, out position); }
+        public bool Mate() { return Mate(out _, out _); }
         /// <summary>
-        /// Returns the position of the closest rechable creature the creature remembers.
+        /// Gets the information of the closest corpse to the creature
+        /// If the creature is herbivorous, it always returns non valid information.
         /// </summary>
-        public Vector2Int GetPreyPosition() { return memory.ClosestPreyPosition(); }
+        /// <param name="id"> The corpse ID </param>
+        /// <param name="position"> The corpse position </param>
+        /// <returns> False if it has no corpse, true otherwise </returns>
+        public bool Corpse(out int id, out Vector2Int position) { return mind.Corpse(out id, out position); }
+        public bool Corpse() { return Corpse(out _, out _); }
         /// <summary>
-        /// Returns the position of the closest corpse the creature remembers.
+        /// Gets the information of the closest edible plant to the creature
+        /// If the creature is carnivorous, it always returns non valid information.
         /// </summary>
-        public Vector2Int GetClosestCorpsePosition() { return memory.ClosestCorpsePosition(); }
+        /// <param name="id"> The plant ID </param>
+        /// <param name="position"> The plant position </param>
+        /// <returns> False if it has no plant, true otherwise </returns>
+        public bool Plant(out int id, out Vector2Int position) { return mind.Plant(out id, out position); }
+        public bool Plant() { return Plant(out _, out _); }
         /// <summary>
-        /// Returns the position of the closest corpse the creature remembers.
+        /// Gets the position of the most valid water position to the creature
         /// </summary>
-        public Vector2Int GetClosestRottenCorpsePosition() { return memory.ClosestRottenCorpsePosition(); }
+        /// <returns> Null if the creature does not have or does not remember any water spot </returns>
+        public Vector2Int WaterPosition() { return mind.WaterPosition(); }
         /// <summary>
-        /// Returns the position of the closest edible plant the creature remembers.
+        /// Gets the position of the most valid safe position to the creature
         /// </summary>
-        public Vector2Int GetFruitPosition()
-        {
-            if (GetSafeFruitPosition() == null) return memory.ClosestFruitPosition();
-            if (DistanceToObjective(GetSafeFruitPosition()) > DistanceToObjective(memory.ClosestFruitPosition()) * UniverseParametersManager.parameters.safePrefferedOverClosestResourceRatio)
-                return memory.ClosestFruitPosition();
-            else
-                return GetSafeFruitPosition();
-        }
+        /// <returns> Null if the creature does not have or does not remember any safe spot </returns>
+        public Vector2Int SafePosition() { return mind.SafePosition(); }
         /// <summary>
-        /// Returns the position of the closest mass of water the creature remembers.
+        /// Gets a new position that the creature has not explored yet or that it does not remember that 
+        /// it has explored it before
         /// </summary>
-        public Vector2Int GetClosestWaterPosition() { return memory.ClosestWaterPosition(); }
-        /// <summary>
-        /// Returns the position of the closest safe place the creature remembers.
-        /// </summary>
-        public Vector2Int GetClosestSafePlacePosition() { return memory.ClosestSafePlacePosition(); }
-        /// <summary>
-        /// Returns the position of a random place the creature barely remembers or does not remember at all.
-        /// </summary>
-        public Vector2Int GetUndiscoveredPlacePosition() { return memory.UndiscoveredPlacePosition(); }
-
-        /// <summary>
-        /// Returns a pointer to the creature's "enemy". That is another creature that has attacked it, or if there is none,
-        /// the closest reachable creature of a different species (not including the species from which this one spawned) as this one.
-        /// </summary>
-        public Creature GetEnemy() { return memory.Enemy(); }
-        public Creature GetClosestCreature() { return memory.ClosestCreature(); }
-        public Creature GetClosestAlly() { return memory.ClosestAlly(); }
-        public Creature GetFather() { return memory.Father(); }
-        public Creature GetMother() { return memory.Mother(); }
-        public Creature GetClosestPossibleMate() { return memory.ClosestPossibleMate(); }
-        public Corpse GetClosestCorpse() { return memory.ClosestCorpse(); }
-        public Corpse GetClosestRottenCorpse() { return memory.ClosestRottenCorpse(); }
-        // Does not matter if it went to a safe plant or the closest, by the time this method is called both will be the same.
-        public EdiblePlant GetFruit() { return memory.ClosestFruit(); }
-        #endregion
-
-        // Parents
-        // TODO Quitar
-        public Creature father { get; set; }
-        public Creature mother { get; set; }
-        public Creature parentToFollow { get; set; }
-        //Childs
-        public List<Creature> childs;
+        public Vector2Int NewPosition() { return mind.NewPosition(); }
         #endregion
 
         #region World Info, Movement and Paths
