@@ -19,11 +19,13 @@ namespace EvolutionSimulation.Entities
         /// <param name="lifeTime"> LifeTime in Ticks of the Entity </param>
         /// <param name="x"> X World position </param>
         /// <param name="y"> Y World position </param>
-        protected void Init(World w, int x, int y)
+        public void Init(World w, int x, int y, float hp)
         {
             world = w;
             this.x = x;
             this.y = y;
+            maxHp = hp;
+            curHp = hp;
         }
 
         /// <summary>
@@ -37,7 +39,13 @@ namespace EvolutionSimulation.Entities
         // World tile position
         public int x { get; protected set; }
         public int y { get; protected set; }
+
+        // Maximum and current health of the entity
+        public float maxHp { get; protected set; }
+        public float curHp { get; protected set; }
+
         // World in which the entity resides
-        public World world { get; protected set; }
+        [NonSerialized]
+        public World world;
     }
 }
