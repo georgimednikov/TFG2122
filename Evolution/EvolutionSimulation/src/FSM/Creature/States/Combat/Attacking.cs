@@ -23,13 +23,14 @@ namespace EvolutionSimulation.FSM.Creature.States
         // Increases current rest
         public override void Action()
         {
-            Entities.Creature objective = creature.GetEnemy();
-            if (objective == null) return;
-            
-            Console.WriteLine(creature.speciesName + " ATTACKS " + objective.speciesName);
-            if(poison)
-                objective.ReceiveInteraction(creature, Entities.Interactions.poison);
-            objective.ReceiveInteraction(creature, Entities.Interactions.attack);
+            if (!creature.Enemy()) return;
+
+            int objID; creature.Enemy(out objID, out _);
+            Entities.Creature objCreature = creature.world.GetCreature(objID);
+            Console.WriteLine(creature.speciesName + " ATTACKS " + objCreature.speciesName);
+            if (poison)
+                objCreature.ReceiveInteraction(creature, Entities.Interactions.poison);
+            objCreature.ReceiveInteraction(creature, Entities.Interactions.attack);
         }
 
         //// No longer cornered, as combat is done
@@ -41,11 +42,6 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override string ToString()
         {
             return "AttackingState";
-        }
-
-        public override string GetInfo()
-        {
-            return creature.GetEnemy().ToString();
         }
     }
 }

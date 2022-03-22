@@ -16,10 +16,9 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            int oX = creature.GetClosestCreature().x,   // Objective's position
-                oY = creature.GetClosestCreature().y;
-            int deltaX = oX - creature.x,       // Direction of objective
-                deltaY = oY - creature.y;
+            Vector2Int obj; creature.Menace(out _, out obj);
+            int deltaX = obj.x - creature.x,       // Direction of objective
+                deltaY = obj.y - creature.y;
 
             return Math.Abs(deltaX) <= danger && Math.Abs(deltaY) <= danger;  // The danger zone is a square and the creature is within it
         }

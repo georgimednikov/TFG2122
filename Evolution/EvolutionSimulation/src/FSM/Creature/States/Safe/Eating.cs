@@ -23,24 +23,12 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
-            if(creature.IsCarnivorous())
-            {
+            if (creature.Corpse())
                 EatCorpse();
-            }
-            else if(creature.IsHerbivorous())
+            else if (creature.Plant())
             {
                 EatPlant();
                 creature.SafeEdiblePlant();
-            }
-            else//Omnivore
-            {
-                if (creature.Corpse())
-                    EatCorpse();
-                else if (creature.Plant())
-                {
-                    EatPlant();
-                    creature.SafeEdiblePlant();
-                }
             }
         }
 

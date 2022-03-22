@@ -25,7 +25,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            Vector2Int posToDiscover = creature.GetUndiscoveredPlacePosition();
+            Vector2Int posToDiscover = creature.NewPosition();
             creature.SetPath(posToDiscover.x, posToDiscover.y);
         }
 
@@ -34,7 +34,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             Vector3 nextPos = creature.GetNextPosOnPath();
             if (nextPos.X < 0 || nextPos.Y < 0)
             {
-                Vector2Int posToDiscover = creature.GetUndiscoveredPlacePosition();
+                Vector2Int posToDiscover = creature.NewPosition();
                 creature.SetPath(posToDiscover.x, posToDiscover.y);
                 nextPos = creature.GetNextPosOnPath();
             }
@@ -44,7 +44,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override string GetInfo()
         {
-            return creature.GetUndiscoveredPlacePosition().ToString();
+            return creature.NewPosition().ToString();
         }
 
         public override string ToString()

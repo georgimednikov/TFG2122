@@ -13,7 +13,7 @@
 
         public override bool Evaluate()
         {
-            return creature.wantMate && creature.GetClosestPossibleMatePosition() == null;
+            return creature.wantMate && !creature.Mate();
         }
 
         public override string ToString()

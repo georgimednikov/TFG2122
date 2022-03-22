@@ -659,7 +659,7 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Returns true if this creature or an ally in sight has been attacked;
         /// </summary>
-        public bool HasBeenAttacked() { return mind.Enemy(); }
+        public bool HasBeenAttacked() { return Enemy(); }
 
         /// <summary>
         /// Returns the danger level of the tile in the map on which the creature is. Danger is calculated based on Intimidation.
@@ -871,6 +871,7 @@ namespace EvolutionSimulation.Entities
             pathIterator = 0;
             return GetNextCostOnPath();
         }
+        public int SetPath(Vector2Int p, HeightLayer z = HeightLayer.Ground) { return SetPath(p.x, p.y, z); }
 
         /// <summary>
         /// Returns the cost for moving to the next position on the path. Does not advance the path iterator.

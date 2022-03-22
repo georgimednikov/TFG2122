@@ -20,28 +20,15 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         /// <returns> True if close the an eating objective</returns>
         public override bool Evaluate()
         {
-            Vector2Int pos;
-            //Herbivore
-            if(creature.IsHerbivorous())
-                return creature.Plant(out _, out pos) && creature.DistanceToObjective(pos) <= UniverseParametersManager.parameters.adjacentLength;
-
-            //Carnivore
-            if (creature.IsCarnivorous())
-            {
-                if (creature.Corpse(out _, out pos) && creature.DistanceToObjective(pos) <= UniverseParametersManager.parameters.adjacentLength)
-                    return true;
-                return false;
-            }
-            //Omnivore
+            Vector2Int corpsePos;
             Vector2Int plantPos;
-            creature.Corpse(out _, out pos);
+            creature.Corpse(out _, out corpsePos);
             creature.Plant(out _, out plantPos);
-            int distPlant = creature.DistanceToObjective(plantPos),
-                distCorpse = creature.DistanceToObjective(pos);
+            int distPlant = creature.DistanceToObjective(plantPos), //Returns int max value if it does not exist
+                distCorpse = creature.DistanceToObjective(corpsePos);
             //Omnivore, close to an eating objective
             return (distCorpse <= UniverseParametersManager.parameters.adjacentLength) ||
                 (distPlant <= UniverseParametersManager.parameters.adjacentLength);
-            
         }
 
         public override string ToString()

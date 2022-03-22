@@ -11,9 +11,10 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            return ((creature.GetClosestCreaturePosition() == null || creature.DistanceToObjective(creature.GetClosestCreaturePosition()) > creature.stats.Perception) &&
+            int id; Vector2Int pos;
+            return ((!creature.Menace(out id, out pos) || creature.DistanceToObjective(pos) > creature.stats.Perception) &&
                 !creature.HasBeenAttacked()) ||
-                (creature.GetClosestCreature() != null && creature.GetClosestCreature().stats.Aggressiveness < UniverseParametersManager.parameters.safeTransitionAggressivenessThreshold);
+                (creature.Menace() && creature.world.GetCreature(id).stats.Aggressiveness < UniverseParametersManager.parameters.safeTransitionAggressivenessThreshold);
             //TODO: revisar entidades vistas y considerar agresividad
         }
 

@@ -20,8 +20,8 @@ namespace EvolutionSimulation.FSM.Creature.States
             Vector2Int posToDrink;
             if (creature.WaterPosition() == null || 
                 (creature.DistanceToObjective(creature.WaterPosition()) >
-                creature.DistanceToObjective(creature.GetClosestWaterPosition()) * UniverseParametersManager.parameters.safePrefferedOverClosestResourceRatio))
-                posToDrink = creature.GetClosestWaterPosition();
+                creature.DistanceToObjective(creature.WaterPosition()) * UniverseParametersManager.parameters.safePrefferedOverClosestResourceRatio))
+                posToDrink = creature.WaterPosition();
             else
                 posToDrink = creature.WaterPosition();
 

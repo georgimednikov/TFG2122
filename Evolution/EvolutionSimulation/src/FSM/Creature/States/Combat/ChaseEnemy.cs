@@ -30,7 +30,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            Entities.Creature objective = creature.GetEnemy();
+            Vector2Int objective; creature.Enemy(out _, out objective);
             objX = objective.x;
             objY = objective.y; 
             creature.SetPath(objX, objY);   // This MUST be set up for the cost of the action to work
@@ -43,7 +43,8 @@ namespace EvolutionSimulation.FSM.Creature.States
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             }
 
-            Entities.Creature objective = creature.GetEnemy();   // This is NOT cached because objective can change to another creature
+            int enemyID; Vector2Int objective;
+            creature.Enemy(out enemyID, out objective);   // This is NOT cached because objective can change to another creature
             if (objX != objective.x ||  // If objective is somewhere else,
                 objY != objective.y)    // adjust path accordingly
             {
@@ -51,7 +52,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 objY = objective.y;
                 creature.SetPath(objX, objY);   // Set the path the creature must follow
             }
-            Console.WriteLine(creature.speciesName + " CHASES " + objective.speciesName);
+            Console.WriteLine(creature.speciesName + " CHASES " + creature.world.GetCreature(enemyID).speciesName);
             // All of this is done AFTER the action due to the fact that GetCost reflects the cost of the older path
             // Were it to be changed BEFORE, the new position's cost may not be the same as the one returned before
             brake = false;

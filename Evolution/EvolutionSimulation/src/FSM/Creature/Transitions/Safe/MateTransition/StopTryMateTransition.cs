@@ -13,7 +13,7 @@
 
         public override bool Evaluate()
         {
-            return creature.GetClosestPossibleMate() == null || !creature.mating
+            return !creature.Mate() || !creature.mating
                 || creature.IsHungry() || creature.IsThirsty() || creature.IsTired();
         }
 

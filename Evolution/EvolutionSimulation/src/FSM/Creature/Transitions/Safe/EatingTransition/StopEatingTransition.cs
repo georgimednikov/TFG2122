@@ -13,8 +13,9 @@
 
         public override bool Evaluate()
         {
-            int distPlant = creature.DistanceToObjective(creature.GetFruitPosition()),
-                distCorpse = creature.DistanceToObjective(creature.GetClosestCorpsePosition());
+            Vector2Int plantPos, corpsePos; creature.Plant(out _, out plantPos); creature.Corpse(out _, out corpsePos);
+            int distPlant = creature.DistanceToObjective(plantPos),
+                distCorpse = creature.DistanceToObjective(corpsePos);
 
             return creature.stats.CurrEnergy >= UniverseParametersManager.parameters.stopEatingTransitionEnergyMultiplier * creature.stats.MaxEnergy         // no hunger
                 || (distCorpse > UniverseParametersManager.parameters.adjacentLength && distPlant > UniverseParametersManager.parameters.adjacentLength)                                    // Both eating objective are far

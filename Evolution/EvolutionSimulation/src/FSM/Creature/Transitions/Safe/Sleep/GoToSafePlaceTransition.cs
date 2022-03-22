@@ -13,7 +13,7 @@
 
         public override bool Evaluate()
         {
-            return creature.GetClosestSafePlacePosition() != null &&
+            return creature.SafePosition() != null &&
                 (creature.IsTired() || creature.PositionDanger(creature.x, creature.y) > 0);
         }
 

@@ -35,7 +35,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 if (creature.stats.Gender == Genetics.Gender.Female)
                 {
-                    // The creature whom it was mating had dead or something
+                    // The creature whom it was mating has died or something
                     if (!creature.Mate()) return;
                     // Create a random number of childs
                     int numberChilds = RandomGenerator.Next(1, 5);//TODO: que el numero de hijos dependa de algo del cromosoma?
@@ -49,15 +49,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                         // The new creature's pos (near to the parents)
                         int nx = creature.x + RandomGenerator.Next(-1, 2);
                         int ny = creature.y + RandomGenerator.Next(-1, 2);
-                        Entities.Animal child = creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName, creature.matingCreature.ID, creature.ID);
-
-                        // Add the parents to the new creature and the child to the parents
-                        //child.father = creature.matingCreature;
-                        //child.mother = creature;
-                        //TODO por que no tiene una lista con los hijos? para avisarles cuando se ha muere
-                        creature.matingCreature.childs.Add(child);
-                        creature.childs.Add(child);
-                        
+                        creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName, creature.matingCreature.ID, creature.ID);
                     }
                     creature.timeToBeInHeat = -1;
                     creature.CreateDanger();
@@ -72,7 +64,6 @@ namespace EvolutionSimulation.FSM.Creature.States
             creature.Mate(out id, out _);
             Entities.Creature mate = creature.world.GetCreature(id);
             Console.WriteLine(creature.speciesName + "MATES WITH " + mate.speciesName + " AT (" + mate.x + ", " + mate.y + ")");
-
         }
         /// <summary>
         /// At the end of the action whatever the reason was, reset the timer

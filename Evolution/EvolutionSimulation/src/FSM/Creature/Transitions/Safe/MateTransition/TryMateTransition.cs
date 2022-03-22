@@ -15,12 +15,10 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            if (creature.stats.Gender == Genetics.Gender.Female)//just in case
-                return false;
-
-            return creature.GetClosestPossibleMate() != null
-               && Math.Abs(creature.GetClosestPossibleMate().x - creature.x) < UniverseParametersManager.parameters.adjacentLength
-               && Math.Abs(creature.GetClosestPossibleMate().y - creature.y) < UniverseParametersManager.parameters.adjacentLength;
+            Vector2Int pos;
+            return creature.Mate(out _, out pos)
+               && Math.Abs(pos.x - creature.x) < UniverseParametersManager.parameters.adjacentLength
+               && Math.Abs(pos.y - creature.y) < UniverseParametersManager.parameters.adjacentLength;
         }
 
         public override string ToString()

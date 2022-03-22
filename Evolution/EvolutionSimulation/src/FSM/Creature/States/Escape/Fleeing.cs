@@ -23,7 +23,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            Entities.Creature objective = creature.GetClosestCreature();
+            Vector2Int objective; creature.Menace(out _, out objective);
             dngX = objective.x;
             dngY = objective.y;
             pathX = 0;
@@ -55,7 +55,8 @@ namespace EvolutionSimulation.FSM.Creature.States
             int normX = deltaX == 0 ? 0 : deltaX / Math.Abs(deltaX),  // Normalized direction of movement 
                 normY = deltaY == 0 ? 0 : deltaY / Math.Abs(deltaY);  // as you can only move once per action (but can have multiple actions per tick)
 
-            if (creature.x == creature.GetClosestCreature().x && creature.y == creature.GetClosestCreature().y) // If it is in the same tile, go in a random direction
+            Vector2Int position; creature.Menace(out _, out position);
+            if (creature.x == position.x && creature.y == position.y) // If it is in the same tile, go in a random direction
                 do
                 {
                     normX = RandomGenerator.Next(-1, 2);
@@ -86,8 +87,8 @@ namespace EvolutionSimulation.FSM.Creature.States
             }
 
             // Attempts to see if the escape route has changed
-            Entities.Creature objective = creature.GetClosestCreature();
-            if(dngX != objective.x || dngY != objective.y)  // If it has changed, reassign the path
+            Vector2Int objective; creature.Menace(out _, out objective);
+            if (dngX != objective.x || dngY != objective.y)  // If it has changed, reassign the path
             {
                 dngX = objective.x;
                 dngY = objective.y;

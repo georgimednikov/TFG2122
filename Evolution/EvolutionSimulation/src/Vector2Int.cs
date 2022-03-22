@@ -2,7 +2,7 @@
 
 namespace EvolutionSimulation
 {
-    public class Vector2Int
+    public class Vector2Int : IEquatable<Vector2Int>
     {        
         public Vector2Int() { x = y = 0; }
         public Vector2Int(int xv, int yv) { x = xv; y = yv; }
@@ -18,6 +18,9 @@ namespace EvolutionSimulation
         public static bool operator ==(Vector2Int v1, Vector2Int v2) { return v1.x == v2.x && v1.y == v2.y; }
         public static bool operator !=(Vector2Int v1, Vector2Int v2) { return !(v1 == v2); }
 
+        public override bool Equals(object obj) { return Equals(obj as Vector2Int); }
+        public virtual bool Equals(Vector2Int obj) { return this == obj; }
+        public override int GetHashCode() { return base.GetHashCode(); }
 
         public double Magnitude() { return Math.Sqrt(Math.Pow(x, 2) + Math.Pow(y, 2)); }
         public double Angle() { return Math.Atan(y / x); }

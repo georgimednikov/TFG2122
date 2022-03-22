@@ -14,7 +14,7 @@
 
         public override bool Evaluate()
         {
-            return creature.IsThirsty() && creature.GetClosestWaterPosition() == null;
+            return creature.IsThirsty() && creature.WaterPosition() == null;
         }
 
         public override string ToString()

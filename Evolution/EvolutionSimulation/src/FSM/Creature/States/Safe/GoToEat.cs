@@ -45,42 +45,28 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             int id; 
             Vector2Int pos;
-            //Herbivore goes to an edible plant
-            if (creature.IsHerbivorous())
-                creature.Plant(out id, out pos);
-            //If there is a corpse, that will be the objective of a carnivorous/omnivorous creature.
-            //Because of how the creature memory works, if the creature is a scavenger the closest corpse will be considered fresh,
-            //no matter its state.
 
-            //Carnivore goes to a corpse
-            else if (creature.IsCarnivorous())
+            //If there is a corpse and no plant, then it goes to the corpse.
+            if (creature.Corpse(out id, out pos) && !creature.Plant())
+                foodPos = pos;
+            //If there is a plant and no corpse, it goes to a plant.
+            else if (!creature.Corpse(out id, out pos) && creature.Plant())
+                foodPos = pos;
+            //If there is a corpse and a plant, it goes to the closest one.
+            else
             {
                 creature.Corpse(out id, out pos);
-            }
-            else //Omnivore
-            {
-                //If there is a corpse and no plant, then it goes to the corpse.
-                if (creature.Corpse(out id, out pos) && !creature.Plant())
-                    foodPos = pos;
-                //If there is a plant and no corpse, it goes to a plant.
-                else if (!creature.Corpse(out id, out pos) && creature.Plant())
-                    foodPos = pos;
-                //If there is a corpse and a plant, it goes to the closest one.
-                else 
-                {
-                    creature.Corpse(out id, out pos);
-                    Vector2Int posPlant;
-                    creature.Plant(out id, out posPlant);
-                    // Goes to the closest food source
-                    int distPlant = creature.DistanceToObjective(posPlant),
-                        distCorpse = creature.DistanceToObjective(pos);
+                Vector2Int posPlant;
+                creature.Plant(out id, out posPlant);
+                // Goes to the closest food source
+                int distPlant = creature.DistanceToObjective(posPlant),
+                    distCorpse = creature.DistanceToObjective(pos);
 
-                    if (distPlant < distCorpse)
-                        foodPos = posPlant;
-                    else
-                        foodPos = pos;
-                }                
-            }            
+                if (distPlant < distCorpse)
+                    foodPos = posPlant;
+                else
+                    foodPos = pos;
+            }
             creature.SetPath(foodPos.x, foodPos.y);
         }
     }
