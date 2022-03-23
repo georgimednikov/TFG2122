@@ -537,19 +537,22 @@ namespace EvolutionSimulation
                         switch (plantType)
                         {
                             case 0:
-                                map[xIndex, yIndex].plant = new Grass();
+                                map[xIndex, yIndex].plant = CreateStableEntity<Grass>();
+                                map[xIndex, yIndex].plant.Init(this, xIndex, yIndex, 10);   // TODO: Numeros arcanos
                                 break;
                             case 1:
-                                map[xIndex, yIndex].plant = new Bush();
+                                map[xIndex, yIndex].plant = CreateStableEntity<Bush>();
+                                map[xIndex, yIndex].plant.Init(this, xIndex, yIndex, 20);   // TODO: Numeros arcanos
                                 break;
                             case 2:
                                 maxTrees++;
-                                map[xIndex, yIndex].plant = new Tree();
+                                map[xIndex, yIndex].plant = CreateStableEntity<Tree>();
                                 break;
                             case 3:
                                 maxTrees++;
                                 trees++;
-                                map[xIndex, yIndex].plant = new EdibleTree();
+                                map[xIndex, yIndex].plant = CreateStableEntity<EdibleTree>();
+                                map[xIndex, yIndex].plant.Init(this, xIndex, yIndex, 50);   // TODO: Numeros arcanos
                                 break;
                             default:
                                 break;
@@ -661,10 +664,6 @@ namespace EvolutionSimulation
             string word = JsonConvert.SerializeObject(map, Formatting.Indented);
             System.IO.File.WriteAllText(UserInfo.ExportDirectory + "World.json", word);
         }
-
-
-
-
 
         // Map with physical properties
         public MapData[,] map { get; private set; }

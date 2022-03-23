@@ -59,7 +59,7 @@ namespace EvolutionSimulation.Entities
             ConfigureStateMachine();
             // Attack
             AddInteraction(Interactions.attack, ReceiveDamage);
-            if (HasAbility(CreatureFeature.Thorns, 0.65f))
+            if (HasAbility(CreatureFeature.Thorns, CreatureChromosome.AbilityUnlock[CreatureFeature.Thorns]))
                 AddInteraction(Interactions.attack, RetalliateDamage);
 
             // Poison
@@ -232,23 +232,7 @@ namespace EvolutionSimulation.Entities
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         private Fsm mfsm;
 
-        // State related attributes
-
-        public Creature matingCreature;
-
-        /// <summary>
-        /// Time in ticks to be in heat (a female)
-        /// </summary>
-        public int timeToBeInHeat;
-        /// <summary>
-        /// If a female want to mate, its false if she has needs like
-        /// sleep or eat or is mating
-        /// </summary>
-        public bool wantMate = false;
-        /// <summary>
-        /// If a creatures is mating
-        /// </summary>
-        public bool mating;
+        
 
         /// <summary>
         /// Returns the creature's current state
@@ -421,6 +405,10 @@ namespace EvolutionSimulation.Entities
         // and values are the actions that the creature performs when something interacts with it.
         Dictionary<Interactions, List<Action<Creature>>> InteractionsDict;
 
+        // Handler for interaction events
+        public delegate void ReceiveInteractionHandler(Creature receiver, Creature sender, Interactions type);
+        public event ReceiveInteractionHandler ReceiveInteractionEvent; // TODO: asi?
+
         // Methods to receive and respond to interactions
         /// <summary>
         /// Executes every response that this creature has to an interaction with other creature
@@ -428,8 +416,11 @@ namespace EvolutionSimulation.Entities
         public void ReceiveInteraction(Creature interacter, Interactions type)
         {
             if (InteractionsDict.ContainsKey(type))
+            {
                 foreach (Action<Creature> response in InteractionsDict[type])
                     response(interacter);
+                ReceiveInteractionEvent?.Invoke(this, interacter, type);
+            }
         }
 
         /// <summary>

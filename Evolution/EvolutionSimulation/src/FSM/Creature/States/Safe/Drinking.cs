@@ -37,5 +37,13 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             return "DrinkingState";
         }
+
+        /// <summary>
+        /// Text used to display state in simulation
+        /// </summary>
+        public override string GetInfo()
+        {
+            return "DRINKING";
+        }
     }
 }

@@ -65,8 +65,12 @@ namespace EvolutionSimulation.Entities
         {
             if (type != Interactions.eat) return;
 
-            if(Edible)
-                other.stats.CurrEnergy += maxNutritionPoints;
+            if (Edible) // The creature bites the corpse, getting fed relative to the bite taken
+            {
+                float dealt = Math.Min(other.stats.Damage, curHp);
+                other.stats.CurrEnergy += (dealt / maxHp) * maxNutritionPoints;
+                curHp -= dealt;
+            }
             // Corpse putrefaction cause penalties on the creature eating it
             else
             {
@@ -77,28 +81,34 @@ namespace EvolutionSimulation.Entities
                 float actualPoisonProb = Math.Min(1.0f, Math.Max(0.0f, poisonProb + 1.0f - remains));
                 float actualNutritionPoints = maxNutritionPoints * remains;
                 // Having the ability 'Scavenger' reduces the penalties of eating the corpse            
-                if (other.HasAbility(Genetics.CreatureFeature.Scavenger, 0.4f)) // TODO: ahora está puesto el % de unlock a pelo, cambiarlo
+                if (other.HasAbility(Genetics.CreatureFeature.Scavenger, 
+                    Genetics.CreatureChromosome.AbilityUnlock[Genetics.CreatureFeature.Scavenger])) // TODO: ahora está puesto el % de unlock a pelo, cambiarlo
                 {
                     actualPoisonProb -= other.stats.Scavenger;
                     actualNutritionPoints += (maxNutritionPoints - actualNutritionPoints) * other.stats.Scavenger;
                 }
                 // Eating the corpse increases the energy of the creature 
-                other.stats.CurrEnergy += actualNutritionPoints;
+                float dealt = Math.Min(other.stats.Damage, curHp);
+                other.stats.CurrEnergy += (dealt / maxHp) * actualNutritionPoints;
+                curHp -= dealt;
                 // The creature can be poisoned when eating the corpse
-                if (prob < actualPoisonProb)
+                if (prob < actualPoisonProb && dealt > 0)   // In case another creature tried eating an empty corpse
                     other.AddStatus(new Status.Poison(poisonDuration, poisonTickDamage));
             }                      
         }
 
-        public override void Tick()
+        /// <summary>
+        /// Destroys the corpse when it reaches the end of its lifetime
+        /// or if it is completely eaten
+        /// </summary>
+        override public void Tick()
         {
             lifeTime--;
             Edible = lifeTime > putridTime;
 
-            Console.WriteLine("Ticks until corpse disappearance: " + lifeTime);
-
-            if (lifeTime <= 0)
-                world.Destroy(ID);
+            if (lifeTime <= 0 || curHp <= 0)
+                world.Destroy(this);
+            else Console.WriteLine("Ticks to corpse disappearance: " + lifeTime);
         }
 
         // Copse state: it is edible until it starts putrefying

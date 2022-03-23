@@ -30,6 +30,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 EatPlant();
                 creature.SafeEdiblePlant();
             }
+            //TODO: Omnivore?
         }
 
         public override void OnExit()
@@ -50,7 +51,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             creature.Plant(out foodID, out _);
             Entities.EdiblePlant closest = creature.world.GetStaticEntity(foodID) as Entities.EdiblePlant;
-            creature.stats.CurrEnergy += closest.Eat();
+            closest.ReceiveInteraction(creature, Entities.Interactions.eat);    // TODO GORDO: ¿Distingue entre plantas ya comidas para no comer aire?
             Console.WriteLine(creature.speciesName + " EATS FRUIT AT (" + closest.x + ", " + closest.y + ")");
         }
 
@@ -66,6 +67,14 @@ namespace EvolutionSimulation.FSM.Creature.States
                 
             closest.ReceiveInteraction(creature, Entities.Interactions.eat);
             Console.WriteLine(creature.speciesName + " EATS CORPSE AT (" + closest.x + ", " + closest.y + ")");
+        }
+
+        /// <summary>
+        /// Text used to display state in simulation
+        /// </summary>
+        public override string GetInfo() 
+        { 
+            return "EATING"; 
         }
     }
 }

@@ -28,7 +28,13 @@ namespace EvolutionSimulation.FSM.Creature.States
             dngY = objective.y;
             pathX = 0;
             pathY = 0;
-            positionAwayFromMe(ref pathX, ref pathY);
+            // It either seeks its allies or runs from its enemy
+            Vector2Int fwiend = creature.GetClosestAllyPosition();
+            if(fwiend != null) {
+                pathX = fwiend.x;
+                pathY = fwiend.y;
+            } else positionAwayFromMe(ref pathX, ref pathY);
+
             if (pathX == creature.x && pathY == creature.y)
                 creature.cornered = true;
             else
@@ -92,7 +98,13 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 dngX = objective.x;
                 dngY = objective.y;
-                positionAwayFromMe(ref pathX, ref pathY);
+                // It either seeks its allies or runs from its enemy
+                Vector2Int fwiend = creature.GetClosestAllyPosition();
+                if (fwiend != null) {
+                    pathX = fwiend.x;
+                    pathY = fwiend.y;
+                }
+                else positionAwayFromMe(ref pathX, ref pathY);
                 if (pathX == creature.x && pathY == creature.y)
                     creature.cornered = true;
                 else

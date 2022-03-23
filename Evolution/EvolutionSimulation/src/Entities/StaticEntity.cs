@@ -20,8 +20,8 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Initializes the Entity
         /// </summary>
+        /// <param name="ID"> ID to identify the creature </param>
         /// <param name="w"> World in which it'll reside </param>
-        /// <param name="lifeTime"> LifeTime in Ticks of the Entity </param>
         /// <param name="x"> X World position </param>
         /// <param name="y"> Y World position </param>
         virtual public void Init(int ID, World w, int x, int y)
@@ -30,6 +30,8 @@ namespace EvolutionSimulation.Entities
             world = w;
             this.x = x;
             this.y = y;
+            maxHp = hp;
+            curHp = hp;
         }
 
         /// <summary>
@@ -43,7 +45,13 @@ namespace EvolutionSimulation.Entities
         // World tile position
         public int x { get; protected set; }
         public int y { get; protected set; }
+
+        // Maximum and current health of the entity
+        public float maxHp { get; protected set; }
+        public float curHp { get; protected set; }
+
         // World in which the entity resides
-        public World world { get; protected set; }
+        [NonSerialized]
+        public World world;
     }
 }

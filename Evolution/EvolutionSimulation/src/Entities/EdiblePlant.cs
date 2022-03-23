@@ -1,30 +1,37 @@
-﻿namespace EvolutionSimulation.Entities
+﻿using System;
+
+namespace EvolutionSimulation.Entities
 {
     public class EdiblePlant : Plant
     {
         public bool eaten { get; protected set; } = false;
         protected int regrowthTime;
-        protected int startRegrowthTime = 0;
         protected float nutritionalValue;
 
         override public void Tick()
         {
-            if (eaten)
-                eaten = startRegrowthTime++ >= regrowthTime;            
+            if (eaten)  // If it is eaten, it remains so until it is fully grown back
+                eaten = curHp < maxHp;
+
+            // It regrows steadily even while not fully eaten
+            curHp = Math.Min(curHp + (1 / (float)regrowthTime) * maxHp, maxHp);
         }
 
         /// <summary>
         /// if the plant has been eaten, it doesn't give nutritional value
         /// </summary>
         /// <returns> Return the nutritional value</returns>
-        public float Eat()
+        public void ReceiveInteraction(Creature other, Interactions type)
         {
-            if (eaten) return 0;
+            if (type != Interactions.eat || eaten) return;
 
-            startRegrowthTime = 0;
-            eaten = true;
-            return nutritionalValue;
+            float dealt = Math.Min(other.stats.Damage, curHp);
+            other.stats.CurrEnergy += (dealt / maxHp) * nutritionalValue;
+            curHp -= dealt;
+
+            if(curHp <= 0) {
+                eaten = true;
+            }
         }
-
     }
 }
