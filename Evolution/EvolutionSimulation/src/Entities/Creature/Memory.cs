@@ -88,12 +88,13 @@ namespace EvolutionSimulation.Entities
             if (parent != null)
                 father = new EntityResource(parent.x, parent.y, parent.ID, maxExperienceTicks);
             else
-                father = null; // should only happen with original creatures
+                father = new EntityResource(-1, -1, -1, maxExperienceTicks);  // Impossible value to represent no parent
             parent = world.GetCreature(mID);
             if (parent != null)
-                father = new EntityResource(parent.x, parent.y, parent.ID, maxExperienceTicks);
+                mother = new EntityResource(parent.x, parent.y, parent.ID, maxExperienceTicks);
             else
-                mother = null;  // should only happen with original creatures
+                mother = new EntityResource(-1, -1, -1, maxExperienceTicks);  // Impossible value to represent no parent
+
             Preys = new List<EntityResource>();
             Allies = new List<EntityResource>();
             FreshCorpses = new List<EntityResource>();
@@ -143,9 +144,9 @@ namespace EvolutionSimulation.Entities
             List<Creature> perceivedCreatures = world.PerceiveCreatures(thisCreature.ID, perceptionRadius);
             List<StaticEntity> perceivedEntities = world.PerceiveEntities(thisCreature.ID, perceptionRadius);
 
-
             //The list of creatures is also needed to calculate danger so it is done here too.
-            float[,] intimidationFelt = new float[perceptionRadius, perceptionRadius]; //The danger in each tile seen by the creature caused by other creatures.
+            //The danger in each tile seen by the creature caused by other creatures.
+            float[,] intimidationFelt = new float[1 + perceptionRadius * 2,1 + perceptionRadius * 2]; //* 2 to make it the diameter and +1 to account for the center.
             foreach (Creature creature in perceivedCreatures)
             {
                 EntityResource resource = new EntityResource(creature.x, creature.y, creature.ID, maxExperienceTicks);
@@ -166,6 +167,7 @@ namespace EvolutionSimulation.Entities
                 //Else they have no relation
                 else
                 {
+                    //Console.WriteLine(perceivedCreatures.Count);
                     int dist = thisCreature.DistanceToObjective(creature);
                     if (creature.stats.Intimidation > thisCreature.stats.Aggressiveness &&
                         (menace == null || thisCreature.DistanceToObjective(menace.position) >= dist)) //This is equal to update the rival information if it is the same
@@ -223,7 +225,7 @@ namespace EvolutionSimulation.Entities
 
                     Position position = GetFromPositionDangers(p);
                     bool positionWasKnown = position == null;
-                    if (!positionWasKnown)
+                    if (positionWasKnown)
                         position = new Position(p, 0, 0, 0);
 
                     position.ticks = maxExperienceTicks; //The number of ticks left to be forgotten is reset too.
@@ -290,7 +292,7 @@ namespace EvolutionSimulation.Entities
         public void AddExplorePosition()
         {
             Vector2Int pos = new Vector2Int(thisCreature.x, thisCreature.y);
-            if (explorePositionsRemembered.Peek() == pos) return;
+            if (explorePositionsRemembered.Count > 0 && explorePositionsRemembered.Peek() == pos) return;
 
             explorePositionsRemembered.Enqueue(pos);
             if (explorePositionsRemembered.Count > maxPositionsRemembered)
@@ -402,9 +404,6 @@ namespace EvolutionSimulation.Entities
                 angle += angleInc;
                 actualAngle += angle * inc;
             }
-
-            if (finalPosition.x <= 0.0 && finalPosition.y == 369.0)
-                Console.WriteLine("Something");
 
             return angle <= 360;
         }
@@ -521,40 +520,39 @@ namespace EvolutionSimulation.Entities
         #endregion
 
         #region Lists
+
+        private void Sort_RemoveExtraInfo<T>(int max, List<T> list) where T : Resource
+        {
+            list.Sort(resourceComparer);
+            if(list.Count > max)
+                list.RemoveRange(max, Preys.Count);
+        }
         // TODO: si tarda mucho hacer priority queue
         private void SortAndAdjustLists()
         {
             RemoveFakeInformation(Preys);
-            Preys.Sort(resourceComparer);
-            Preys.RemoveRange(maxResourcesRemembered, Preys.Count);
+            Sort_RemoveExtraInfo(maxResourcesRemembered, Preys);
 
             RemoveFakeInformation(Allies);
-            Allies.Sort(resourceComparer);
-            Allies.RemoveRange(maxResourcesRemembered, Allies.Count);
+            Sort_RemoveExtraInfo(maxResourcesRemembered, Allies);
 
             RemoveFakeInformation(FreshCorpses);
-            FreshCorpses.Sort(resourceComparer);
-            FreshCorpses.RemoveRange(maxResourcesRemembered, FreshCorpses.Count);
+            Sort_RemoveExtraInfo(maxResourcesRemembered, FreshCorpses);
 
             RemoveFakeInformation(RottenCorpses);
-            RottenCorpses.Sort(resourceComparer);
-            RottenCorpses.RemoveRange(maxResourcesRemembered, RottenCorpses.Count);
+            Sort_RemoveExtraInfo(maxResourcesRemembered, RottenCorpses);
 
-            WaterPositions.Sort(resourceComparer);
-            WaterPositions.RemoveRange(maxResourcesRemembered, WaterPositions.Count);
-            SafeWaterPositions.Sort(resourceComparer);
-            SafeWaterPositions.RemoveRange(maxResourcesRemembered, SafeWaterPositions.Count);
+            Sort_RemoveExtraInfo(maxResourcesRemembered, WaterPositions);
+            Sort_RemoveExtraInfo(maxResourcesRemembered, SafeWaterPositions);
 
             RemoveFruitlessPlants();
-            EdiblePlants.Sort(resourceComparer);
-            EdiblePlants.RemoveRange(maxResourcesRemembered, EdiblePlants.Count);
-            SafeEdiblePlants.Sort(resourceComparer);
-            SafeEdiblePlants.RemoveRange(maxResourcesRemembered, SafeEdiblePlants.Count);
+            Sort_RemoveExtraInfo(maxResourcesRemembered, EdiblePlants);
+            Sort_RemoveExtraInfo(maxResourcesRemembered, SafeEdiblePlants);
         }
 
         private void RemoveFakeInformation(List<EntityResource> list)
         {
-            for (int i = list.Count - 1; i <= 0; i--)
+            for (int i = list.Count - 1; i >= 0; i--)
             {
                 //If the resource is within sight and yet is has not been updated, that means that it no longer is there, and therefore, lost.
                 if (list[i].ticks < maxExperienceTicks && thisCreature.DistanceToObjective(list[i].position) <= perceptionRadius)
@@ -563,7 +561,7 @@ namespace EvolutionSimulation.Entities
         }
         private void RemoveFruitlessPlants()
         {
-            for (int i = EdiblePlants.Count - 1; i <= 0; i--)
+            for (int i = EdiblePlants.Count - 1; i >= 0; i--)
             {
                 EdiblePlant plant = world.GetStaticEntity(EdiblePlants[i].ID) as EdiblePlant;
 
@@ -618,13 +616,13 @@ namespace EvolutionSimulation.Entities
 
         private void i_forgor<T>(ref T res) where T : Resource
         {
-            if (--res.ticks == 0) //If it is time to forget.
+            if (res != null && --res.ticks == 0) //If it is time to forget.
                 res = null;
         }
 
         private void i_forgor_position<T>(ref T res) where T : Resource
         {
-            if (--res.ticks == 0) //If it is time to forget.
+            if (res != null && --res.ticks == 0) //If it is time to forget.
                 res.position = null;
         }
 

@@ -17,8 +17,8 @@ namespace EvolutionSimulation
         public static Vector2Int operator /(Vector2Int v1, Vector2Int v2) { return new Vector2Int(v1.x / v2.x, v1.y / v2.y); }
         public static bool operator ==(Vector2Int v1, Vector2Int v2) 
         {
-            if (v1 is null)
-                return v2 is null;
+            if (v1 is null || v2 is null)
+                return v1 is null && v2 is null;
             return v1.x == v2.x && v1.y == v2.y;
         }
         public static bool operator !=(Vector2Int v1, Vector2Int v2) { return !(v1 == v2); }

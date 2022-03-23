@@ -47,6 +47,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void UpdatePriorities()
         {
+            mem.Update();
             UpdateParent();
             UpdatePrey();
             UpdateCorpse();
@@ -98,7 +99,7 @@ namespace EvolutionSimulation.Entities
             float bestValue = 0;
             foreach (EntityResource prey in mem.Preys)
             {
-                float preyValue = world.GetCreature(prey.ID).stats.Size / creature.DistanceToObjective(prey.position);
+                float preyValue = world.GetCreature(prey.ID).stats.Size / Math.Max(1, creature.DistanceToObjective(prey.position));
                 if (preyValue > bestValue)
                 {
                     worthyPrey = prey;
@@ -242,8 +243,8 @@ namespace EvolutionSimulation.Entities
 
         public static bool operator ==(Resource eR1, Resource eR2)
         {
-            if (eR1 is null)
-                return eR2 is null;
+            if (eR1 is null || eR2 is null)
+                return eR1 is null && eR2 is null;
             return eR1.position == eR2.position;
         }
         public static bool operator !=(Resource eR1, Resource eR2) { return !(eR1 == eR2); }
@@ -261,8 +262,8 @@ namespace EvolutionSimulation.Entities
 
         public static bool operator ==(EntityResource eR1, EntityResource eR2)
         {
-            if (eR1 is null)
-                return eR2 is null;
+            if (eR1 is null || eR2 is null)
+                return eR1 is null && eR2 is null;
             return eR1.ID == eR2.ID;
         }
         public static bool operator !=(EntityResource eR1, EntityResource eR2) { return !(eR1 == eR2); }

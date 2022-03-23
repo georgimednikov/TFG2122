@@ -77,10 +77,6 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void Tick()
         {
-            // Bodily functions
-            if (x == -1 || y == -1)
-                Console.WriteLine("ALGO MAL");
-            
             Expend();
             Regen();
             CheckTemperature();
@@ -794,8 +790,6 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void Place(int x, int y, HeightLayer z = HeightLayer.Ground)
         {
-            if (x == -1)
-                Console.WriteLine("MAl en place");
             this.x = x;
             this.y = y;
             if (world.isTree(x, y))

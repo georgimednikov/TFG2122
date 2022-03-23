@@ -13,7 +13,7 @@
 
         public override bool Evaluate()
         {
-            return creature.IsThirsty();
+            return creature.IsThirsty() && creature.WaterPosition() != null;
         }
 
         public override string ToString()

@@ -259,6 +259,11 @@ namespace EvolutionSimulation
             T ent = new T();
             
             ent.Init(entitiesID, this, x, y, chromosome, name, fatherID, motherID);
+            // Progenitors start being adults
+            if(fatherID == -1)
+            {
+                ent.stats.CurrAge = (int)(UniverseParametersManager.parameters.adulthoodThreshold * ent.stats.LifeSpan);
+            }
             taxonomy.AddCreatureToSpecies(ent);
 
             Creatures.Add(entitiesID, ent);

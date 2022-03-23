@@ -63,11 +63,10 @@ namespace UnitySimulation
         /// </summary>
         public void Run()
         {
-            int nYears = 0;
-            while (nYears < UserInfo.Years) { 
+            int ticks = world.YearToTick(UserInfo.Years);
+            for (int i = 0; i < ticks; i++)
+            {
                 world.Tick();
-                // TODO: No se suma un anio cada tick pero para probar
-                nYears++;
             }
         }
 
