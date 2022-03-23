@@ -26,22 +26,31 @@ namespace UnitySimulation
     [RequireComponent(typeof(Terrain))]
     public class GenerateWorld : MonoBehaviour
     {
-        public TextAsset world;
-        World.MapData[,] map;
+        public TextAsset worldJson;
+        public int worldSize;   // TODO: ocultarlo si hay json y viceversa
+        World world;
         public GameObject waterPlane;
         GameObject waterPlaneInstance;
 
-        void Start()
+        public World Generate()
         {
-            if (waterPlaneInstance != null)
+            EvolutionSimulation.Genetics.CreatureChromosome.SetChromosome();
+            UniverseParametersManager.ReadJSON();
+            world = new World();
+
+            if (worldJson != null)
+                world.Init(worldJson.text);
+            else
+                world.Init(worldSize);
+            if(waterPlaneInstance != null)
                 MapGen();
+            return world;
         }
 
         public void MapGen()
         {
-            map = Newtonsoft.Json.JsonConvert.DeserializeObject<World.MapData[,]>(world.text);
-            UpdateMeshVertices(map);
-            GenerateFlora(map);
+            UpdateMeshVertices(world.map);
+            GenerateFlora(world.map);
             SetWaterPlane();
         }
 

@@ -228,15 +228,15 @@ GameObject:
   - component: {fileID: 848237405}
   - component: {fileID: 848237404}
   - component: {fileID: 848237408}
-  - component: {fileID: 848237407}
   - component: {fileID: 848237403}
+  - component: {fileID: 848237407}
   m_Layer: 3
   m_Name: World (funca)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &848237403
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -250,10 +250,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   creaturePrefab: {fileID: 7305408888903237956, guid: a715dea8e9efb7d4da42974b682f6dab, type: 3}
-  spawn:
-    positionX: 100
-    positionZ: 100
-    positionRadius: 0
 --- !u!154 &848237404
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -310,7 +306,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &848237407
 MonoBehaviour:
@@ -324,7 +320,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef74d56d6159b614c83eede224432772, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  world: {fileID: 4900000, guid: 0127c2171d5132b4fb5231b6ac57feae, type: 3}
+  worldJson: {fileID: 4900000, guid: 0127c2171d5132b4fb5231b6ac57feae, type: 3}
+  worldSize: 0
   waterPlane: {fileID: 4798661411487492717, guid: 3fbd9c7603b5ef247b076c1b27f46465, type: 3}
 --- !u!114 &848237408
 MonoBehaviour:
@@ -338,14 +335,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26cfca4c6af99564691be0bd5c22bf72, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MapSize: 32
   EvolutionYears: 0
   SpeciesNumber: 2
   IndividualsNumber: 2
+  TimeBetweenSteps: 1
   DataDirectory: ProgramData
   ExportDirectory: ExportData
-  worldCreatureManager: {fileID: 1277125822}
-  worldGenerator: {fileID: 0}
+  worldCreatureManager: {fileID: 848237403}
+  worldGenerator: {fileID: 848237407}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -429,118 +426,3 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1277125818
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1277125821}
-  - component: {fileID: 1277125820}
-  - component: {fileID: 1277125819}
-  - component: {fileID: 1277125823}
-  - component: {fileID: 1277125822}
-  m_Layer: 3
-  m_Name: World
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967295
-  m_IsActive: 1
---- !u!154 &1277125819
-TerrainCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1277125818}
-  m_Material: {fileID: 0}
-  m_Enabled: 1
-  m_TerrainData: {fileID: 15600000, guid: 793bafd693a01df4b82ea4414a07e193, type: 2}
-  m_EnableTreeColliders: 1
---- !u!218 &1277125820
-Terrain:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1277125818}
-  m_Enabled: 1
-  serializedVersion: 6
-  m_TerrainData: {fileID: 15600000, guid: 793bafd693a01df4b82ea4414a07e193, type: 2}
-  m_TreeDistance: 5000
-  m_TreeBillboardDistance: 50
-  m_TreeCrossFadeLength: 5
-  m_TreeMaximumFullLODCount: 50
-  m_DetailObjectDistance: 80
-  m_DetailObjectDensity: 1
-  m_HeightmapPixelError: 5
-  m_SplatMapDistance: 1000
-  m_HeightmapMaximumLOD: 0
-  m_ShadowCastingMode: 2
-  m_DrawHeightmap: 1
-  m_DrawInstanced: 0
-  m_DrawTreesAndFoliage: 1
-  m_ReflectionProbeUsage: 1
-  m_MaterialTemplate: {fileID: 10652, guid: 0000000000000000f000000000000000, type: 0}
-  m_BakeLightProbesForTrees: 1
-  m_PreserveTreePrototypeLayers: 0
-  m_DeringLightProbesForTrees: 1
-  m_ScaleInLightmap: 0.0256
-  m_LightmapParameters: {fileID: 15203, guid: 0000000000000000f000000000000000, type: 0}
-  m_GroupingID: 0
-  m_RenderingLayerMask: 1
-  m_AllowAutoConnect: 1
---- !u!4 &1277125821
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1277125818}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1277125822
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1277125818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1f6ae8bdd53c7204e94799d1460279f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  creaturePrefab: {fileID: 7305408888903237956, guid: a715dea8e9efb7d4da42974b682f6dab, type: 3}
-  spawn:
-    positionX: 0
-    positionZ: 0
-    positionRadius: 0
---- !u!114 &1277125823
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1277125818}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 26cfca4c6af99564691be0bd5c22bf72, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MapSize: 32
-  EvolutionYears: 0
-  SpeciesNumber: 1
-  IndividualsNumber: 1
-  DataDirectory: ProgramData
-  ExportDirectory: ExportData
-  worldCreatureManager: {fileID: 1277125822}
-  worldGenerator: {fileID: 0}

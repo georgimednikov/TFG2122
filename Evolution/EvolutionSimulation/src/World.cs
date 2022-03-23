@@ -89,6 +89,26 @@ namespace EvolutionSimulation
             Init(c);
         }
 
+        public void Init(string json)
+        {
+            // TODO: poneer un orden para inicializar las cosas
+            ticksHour = UniverseParametersManager.parameters.ticksPerHour;
+            hoursDay = UniverseParametersManager.parameters.hoursPerDay;
+            daysYear = UniverseParametersManager.parameters.daysPerYear;
+            morning = UniverseParametersManager.parameters.morningStart;
+            night = UniverseParametersManager.parameters.nightStart;
+
+            map = JsonConvert.DeserializeObject<MapData[,]>(json);
+            mapSize = map.GetLength(0);
+            // TODO: comprobar que el json es valido
+            taxonomy = new GeneticTaxonomy();
+            taxonomy.Init();
+            Creatures = new Dictionary<int, Creature>();
+            metabolismComparer = new Utils.SortByMetabolism();
+            StaticEntities = new Dictionary<int, StaticEntity>();
+            entitiesToDelete = new List<int>();
+        }
+
         /// <summary>
         /// Initializes the map with a matrix of provided size.
         /// </summary>

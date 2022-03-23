@@ -12,18 +12,15 @@ namespace UnitySimulation
     // TODO: No ser un ISubject del world directamente, ahora para probar
     public class UnitySimulation : ISimulation, ISubject<World> 
     {
+
         public void Init()
         {
             world_listeners = new List<IListener<World>>();
-            CreatureChromosome.SetChromosome();
-            UniverseParametersManager.ReadJSON();
-            world = new World();
-            world.Init(UserInfo.Size);
+            UnityEngine.Debug.Log("SIZE: " + UserInfo.Size);
             //A minimum distance to leave in between species spawn points to give them some room.
             //Calculated based on the world size and amount of species to spawn, and then reduced by
             //a value to give room in the world and not fill it in a homogenous manner.
             int minSpawnDist = UserInfo.Size / UserInfo.Species / 5;
-
             //List with previous spawn positions, to know if a new spot is too close to another one used.
             List<Tuple<int, int>> spawnPositions = new List<Tuple<int, int>>();
             int x, y;
@@ -92,9 +89,12 @@ namespace UnitySimulation
         /// </summary>
         /// <param name="years"> Number of years to simulate </param>
         /// <param name="animals"> Number of animals that are initially created </param>
-        public void SetInitialParameters(int size, int years, int species, int individuals, string dataDirectory, string exportDirectory)
+        public void SetInitialParameters(GenerateWorld worldGenerator, int years, int species, int individuals, string dataDirectory, string exportDirectory)
         {
-            UserInfo.SetInformation(size, years, species, individuals, dataDirectory, exportDirectory);
+            UserInfo.SetInformation(0, years, species, individuals, dataDirectory, exportDirectory);
+            // TODO: ehhh???
+            world = worldGenerator.Generate();
+            UserInfo.Size = world.map.GetLength(0);
         }
 
         public bool Subscribe(IListener<World> listener)

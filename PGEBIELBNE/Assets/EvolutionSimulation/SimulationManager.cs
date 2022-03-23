@@ -6,9 +6,6 @@ namespace UnitySimulation
     public class SimulationManager : MonoBehaviour
     {
         //TODO: Setear estos paramatros poniendo directamente los archivos en vez de el directorio
-        [Tooltip("Terrain size (in world units)")]
-        public int MapSize;
-
         [Tooltip("Evolution years to perform before simulation")]
         public int EvolutionYears;
 
@@ -32,9 +29,12 @@ namespace UnitySimulation
         UnitySimulation simulation;
         void Start()
         {
+            if (worldGenerator == null)
+                Debug.LogError("WorldGenerator is not assigned");
             simulation = new UnitySimulation();
+
             simulation.SetInitialParameters(
-                MapSize,
+                worldGenerator,
                 EvolutionYears,
                 SpeciesNumber,
                 IndividualsNumber,
