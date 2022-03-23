@@ -107,7 +107,7 @@ namespace EvolutionSimulation.Entities
             Edible = lifeTime > putridTime;
 
             if (lifeTime <= 0 || curHp <= 0)
-                world.Destroy(this);
+                world.Destroy(this.ID);
             else Console.WriteLine("Ticks to corpse disappearance: " + lifeTime);
         }
 

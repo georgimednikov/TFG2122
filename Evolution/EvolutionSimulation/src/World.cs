@@ -254,10 +254,10 @@ namespace EvolutionSimulation
         /// and fulfill the same objecive during all their life-time.
         /// T: Any subclass of StableEntites i.e. Plant, Corpse
         /// </summary>
-        public T CreateStableEntity<T>(int x, int y) where T : StaticEntity, new()
+        public T CreateStaticEntity<T>(int x, int y, int hp) where T : StaticEntity, new()
         {
             T ent = new T();
-            ent.Init(entitiesID, this, x, y);
+            ent.Init(entitiesID, this, x, y, hp);
             StaticEntities.Add(entitiesID, ent);
             entitiesID++;
             return ent;
@@ -537,22 +537,19 @@ namespace EvolutionSimulation
                         switch (plantType)
                         {
                             case 0:
-                                map[xIndex, yIndex].plant = CreateStableEntity<Grass>();
-                                map[xIndex, yIndex].plant.Init(this, xIndex, yIndex, 10);   // TODO: Numeros arcanos
+                                map[xIndex, yIndex].plant = CreateStaticEntity<Grass>(xIndex, yIndex, 10); // TODO: Numeros arcanos
                                 break;
                             case 1:
-                                map[xIndex, yIndex].plant = CreateStableEntity<Bush>();
-                                map[xIndex, yIndex].plant.Init(this, xIndex, yIndex, 20);   // TODO: Numeros arcanos
+                                map[xIndex, yIndex].plant = CreateStaticEntity<Bush>(xIndex, yIndex, 10); // TODO: Numeros arcanos
                                 break;
                             case 2:
                                 maxTrees++;
-                                map[xIndex, yIndex].plant = CreateStableEntity<Tree>();
+                                map[xIndex, yIndex].plant = CreateStaticEntity<Tree>(xIndex, yIndex, 0); //TODO: el Tree no necesita hp
                                 break;
                             case 3:
                                 maxTrees++;
                                 trees++;
-                                map[xIndex, yIndex].plant = CreateStableEntity<EdibleTree>();
-                                map[xIndex, yIndex].plant.Init(this, xIndex, yIndex, 50);   // TODO: Numeros arcanos
+                                map[xIndex, yIndex].plant = CreateStaticEntity<EdibleTree>(xIndex, yIndex, 50);  // TODO: Numeros arcanos
                                 break;
                             default:
                                 break;

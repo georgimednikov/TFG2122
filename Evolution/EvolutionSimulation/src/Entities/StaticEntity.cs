@@ -24,7 +24,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="w"> World in which it'll reside </param>
         /// <param name="x"> X World position </param>
         /// <param name="y"> Y World position </param>
-        virtual public void Init(int ID, World w, int x, int y)
+        virtual public void Init(int ID, World w, int x, int y, int hp)
         {
             this.ID = ID;
             world = w;
@@ -47,6 +47,7 @@ namespace EvolutionSimulation.Entities
         public int y { get; protected set; }
 
         // Maximum and current health of the entity
+        // TODO: esto es solo para las entidades edible
         public float maxHp { get; protected set; }
         public float curHp { get; protected set; }
 

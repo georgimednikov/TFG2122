@@ -532,13 +532,13 @@ namespace EvolutionSimulation.Entities
             {
                 wantMate = false;
                 mating = true;
-                matingCreature = interacter;
+                matingCreature = interacter.ID;
                 interacter.ReceiveInteraction(this, Interactions.mate);
             }
             else if (stats.Gender == Gender.Male)
             {
                 mating = true;
-                matingCreature = interacter;
+                matingCreature = interacter.ID;
             }
         }
 
@@ -548,13 +548,20 @@ namespace EvolutionSimulation.Entities
         /// <param name="interacter"> Creature who has sent the interaction </param>
         private void StopMating(Creature interacter)
         {
-            if (matingCreature != null)
+            Creature mate = world.GetCreature(matingCreature);
+            if (mate != null)
             {
-                matingCreature.ReceiveInteraction(this, Interactions.stopMate);
-                matingCreature = null;
+                mate.ReceiveInteraction(this, Interactions.stopMate);
+                matingCreature = -1;
                 mating = false;
             }
         }
+
+
+        public  int timeToBeInHeat { get;  set; }
+        public bool mating { get; set; }
+        public bool wantMate { get; set; }
+        public int matingCreature { get; set; }
         #endregion
 
         #region Creature Information

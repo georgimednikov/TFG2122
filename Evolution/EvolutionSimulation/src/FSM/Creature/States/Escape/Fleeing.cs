@@ -29,8 +29,8 @@ namespace EvolutionSimulation.FSM.Creature.States
             pathX = 0;
             pathY = 0;
             // It either seeks its allies or runs from its enemy
-            Vector2Int fwiend = creature.GetClosestAllyPosition();
-            if(fwiend != null) {
+            Vector2Int fwiend;
+            if(creature.Ally(out _, out fwiend)) {
                 pathX = fwiend.x;
                 pathY = fwiend.y;
             } else positionAwayFromMe(ref pathX, ref pathY);
@@ -99,8 +99,8 @@ namespace EvolutionSimulation.FSM.Creature.States
                 dngX = objective.x;
                 dngY = objective.y;
                 // It either seeks its allies or runs from its enemy
-                Vector2Int fwiend = creature.GetClosestAllyPosition();
-                if (fwiend != null) {
+                Vector2Int fwiend;
+                if (creature.Ally(out _, out fwiend)) {
                     pathX = fwiend.x;
                     pathY = fwiend.y;
                 }
