@@ -307,7 +307,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         private Vector2Int FindNewPosition()
         {
-            Vector3 vector;
+            Vector3 vector = Vector3.Zero;
             if (dangersRemembered.Count > 0 || explorePositionsRemembered.Count > 0)
             {
                 // The average position of this creature's path so far is calculated and the used as a reference
@@ -334,26 +334,19 @@ namespace EvolutionSimulation.Entities
                 averageX /= dangersRemembered.Count + explorePositionsRemembered.Count;
                 averageY /= dangersRemembered.Count + explorePositionsRemembered.Count;
                 vector = new Vector3(x - averageX, y - averageY, 0);
-                vector /= vector.Length();
+                Vector3.Normalize(vector);
             }
-            else
-            {
-                // If no positions are remebered, the creature chooses a random direction
-                int dirX, dirY;
-                do
-                {
-                    dirX = RandomGenerator.Next(2);
-                    dirY = RandomGenerator.Next(2);
-                }
-                while (dirX == 0 && dirY == 0);
-                vector = new Vector3(dirX, dirY, 0);
-            }
+            // If no positions are remebered or the resulting vector is zero, the creature chooses a random direction
+            if (vector.Length() == 0)
+                vector = RandomDir();
+            
 
             float radius = perceptionRadius;
             float degreesInc = (float)(Math.PI / 4.0);  // 45 degrees
 
             Vector2Int targetPosition = new Vector2Int(thisCreature.x + (int)(vector.X * radius), thisCreature.y + (int)(vector.Y * radius));
             Vector2Int finalPosition = new Vector2Int(targetPosition.x, targetPosition.y);
+
             int cont = 0;
             //Find a position to explore that is not water and is far of the vector calculated before
             do
@@ -368,9 +361,25 @@ namespace EvolutionSimulation.Entities
                     finalPosition.x = targetPosition.x; finalPosition.y = targetPosition.y;
                 }
             }
-            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer));
+            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) || 
+            (finalPosition.x == thisCreature.x && finalPosition.y == thisCreature.y));
+
+            
 
             return finalPosition;
+        }
+
+       
+        private Vector3 RandomDir()
+        {
+            int dirX, dirY;
+            do
+            {
+                dirX = RandomGenerator.Next(2);
+                dirY = RandomGenerator.Next(2);
+            }
+            while (dirX == 0 && dirY == 0);
+            return new Vector3(dirX, dirY, 0);
         }
         /// <summary>
         /// Find a point to explore given a radius that is not water.
@@ -382,16 +391,21 @@ namespace EvolutionSimulation.Entities
         {
             float angle = angleInc;
             int inc = 1;
-            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) && angle <= 360)
+            float actualAngle = 0;
+            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) && angle <= 2*Math.PI)
             {
-                float actualAngle = angle * inc;
                 Vector2Int old = finalPosition;
                 finalPosition.x = (int)(finalPosition.x * Math.Cos(actualAngle) - finalPosition.y * Math.Sin(actualAngle));
                 finalPosition.y = (int)(old.x * Math.Sin(actualAngle) + old.y * Math.Cos(actualAngle));
 
                 inc *= -1;
                 angle += angleInc;
+                actualAngle += angle * inc;
             }
+
+            if (finalPosition.x <= 0.0 && finalPosition.y == 369.0)
+                Console.WriteLine("Something");
+
             return angle <= 360;
         }
         /// <summary>

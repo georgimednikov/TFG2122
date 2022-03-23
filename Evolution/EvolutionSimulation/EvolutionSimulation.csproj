@@ -69,22 +69,22 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\Entities\Animal.cs" />
+    <Compile Include="src\Entities\Creature\Animal.cs" />
     <Compile Include="src\Entities\Astar.cs" />
-    <Compile Include="src\Entities\Memory.cs" />
-    <Compile Include="src\Entities\CreatureStats.cs" />
-    <Compile Include="src\Entities\Mind.cs" />
+    <Compile Include="src\Entities\Creature\Memory.cs" />
+    <Compile Include="src\Entities\Creature\CreatureStats.cs" />
+    <Compile Include="src\Entities\Creature\Mind.cs" />
     <Compile Include="src\Entities\StaticEntity.cs" />
-    <Compile Include="src\Entities\Bush.cs" />
-    <Compile Include="src\Entities\EdiblePlant.cs" />
-    <Compile Include="src\Entities\EdibleTree.cs" />
+    <Compile Include="src\Entities\Plants\Bush.cs" />
+    <Compile Include="src\Entities\Plants\EdiblePlant.cs" />
+    <Compile Include="src\Entities\Plants\EdibleTree.cs" />
     <Compile Include="src\Entities\Status\Rut.cs" />
     <Compile Include="src\Entities\Status\Starving.cs" />
     <Compile Include="src\Entities\Status\Exhausted.cs" />
     <Compile Include="src\Entities\Status\Poison.cs" />
     <Compile Include="src\Entities\Status\Status.cs" />
     <Compile Include="src\Entities\Status\IStatus.cs" />
-    <Compile Include="src\Entities\Tree.cs" />
+    <Compile Include="src\Entities\Plants\Tree.cs" />
     <Compile Include="src\FSM\CompoundState.cs" />
     <Compile Include="src\FSM\Creature\States\Combat\ChaseEnemy.cs" />
     <Compile Include="src\FSM\Creature\States\CalmState.cs" />
@@ -139,13 +139,13 @@
     <Compile Include="src\FSM\Creature\Transitions\Safe\EatingTransition\HungerTransition.cs" />
     <Compile Include="src\FSM\Fsm.cs" />
     <Compile Include="src\Genetics\GeneticTaxonomy.cs" />
-    <Compile Include="src\Entities\Grass.cs" />
+    <Compile Include="src\Entities\Plants\Grass.cs" />
     <Compile Include="src\NameGenerator.cs" />
     <Compile Include="src\Utils\ListenerPattern.cs" />
     <Compile Include="src\UniverseParameters.cs" />
     <Compile Include="src\Utils\PriorityQueue.cs" />
     <Compile Include="src\RandomGenerator.cs" />
-    <Compile Include="src\Entities\Corpse.cs" />
+    <Compile Include="src\Entities\Creature\Corpse.cs" />
     <Compile Include="src\Genetics\CreatureFeatures.cs" />
     <Compile Include="src\Genetics\CreatureChromosome.cs" />
     <Compile Include="src\Genetics\GeneticFunctions.cs" />
@@ -154,7 +154,7 @@
     <Compile Include="src\FSM\Interfaces.cs" />
     <Compile Include="src\Entities\IInteractable.cs" />
     <Compile Include="src\Perlin.cs" />
-    <Compile Include="src\Entities\Creature.cs" />
+    <Compile Include="src\Entities\Creature\Creature.cs" />
     <Compile Include="src\ISimulation.cs" />
     <Compile Include="src\Utils\SortByDistanceSEntities.cs" />
     <Compile Include="src\Validator.cs" />
@@ -165,7 +165,7 @@
     <Compile Include="src\World.cs" />
     <Compile Include="src\Simulation.cs" />
     <Compile Include="src\Entities\IEntity.cs" />
-    <Compile Include="src\Entities\Plant.cs" />
+    <Compile Include="src\Entities\Plants\Plant.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
