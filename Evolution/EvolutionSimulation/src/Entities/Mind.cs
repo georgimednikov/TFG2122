@@ -47,27 +47,43 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void UpdatePriorities()
         {
-            //UpdateParent();
+            UpdateParent();
             UpdatePrey();
             UpdateCorpse();
             UpdateWaterSource();
             UpdatePlant();
         }
+
         /// <summary>
-        /// It is call when a parent dead. Set the parent to follow if the creature is a child
+        /// This method change the parent to follow. The creature will always follow the same parent
+        /// nevertheless it dead, then if the creature remember where is the other parent, it will 
+        /// follow it.
+        /// Also if is not following anyone but remember a parent (the creature perceive a parent)
+        /// it will start follow it too.
         /// </summary>
-        /// <param name="parentID"> the ID of the parent that has dead</param>
-        public void UpdateParent(int parentID)
+        private void UpdateParent()
         {
-            //The mother has dead 
-            if (mem.Mother != null && mem.Mother.ID == parentID)
-                parentToFollow = mem.Father;
-            //The father has dead 
-            else if (mem.Father != null && mem.Father.ID == parentID ) 
-                parentToFollow = mem.Mother;
-            else//both are dead 
+            // The parent that the creature is following has died
+            if (parentToFollow != null && world.GetCreature(parentToFollow.ID) == null)
             {
-                parentToFollow = null;
+                // The mother is who has died
+                if (mem.Mother != null && mem.Mother.ID == parentToFollow.ID)
+                    parentToFollow = mem.Father;
+                // The father is who has died
+                else if (mem.Father != null && mem.Father.ID == parentToFollow.ID)
+                    parentToFollow = mem.Mother;
+                else // Just in case the creature doesn't have parents
+                    parentToFollow = null;
+            }// If the creature doesn't has a parent to follow but suddenly remember a parent
+             // (the creature has seen a parent), then it start to follow the parent
+            else if((parentToFollow != null && parentToFollow.ticks <= 0) || parentToFollow == null)
+            {
+                // Remember where is the mother
+                if(mem.Mother != null && mem.Mother.ticks > 0)
+                    parentToFollow = mem.Mother;
+                // Remember where is the father
+                else if (mem.Father != null && mem.Father.ticks > 0)
+                    parentToFollow = mem.Father;
             }
         }
         private void UpdatePrey()

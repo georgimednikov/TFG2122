@@ -13,7 +13,7 @@
 
         public override bool Evaluate()
         {
-            return !creature.mating;
+            return !creature.mating || creature.matingCreature == -1;
         }
 
         public override string ToString()

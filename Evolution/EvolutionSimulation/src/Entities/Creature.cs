@@ -113,10 +113,7 @@ namespace EvolutionSimulation.Entities
             mind.UpdatePerception();
         }
 
-        public void ParentDead(int parentID)
-        {
-            mind.UpdateParent(parentID);
-        }
+        
 
         void CheckTemperature()
         {
@@ -552,9 +549,9 @@ namespace EvolutionSimulation.Entities
             if (mate != null)
             {
                 mate.ReceiveInteraction(this, Interactions.stopMate);
-                matingCreature = -1;
-                mating = false;
             }
+            matingCreature = -1;
+            mating = false;
         }
 
 

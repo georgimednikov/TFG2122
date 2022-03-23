@@ -326,7 +326,6 @@ namespace EvolutionSimulation
             {
                 if (Creatures.ContainsKey(id))
                 {
-                    Creatures[id].ParentDead(id);
                     Creatures.Remove(id);
                 }
                 else

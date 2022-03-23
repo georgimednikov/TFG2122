@@ -36,7 +36,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 if (creature.stats.Gender == Genetics.Gender.Female)
                 {
                     // The creature whom it was mating has died or something
-                    if (!creature.Mate()) return;
+                    if (creature.world.GetCreature(creature.matingCreature) == null) return;
                     // Create a random number of childs
                     int numberChilds = RandomGenerator.Next(1, 5);//TODO: que el numero de hijos dependa de algo del cromosoma?
                     for (int i = 0; i < numberChilds; ++i)
@@ -47,11 +47,16 @@ namespace EvolutionSimulation.FSM.Creature.States
                         // Mutate the chromosome
                         Genetics.GeneticFunctions.UniformMutation(ref childC, UniverseParametersManager.parameters.mutationChance);
                         // The new creature's pos (near to the parents)
-                        int nx = creature.x + RandomGenerator.Next(-1, 2);
-                        int ny = creature.y + RandomGenerator.Next(-1, 2);
+                        int nx, ny;
+                        do{
+                            nx = creature.x + RandomGenerator.Next(-1, 2);
+                            ny = creature.y + RandomGenerator.Next(-1, 2);
+                        }while(creature.world.canMove(nx,ny));
+                       
                         creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName, creature.matingCreature, creature.ID);
                     }
                     creature.timeToBeInHeat = -1;
+                    creature.mating = false; //This is needed to stop mating
                     creature.CreateDanger();
                 }
                 ShowInfo();
@@ -60,9 +65,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         private void ShowInfo()
         {
-            int id;
-            creature.Mate(out id, out _);
-            Entities.Creature mate = creature.world.GetCreature(id);
+            Entities.Creature mate = creature.world.GetCreature(creature.matingCreature);
             Console.WriteLine(creature.speciesName + "MATES WITH " + mate.speciesName + " AT (" + mate.x + ", " + mate.y + ")");
         }
         /// <summary>
