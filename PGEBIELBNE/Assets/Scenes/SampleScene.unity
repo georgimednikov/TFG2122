@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641258, b: 0.5748172, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -227,8 +227,9 @@ GameObject:
   - component: {fileID: 848237406}
   - component: {fileID: 848237405}
   - component: {fileID: 848237404}
-  - component: {fileID: 848237403}
+  - component: {fileID: 848237408}
   - component: {fileID: 848237407}
+  - component: {fileID: 848237403}
   m_Layer: 3
   m_Name: World (funca)
   m_TagString: Untagged
@@ -243,13 +244,16 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 848237402}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 471cdeccff20b8046ac765777cfc2228, type: 3}
+  m_Script: {fileID: 11500000, guid: 1f6ae8bdd53c7204e94799d1460279f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  creature: {fileID: 7305408888903237956, guid: a715dea8e9efb7d4da42974b682f6dab, type: 3}
-  creatureDistribution: []
+  creaturePrefab: {fileID: 7305408888903237956, guid: a715dea8e9efb7d4da42974b682f6dab, type: 3}
+  spawn:
+    positionX: 100
+    positionZ: 100
+    positionRadius: 0
 --- !u!154 &848237404
 TerrainCollider:
   m_ObjectHideFlags: 0
@@ -322,6 +326,26 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   world: {fileID: 4900000, guid: 0127c2171d5132b4fb5231b6ac57feae, type: 3}
   waterPlane: {fileID: 4798661411487492717, guid: 3fbd9c7603b5ef247b076c1b27f46465, type: 3}
+--- !u!114 &848237408
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 848237402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26cfca4c6af99564691be0bd5c22bf72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MapSize: 32
+  EvolutionYears: 0
+  SpeciesNumber: 2
+  IndividualsNumber: 2
+  DataDirectory: ProgramData
+  ExportDirectory: ExportData
+  worldCreatureManager: {fileID: 1277125822}
+  worldGenerator: {fileID: 0}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -519,3 +543,4 @@ MonoBehaviour:
   DataDirectory: ProgramData
   ExportDirectory: ExportData
   worldCreatureManager: {fileID: 1277125822}
+  worldGenerator: {fileID: 0}

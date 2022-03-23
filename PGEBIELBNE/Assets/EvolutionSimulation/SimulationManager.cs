@@ -27,6 +27,7 @@ namespace UnitySimulation
         public string ExportDirectory;
 
         public WorldCreaturesManager worldCreatureManager;
+        public GenerateWorld worldGenerator;
 
         UnitySimulation simulation;
         void Start()
