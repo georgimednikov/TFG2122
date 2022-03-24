@@ -99,6 +99,7 @@ namespace EvolutionSimulation.Entities
             float bestValue = 0;
             foreach (EntityResource prey in mem.Preys)
             {
+                if (world.GetCreature(prey.ID) == null) continue;
                 // TODO: guardar el valor en el recurso
                 float preyValue = world.GetCreature(prey.ID).stats.Size / Math.Max(1, creature.DistanceToObjective(prey.position));
                 if (preyValue > bestValue)
@@ -279,12 +280,12 @@ namespace EvolutionSimulation.Entities
         public override int GetHashCode() { return base.GetHashCode(); }
     }
 
-    public class PreyResource : EntityResource
-    {
-        public int size;
+    //public class PreyResource : EntityResource
+    //{
+    //    public int size;
 
-        public EntityResource(Vector2Int p, int id, int t) : base(p, t) { ID = id; }
-        public EntityResource(int x, int y, int id, int t) : base(new Vector2Int(x, y), t) { ID = id; }
+    //    public EntityResource(Vector2Int p, int id, int t) : base(p, t) { ID = id; }
+    //    public EntityResource(int x, int y, int id, int t) : base(new Vector2Int(x, y), t) { ID = id; }
 
-    }
+    //}
 }

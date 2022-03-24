@@ -44,7 +44,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override string GetInfo()
         {
-            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")" + " EXPLORES AT (" + posToDiscover.x + ", " + posToDiscover.y + ")";
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")" + " EXPLORES AT (" + creature.GetNextPosOnPath().X + ", " + creature.GetNextPosOnPath().Y + ")";
         }
 
         public override string ToString()

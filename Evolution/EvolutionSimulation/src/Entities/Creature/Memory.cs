@@ -347,6 +347,15 @@ namespace EvolutionSimulation.Entities
             float degreesInc = (float)(Math.PI / 4.0);  // 45 degrees
 
             Vector2Int targetPosition = new Vector2Int(thisCreature.x + (int)(vector.X * radius), thisCreature.y + (int)(vector.Y * radius));
+            //TODO hay veces que intentas ir a un sitio en negativo (x = -100 por ejemplo) y al no poder se queda en bucle infinito
+            // supongo que pasara lo mismo si intentas ir a explorar a un sitio muy grande (x = 600 y mapa es de 512)
+            // tambien he visto que los puntos de exploracion eran sobre la x = 100 mas o menos y pasaban estas cosas de
+            // targetposition.x = -100 porque la criatura estaba ahora en x = 5, muy raro
+            /*while (targetPosition.x < 0 || targetPosition.y < 0)
+            {
+                vector = RandomDir();
+                targetPosition = new Vector2Int(thisCreature.x + (int)(vector.X * radius), thisCreature.y + (int)(vector.Y * radius));
+            }*/
             Vector2Int finalPosition = new Vector2Int(targetPosition.x, targetPosition.y);
 
             int cont = 0;
@@ -405,7 +414,7 @@ namespace EvolutionSimulation.Entities
                 actualAngle += angle * inc;
             }
 
-            return angle <= 360;
+            return angle <= 2 * Math.PI && finalPosition.x != thisCreature.x && finalPosition.y != thisCreature.y;
         }
         /// <summary>
         /// This method has to be called when day changed to night nad vice versa, to update the radius the creature sees based on the
