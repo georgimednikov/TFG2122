@@ -40,6 +40,8 @@ namespace EvolutionSimulation.Entities
         int ticksElapsed;               //How many ticks have gone by, used along with ticksToSavePosition.
 
         ResourcePositionComparer resourceComparer;
+        ResourceValueComparer valueComparer;
+
         Queue<Vector2Int> explorePositionsRemembered;   //All the dangers the creature remembers, with their dangers and ticks left.
         List<Position> dangersRemembered;               //All the dangers the creature remembers, with their dangers and ticks left.
 
@@ -68,7 +70,7 @@ namespace EvolutionSimulation.Entities
         }
         private EntityResource mother;
         public EntityResource Mate { get; private set; }
-        public List<EntityResource> Preys { get; private set; }         //Closest reachable creature.
+        public List<ValueResource> Preys { get; private set; }         //Closest reachable creature.
         public List<EntityResource> Allies { get; private set; }
         public List<EntityResource> FreshCorpses { get; private set; }
         public List<EntityResource> RottenCorpses { get; private set; }
@@ -95,7 +97,7 @@ namespace EvolutionSimulation.Entities
             else
                 mother = new EntityResource(-1, -1, -1, maxExperienceTicks);  // Impossible value to represent no parent
 
-            Preys = new List<EntityResource>();
+            Preys = new List<ValueResource>();
             Allies = new List<EntityResource>();
             FreshCorpses = new List<EntityResource>();
             RottenCorpses = new List<EntityResource>();
@@ -107,6 +109,8 @@ namespace EvolutionSimulation.Entities
             SafeEdiblePlants = new List<EntityResource>();
 
             resourceComparer = new ResourcePositionComparer(c);
+            valueComparer = new ResourceValueComparer();
+
 
             maxResourcesRemembered = 5; //TODO: Esto bien
             maxPositionsRemembered = 10; //TODO: Esto bien
@@ -181,7 +185,11 @@ namespace EvolutionSimulation.Entities
                         creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach ||
                         creature.creatureLayer == Creature.HeightLayer.Ground &&
                         creatureDanger < thisCreature.stats.Aggressiveness)
-                        UpdateList(Preys, resource, maxExperienceTicks);
+                    {
+                        float preyValue = world.GetCreature(resource.ID).stats.Size / Math.Max(1, creature.DistanceToObjective(resource.position));
+                        ValueResource prey = new ValueResource(resource.position, resource.ID, preyValue, resource.ticks);
+                        UpdateList(Preys, prey, maxExperienceTicks);
+                    }
 
                     //Since it does not make sense to create an array with the size of the world only to save information about a part of it,
                     //and since using lists complicates the process making it necessary to go through the list with the intimidation levels comparing
@@ -213,6 +221,7 @@ namespace EvolutionSimulation.Entities
             //This for structure is recurrent all throughtout this class and is explained with the following example:
             //With radius = 3, it goes from -3 inclusive to 3 inclusive in both axis, going through -3, -2, -1, 0, 1, 2, 3
             //This is used to calculate the offsets of the creature's position to go through an area around it.
+            int range = UniverseParametersManager.parameters.adjacentLength;
             for (int i = -perceptionRadius; i <= perceptionRadius; i++)
             {
                 for (int j = -perceptionRadius; j <= perceptionRadius; j++)
@@ -221,21 +230,28 @@ namespace EvolutionSimulation.Entities
                     if (IsOutOfBounds(p)) continue;
 
                     if (world.map[p.x, p.y].isWater)
+                    {
+                        //All shores adjacent to the creature are saved.
+                        bool shore = false;
+                        for (int k = -range; !shore && k <= range; k++)
+                            for (int h = -range; !shore && h <= range; h++)
+                                if (world.checkBounds(p.x + k, p.y + h) && !world.map[p.x + k, p.y + h].isWater) shore = true;
                         UpdateList(WaterPositions, new Resource(p, maxExperienceTicks), maxExperienceTicks);
 
-                    Position position = GetFromPositionDangers(p);
-                    bool positionWasKnown = position == null;
-                    if (positionWasKnown)
-                        position = new Position(p, 0, 0, 0);
+                        Position position = GetFromPositionDangers(p);
+                        bool positionWasKnown = position == null;
+                        if (positionWasKnown)
+                            position = new Position(p, 0, 0, 0);
 
-                    position.ticks = maxExperienceTicks; //The number of ticks left to be forgotten is reset too.
-                    position.intimidation = intimidationFelt[i + perceptionRadius, j + perceptionRadius];
+                        position.ticks = maxExperienceTicks; //The number of ticks left to be forgotten is reset too.
+                        position.intimidation = intimidationFelt[i + perceptionRadius, j + perceptionRadius];
 
-                    //If this position was not remembered and there is valuable information in it (a danger level) it is remembered.
-                    if (!positionWasKnown && position.intimidation != 0) dangersRemembered.Add(position);
+                        //If this position was not remembered and there is valuable information in it (a danger level) it is remembered.
+                        if (!positionWasKnown && position.intimidation != 0) dangersRemembered.Add(position);
+
+                    }
                 }
             }
-
             // The following code also forgets, but since it does not deal with entities rather positions and danger
             // it also serves to assign the safe place of the creature.
             int safePlaceDist = 0;
@@ -530,9 +546,19 @@ namespace EvolutionSimulation.Entities
 
         #region Lists
 
-        private void Sort_RemoveExtraInfo<T>(int max, List<T> list) where T : Resource
+        private void AdjustValueResourceList<T>(int max, List<T> list) where T : ValueResource
+        {
+            list.Sort(valueComparer);
+            AdjustList(max, list);
+        }
+        private void AdjustResourceList<T>(int max, List<T> list) where T : Resource
         {
             list.Sort(resourceComparer);
+            if (list.Count > max)
+                list.RemoveRange(max, list.Count - max);
+        }
+        private void AdjustList<T>(int max, List<T> list) where T : Resource
+        {
             if(list.Count > max)
                 list.RemoveRange(max, list.Count - max);
         }
@@ -540,26 +566,26 @@ namespace EvolutionSimulation.Entities
         private void SortAndAdjustLists()
         {
             RemoveFakeInformation(Preys);
-            Sort_RemoveExtraInfo(maxResourcesRemembered, Preys);
+            AdjustValueResourceList(maxResourcesRemembered, Preys);
 
             RemoveFakeInformation(Allies);
-            Sort_RemoveExtraInfo(maxResourcesRemembered, Allies);
+            AdjustResourceList(maxResourcesRemembered, Allies);
 
             RemoveFakeInformation(FreshCorpses);
-            Sort_RemoveExtraInfo(maxResourcesRemembered, FreshCorpses);
+            AdjustResourceList(maxResourcesRemembered, FreshCorpses);
 
             RemoveFakeInformation(RottenCorpses);
-            Sort_RemoveExtraInfo(maxResourcesRemembered, RottenCorpses);
+            AdjustResourceList(maxResourcesRemembered, RottenCorpses);
 
-            Sort_RemoveExtraInfo(maxResourcesRemembered, WaterPositions);
-            Sort_RemoveExtraInfo(maxResourcesRemembered, SafeWaterPositions);
+            AdjustResourceList(maxResourcesRemembered, WaterPositions);
+            AdjustResourceList(maxResourcesRemembered, SafeWaterPositions);
 
             RemoveFruitlessPlants();
-            Sort_RemoveExtraInfo(maxResourcesRemembered, EdiblePlants);
-            Sort_RemoveExtraInfo(maxResourcesRemembered, SafeEdiblePlants);
+            AdjustResourceList(maxResourcesRemembered, EdiblePlants);
+            AdjustResourceList(maxResourcesRemembered, SafeEdiblePlants);
         }
 
-        private void RemoveFakeInformation(List<EntityResource> list)
+        private void RemoveFakeInformation<T>(List<T> list) where T : EntityResource
         {
             for (int i = list.Count - 1; i >= 0; i--)
             {
@@ -705,7 +731,7 @@ namespace EvolutionSimulation.Entities
         }
         #endregion
 
-        #region Comparator
+        #region Comparators
         /// <summary>
         /// Given a list of edible plants, these are ordered based on distance from it. The shortest goes first.
         /// </summary>
@@ -719,6 +745,15 @@ namespace EvolutionSimulation.Entities
                 int aDist = Math.Abs(creature.x - a.position.x) + Math.Abs(creature.y - a.position.y);
                 int bDist = Math.Abs(creature.x - b.position.x) + Math.Abs(creature.y - b.position.y);
                 return aDist.CompareTo(bDist);
+            }
+        }
+        private class ResourceValueComparer : Comparer<ValueResource>
+        {
+            public ResourceValueComparer() {}
+
+            public override int Compare(ValueResource a, ValueResource b)
+            {
+                return a.value.CompareTo(b.value);
             }
         }
         #endregion
