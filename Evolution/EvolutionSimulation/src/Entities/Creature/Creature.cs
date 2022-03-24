@@ -95,7 +95,9 @@ namespace EvolutionSimulation.Entities
             {
                 mfsm.CurrentState.Action();
                 ActionPoints -= cost;
+                Console.WriteLine(GetStateInfo());
             }
+
             Clear();
         }
 

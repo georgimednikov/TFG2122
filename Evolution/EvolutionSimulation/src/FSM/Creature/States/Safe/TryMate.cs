@@ -9,6 +9,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     class TryMate : CreatureState
     {
         public TryMate(Entities.Creature c) : base(c) { creature = c; }
+        int mateID; Vector2Int matePos;
 
         // This move is energy netural, costing the same energy that is obtained in a tick
         public override int GetCost()
@@ -19,11 +20,9 @@ namespace EvolutionSimulation.FSM.Creature.States
         // Increases current rest
         public override void Action()
         {
-            int id; Vector2Int pos;
-            if (creature.Mate(out id, out pos) &&
-                creature.DistanceToObjective(pos) <= UniverseParametersManager.parameters.adjacentLength)
-                creature.world.GetCreature(id).ReceiveInteraction(creature, Entities.Interactions.mate);
-            Console.WriteLine(creature.speciesName + " TRIES TO MATE");
+            if (creature.Mate(out mateID, out matePos) &&
+                creature.DistanceToObjective(matePos) <= UniverseParametersManager.parameters.adjacentLength)
+                creature.world.GetCreature(mateID).ReceiveInteraction(creature, Entities.Interactions.mate);
         }
 
         public override string ToString()
@@ -36,7 +35,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override string GetInfo()
         {
-            return "TRYING TO MATE";
+            return creature.speciesName + " with ID: " + creature.ID + " TRIES TO MATE WITH ID: " + creature.matingCreature + " AT (" + matePos.x + ", " + matePos.y + ")";
         }
     }
 }

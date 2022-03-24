@@ -10,12 +10,14 @@ namespace EvolutionSimulation.FSM.Creature.States
     {
         int time;
         int startTime;
-
+        Vector2Int matePos;
+        string mateSpecies;
         public Mating(Entities.Creature c, int time) : base(c){ this.time = time; startTime = time; }
 
         public override void OnEntry()
         {
             creature.stats.ActionPerceptionPercentage = UniverseParametersManager.parameters.actionPerceptionPercentage;
+            SetInfo();
         }
 
         // This move is energy netural, costing the same energy that is obtained in a tick
@@ -36,7 +38,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 if (creature.stats.Gender == Genetics.Gender.Female)
                 {
                     // The creature whom it was mating has died or something
-                    if (creature.world.GetCreature(creature.matingCreature) == null) return;
+                    if (creature.world.GetCreature(creature.matingCreature) == null) { mateSpecies = ""; matePos = new Vector2Int(-1, -1); return; }
                     // Create a random number of childs
                     int numberChilds = RandomGenerator.Next(1, 5);//TODO: que el numero de hijos dependa de algo del cromosoma?
                     for (int i = 0; i < numberChilds; ++i)
@@ -59,14 +61,22 @@ namespace EvolutionSimulation.FSM.Creature.States
                     creature.mating = false; //This is needed to stop mating
                     creature.CreateDanger();
                 }
-                ShowInfo();
             }
         }
 
-        private void ShowInfo()
+        private void SetInfo()
         {
             Entities.Creature mate = creature.world.GetCreature(creature.matingCreature);
-            Console.WriteLine(creature.speciesName + "MATES WITH " + mate.speciesName + " AT (" + mate.x + ", " + mate.y + ")");
+            if (mate != null)
+            {
+                matePos = new Vector2Int(mate.x, mate.y);
+                mateSpecies = mate.speciesName;
+            }
+            else
+            {
+                matePos = new Vector2Int(-1, -1);
+                mateSpecies = "";
+            }
         }
         /// <summary>
         /// At the end of the action whatever the reason was, reset the timer
@@ -89,7 +99,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override string GetInfo()
         {
-            return "MATING";
+            return creature.speciesName + " with ID: " + creature.ID + " MATES WITH " + mateSpecies + " with ID: " + creature.matingCreature + " AT (" + matePos.x + ", " + matePos.y + ")" ;
         }
     }
 }

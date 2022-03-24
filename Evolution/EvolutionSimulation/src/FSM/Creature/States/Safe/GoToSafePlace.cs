@@ -39,7 +39,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override string GetInfo()
         {
-            return safePos.ToString();
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")GOES TO SAFE PLACE AT (" + safePos.x + ", " + safePos.y + ")";
         }
         public override string ToString()
         {

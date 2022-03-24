@@ -110,12 +110,11 @@ namespace EvolutionSimulation.FSM.Creature.States
                 else
                     creature.SetPath(pathX, pathY);
             }
-            Console.WriteLine(creature.speciesName + " FLEES (" + creature.x + ", " + creature.y + ")");
         }
 
         public override string GetInfo()
         {
-            return "Objective: " + pathX + ", " + pathY;
+            return  creature.speciesName + " with ID: " + creature.ID + " AT (" + creature.x + ", " + creature.y + ") FLEES TO (" + pathX + ", " + pathY + ")";
         }
 
         public override string ToString()

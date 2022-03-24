@@ -99,6 +99,7 @@ namespace EvolutionSimulation.Entities
             float bestValue = 0;
             foreach (EntityResource prey in mem.Preys)
             {
+                // TODO: guardar el valor en el recurso
                 float preyValue = world.GetCreature(prey.ID).stats.Size / Math.Max(1, creature.DistanceToObjective(prey.position));
                 if (preyValue > bestValue)
                 {
@@ -213,7 +214,13 @@ namespace EvolutionSimulation.Entities
         public bool Menace(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Menace, out id, out position); }
         public bool Parent(out int id, out Vector2Int position) { return AssignEntityInfo(parentToFollow, out id, out position); }
         public bool Prey(out int id, out Vector2Int position) { return AssignEntityInfo(worthyPrey, out id, out position); }
-        public bool Ally(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Allies[0], out id, out position); }
+        public bool Ally(out int id, out Vector2Int position) 
+        { 
+            if(mem.Allies.Count > 0) 
+                return AssignEntityInfo(mem.Allies[0], out id, out position);
+            id = -1; position = new Vector2Int(-1, -1);
+            return false;
+        }
         public bool Mate(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Mate, out id, out position); }
         public bool Corpse(out int id, out Vector2Int position) { return AssignEntityInfo(worthyCorpse, out id, out position); }
         public bool Plant(out int id, out Vector2Int position) { return AssignEntityInfo(worthyPlant, out id, out position); }
@@ -270,5 +277,14 @@ namespace EvolutionSimulation.Entities
         public override bool Equals(object obj) { return Equals(obj as EntityResource); }
         public override bool Equals(Resource obj) { return this == obj as EntityResource; }
         public override int GetHashCode() { return base.GetHashCode(); }
+    }
+
+    public class PreyResource : EntityResource
+    {
+        public int size;
+
+        public EntityResource(Vector2Int p, int id, int t) : base(p, t) { ID = id; }
+        public EntityResource(int x, int y, int id, int t) : base(new Vector2Int(x, y), t) { ID = id; }
+
     }
 }

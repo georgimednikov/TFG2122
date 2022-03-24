@@ -25,7 +25,6 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             SetPath();
-            Console.WriteLine(creature.speciesName + " GOES TO EAT (" + creature.x + ", " + creature.y + ")");
         }
 
         public override string ToString()
@@ -34,7 +33,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         }
         public override string GetInfo()
         {
-            return foodPos.ToString();
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")GOES TO EAT AT (" + foodPos.x + ", " + foodPos.y + ")";
         }
 
         /// <summary>

@@ -29,7 +29,6 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 creature.Place(nX, nY);
             }
-            Console.WriteLine(creature.speciesName + " WANDERS (" + creature.x + ", " + creature.y + ")");
         }
 
         public override string ToString()
@@ -42,7 +41,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override string GetInfo()
         {
-            return "WANDER";
+            return creature.speciesName + " with ID: " + creature.ID + " WANDERS (" + creature.x + ", " + creature.y + ")";
         }
     }
 }

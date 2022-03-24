@@ -9,7 +9,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         // If creature has poison
         private bool poison = false;
-
+        int enemyID;
+        string speciesName;
         public Attacking(Entities.Creature c) : base(c) { creature = c; }
 
         public override int GetCost()
@@ -23,11 +24,10 @@ namespace EvolutionSimulation.FSM.Creature.States
         // Increases current rest
         public override void Action()
         {
-            if (!creature.Enemy()) return;
+            if (!creature.Enemy(out enemyID, out _)) { speciesName = ""; return; }
 
-            int objID; creature.Enemy(out objID, out _);
-            Entities.Creature objCreature = creature.world.GetCreature(objID);
-            Console.WriteLine(creature.speciesName + " ATTACKS " + objCreature.speciesName);
+            Entities.Creature objCreature = creature.world.GetCreature(enemyID);
+            speciesName = objCreature.speciesName;
             if (poison)
                 objCreature.ReceiveInteraction(creature, Entities.Interactions.poison);
             objCreature.ReceiveInteraction(creature, Entities.Interactions.attack);
@@ -42,6 +42,11 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override string ToString()
         {
             return "AttackingState";
+        }
+
+        public override string GetInfo()
+        {
+            return creature.speciesName + " with ID: " + creature.ID + " ATTACKS " + speciesName + " with ID: " + enemyID;
         }
     }
 }

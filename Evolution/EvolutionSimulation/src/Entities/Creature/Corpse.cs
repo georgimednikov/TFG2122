@@ -108,7 +108,7 @@ namespace EvolutionSimulation.Entities
 
             if (lifeTime <= 0 || curHp <= 0)
                 world.Destroy(this.ID);
-            else Console.WriteLine("Ticks to corpse disappearance: " + lifeTime);
+            //else Console.WriteLine("Ticks to corpse disappearance: " + lifeTime);
         }
 
         // Copse state: it is edible until it starts putrefying

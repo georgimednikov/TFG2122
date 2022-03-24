@@ -7,8 +7,11 @@ namespace EvolutionSimulation.FSM.Creature.States
     {
         // How costly it is to move compared to regular safe movement
         private float modifier;
-        // Position of the objective
-        int objX, objY;
+        // Position and ID of the objective
+        int enemyID;
+        Vector2Int objective;
+        string speciesName;
+
         // In case the chase ends and it does not end up attacking
         bool brake = false;
 
@@ -30,10 +33,9 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            Vector2Int objective; creature.Enemy(out _, out objective);
-            objX = objective.x;
-            objY = objective.y; 
-            creature.SetPath(objX, objY);   // This MUST be set up for the cost of the action to work
+            creature.Enemy(out enemyID, out objective);
+            speciesName = creature.world.GetCreature(enemyID).speciesName;
+            creature.SetPath(objective);   // This MUST be set up for the cost of the action to work
         }
 
         public override void Action()
@@ -43,16 +45,15 @@ namespace EvolutionSimulation.FSM.Creature.States
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             }
 
-            int enemyID; Vector2Int objective;
-            creature.Enemy(out enemyID, out objective);   // This is NOT cached because objective can change to another creature
-            if (objX != objective.x ||  // If objective is somewhere else,
-                objY != objective.y)    // adjust path accordingly
+            int otherID; Vector2Int obj;
+            creature.Enemy(out otherID, out obj);   // This is NOT cached because objective can change to another creature
+            if (otherID != enemyID)  // If objective is somewhere else, adjust path accordingly
             {
-                objX = objective.x;
-                objY = objective.y;
-                creature.SetPath(objX, objY);   // Set the path the creature must follow
+                enemyID = otherID;
+                speciesName = creature.world.GetCreature(enemyID).speciesName;
+                objective = obj;
+                creature.SetPath(objective);   // Set the path the creature must follow
             }
-            Console.WriteLine(creature.speciesName + " CHASES " + creature.world.GetCreature(enemyID).speciesName);
             // All of this is done AFTER the action due to the fact that GetCost reflects the cost of the older path
             // Were it to be changed BEFORE, the new position's cost may not be the same as the one returned before
             brake = false;
@@ -66,7 +67,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override string GetInfo()
         {
-            return "Objective: " + objX + ", " + objY;
+            return creature.speciesName + " with ID: " + creature.ID + " CHASES " + speciesName + " with ID: " + enemyID;
         }
 
         public override string ToString()

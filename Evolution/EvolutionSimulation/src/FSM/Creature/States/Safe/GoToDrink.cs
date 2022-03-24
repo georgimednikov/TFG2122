@@ -39,11 +39,10 @@ namespace EvolutionSimulation.FSM.Creature.States
             Vector3 nextPos = creature.GetNextPosOnPath();
             if (nextPos.X < 0) return; //If it is already in the right spot it should not move.
             creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-            Console.WriteLine(creature.speciesName + " GOES TO DRINK (" + creature.x + ", " + creature.y + ")");
         }
         public override string GetInfo()
         {
-            return finalPosition.ToString();
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")" + " GOES TO DRINK AT (" + finalPosition.x + ", " + finalPosition.y + ")";
         }
 
         public override string ToString()

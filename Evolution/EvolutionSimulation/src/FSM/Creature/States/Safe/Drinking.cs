@@ -25,7 +25,6 @@ namespace EvolutionSimulation.FSM.Creature.States
                 //TODO: Mirar los valores cuando se llama a SafeWaterSpotFound SafePlantFound y CreateExperience
                 creature.SafeWaterSource();
             }
-            Console.WriteLine(creature.speciesName + " DRINKS (" + creature.x + ", " + creature.y + ")");
         }
 
         public override void OnExit()
@@ -43,7 +42,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override string GetInfo()
         {
-            return "DRINKING";
+            return creature.speciesName + " with ID: " + creature.ID + " DRINKS AT (" + creature.x + ", " + creature.y + ")";
         }
     }
 }

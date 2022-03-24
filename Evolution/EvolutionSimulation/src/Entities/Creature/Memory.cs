@@ -525,7 +525,7 @@ namespace EvolutionSimulation.Entities
         {
             list.Sort(resourceComparer);
             if(list.Count > max)
-                list.RemoveRange(max, Preys.Count);
+                list.RemoveRange(max, list.Count - max);
         }
         // TODO: si tarda mucho hacer priority queue
         private void SortAndAdjustLists()

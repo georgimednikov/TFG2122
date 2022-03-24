@@ -18,7 +18,6 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override void Action()
         {
-            Console.WriteLine(creature.speciesName + " DIES");
             creature.world.Destroy(creature.ID);
             Entities.Corpse corpse = creature.world.CreateStaticEntity<Entities.Corpse>(creature.x, creature.y, 50);    // TODO: no poner el hp a pelo
             corpse.SetTraits(creature);
@@ -27,6 +26,11 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override string ToString()
         {
             return "DeadState";
+        }
+
+        public override string GetInfo()
+        {
+            return creature.speciesName + "with ID " + creature.ID + " DIES";
         }
     }
 }

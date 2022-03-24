@@ -29,7 +29,6 @@ namespace EvolutionSimulation.FSM.Creature.States
                 creature.stats.CurrRest = creature.stats.MaxRest;
                 creature.CreateDanger();
             }
-            Console.WriteLine(creature.speciesName + " SLEEPS");
         }
 
         public override void OnExit()
@@ -47,7 +46,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override string GetInfo()
         {
-            return "SLEEPING";
+            return creature.speciesName + " with ID: " + creature.ID + " SLEEPS AT (" + creature.x + ", " + creature.y + ")";
         }
     }
 }
