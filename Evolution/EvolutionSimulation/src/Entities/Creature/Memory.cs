@@ -79,7 +79,6 @@ namespace EvolutionSimulation.Entities
         public List<EntityResource> EdiblePlants { get; private set; }
         public List<EntityResource> SafeEdiblePlants { get; private set; }  //List containing all safe edible plants that the creature remembers.
         public Vector2Int SafePosition { get; private set; }            //The closest safe location for the creature.
-        public Vector2Int NewPosition { get => FindNewPosition(); }
 
 
         public Memory(Creature c, int fID, int mID)
@@ -323,7 +322,7 @@ namespace EvolutionSimulation.Entities
         /// circumference, with an angle and/or radius adjustment until 
         /// a reachable position its achieved.
         /// </summary>
-        private Vector2Int FindNewPosition()
+        public Vector2Int FindNewPosition()
         {
             Vector3 vector = Vector3.Zero;
             if (dangersRemembered.Count > 0 || explorePositionsRemembered.Count > 0)
@@ -352,46 +351,37 @@ namespace EvolutionSimulation.Entities
                 averageX /= dangersRemembered.Count + explorePositionsRemembered.Count;
                 averageY /= dangersRemembered.Count + explorePositionsRemembered.Count;
                 vector = new Vector3(x - averageX, y - averageY, 0);
-                vector = Vector3.Normalize(vector);
+                if(vector.X != 0 || vector.Y != 0)
+                    vector = Vector3.Normalize(vector);
             }
             // If no positions are remebered or the resulting vector is zero, the creature chooses a random direction
             if (vector.Length() == 0)
-                vector = RandomDir();
-            
+                vector = RandomDir();            
 
             float radius = perceptionRadius;
             float degreesInc = (float)(Math.PI / 4.0);  // 45 degrees
 
-            Vector2Int targetPosition = new Vector2Int(thisCreature.x + (int)(vector.X * radius), thisCreature.y + (int)(vector.Y * radius));
-            //TODO hay veces que intentas ir a un sitio en negativo (x = -100 por ejemplo) y al no poder se queda en bucle infinito
-            // supongo que pasara lo mismo si intentas ir a explorar a un sitio muy grande (x = 600 y mapa es de 512)
-            // tambien he visto que los puntos de exploracion eran sobre la x = 100 mas o menos y pasaban estas cosas de
-            // targetposition.x = -100 porque la criatura estaba ahora en x = 5, muy raro
-            /*while (targetPosition.x < 0 || targetPosition.y < 0)
-            {
-                vector = RandomDir();
-                targetPosition = new Vector2Int(thisCreature.x + (int)(vector.X * radius), thisCreature.y + (int)(vector.Y * radius));
-            }*/
-            Vector2Int finalPosition = new Vector2Int(targetPosition.x, targetPosition.y);
+            Vector2Int finalPosition;
             
             int cont = 0;
             //Find a position to explore that is not water and is far of the vector calculated before
             do
             {
-                if (!GetPositionsAtRadius(ref finalPosition, degreesInc))
+                if (!GetPositionsAtRadius(out finalPosition, vector, radius, degreesInc))
                 {
                     if (++cont % 2 == 0)    // TODO: these numbers are magic
                         degreesInc /= 2;
                     else
-                        targetPosition *= 0.75f;
-
-                    finalPosition.x = targetPosition.x; finalPosition.y = targetPosition.y;
+                        radius *= 0.75f;                    
+                }
+                //TODO: quitar mas adelante / si molesta. Si entra aquí deberia ser bucle infinito. hablar con pablo o andres
+                if(cont > 10)
+                {
+                    throw new Exception("Bucle infinito buscando sitio a explorar");
                 }
             }
-            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) || 
+            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) ||
             (finalPosition.x == thisCreature.x && finalPosition.y == thisCreature.y));
-
-            
 
             return finalPosition;
         }
@@ -409,28 +399,35 @@ namespace EvolutionSimulation.Entities
             return new Vector3(dirX, dirY, 0);
         }
         /// <summary>
-        /// Find a point to explore given a radius that is not water.
+        /// Given an initial direction checks the tiles in a radius around the creature and returns
+        /// a position where the creature can go. Checks positions increasing and decreasing an angle
+        /// describing a circunference. If it does not find any position, it returns false and a smaller radius
+        /// or smaller angle increment must be provieded.
         /// </summary>
-        /// <param name="finalPosition"> position where the creature try to go</param>
-        /// <param name="angleInc"></param>
-        /// <returns>Returns false if search in all directions and always find water</returns>
-        private bool GetPositionsAtRadius(ref Vector2Int finalPosition, float angleInc)
+        /// <param name="finalPosition"> Position where the creature try to go</param>
+        /// <param name="dir"> Initial direction to start searching </param>
+        /// <param name="radius"> Radius of the circunference </param>
+        /// <param name="angleInc"> Angle increment to check positions in a circunference </param>
+        private bool GetPositionsAtRadius(out Vector2Int finalPosition, Vector3 dir, float radius, float angleInc)
         {
-            float angle = angleInc;
+            finalPosition = new Vector2Int();
+            double dot = Vector3.Dot(dir, Vector3.UnitX);
+            double acos = Math.Acos(dot);
+            float angleAcum = 0, 
+                actualAngle = (float)acos;
             int inc = 1;
-            float actualAngle = 0;
-            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) && angle <= 2*Math.PI)
+            do
             {
-                Vector2Int old = finalPosition;
-                finalPosition.x = (int)(finalPosition.x * Math.Cos(actualAngle) - finalPosition.y * Math.Sin(actualAngle));
-                finalPosition.y = (int)(old.x * Math.Sin(actualAngle) + old.y * Math.Cos(actualAngle));
-
+                finalPosition.x = thisCreature.x + (int)Math.Round(Math.Cos(actualAngle) * radius, MidpointRounding.AwayFromZero);
+                finalPosition.y = thisCreature.y + (int)Math.Round(Math.Sin(actualAngle) * radius, MidpointRounding.AwayFromZero);
+                
                 inc *= -1;
-                angle += angleInc;
-                actualAngle += angle * inc;
+                angleAcum += angleInc;
+                actualAngle += angleAcum * inc;
             }
+            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) && angleAcum <= 2 * Math.PI);
 
-            return angle <= 2 * Math.PI && finalPosition.x != thisCreature.x && finalPosition.y != thisCreature.y;
+            return angleAcum <= 2 * Math.PI && finalPosition.x != thisCreature.x && finalPosition.y != thisCreature.y;
         }
         /// <summary>
         /// This method has to be called when day changed to night nad vice versa, to update the radius the creature sees based on the
