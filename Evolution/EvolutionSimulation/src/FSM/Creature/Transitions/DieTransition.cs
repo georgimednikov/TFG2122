@@ -16,7 +16,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         public override bool Evaluate()
         {
             return  creature.stats.CurrHealth <= 0
-                || creature.stats.CurrAge++ >= creature.stats.LifeSpan;    // Adjustment needed since LifeSpan is apparently measured in years
+                || creature.stats.CurrAge >= creature.stats.LifeSpan;    
         }                                                                  
 
         public override string ToString()

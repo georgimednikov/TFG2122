@@ -364,6 +364,8 @@ namespace EvolutionSimulation.Entities
             Vector2Int finalPosition;
             
             int cont = 0;
+            float r = radius;
+            float d = degreesInc;
             //Find a position to explore that is not water and is far of the vector calculated before
             do
             {
@@ -375,9 +377,12 @@ namespace EvolutionSimulation.Entities
                         radius *= 0.75f;                    
                 }
                 //TODO: quitar mas adelante / si molesta. Si entra aquí deberia ser bucle infinito. hablar con pablo o andres
-                if(cont > 10)
+                if(cont > 100)
                 {
-                    throw new Exception("Bucle infinito buscando sitio a explorar");
+                    cont = 0;
+                    radius = r;
+                    degreesInc = d;
+                    //throw new Exception("Bucle infinito buscando sitio a explorar");
                 }
             }
             while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) ||
@@ -602,8 +607,8 @@ namespace EvolutionSimulation.Entities
                 //forget the plant it has eaten from inmediatly after eating its fruit.
                 if (plant == null || (plant.eaten && thisCreature.IsHungry() && thisCreature.DistanceToObjective(EdiblePlants[i].position) <= perceptionRadius))
                 {
-                    EdiblePlants.RemoveAt(i);
                     RemoveFromSafePlant(EdiblePlants[i].position);
+                    EdiblePlants.RemoveAt(i);
                 }
             }
         }
