@@ -78,7 +78,7 @@ namespace EvolutionSimulation.Entities
         public void Tick()
         {
             Expend();
-            Regen();
+            ManageHealth();
             CheckTemperature();
             FemaleTick();
 
@@ -186,19 +186,26 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         void Expend()
         {
-            stats.CurrHydration -= stats.HydrationExpense;
-            stats.CurrRest -= stats.RestExpense;
-            stats.CurrEnergy -= stats.EnergyExpense;
+            stats.CurrHydration = Math.Max(stats.CurrHydration - stats.HydrationExpense, 0);
+            stats.CurrRest = Math.Max(stats.CurrRest - stats.RestExpense, 0);
+            stats.CurrEnergy = Math.Max(stats.CurrEnergy - stats.EnergyExpense, 0);
+            stats.CurrAge++;
         }
 
         /// <summary>
-        /// Attempts to regenrate the creature's health
+        /// Attempts to regenrate the creature's health if is healthy, 
+        /// if the stats are 0 then reduce his health.
         /// Checks first if it can with current energy and rest
         /// And then regenrates a percentage of the creature's max hp
         /// </summary>
-        void Regen()
+        void ManageHealth()
         {
-            if (stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
+            
+            if(stats.CurrEnergy <= 0 || stats.CurrRest <= 0 || stats.CurrHydration <= 0)
+            {
+                stats.CurrHealth--;
+            }
+            else if (stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
                 stats.CurrRest >= (stats.MaxRest * UniverseParametersManager.parameters.restRegenerationThreshold) &&
                 stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold))
             {

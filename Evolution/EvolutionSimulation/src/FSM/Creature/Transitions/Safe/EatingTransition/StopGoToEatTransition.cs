@@ -28,10 +28,6 @@
             if (creature.IsVeryThirsty())
                 return true;
 
-            //If the creature doesn't have any objective to eat
-            if (!creature.Plant() && !creature.Corpse())
-                return true;
-
             return false;
         }
 
