@@ -24,7 +24,7 @@
   "energyRegenerationThreshold": 0.85,
   "hydrationRegenerationThreshold": 0.85,
   "regenerationRate": 0.01,
-  "hoursTilStarvation": 24,
+  "hoursTilStarvation": 124,
   "thirstToHungerRatio": 3,
   "newbornStatMultiplier": 0.33,
   "adulthoodThreshold": 0.25,

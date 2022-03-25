@@ -47,16 +47,20 @@ namespace EvolutionSimulation.FSM.Creature.States
 
             int otherID; Vector2Int obj;
             creature.Enemy(out otherID, out obj);   // This is NOT cached because objective can change to another creature
-            if (otherID != enemyID)  // If objective is somewhere else, adjust path accordingly
+            if (otherID == -1)  // This implies the chased creature is missin and there is no replacement nearby, ergo the chase must stop
             {
-                enemyID = otherID;
-                speciesName = creature.world.GetCreature(enemyID).speciesName;
-                objective = obj;
-                creature.SetPath(objective);   // Set the path the creature must follow
+                if (otherID != enemyID)  // If objective is somewhere else, adjust path accordingly
+                {
+                    enemyID = otherID;
+                    speciesName = creature.world.GetCreature(enemyID).speciesName;
+                    objective = obj;
+                    creature.SetPath(objective);   // Set the path the creature must follow
+                }
+                // All of this is done AFTER the action due to the fact that GetCost reflects the cost of the older path
+                // Were it to be changed BEFORE, the new position's cost may not be the same as the one returned before
+                brake = false;
             }
-            // All of this is done AFTER the action due to the fact that GetCost reflects the cost of the older path
-            // Were it to be changed BEFORE, the new position's cost may not be the same as the one returned before
-            brake = false;
+            else brake = true;
         }
 
         //// No longer cornered, as combat is done
