@@ -221,22 +221,22 @@ namespace EvolutionSimulation.Entities
             //This for structure is recurrent all throughtout this class and is explained with the following example:
             //With radius = 3, it goes from -3 inclusive to 3 inclusive in both axis, going through -3, -2, -1, 0, 1, 2, 3
             //This is used to calculate the offsets of the creature's position to go through an area around it.
-            int range = UniverseParametersManager.parameters.adjacentLength;
             for (int i = -perceptionRadius; i <= perceptionRadius; i++)
             {
                 for (int j = -perceptionRadius; j <= perceptionRadius; j++)
                 {
                     Vector2Int p = new Vector2Int(x + i, y + j);
-                    if (IsOutOfBounds(p)) continue;
+                    if (!world.checkBounds(p.x, p.y)) continue;
 
                     if (world.map[p.x, p.y].isWater)
                     {
                         //All shores adjacent to the creature are saved.
                         bool shore = false;
-                        for (int k = -range; !shore && k <= range; k++)
-                            for (int h = -range; !shore && h <= range; h++)
-                                if (world.checkBounds(p.x + k, p.y + h) && !world.map[p.x + k, p.y + h].isWater) shore = true;
-                        UpdateList(WaterPositions, new Resource(p, maxExperienceTicks), maxExperienceTicks);
+                        for (int k = -1; !shore && k <= 1; k++)
+                            for (int h = -1; !shore && h <= 1; h++)
+                                if (world.checkBounds(p.x + k, p.y + h) && !world.map[p.x + k, p.y + h].isWater)
+                                    shore = true;
+                        if (shore) UpdateList(WaterPositions, new Resource(p, maxExperienceTicks), maxExperienceTicks);
 
                         Position position = GetFromPositionDangers(p);
                         bool positionWasKnown = position == null;
@@ -718,16 +718,6 @@ namespace EvolutionSimulation.Entities
             }
             else
                 l.Add(r);
-        }
-        #endregion
-
-        #region AuxiliaryMethods
-        /// <summary>
-        /// Checks if a position is outside the world, in other words, if the position given is valid.
-        /// </summary>
-        private bool IsOutOfBounds(Vector2Int p)
-        {
-            return p.x < 0 || p.y < 0 || p.x >= world.map.GetLength(0) || p.y >= world.map.GetLength(1);
         }
         #endregion
 
