@@ -48,7 +48,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void Action()
         {
             Vector3 nextPos = creature.GetNextPosOnPath();
-            //if (nextPos.X < 0) return; //If it is already in the right spot it should not move.
+            if (nextPos.X < 0) 
+                return; //If it is already in the right spot it should not move.
             creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
         }
         public override string GetInfo()

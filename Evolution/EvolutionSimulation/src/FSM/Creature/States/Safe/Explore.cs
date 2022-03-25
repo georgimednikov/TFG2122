@@ -20,7 +20,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         }
 
         public override int GetCost()
-        {
+        { 
             return creature.GetNextCostOnPath();
         }
 
@@ -37,9 +37,9 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 posToDiscover = creature.NewPosition();
                 creature.SetPath(posToDiscover.x, posToDiscover.y);
-                nextPos = creature.GetNextPosOnPath();
             }
-            creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+            else
+                creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
         }
 
         public override string GetInfo()

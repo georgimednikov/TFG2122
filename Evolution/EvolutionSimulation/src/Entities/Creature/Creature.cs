@@ -877,8 +877,6 @@ namespace EvolutionSimulation.Entities
             // TODO Hay que tener en cuenta el path sea de longuitud 0
             if (path == null || path.Length == 0 || pathIterator == path.Length) // TODO: que los estados tengan cuidado de cuando el coste que les dan es -1
                 return -1;
-
-            int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
             int speed;
             switch ((int)path[pathIterator].Z)
             {
@@ -893,9 +891,11 @@ namespace EvolutionSimulation.Entities
                     speed = stats.GroundSpeed;
                     break;
             }
+
+            int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
             if (world.map[x, y].plant is Tree || world.map[x, y].plant is EdibleTree)
                 return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed * (2 - Tree.movementPenalty)) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2)));
-            return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2)));
+            return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2.0f)));
         }
 
         /// <summary>

@@ -126,7 +126,7 @@ namespace EvolutionSimulation.Entities
         {
             int x = thisCreature.x, y = thisCreature.y;
 
-            if (ticksElapsed++ == ticksToSavePosition)
+            if (++ticksElapsed == ticksToSavePosition)
             {
                 ticksElapsed = 0;
                 AddExplorePosition();
@@ -352,7 +352,7 @@ namespace EvolutionSimulation.Entities
                 averageX /= dangersRemembered.Count + explorePositionsRemembered.Count;
                 averageY /= dangersRemembered.Count + explorePositionsRemembered.Count;
                 vector = new Vector3(x - averageX, y - averageY, 0);
-                Vector3.Normalize(vector);
+                vector = Vector3.Normalize(vector);
             }
             // If no positions are remebered or the resulting vector is zero, the creature chooses a random direction
             if (vector.Length() == 0)
@@ -373,7 +373,7 @@ namespace EvolutionSimulation.Entities
                 targetPosition = new Vector2Int(thisCreature.x + (int)(vector.X * radius), thisCreature.y + (int)(vector.Y * radius));
             }*/
             Vector2Int finalPosition = new Vector2Int(targetPosition.x, targetPosition.y);
-
+            
             int cont = 0;
             //Find a position to explore that is not water and is far of the vector calculated before
             do
