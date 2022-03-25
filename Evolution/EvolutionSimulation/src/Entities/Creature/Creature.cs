@@ -807,12 +807,7 @@ namespace EvolutionSimulation.Entities
         public int DistanceToObjective(IEntity entity)
         {
             if (entity == null) return int.MaxValue;
-
-            int x1, y1;
-            x1 = Math.Abs(x - entity.x);
-            y1 = Math.Abs(y - entity.y);
-
-            return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
+            return DistanceToObjective(entity.x, entity.y);
         }
 
         /// <summary>
@@ -821,13 +816,13 @@ namespace EvolutionSimulation.Entities
         /// <returns> Distance between creature and pos. intMaxValue if out of the map </returns>
         public int DistanceToObjective(Vector2Int pos)
         {
-            if (!world.checkBounds(pos.x, pos.y)) return int.MaxValue;
-
-            int x1, y1;
-            x1 = Math.Abs(x - pos.x);
-            y1 = Math.Abs(y - pos.y);
-
-            return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
+            if (pos == null) return int.MaxValue;
+            return DistanceToObjective(pos.x, pos.y);
+        }
+        public int DistanceToObjective(int ox, int oy)
+        {
+            if (!world.checkBounds(ox, oy)) return int.MaxValue;
+            return Math.Max(Math.Abs(ox - x), Math.Abs(oy - y));
         }
 
         /// <summary>

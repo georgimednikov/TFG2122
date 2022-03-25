@@ -11,7 +11,6 @@ namespace EvolutionSimulation.Entities
         World world;
 
         EntityResource parentToFollow;
-        EntityResource worthyPrey;
         EntityResource worthyCorpse;
         EntityResource worthyPlant;
         Vector2Int worthyWaterPosition;
