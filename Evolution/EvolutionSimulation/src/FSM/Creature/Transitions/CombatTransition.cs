@@ -13,7 +13,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         {
             Vector2Int preyPos;
             // If it has not been attacked and has no creature to hunt it does not engage in combat.
-            if (!creature.Prey(out _, out preyPos) && !creature.HasBeenAttacked()) return false;
+            if (!creature.HasBeenAttacked() && !creature.Prey(out _, out preyPos)) return false;
 
             // Else if attacked it considers its nearby allies in combat.
             if (creature.HasBeenAttacked() &&
@@ -22,14 +22,21 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
                 return true;
 
             // Else it is trying to hunt
-            if (!creature.IsHerbivorous() && creature.Prey(out _, out preyPos) && creature.IsHungry() &&
+            int preyId;
+            if (!creature.IsHerbivorous() && creature.Prey(out preyId, out preyPos) && creature.IsHungry() &&
                 creature.stats.Aggressiveness >= creature.PositionDanger(preyPos.x, preyPos.y) &&  // TODO: ajustar valor
                 creature.AbleToFight())
             {
                 if (creature.IsCarnivorous())
+                {
+                    creature.TargetEnemy(preyId);   // The Prey becomes the Enemy, beginning combat
                     return true;
+                }
                 else if (!creature.Plant(out _, out Vector2Int plantPos) || creature.DistanceToObjective(plantPos) > creature.DistanceToObjective(preyPos))
+                {
+                    creature.TargetEnemy(preyId);   // The Prey becomes the Enemy, beginning combat
                     return true;
+                }
             }
 
             return false;

@@ -15,7 +15,8 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             int deltaX = obj.x - creature.x,       // Direction of objective
                 deltaY = obj.y - creature.y;
 
-            return Math.Abs(deltaX) <= UniverseParametersManager.parameters.adjacentLength && Math.Abs(deltaY) <= UniverseParametersManager.parameters.adjacentLength;  // This implies inisde melee range
+            return Math.Abs(deltaX) <= UniverseParametersManager.parameters.adjacentLength && 
+                Math.Abs(deltaY) <= UniverseParametersManager.parameters.adjacentLength;  // This implies inisde melee range
         }
 
         public override string ToString()

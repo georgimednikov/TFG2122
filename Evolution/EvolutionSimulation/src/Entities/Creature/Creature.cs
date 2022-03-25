@@ -889,7 +889,7 @@ namespace EvolutionSimulation.Entities
 
             int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
             if (world.map[x, y].plant is Tree || world.map[x, y].plant is EdibleTree)
-                return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed * (2 - Tree.movementPenalty)) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2)));
+                return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed * (2 - Tree.movementPenalty)) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2.0f)));
             return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2.0f)));
         }
 
