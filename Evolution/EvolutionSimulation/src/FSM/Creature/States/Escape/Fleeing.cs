@@ -18,7 +18,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         public Fleeing(Entities.Creature c) : base(c)
         {
             creature = c;
-            modifier = 1.1f - (creature.stats.GroundSpeed / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) * UniverseParametersManager.parameters.fleeingCostMultiplier);
+            modifier = 1.1f - (creature.stats.GroundSpeed / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) * 
+                UniverseParametersManager.parameters.fleeingCostMultiplier);
         }
 
         public override void OnEntry()
@@ -30,7 +31,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             pathY = 0;
             // It either seeks its allies or runs from its enemy
             Vector2Int fwiend;
-            if(creature.Ally(out _, out fwiend)) {
+            if(creature.Ally(out _, out fwiend) && checkIfSafe(fwiend)) {
                 pathX = fwiend.x;
                 pathY = fwiend.y;
             } else positionAwayFromMe(ref pathX, ref pathY);
@@ -52,8 +53,8 @@ namespace EvolutionSimulation.FSM.Creature.States
             } else return creature.cornered? UniverseParametersManager.parameters.baseActionCost : (int)(cost * modifier);
         }
 
-        // TODO: Esto no deberia estar aqui!!!
-        public void positionAwayFromMe(ref int fX, ref int fY)
+        // TODO: Esto deberia estar aqui?
+        private void positionAwayFromMe(ref int fX, ref int fY)
         {
             // If the creature is in a different tile, simpli get away from it
             int deltaX = dngX - creature.x,       // Direction of opposite movement
@@ -83,6 +84,26 @@ namespace EvolutionSimulation.FSM.Creature.States
             }
         }
 
+        /// <summary>
+        /// Returns if it is safe to go to a position
+        /// In summary, if it would entail going through the current danger position.
+        /// </summary>
+        private bool checkIfSafe(Vector2Int friendPos)
+        {
+            // Direction of possible ally
+            int fwiendX = friendPos.x - creature.x,
+                fwiendY = friendPos.y - creature.y;
+            int fnormX = fwiendX == 0 ? 0 : fwiendX / Math.Abs(fwiendX),
+                fnormY = fwiendY == 0 ? 0 : fwiendY / Math.Abs(fwiendY);
+            // Direction of enemy
+            int nmeX = dngX - creature.x,
+                nmeY = dngY - creature.y;
+            int nnormX = nmeX == 0 ? 0 : nmeX / Math.Abs(nmeX),  // Normalized direction of movement 
+                nnormY = nmeY == 0 ? 0 : nmeY / Math.Abs(nmeY);  // as you can only move once per action (but can have multiple actions per tick)
+
+            return (fnormX != nnormX || fnormY != nnormY);
+        }
+
         public override void Action()
         {
             if (!creature.cornered)
@@ -100,11 +121,11 @@ namespace EvolutionSimulation.FSM.Creature.States
                 dngY = objective.y;
                 // It either seeks its allies or runs from its enemy
                 Vector2Int fwiend;
-                if (creature.Ally(out _, out fwiend)) {
+                if (creature.Ally(out _, out fwiend) && checkIfSafe(fwiend)) {   // If the creature must not go through the enmy, it'll go to the ally
                     pathX = fwiend.x;
                     pathY = fwiend.y;
-                }
-                else positionAwayFromMe(ref pathX, ref pathY);
+                } else positionAwayFromMe(ref pathX, ref pathY);
+
                 if (pathX == creature.x && pathY == creature.y)
                     creature.cornered = true;
                 else
