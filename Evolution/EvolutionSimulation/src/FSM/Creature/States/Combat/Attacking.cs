@@ -25,7 +25,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void Action()
         {
             if (!creature.Enemy(out enemyID, out _)) { speciesName = ""; return; }
-
+            // TODO: Handlear la perdida posible de enmigo de la misma amnera que chase? De momento no peta \[T]/
             Entities.Creature objCreature = creature.world.GetCreature(enemyID);
             speciesName = objCreature.speciesName;
             if (poison)
@@ -33,11 +33,11 @@ namespace EvolutionSimulation.FSM.Creature.States
             objCreature.ReceiveInteraction(creature, Entities.Interactions.attack);
         }
 
-        //// No longer cornered, as combat is done
-        //public override void OnExit()
-        //{
-        //    creature.cornered = false;
-        //}
+        // No longer cornered, as combat is done
+        public override void OnExit()
+        {
+            creature.cornered = false;
+        }
 
         public override string ToString()
         {

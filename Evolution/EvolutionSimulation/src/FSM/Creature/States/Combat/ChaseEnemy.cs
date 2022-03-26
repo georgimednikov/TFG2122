@@ -13,7 +13,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         string speciesName;
 
         // In case the chase ends and it does not end up attacking
-        bool brake = false;
+        bool brake = false; // TODO: esto en teoria no deberia pasar nunca ?
 
         public ChaseEnemy(Entities.Creature c) : base(c) 
         { 
@@ -47,27 +47,28 @@ namespace EvolutionSimulation.FSM.Creature.States
 
             int otherID; Vector2Int obj;
             creature.Enemy(out otherID, out obj);   // This is NOT cached because objective can change to another creature
-            if (otherID == -1)  // This implies the chased creature is missing and there is no replacement nearby, ergo the chase must stop
-            {
-                if (otherID != objectiveID)  // If objective is somewhere else, adjust path accordingly
-                {
-                    objectiveID = otherID;
-                    speciesName = creature.world.GetCreature(objectiveID).speciesName;
-                    objective = obj;
-                    creature.SetPath(objective);   // Set the path the creature must follow
-                }
-                // All of this is done AFTER the action due to the fact that GetCost reflects the cost of the older path
-                // Were it to be changed BEFORE, the new position's cost may not be the same as the one returned before
-                brake = false;
+
+            if(otherID == -1)   // Target has died! This entails looking for another ONLY if there is a menace, or none if there is not
+            {                   // This will only take place when the creature still feels threatened and is cornered, because it won't be able to flee
+                creature.Menace(out otherID, out obj);  
             }
-            else brake = true;
+
+            if (otherID != objectiveID)  // If objective is a different one, adjust accordingly
+            {
+                objectiveID = otherID;
+                speciesName = creature.world.GetCreature(objectiveID).speciesName;
+                objective = obj;
+                creature.TargetEnemy(otherID);  // Redundant, except when current target dies
+                creature.SetPath(objective);    // Set the path the creature must follow
+            }
+            brake = false;
         }
 
-        //// No longer cornered, as combat is done
-        //public override void OnExit()
-        //{
-        //    creature.cornered = false;
-        //}
+        // No longer cornered, as combat is done
+        public override void OnExit()
+        {
+            creature.cornered = false;
+        }
 
         public override string GetInfo()
         {
