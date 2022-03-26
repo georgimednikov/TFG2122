@@ -32,7 +32,9 @@ namespace EvolutionSimulation.Entities.Status
 
         public override void OnRemove()
         {
+#if DEBUG
             Console.WriteLine("Starving removed");
+#endif
         }
 
         public override void OnExpire()
