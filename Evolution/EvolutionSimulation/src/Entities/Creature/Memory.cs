@@ -116,8 +116,8 @@ namespace EvolutionSimulation.Entities
             ticksToSavePosition = 10; //TODO: Esto bien en base a action points?
             ticksElapsed = 0;
             maxExperienceTicks = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
-            dangerRadius = (int)((thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) - thisCreature.stats.Aggressiveness) * UniverseParametersManager.parameters.aggressivenessToRadiusMultiplier);
-            danger = thisCreature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier;
+            dangerRadius = (int)(thisCreature.stats.Aggressiveness * UniverseParametersManager.parameters.aggressivenessToRadiusMultiplier);
+            danger = thisCreature.chromosome.GetFeature(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier;
             CalculatePerceptionRadius();
         }
 
@@ -170,9 +170,12 @@ namespace EvolutionSimulation.Entities
                 //Else they have no relation
                 else
                 {
-                    //Console.WriteLine(perceivedCreatures.Count);
                     int dist = thisCreature.DistanceToObjective(creature);
-                    if (creature.stats.Intimidation > thisCreature.stats.Aggressiveness &&
+
+                    //The intimidation of the perceived creature increases based on how much health this one is missing, up to a value defined in UniverseParameters.
+                    float intimidation = creature.stats.Intimidation * 
+                        (UniverseParametersManager.parameters.maxMenaceIntimidationMultiplierBasedOnMissingHealth - thisCreature.stats.CurrHealth / thisCreature.stats.MaxHealth);
+                    if (intimidation > thisCreature.stats.Aggressiveness &&
                         (menace == null || thisCreature.DistanceToObjective(menace.position) >= dist)) //This is equal to update the rival information if it is the same
                     {
                         menace = resource;
@@ -180,8 +183,9 @@ namespace EvolutionSimulation.Entities
 
                     //If the creature is reachable and not considered too dangerous it is considered possible prey.
                     float creatureDanger = GetPositionDanger(creature.x, creature.y);
-                    if ((creature.creatureLayer == Creature.HeightLayer.Air && thisCreature.stats.AirReach) ||
-                        creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach ||
+                    if (!creature.IsHerbivorous() &&
+                        (creature.creatureLayer == Creature.HeightLayer.Air && thisCreature.stats.AirReach) ||
+                        (creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach) ||
                         creature.creatureLayer == Creature.HeightLayer.Ground &&
                         creatureDanger < thisCreature.stats.Aggressiveness)
                     {
@@ -207,7 +211,7 @@ namespace EvolutionSimulation.Entities
                 if (entity is Corpse && !thisCreature.IsHerbivorous())
                 {
                     Corpse newCorpse = entity as Corpse;
-                    if (thisCreature.HasAbility(Genetics.CreatureFeature.Scavenger, 0.4f) || newCorpse.Edible) //TODO cambiar 0.4
+                    if (thisCreature.chromosome.HasAbility(Genetics.CreatureFeature.Scavenger, 0.4f) || newCorpse.Edible) //TODO cambiar 0.4
                         UpdateList(FreshCorpses, resource, maxExperienceTicks);
                     else
                         UpdateList(RottenCorpses, resource, maxExperienceTicks);

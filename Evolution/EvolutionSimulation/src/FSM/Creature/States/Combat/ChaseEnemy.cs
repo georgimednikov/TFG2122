@@ -8,7 +8,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         // How costly it is to move compared to regular safe movement
         private float modifier;
         // Position and ID of the objective
-        int enemyID;
+        int objectiveID;
         Vector2Int objective;
         string speciesName;
 
@@ -33,8 +33,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            creature.Enemy(out enemyID, out objective);
-            speciesName = creature.world.GetCreature(enemyID).speciesName;
+            creature.Enemy(out objectiveID, out objective);
+            speciesName = creature.world.GetCreature(objectiveID).speciesName;
             creature.SetPath(objective);   // This MUST be set up for the cost of the action to work
         }
 
@@ -47,12 +47,12 @@ namespace EvolutionSimulation.FSM.Creature.States
 
             int otherID; Vector2Int obj;
             creature.Enemy(out otherID, out obj);   // This is NOT cached because objective can change to another creature
-            if (otherID == -1)  // This implies the chased creature is missin and there is no replacement nearby, ergo the chase must stop
+            if (otherID == -1)  // This implies the chased creature is missing and there is no replacement nearby, ergo the chase must stop
             {
-                if (otherID != enemyID)  // If objective is somewhere else, adjust path accordingly
+                if (otherID != objectiveID)  // If objective is somewhere else, adjust path accordingly
                 {
-                    enemyID = otherID;
-                    speciesName = creature.world.GetCreature(enemyID).speciesName;
+                    objectiveID = otherID;
+                    speciesName = creature.world.GetCreature(objectiveID).speciesName;
                     objective = obj;
                     creature.SetPath(objective);   // Set the path the creature must follow
                 }
@@ -71,7 +71,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override string GetInfo()
         {
-            return creature.speciesName + " with ID: " + creature.ID + " CHASES " + speciesName + " with ID: " + enemyID;
+            return creature.speciesName + " with ID: " + creature.ID + " CHASES " + speciesName + " with ID: " + objectiveID;
         }
 
         public override string ToString()

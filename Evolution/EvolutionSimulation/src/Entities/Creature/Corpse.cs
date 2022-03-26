@@ -46,7 +46,7 @@ namespace EvolutionSimulation.Entities
             putridTime = (int)(lifeTime * putridStart);
 
             // If it is venomous it will be more risky to eat 
-            if (creature.HasAbility(Genetics.CreatureFeature.Venomous, UniverseParametersManager.parameters.abilityUnlockPercentage))
+            if (creature.chromosome.HasAbility(Genetics.CreatureFeature.Venomous, UniverseParametersManager.parameters.abilityUnlockPercentage))
                 poisonProb = creature.stats.Venom / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Venomous);
             else
                 poisonProb = 0;
@@ -81,7 +81,7 @@ namespace EvolutionSimulation.Entities
                 float actualPoisonProb = Math.Min(1.0f, Math.Max(0.0f, poisonProb + 1.0f - remains));
                 float actualNutritionPoints = maxNutritionPoints * remains;
                 // Having the ability 'Scavenger' reduces the penalties of eating the corpse            
-                if (other.HasAbility(Genetics.CreatureFeature.Scavenger, 
+                if (other.chromosome.HasAbility(Genetics.CreatureFeature.Scavenger, 
                     Genetics.CreatureChromosome.AbilityUnlock[Genetics.CreatureFeature.Scavenger])) // TODO: ahora está puesto el % de unlock a pelo, cambiarlo
                 {
                     actualPoisonProb -= other.stats.Scavenger;

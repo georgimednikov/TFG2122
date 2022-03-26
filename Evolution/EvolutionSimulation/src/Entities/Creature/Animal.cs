@@ -53,9 +53,9 @@ namespace EvolutionSimulation.Entities
             stats.Perforation = chromosome.GetFeature(CreatureFeature.Piercing);
 
             //See mobilityPenalty commentary
-            bool wings = HasAbility(CreatureFeature.Wings, CreatureChromosome.AbilityUnlock[CreatureFeature.Wings]);
-            bool arboreal = HasAbility(CreatureFeature.Arboreal, CreatureChromosome.AbilityUnlock[CreatureFeature.Arboreal]);
-            stats.Upright = HasAbility(CreatureFeature.Upright, CreatureChromosome.AbilityUnlock[CreatureFeature.Upright]);
+            bool wings = chromosome.HasAbility(CreatureFeature.Wings, CreatureChromosome.AbilityUnlock[CreatureFeature.Wings]);
+            bool arboreal = chromosome.HasAbility(CreatureFeature.Arboreal, CreatureChromosome.AbilityUnlock[CreatureFeature.Arboreal]);
+            stats.Upright = chromosome.HasAbility(CreatureFeature.Upright, CreatureChromosome.AbilityUnlock[CreatureFeature.Upright]);
             int speed = chromosome.GetFeature(CreatureFeature.Mobility);
             stats.AirReach = wings;
             stats.TreeReach = wings || arboreal || stats.Upright;
@@ -63,13 +63,13 @@ namespace EvolutionSimulation.Entities
             stats.AerialSpeed = stats.ArborealSpeed = -1;
             if (wings)
             {
-                stats.AerialSpeed = Math.Max((int)((speed * (minMobilityMedium + (1 - minMobilityMedium) * ((float)chromosome.GetFeature(CreatureFeature.Wings) / chromosome.GetFeatureMax(CreatureFeature.Wings)))) - (chromosome.GetFeature(CreatureFeature.Size)/chromosome.GetFeatureMax(CreatureFeature.Size) * stats.MaxSpeed)), 0);
-                stats.ArborealSpeed = Math.Max((int)((stats.AerialSpeed * mobilityPenalty) - (chromosome.GetFeature(CreatureFeature.Size) / chromosome.GetFeatureMax(CreatureFeature.Size) * stats.MaxSpeed) / 2f),0);
+                stats.AerialSpeed = Math.Max((int)((speed * (minMobilityMedium + (1 - minMobilityMedium) * chromosome.GetFeaturePercentage(CreatureFeature.Wings))) - (chromosome.GetFeaturePercentage(CreatureFeature.Size) * stats.MaxSpeed)), 0);
+                stats.ArborealSpeed = Math.Max((int)((stats.AerialSpeed * mobilityPenalty) - (chromosome.GetFeaturePercentage(CreatureFeature.Size) * stats.MaxSpeed) / 2f), 0);
                 stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
             }
             if (arboreal)
             {
-                stats.ArborealSpeed = Math.Max((int)((speed * (minMobilityMedium + (1 - minMobilityMedium) * ((float)chromosome.GetFeature(CreatureFeature.Arboreal) / chromosome.GetFeatureMax(CreatureFeature.Arboreal)))) - (chromosome.GetFeature(CreatureFeature.Size) / chromosome.GetFeatureMax(CreatureFeature.Size) * stats.MaxSpeed) / 2f), 0);
+                stats.ArborealSpeed = Math.Max((int)((speed * (minMobilityMedium + (1 - minMobilityMedium) * chromosome.GetFeaturePercentage(CreatureFeature.Arboreal))) - (chromosome.GetFeaturePercentage(CreatureFeature.Size) * stats.MaxSpeed) / 2f), 0);
                 stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
             }
             if (!wings && !arboreal)
@@ -80,11 +80,11 @@ namespace EvolutionSimulation.Entities
             //Physique related stats
             stats.Size = chromosome.GetFeature(CreatureFeature.Size);
 
-            if (!HasAbility(CreatureFeature.Scavenger, CreatureChromosome.AbilityUnlock[CreatureFeature.Scavenger])) stats.Scavenger = 0;
-            else stats.Scavenger = (float)chromosome.GetFeature(CreatureFeature.Scavenger) / chromosome.GetFeatureMax(CreatureFeature.Scavenger);
-            if (!HasAbility(CreatureFeature.Venomous, CreatureChromosome.AbilityUnlock[CreatureFeature.Venomous])) stats.Venom = 0;
+            if (!chromosome.HasAbility(CreatureFeature.Scavenger, CreatureChromosome.AbilityUnlock[CreatureFeature.Scavenger])) stats.Scavenger = 0;
+            else stats.Scavenger = chromosome.GetFeaturePercentage(CreatureFeature.Scavenger);
+            if (!chromosome.HasAbility(CreatureFeature.Venomous, CreatureChromosome.AbilityUnlock[CreatureFeature.Venomous])) stats.Venom = 0;
             else stats.Venom = chromosome.GetFeature(CreatureFeature.Venomous);
-            if (!HasAbility(CreatureFeature.Thorns, CreatureChromosome.AbilityUnlock[CreatureFeature.Thorns])) stats.Counter = 0;
+            if (!chromosome.HasAbility(CreatureFeature.Thorns, CreatureChromosome.AbilityUnlock[CreatureFeature.Thorns])) stats.Counter = 0;
             else stats.Counter = chromosome.GetFeature(CreatureFeature.Thorns);
 
             stats.Members = SetStatInRange(CreatureFeature.Members, maxLimbs + 1);//its not inclusive [0-11)
@@ -114,7 +114,7 @@ namespace EvolutionSimulation.Entities
             stats.CurrRest = stats.MaxRest;
             float re = 1f / (UniverseParametersManager.parameters.hoursTilExhaustion * UniverseParametersManager.parameters.ticksPerHour);
             stats.RestExpense = re / 2f +   // TODO: Numeros arcanos
-                (re / 2f * (1 - (float)chromosome.GetFeature(CreatureFeature.Resistance) / chromosome.GetFeatureMax(CreatureFeature.Resistance)));
+                (re / 2f * (1 - chromosome.GetFeaturePercentage(CreatureFeature.Resistance)));
             //    minRestExpense + (maxRestExpense - minRestExpense) * 
             //    (1 - (float)chromosome.GetFeature(CreatureFeature.Resistance) / chromosome.GetFeatureMax(CreatureFeature.Resistance));
             //stats.RestRecovery = stats.RestExpense * exhaustToSleepRatio;
@@ -128,7 +128,7 @@ namespace EvolutionSimulation.Entities
             stats.MaxPerception = minPerception + (maxPerception - minPerception) * 1;
             //If the creature does not have the feature night vision then its perception will be the lowest posible,
             //So instead of Perception * 1 it will be Perception * minNightVision
-            if (!HasAbility(CreatureFeature.NightVision, CreatureChromosome.AbilityUnlock[CreatureFeature.NightVision]))
+            if (!chromosome.HasAbility(CreatureFeature.NightVision, CreatureChromosome.AbilityUnlock[CreatureFeature.NightVision]))
                 stats.NightPerceptionPercentage = perceptionWithoutNightVision;
 
             //Else it is calculated what percentage of the ability the creature has unlocked, removing the minimum value needed to have the ability per se,
@@ -146,14 +146,14 @@ namespace EvolutionSimulation.Entities
             stats.ActionPerceptionPercentage = 1;
 
             //If the creature can see in the dark, that penalty is reduced the better sight it has
-            if (HasAbility(CreatureFeature.NightVision, CreatureChromosome.AbilityUnlock[CreatureFeature.NightVision]))
-                stats.CurrentVision *= 1 - ((float)chromosome.GetFeature(CreatureFeature.NightVision) / chromosome.GetFeatureMax(CreatureFeature.NightVision));
+            if (chromosome.HasAbility(CreatureFeature.NightVision, CreatureChromosome.AbilityUnlock[CreatureFeature.NightVision]))
+                stats.CurrentVision *= 1 - chromosome.GetFeaturePercentage(CreatureFeature.NightVision);
 
 
             //Behaviour related stats
             stats.Knowledge = chromosome.GetFeature(CreatureFeature.Knowledge);
 
-            if (!HasAbility(CreatureFeature.Paternity, CreatureChromosome.AbilityUnlock[CreatureFeature.Paternity])) stats.Paternity = 0;
+            if (!chromosome.HasAbility(CreatureFeature.Paternity, CreatureChromosome.AbilityUnlock[CreatureFeature.Paternity])) stats.Paternity = 0;
             else stats.Paternity = chromosome.GetFeature(CreatureFeature.Paternity);
 
             ModifyStatsByAbilities(abilityUnlock);
@@ -166,7 +166,7 @@ namespace EvolutionSimulation.Entities
         private void ModifyStatsByAbilities(float abilityUnlock)
         {
             //Hair. Better with low temperatures and worse with high temperatures
-            stats.Hair = HasAbility(CreatureFeature.Hair, CreatureChromosome.AbilityUnlock[CreatureFeature.Hair]);
+            stats.Hair = chromosome.HasAbility(CreatureFeature.Hair, CreatureChromosome.AbilityUnlock[CreatureFeature.Hair]);
             if (stats.Hair)
             {
                 int hairValue = chromosome.GetFeature(CreatureFeature.Hair);
@@ -176,10 +176,9 @@ namespace EvolutionSimulation.Entities
             }
 
             //UpRight increase the perception at most 1.5
-            if (HasAbility(CreatureFeature.Upright, CreatureChromosome.AbilityUnlock[CreatureFeature.Upright]))
+            if (chromosome.HasAbility(CreatureFeature.Upright, CreatureChromosome.AbilityUnlock[CreatureFeature.Upright]))
             {
-                float increase = 1.0f + chromosome.GetFeature(CreatureFeature.Upright)
-                                         / (float)chromosome.GetFeatureMax(CreatureFeature.Upright) / 2.0f;
+                float increase = 1.0f + chromosome.GetFeaturePercentage(CreatureFeature.Upright) / 2.0f;
 
                 stats.Perception = (int)(stats.Perception * increase);
                 increase = 1.0f + 1.0f / 2.0f;
@@ -190,7 +189,7 @@ namespace EvolutionSimulation.Entities
             float intimidation = stats.Size / 2 * ((int)stats.Diet + 1);
 
             //Horns. Increase damage and intimidation
-            if (HasAbility(CreatureFeature.Horns, CreatureChromosome.AbilityUnlock[CreatureFeature.Horns]))
+            if (chromosome.HasAbility(CreatureFeature.Horns, CreatureChromosome.AbilityUnlock[CreatureFeature.Horns]))
             {
 
                 int hornsValue = chromosome.GetFeature(CreatureFeature.Horns);
@@ -201,10 +200,9 @@ namespace EvolutionSimulation.Entities
 
             float increaseIntimidation = 0;
             //Mimic increase the intimidation at most twice
-            if (HasAbility(CreatureFeature.Mimic, CreatureChromosome.AbilityUnlock[CreatureFeature.Mimic]))
+            if (chromosome.HasAbility(CreatureFeature.Mimic, CreatureChromosome.AbilityUnlock[CreatureFeature.Mimic]))
             {
-                increaseIntimidation = 1.0f + chromosome.GetFeature(CreatureFeature.Mimic)
-                                          / (float)chromosome.GetFeatureMax(CreatureFeature.Mimic);
+                increaseIntimidation = 1.0f + chromosome.GetFeaturePercentage(CreatureFeature.Mimic);
             }
 
             stats.Intimidation = (int)(intimidation * increaseIntimidation);

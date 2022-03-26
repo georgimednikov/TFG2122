@@ -568,7 +568,7 @@ namespace EvolutionSimulation
         static void ValidateCreatureTransitions(UniverseParameters parameters)
         {
             if (parameters.fleeingTransitionMultiplier <= 0 || parameters.hidingTransitionMultiplier <= 0 || parameters.stopEatingTransitionEnergyMultiplier <= 0 || 
-                parameters.combatTransitionHealthThresholdMultiplier <= 0 || parameters.escapeTransitionHealthThresholdMultiplier <= 0 || 
+                parameters.combatTransitionHealthThresholdMultiplier <= 0 || 
                 parameters.safeTransitionAggressivenessThreshold <= 0 || parameters.experienceMaxAggresivenessMultiplier <= 0 || parameters.safePrefferedOverClosestResourceRatio <= 0) 
                 throw new UniverseParameterIsZeroException("The provided transition parameters must be positive");
         }

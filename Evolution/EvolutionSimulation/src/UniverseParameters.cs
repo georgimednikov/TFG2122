@@ -80,7 +80,7 @@ namespace EvolutionSimulation
         public int hidingTransitionMultiplier = 4;
         public float stopEatingTransitionEnergyMultiplier = 1;
         public float combatTransitionHealthThresholdMultiplier = 50;
-        public float escapeTransitionHealthThresholdMultiplier = 50;
+        public float maxMenaceIntimidationMultiplierBasedOnMissingHealth = 2;
         public float safeTransitionAggressivenessThreshold = 1;
         public float experienceMaxAggresivenessMultiplier = 0.2f; //Percentage of the max aggressiveness used to create experiences
         public float safePrefferedOverClosestResourceRatio = 1.25f; //Acceptable max distance of the closest safe resource compared to the closest
