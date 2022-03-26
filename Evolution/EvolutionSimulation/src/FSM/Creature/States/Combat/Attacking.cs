@@ -25,7 +25,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void Action()
         {
             if (!creature.Enemy(out enemyID, out _)) { speciesName = ""; return; }
-            // TODO: Handlear la perdida posible de enmigo de la misma amnera que chase? De momento no peta \[T]/
+            // TODO: Handlear la perdida posible de enmigo de la misma manera que chase? De momento no peta \[T]/
             Entities.Creature objCreature = creature.world.GetCreature(enemyID);
             speciesName = objCreature.speciesName;
             if (poison)
