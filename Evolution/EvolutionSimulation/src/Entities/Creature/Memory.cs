@@ -42,11 +42,11 @@ namespace EvolutionSimulation.Entities
         ResourcePositionComparer resourceComparer;
         ResourceValueComparer valueComparer;
 
-        Queue<Vector2Int> explorePositionsRemembered;   //All the dangers the creature remembers, with their dangers and ticks left.
-        List<Position> dangersRemembered;               //All the dangers the creature remembers, with their dangers and ticks left.
+        Queue<Vector2Int> explorePositionsRemembered;       //All the dangers the creature remembers, with their dangers and ticks left.
+        List<Position> dangersRemembered;                   //All the dangers the creature remembers, with their dangers and ticks left.
 
-        public EntityResource Enemy { get; private set; }               //Creature that has attacked this creature or an ally of its.
-        public EntityResource Menace { get => menace; }              //Closest creature that is not part of the creature's "family" regarding its species.
+        public EntityResource Enemy { get; private set; }   //Creature that has attacked this creature or an ally of its.
+        public EntityResource Menace { get => menace; }     //Closest creature that is not part of the creature's "family" regarding its species.
         private EntityResource menace;
         public EntityResource Father { //If the father is forgotten or dead, his position is lost but not his ID so
                                        //it can be recognized, but in practice it is the same as returning null until found again.
@@ -176,7 +176,7 @@ namespace EvolutionSimulation.Entities
                     float intimidation = creature.stats.Intimidation * 
                         (UniverseParametersManager.parameters.maxMenaceIntimidationMultiplierBasedOnMissingHealth - thisCreature.stats.CurrHealth / thisCreature.stats.MaxHealth);
                     if (intimidation > thisCreature.stats.Aggressiveness &&
-                        (menace == null || thisCreature.DistanceToObjective(menace.position) >= dist)) //This is equal to update the rival information if it is the same
+                        (menace == null || menace == resource || thisCreature.DistanceToObjective(menace.position) >= dist) ) //This is equal to update the rival information if it is the same
                     {
                         menace = resource;
                     }
@@ -280,6 +280,8 @@ namespace EvolutionSimulation.Entities
             }
 
             SortAndAdjustLists();
+            if(menace != null && menace.ticks != maxExperienceTicks && thisCreature.DistanceToObjective(menace.position) <= perceptionRadius)
+                menace = null;
 
             Mate = null; //By default there is no mate available.
             for (int i = 0; i < Allies.Count; i++) //For every ally the creature remembers the following comprobations are done:
@@ -617,6 +619,9 @@ namespace EvolutionSimulation.Entities
             }
         }
 
+        /// <summary>
+        /// Check all the resources if the creature has to forget it 
+        /// </summary>
         private void Forget()
         {
             i_forgor(Preys);
