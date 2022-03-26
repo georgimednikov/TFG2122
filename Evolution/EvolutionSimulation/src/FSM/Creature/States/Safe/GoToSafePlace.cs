@@ -33,7 +33,9 @@ namespace EvolutionSimulation.FSM.Creature.States
                 safePos = creature.SafePosition();
                 creature.SetPath(safePos.x, safePos.y);
             }
+#if DEBUG
             Console.WriteLine(creature.speciesName + " GOES TO SAFE PLACE (" + creature.x + ", " + creature.y + ")");
+#endif
         }
 
 

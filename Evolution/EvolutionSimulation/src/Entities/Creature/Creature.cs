@@ -96,7 +96,9 @@ namespace EvolutionSimulation.Entities
             {
                 mfsm.CurrentState.Action();
                 ActionPoints -= cost;
+#if DEBUG
                 Console.WriteLine(GetStateInfo());
+#endif
             }
 
             Clear();
@@ -528,7 +530,9 @@ namespace EvolutionSimulation.Entities
         private void RetalliateDamage(Creature interacter)
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
+#if DEBUG
             Console.WriteLine(speciesName + " RETURNS " + stats.Counter + " DMG");
+#endif
         }
 
         /// <summary>

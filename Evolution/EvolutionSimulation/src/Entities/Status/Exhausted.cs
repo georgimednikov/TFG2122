@@ -33,7 +33,9 @@ namespace EvolutionSimulation.Entities.Status
 
         public override void OnRemove()
         {
+#if DEBUG
             Console.WriteLine("Exhausted removed");
+#endif
         }
 
         public override void OnExpire()

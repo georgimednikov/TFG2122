@@ -19,10 +19,13 @@ namespace EvolutionSimulation.Entities.Status
         public override bool OnTick()
         {
             owner.stats.CurrHealth -= damage;
+#if DEBUG
             Console.WriteLine("POSIONE DEALT " + damage.ToString() + " DMG TO " + owner.speciesName);
+#endif
             return base.OnTick();
         }
 
+#if DEBUG
         public override void OnApply()
         {
             Console.WriteLine(owner.speciesName + " POSIONED FOR " + damage.ToString() + " DMG/TICK");
@@ -37,5 +40,6 @@ namespace EvolutionSimulation.Entities.Status
         {
             Console.WriteLine("POISON EXPIRED FROM " + owner.speciesName);
         }
+#endif
     }
 }
