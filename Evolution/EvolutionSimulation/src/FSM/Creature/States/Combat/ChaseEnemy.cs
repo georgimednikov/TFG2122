@@ -51,6 +51,12 @@ namespace EvolutionSimulation.FSM.Creature.States
             if(otherID == -1)   // Target has died! This entails looking for another ONLY if there is a menace, or none if there is not
             {                   // This will only take place when the creature still feels threatened and is cornered, because it won't be able to flee
                 creature.Menace(out otherID, out obj);  
+                if(Math.Abs(obj.x - creature.x) >= creature.stats.Perception / 2 || Math.Abs(obj.y - creature.y) >= creature.stats.Perception / 2)
+                {   // Creature is sufficiently far away to not pose immediate danger
+                    creature.cornered = false;
+                    brake = false;
+                    return;
+                }
             }
 
             if (otherID != objectiveID)  // If objective is a different one, adjust accordingly

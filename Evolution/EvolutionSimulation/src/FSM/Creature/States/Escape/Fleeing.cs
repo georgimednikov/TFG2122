@@ -70,7 +70,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 dngY = objective.y;
                 // It either seeks its allies or runs from its enemy
                 Vector2Int fwiend;
-                if (creature.Ally(out _, out fwiend) && CheckIfSafe(fwiend)) {   // If the creature must not go through the enmy, it'll go to the ally
+                if (creature.Ally(out _, out fwiend) && CheckIfSafe(fwiend)) {   // If the creature must not go through the enemy, it'll go to the ally
                     pathX = fwiend.x;
                     pathY = fwiend.y;
                 } else PositionAwayFromMe(ref pathX, ref pathY);
