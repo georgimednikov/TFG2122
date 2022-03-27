@@ -572,10 +572,11 @@ namespace EvolutionSimulation.Entities
         private void StopMating(Creature interacter)
         {
             Creature mate = world.GetCreature(matingCreature);
-            if (mate != null)
-            {
-                mate.ReceiveInteraction(this, Interactions.stopMate);
-            }
+            // TODO: crea un stack overflow al parecer, y no necesita estar ya que las dos criaturas ya han parado de matear
+            //if (mate != null)
+            //{
+            //    mate.ReceiveInteraction(this, Interactions.stopMate);
+            //}
             matingCreature = -1;
             mating = false;
         }

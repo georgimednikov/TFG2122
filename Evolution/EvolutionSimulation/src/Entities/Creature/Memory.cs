@@ -271,8 +271,8 @@ namespace EvolutionSimulation.Entities
                     RemoveFromSafeWater(p.position);
                     RemoveFromSafePlant(p.position);
                 }
-                //If the tile remains in memory, it is safe and no safe place has been assigned or it is closer than the one already found, it is saved.
-                else if (positionDanger <= 0 && (SafePosition == null || safePlaceDist > thisCreature.DistanceToObjective(p.position)))
+                //If the tile remains in memory, it is safe and no safe place has been assigned or it is closer than the one already found, it is saved, unless that position can't be reached
+                else if (positionDanger <= 0 && world.canMove(p.position.x, p.position.y) && (SafePosition == null || safePlaceDist > thisCreature.DistanceToObjective(p.position)))
                 {
                     SafePosition = p.position;
                     safePlaceDist = thisCreature.DistanceToObjective(p.position);
@@ -521,6 +521,9 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void SafeEdiblePlant()
         {
+            // TODO: puede olvidarse de todas las plantas al llegar aqui
+            if (EdiblePlants.Count == 0) return;
+
             Position posDanger = GetFromPositionDangers(EdiblePlants[0].position);
             if (posDanger != null) //If the position is already in the list it is updated.
             {

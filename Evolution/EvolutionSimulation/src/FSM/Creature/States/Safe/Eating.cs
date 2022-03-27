@@ -68,8 +68,8 @@ namespace EvolutionSimulation.FSM.Creature.States
             Entities.Corpse closest;
             creature.Corpse(out foodID, out foodPos);
             closest = creature.world.GetStaticEntity(foodID) as Entities.Corpse;
-                
-            closest.ReceiveInteraction(creature, Entities.Interactions.eat);
+            if(closest != null) // TODO: puede desaparecerle el corpse al llegar aqui
+                closest.ReceiveInteraction(creature, Entities.Interactions.eat);
         }
 
         /// <summary>
