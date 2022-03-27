@@ -107,6 +107,10 @@ namespace EvolutionSimulation
             metabolismComparer = new Utils.SortByMetabolism();
             StaticEntities = new Dictionary<int, StaticEntity>();
             entitiesToDelete = new List<int>();
+            chunkSize = 32;
+            int chunk = (int)Math.Floor(mapSize / (float)chunkSize) + ((mapSize % chunkSize == 0) ? 1 : 0);
+            highMap = new bool[chunk, chunk];
+            FillHighMap();
         }
 
         /// <summary>
@@ -140,6 +144,10 @@ namespace EvolutionSimulation
             p = new Perlin();
             if (config.heightMap != null) { heightMap = config.heightMap; mapSize = heightMap.GetLength(0); }
             else mapSize = config.mapSize;
+
+            chunkSize = 32;
+            int chunk = (int)Math.Floor(mapSize / (float)chunkSize) + ((mapSize % chunkSize == 0) ? 1 : 0);
+            highMap = new bool[chunk, chunk];
 
             if (config.heightWaves != null) heightWaves = config.heightWaves;
             else
@@ -183,6 +191,29 @@ namespace EvolutionSimulation
             }
 
             InitMap();
+            FillHighMap();
+        }
+
+        private void FillHighMap()
+        {
+            for (int i = 0; i < highMap.GetLength(0); i++)
+            {
+                for (int j = 0; j < highMap.GetLength(1); j++)
+                {
+                    int numWater = 0;
+                    double totalNum = Math.Pow(chunkSize, 2);
+                    for (int k = 0; k < chunkSize; k++)
+                    {
+                        for (int l = 0; l < chunkSize; l++)
+                        {
+                            if (!canMove(i * chunkSize + k, j * chunkSize + l)) { totalNum--; continue; }
+                            if (map[i * chunkSize + k, j * chunkSize + l].isWater) numWater++;
+                        }
+                    }
+
+                    highMap[i, j] = (numWater / totalNum > 0.5);
+                }
+            }
         }
 
         /// <summary>
@@ -257,10 +288,10 @@ namespace EvolutionSimulation
         public T CreateCreature<T>(int x, int y, CreatureChromosome chromosome = null, string name = "None", int fatherID = -1, int motherID = -1) where T : Creature, new()
         {
             T ent = new T();
-            
+
             ent.Init(entitiesID, this, x, y, chromosome, name, fatherID, motherID);
             // Progenitors start being adults
-            if(fatherID == -1)
+            if (fatherID == -1)
             {
                 ent.stats.CurrAge = (int)(UniverseParametersManager.parameters.adulthoodThreshold * ent.stats.LifeSpan);
             }
@@ -325,7 +356,7 @@ namespace EvolutionSimulation
             // Tick for every static entity
             foreach (StaticEntity sEnt in StaticEntities.Values)
                 sEnt.Tick();
-            
+
             // Entity deletion
             entitiesToDelete.ForEach(delegate (int id)
             {
@@ -356,7 +387,7 @@ namespace EvolutionSimulation
                 if (cID == e.ID) continue;
                 if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius)// Square vision
                 {
-                    
+
                     float perception = c.stats.Perception / (float)c.stats.MaxPerception;
                     float camouflage = e.stats.Camouflage / (float)e.chromosome.GetFeatureMax(CreatureFeature.Camouflage);
                     // Perceive the creature if your perception percentage is greater than him camouflage percentage
@@ -688,7 +719,9 @@ namespace EvolutionSimulation
 
         // Map with physical properties
         public MapData[,] map { get; private set; }
+        public bool[,] highMap { get; private set; }
         int mapSize;
+        public int chunkSize { get; private set; }
         public bool day;
         public uint step;
         // 50 steps equals and hour, and 24 hours equal a day. 365 days equal a year

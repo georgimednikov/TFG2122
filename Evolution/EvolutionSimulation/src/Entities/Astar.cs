@@ -53,6 +53,90 @@ namespace EvolutionSimulation.Entities
         public static Vector3[] GetPath(Creature c, World w, Vector3 start, Vector3 end, out double treeDensity)
         {
             Console.WriteLine("Empieza Astar: " + start + " " + end);
+
+            Vector3 tempEnd = HighAstar(w, start, end);
+
+            return LowAstar(c, w, start, tempEnd, out treeDensity);
+        }
+
+        private static Vector3 HighAstar(World w, Vector3 start, Vector3 end)
+        {
+            Vector3 nStart = new Vector3((float)Math.Floor((double)start.X / (double)w.chunkSize), (float)Math.Floor((double)start.Y / (double)w.chunkSize), 0);
+            Vector3 nEnd = new Vector3((float)Math.Floor((double)end.X / (double)w.chunkSize), (float)Math.Floor((double)end.Y / (double)w.chunkSize), 0);
+
+            List<GraphNode> list = new List<GraphNode>();
+            Utils.PriorityQueue<GraphNode> open = new Utils.PriorityQueue<GraphNode>();
+            List<GraphNode> closed = new List<GraphNode>();
+            GraphNode init = new GraphNode(nStart, null);
+            open.Insert(init);
+
+            while (open.Count > 0)
+            {
+                GraphNode current = open.RemoveTop();
+                if (closed.Contains(current))
+                    continue;
+                closed.Add(current);
+                if (current.pos == nEnd)
+                    break;
+                foreach (GraphNode n in HighGetNeighbours(w, current))
+                {
+                    n.estimatedCost = current.costSoFar + manhattanHeuristic(n.pos, nEnd);
+                    if (!open.Contains(n))
+                        open.Insert(n);
+                }
+            }
+
+            GraphNode aux = closed[closed.Count - 1];
+            while (aux != null)
+            {
+                list.Add(aux);
+                aux = aux.prev;
+            }
+            list.Reverse();
+
+            Vector2[] posToGo = new Vector2[3];
+            for (int i = 0; i < posToGo.Length - 1; ++i)
+            {
+                Vector3 pos = list[Math.Min(i, list.Count - 1)].pos;
+                posToGo[i] = new Vector2((pos.X + 0.5f) * w.chunkSize, (pos.Y + 0.5f) * w.chunkSize);
+            }
+            Vector3 finalPos = new Vector3();
+            double xD1 = posToGo[1].Y - posToGo[0].Y, yD1 = posToGo[0].X - posToGo[1].X, xD2 = posToGo[2].X - posToGo[0].X, yD2 = posToGo[2].Y - posToGo[0].Y;
+            // y = (yD2/xD2)(x - posToGo[0].X) + posToGo[0].Y 
+            //       m   n           o              p
+            // y = (yD1/xD1)(x - ((posToGo[0].X + posToGo[1].X) / 2))) + ((posToGo[0].Y + posToGo[1].Y) / 2))
+            //        q  r             s                t                      u              v
+            //(m/n)(x-o)+p=(q/r)(x-((s+t)/2))+(u+v)/2
+            // 
+            //Falta calcular (x, y) que me da pereza
+
+            finalPos.Y = (float)(yD2 / xD2) * (finalPos.X - posToGo[0].X) + posToGo[0].Y;
+
+            bool horizontal = finalPos.X - start.X > finalPos.Y - start.Y;
+            bool positiveX = finalPos.X - start.X > 0, positiveY = finalPos.Y - start.Y > 0; 
+            while (!w.canMove(finalPos))
+            {
+                if (horizontal)
+                {
+                    if (positiveX) 
+                        finalPos.X--;
+                    else
+                        finalPos.X++;
+                }
+                else
+                {
+                    if (positiveY)
+                        finalPos.Y--;
+                    else
+                        finalPos.Y++;
+                }
+            }
+
+            return finalPos;
+        }
+
+        private static Vector3[] LowAstar(Creature c, World w, Vector3 start, Vector3 end, out double treeDensity)
+        {
             List<GraphNode> path = new List<GraphNode>();
             Utils.PriorityQueue<GraphNode> open = new Utils.PriorityQueue<GraphNode>();
             List<GraphNode> closed = new List<GraphNode>();
@@ -69,7 +153,7 @@ namespace EvolutionSimulation.Entities
                 closed.Add(current);
                 if (current.pos == end)
                     break;
-                foreach (GraphNode n in GetNeighbours(treeBetter, c, w, current))
+                foreach (GraphNode n in LowGetNeighbours(treeBetter, c, w, current))
                 {
                     n.estimatedCost = current.costSoFar + CustomHeuristic(treeBetter, c, n.pos, end, w, out double partialTreeDensity);
                     Vector3 posToEnd = end - n.pos;
@@ -121,7 +205,7 @@ namespace EvolutionSimulation.Entities
                 ntiles++;
                 dirAux += dirN;
             }
-            if(ntiles != 0) treeDensity /= ntiles;
+            if (ntiles != 0) treeDensity /= ntiles;
 
             double ret = Math.Max(Math.Abs(dir.X), Math.Abs(dir.Y));
             if ((start.Z == (int)Creature.HeightLayer.Tree || end.Z == (int)Creature.HeightLayer.Tree) && treeBetter) ret *= c.stats.GroundSpeed / c.stats.ArborealSpeed;
@@ -137,7 +221,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="w">World where it happens</param>
         /// <param name="n">Current node</param>
         /// <returns></returns>
-        static List<GraphNode> GetNeighbours(bool treeBetter, Creature c, World w, GraphNode n)
+        static List<GraphNode> LowGetNeighbours(bool treeBetter, Creature c, World w, GraphNode n)
         {
             List<GraphNode> neigh = new List<GraphNode>();
             for (int i = -1; i <= 1; ++i)
@@ -158,6 +242,27 @@ namespace EvolutionSimulation.Entities
                     }
                 }
             return neigh;
+        }
+
+        static List<GraphNode> HighGetNeighbours(World w, GraphNode n)
+        {
+            List<GraphNode> neigh = new List<GraphNode>();
+            for (int i = -1; i <= 1; ++i)
+                for (int j = -1; j <= 1; ++j)
+                {
+                    Vector3 newPos = n.pos + new Vector3(i, j, 0);
+                    if (newPos.X > 0 && newPos.X < w.highMap.GetLength(0) && newPos.Y > 0 && newPos.Y < w.highMap.GetLength(1) && !w.highMap[(int)newPos.X, (int)newPos.Y])
+                    {
+                        double costSoFar = n.costSoFar;
+                        neigh.Add(new GraphNode(newPos, n, costSoFar + 1));
+                    }
+                }
+            return neigh;
+        }
+
+        static float manhattanHeuristic(Vector3 start, Vector3 end)
+        {
+            return (Math.Abs(end.X - start.X) + Math.Abs(end.Y - start.Y));
         }
 
         /// <summary>
