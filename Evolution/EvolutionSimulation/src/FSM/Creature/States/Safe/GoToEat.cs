@@ -57,7 +57,10 @@ namespace EvolutionSimulation.FSM.Creature.States
                 foodPos = posPlant;
             else
                 foodPos = posCorpse;
-            creature.SetPath(foodPos.x, foodPos.y);
+
+            // If the creature is not already there
+            if(creature.x != foodPos.x || creature.y != foodPos.y)
+                creature.SetPath(foodPos.x, foodPos.y);
         }
     }
 }
