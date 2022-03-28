@@ -364,35 +364,39 @@ namespace EvolutionSimulation.Entities
             if (vector.Length() == 0)
                 vector = RandomDir();
 
-            float radius = perceptionRadius;
-            float degreesInc = (float)(Math.PI / 4.0);  // 45 degrees
-
+            double radius = perceptionRadius;
+            double angleIncrement = Math.PI / 4.0;  // 45 degrees
+            double maxAngle = 3.0 * Math.PI / 2.0;
+            double angleDesist = 0.08727;   // 5 degrees to stop searching forward
             Vector2Int finalPosition;
 
             int cont = 0;
-            float r = radius;
-            float d = degreesInc;
             //Find a position to explore that is not water and is far of the vector calculated before
             do
             {
-                if (!GetPositionsAtRadius(out finalPosition, vector, radius, degreesInc))
+                if (!GetPositionsAtRadius(out finalPosition, vector, radius, angleIncrement, maxAngle))
                 {
                     if (++cont % 2 == 0)    // TODO: these numbers are magic
-                        degreesInc /= 2;
+                        angleIncrement /= 2.0;
                     else
                         radius *= 0.75f;
                 }
-                //TODO: quitar mas adelante / si molesta. Si entra aquí deberia ser bucle infinito. hablar con pablo o andres
-                if (cont > 100)
+                // If no viable position is found forward after several iterations, it goes back
+                if (angleIncrement < angleDesist || radius < 0.5)
                 {
-                    cont = 0;
-                    radius = r;
-                    degreesInc = d;
-                    //throw new Exception("Bucle infinito buscando sitio a explorar");
+                    vector *= -1;
+                    radius = perceptionRadius;
+                    angleIncrement = Math.PI / 4.0;
+                    maxAngle = Math.PI / 2.0;   // 90 degrees, the area that the creature should have come from
+                }
+                if(cont >= 1000)
+                {
+                    // no deberia de pasar aqui pero xd
+                    Console.WriteLine("bucle infinito");
                 }
             }
-            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) ||
-            (finalPosition.x == thisCreature.x && finalPosition.y == thisCreature.y));
+            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) 
+                || (finalPosition.x == thisCreature.x && finalPosition.y == thisCreature.y));
 
             return finalPosition;
         }
@@ -419,13 +423,13 @@ namespace EvolutionSimulation.Entities
         /// <param name="dir"> Initial direction to start searching </param>
         /// <param name="radius"> Radius of the circunference </param>
         /// <param name="angleInc"> Angle increment to check positions in a circunference </param>
-        private bool GetPositionsAtRadius(out Vector2Int finalPosition, Vector3 dir, float radius, float angleInc)
+        private bool GetPositionsAtRadius(out Vector2Int finalPosition, Vector3 dir, double radius, double angleInc, double maxAngle)
         {
             finalPosition = new Vector2Int();
             double dot = Vector3.Dot(dir, Vector3.UnitX);
             double acos = Math.Acos(dot);
-            float angleAcum = 0,
-                actualAngle = (float)acos;
+            double angleAcum = 0,
+                actualAngle = (double)acos;
             int inc = 1;
             do
             {
@@ -436,9 +440,10 @@ namespace EvolutionSimulation.Entities
                 angleAcum += angleInc;
                 actualAngle += angleAcum * inc;
             }
-            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) && angleAcum <= 2 * Math.PI);
+            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) && angleAcum <= maxAngle);
 
-            return angleAcum <= 2 * Math.PI && finalPosition.x != thisCreature.x && finalPosition.y != thisCreature.y;
+            return angleAcum <= maxAngle 
+                && (finalPosition.x != thisCreature.x || finalPosition.y != thisCreature.y);
         }
         /// <summary>
         /// This method has to be called when day changed to night nad vice versa, to update the radius the creature sees based on the

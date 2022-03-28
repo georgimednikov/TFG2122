@@ -39,10 +39,11 @@ namespace EvolutionSimulation.FSM.Creature.States
             creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             if (creature.GetNextCostOnPath() <= 0 || (nextPos.X == creature.x && nextPos.Y == creature.y))
             {
-                do
-                {
-                    posToDiscover = creature.NewPosition();
-                } while (posToDiscover.x == creature.x && creature.y == posToDiscover.y);
+                //do
+                //{
+                //} while (posToDiscover.x == creature.x && creature.y == posToDiscover.y);
+                // The new position cannot be a 
+                posToDiscover = creature.NewPosition();
                 creature.SetPath(posToDiscover.x, posToDiscover.y);
             }
         }
