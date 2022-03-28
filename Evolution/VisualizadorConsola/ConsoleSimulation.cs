@@ -22,7 +22,7 @@ namespace VisualizadorConsola
             world = new World();
             world.Init(512);//UserInfo.Size);
             //world.ExportContent();
-            //WorldToBmp();
+            WorldToBmp();
             //A minimum distance to leave in between species spawn points to give them some room.
             //Calculated based on the world size and amount of species to spawn, and then reduced by
             //a value to give room in the world and not fill it in a homogenous manner.
@@ -175,7 +175,7 @@ namespace VisualizadorConsola
                     if (world.map[j / scale, i / scale].isWater)
                     {
                         SetPixel(j, i, Color.FromArgb(0, 0, 255), holdRidgeMap, scale);
-                        
+
                     }
                     #endregion
 
@@ -251,7 +251,7 @@ namespace VisualizadorConsola
                         else SetPixel(j, i, Color.FromArgb(32, 255, 160), holdRidgeMap, scale); //Tropical Rain Forest
                     }
                     #endregion
-                    
+
                     #region VoronoiDiagram
                     val = world.map[j / scale, i / scale].regionId;
                     switch (val % 10)
@@ -290,7 +290,7 @@ namespace VisualizadorConsola
                     #endregion
                     if ((j / scale) % 32 == 0 || (i / scale) % 32 == 0)
                     {
-                        SetPixel(j, i, Color.White, voronoiMap, scale);
+                        SetPixel(j, i, Color.White, voronoiMap, scale / 2);
                     }
                 }
             }

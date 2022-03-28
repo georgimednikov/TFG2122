@@ -53,7 +53,7 @@ namespace EvolutionSimulation.Entities
         public static Vector3[] GetPath(Creature c, World w, Vector3 start, Vector3 end, out double treeDensity)
         {
             Console.WriteLine("Empieza Astar: " + start + " " + end);
-
+            if (end == start) throw new InvalidOperationException("La misma pos esta mal");
             Vector3 tempEnd = HighAstar(w, start, end);
 
             return LowAstar(c, w, start, tempEnd, out treeDensity);

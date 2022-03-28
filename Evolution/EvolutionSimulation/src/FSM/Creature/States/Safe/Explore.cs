@@ -26,7 +26,11 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            posToDiscover = creature.NewPosition();
+            do
+            {
+                posToDiscover = creature.NewPosition();
+
+            } while (posToDiscover.x == creature.x && creature.y == posToDiscover.y);
             creature.SetPath(posToDiscover.x, posToDiscover.y);
         }
 
@@ -35,7 +39,11 @@ namespace EvolutionSimulation.FSM.Creature.States
             Vector3 nextPos = creature.GetNextPosOnPath();
             if (nextPos.X < 0 || nextPos.Y < 0)
             {
-                posToDiscover = creature.NewPosition();
+                do
+                {
+                    posToDiscover = creature.NewPosition();
+
+                } while (posToDiscover.x == creature.x && creature.y == posToDiscover.y);
                 creature.SetPath(posToDiscover.x, posToDiscover.y);
             }
             else

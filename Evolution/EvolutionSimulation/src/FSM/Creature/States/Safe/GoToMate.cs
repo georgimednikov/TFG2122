@@ -31,7 +31,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void Action()
         {
             Vector3 nextPos = creature.GetNextPosOnPath();
-            if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
+            if (nextPos.X != -1 && nextPos.Y != -1)
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             
             Vector2Int tmpPos;            

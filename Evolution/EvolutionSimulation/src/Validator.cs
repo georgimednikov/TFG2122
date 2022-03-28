@@ -556,22 +556,32 @@ namespace EvolutionSimulation
         {
             //TODO: MIN PERCEPTION TIENE QUE SER MENOR QUE MAX PERCEPTION Y ESTOY SEGURO DE QUE MÄS VARIABLE NECESITAN ESTA COMPROBACÏÓN
 
-            if (parameters.newbornStatMultiplier <= 0 || parameters.adulthoodThreshold <= 0 || parameters.tiredThreshold <= 0 || parameters.exhaustThreshold <= 0 ||
-                parameters.hungryThreshold <= 0 || parameters.veryHungryThreshold <= 0 || parameters.thirstyThreshold <= 0 || parameters.veryThirstyThreshold <= 0 ||
-                parameters.actionPerceptionPercentage <= 0 || parameters.minPerception <= 0 || parameters.maxPerception <= 0)
-                throw new UniverseParameterIsZeroException("The provided stat parameters must be positive");
-            if (parameters.newbornStatMultiplier > 1 || parameters.adulthoodThreshold > 1 || parameters.tiredThreshold > 1 || parameters.exhaustThreshold > 1 ||
-                parameters.hungryThreshold > 1 || parameters.veryHungryThreshold > 1 || parameters.thirstyThreshold > 1 || parameters.veryThirstyThreshold > 1 ||
-                parameters.actionPerceptionPercentage > 1)
-                throw new PercentageOverOneException("The provided stat percentages are over one");
+            if (parameters.newbornStatMultiplier <= 0) throw new UniverseParameterIsZeroException("The provided newbornStatMultiplier must be positive");
+            if (parameters.adulthoodThreshold <= 0) throw new UniverseParameterIsZeroException("The provided adulthoodThreshold must be positive");
+            if (parameters.tiredThreshold <= 0) throw new UniverseParameterIsZeroException("The provided tiredThreshold must be positive");
+            if (parameters.exhaustThreshold <= 0) throw new UniverseParameterIsZeroException("The provided exhaustThreshold must be positive");
+            if (parameters.hungryThreshold <= 0) throw new UniverseParameterIsZeroException("The provided hungryThreshold must be positive");
+            if (parameters.veryHungryThreshold <= 0) throw new UniverseParameterIsZeroException("The provided veryHungryThreshold must be positive");
+            if (parameters.thirstyThreshold <= 0) throw new UniverseParameterIsZeroException("The provided thirstyThreshold must be positive");
+            if (parameters.veryThirstyThreshold <= 0) throw new UniverseParameterIsZeroException("The provided veryThirstyThreshold must be positive");
+            if (parameters.actionPerceptionPercentage <= 0) throw new UniverseParameterIsZeroException("The provided actionPerceptionPercentage must be positive");
+            if (parameters.minPerception <= 0) throw new UniverseParameterIsZeroException("The provided minPerception must be positive");
+            if (parameters.maxPerception <= 0) throw new UniverseParameterIsZeroException("The provided maxPerception must be positive");
+            if (parameters.newbornStatMultiplier > 1) throw new PercentageOverOneException("The provided newbornStatMultiplier is over one");
+            if (parameters.adulthoodThreshold > 1) throw new PercentageOverOneException("The provided adulthoodThreshold is over one");
+            if (parameters.tiredThreshold > 1) throw new PercentageOverOneException("The provided tiredThreshold is over one");
+            if (parameters.exhaustThreshold > 1) throw new PercentageOverOneException("The provided exhaustThreshold is over one");
+            if (parameters.hungryThreshold > 1) throw new PercentageOverOneException("The provided hungryThreshold is over one");
+            if (parameters.veryHungryThreshold > 1) throw new PercentageOverOneException("The provided veryHungryThreshold is over one");
+            if (parameters.thirstyThreshold > 1) throw new PercentageOverOneException("The provided thirstyThreshold is over one");
+            if (parameters.veryThirstyThreshold > 1) throw new PercentageOverOneException("The provided veryThirstyThreshold is over one");
+            if (parameters.actionPerceptionPercentage > 1) throw new PercentageOverOneException("The provided actionPerceptionPercentage is over one");
         }
 
         static void ValidateTrees(UniverseParameters parameters)
         {
-            if (parameters.treeMovementPenalty <= 0)
-                throw new UniverseParameterIsZeroException("The provided tree parameters must be positive");
-            if (parameters.treeMovementPenalty > 1)
-                throw new PercentageOverOneException("The provided tree percentages are over one");
+            if (parameters.treeMovementPenalty <= 0) throw new UniverseParameterIsZeroException("The provided treeMovementPenalty must be positive");
+            if (parameters.treeMovementPenalty > 1) throw new PercentageOverOneException("The provided treeMovementPenalty is over one");
         }
 
         static void ValidateMemory(UniverseParameters parameters)
@@ -592,9 +602,9 @@ namespace EvolutionSimulation
 
         static void ValidateCreatureTransitions(UniverseParameters parameters)
         {
-            if (parameters.fleeingTransitionMultiplier <= 0 || parameters.hidingTransitionMultiplier <= 0 || parameters.stopEatingTransitionEnergyMultiplier <= 0 || 
-                parameters.combatTransitionHealthThresholdMultiplier <= 0 || 
-                parameters.safeTransitionAggressivenessThreshold <= 0 || parameters.experienceMaxAggresivenessMultiplier <= 0 || parameters.safePrefferedOverClosestResourceRatio <= 0) 
+            if (parameters.fleeingTransitionMultiplier <= 0 || parameters.hidingTransitionMultiplier <= 0 || parameters.stopEatingTransitionEnergyMultiplier <= 0 ||
+                parameters.combatTransitionHealthThresholdMultiplier <= 0 ||
+                parameters.safeTransitionAggressivenessThreshold <= 0 || parameters.experienceMaxAggresivenessMultiplier <= 0 || parameters.safePrefferedOverClosestResourceRatio <= 0)
                 throw new UniverseParameterIsZeroException("The provided transition parameters must be positive");
         }
 

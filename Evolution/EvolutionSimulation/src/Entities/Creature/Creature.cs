@@ -203,8 +203,8 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         void ManageHealth()
         {
-            
-            if(stats.CurrEnergy <= 0 || stats.CurrRest <= 0 || stats.CurrHydration <= 0)
+
+            if (stats.CurrEnergy <= 0 || stats.CurrRest <= 0 || stats.CurrHydration <= 0)
             {
                 stats.CurrHealth--;
             }
@@ -789,7 +789,7 @@ namespace EvolutionSimulation.Entities
 
         Vector3[] path;
         int pathIterator;
-        int halfMaxMobility;
+        double halfMaxMobility;
 
         public bool cornered { get; set; }  // This determines if the creature cannot flee fruther and must fight back
 
@@ -919,13 +919,12 @@ namespace EvolutionSimulation.Entities
         /// <returns>Next position or (-1, -1, -1) on path end.</returns>
         public Vector3 GetNextPosOnPath()
         {
-            if (pathIterator >= path.Length-1)
+            if (pathIterator >= path.Length)
             {
-                if (pathIterator == path.Length - 1 && path[pathIterator] != finalPos)
-                    SetPath((int)finalPos.X, (int)finalPos.Y, (HeightLayer)finalPos.Z);
-                else
-                    path = null; return new Vector3(-1, -1, -1);
+                path = null; return new Vector3(-1, -1, -1);
             }
+            if (pathIterator == path.Length - 1 && path[pathIterator] != finalPos)
+                SetPath((int)finalPos.X, (int)finalPos.Y, (HeightLayer)finalPos.Z);
             return path[pathIterator++];
         }
         #endregion
