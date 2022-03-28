@@ -419,16 +419,16 @@ namespace EvolutionSimulation
                 throw new NotAllAbilitiesUnlockDefinedException("There must be as many abilities as abilities features listed in 'CreatureFeature', " + ((int)CreatureFeature.Count - (int)CreatureFeature.Arboreal));
 
             bool[] featuresGiven = new bool[abUnlock.Length]; //Bool default value = false
-            
+
             foreach (Tuple<CreatureFeature, float> ab in abUnlock)
             {
-                featuresGiven[(int)ab.Item1 - (int)CreatureFeature.Arboreal ] = true;
-                if(ab.Item2 < 0 || ab.Item2 > 1)
+                featuresGiven[(int)ab.Item1 - (int)CreatureFeature.Arboreal] = true;
+                if (ab.Item2 < 0 || ab.Item2 > 1)
                 {
                     throw new AbilitiesUnlockNotNotInRange("The value of " + ab.Item1 + " must be between 0 and 1");
                 }
             }
-            
+
             foreach (bool feat in featuresGiven)
                 if (!feat)
                     throw new NotAllAbilitiesUnlockDefinedException("Each one of the " + ((int)CreatureFeature.Count - (int)CreatureFeature.Arboreal) + " abilities features declared in 'CreatureFeature' must have an ability unlock value");
@@ -478,7 +478,7 @@ namespace EvolutionSimulation
               System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
         }
 
-        public static void Validate(UniverseParameters parameters) 
+        public static void Validate(UniverseParameters parameters)
         {
             ValidateWorld(parameters);
 
@@ -499,32 +499,57 @@ namespace EvolutionSimulation
 
         static void ValidateWorld(UniverseParameters parameters)
         {
-            if (parameters.ticksPerHour <= 0 || parameters.hoursPerDay <= 0 || parameters.daysPerYear <= 0 || parameters.morningStart <= 0 || parameters.nightStart <= 0) 
+            if (parameters.ticksPerHour <= 0 || parameters.hoursPerDay <= 0 || parameters.daysPerYear <= 0 || parameters.morningStart <= 0 || parameters.nightStart <= 0)
                 throw new UniverseParameterIsZeroException("The provided time parameters must be positive");
-            if(parameters.morningStart > parameters.nightStart)
+            if (parameters.morningStart > parameters.nightStart)
                 throw new MinMaxValueSwappedException("The day must start before night starts");
-            if(parameters.morningStart > parameters.hoursPerDay || parameters.nightStart > parameters.hoursPerDay)
+            if (parameters.morningStart > parameters.hoursPerDay || parameters.nightStart > parameters.hoursPerDay)
                 throw new UniverseParameterBeyondMaxException("The provided day change parameters are beyond the duration of a day in hours");
         }
 
         static void ValidateCreature(UniverseParameters parameters)
         {
-            if (parameters.abilityUnlockPercentage <= 0 || parameters.minHealth <= 0 || parameters.healthGainMultiplier <= 0 || 
-                parameters.healthRegeneration <= 0 || parameters.maxLimbs <= 0 || parameters.minRestExpense <= 0 || parameters.maxRestExpense <= 0 ||
-                parameters.resourceAmount <= 0 || parameters.minLifeSpan <= 0 || parameters.exhaustToSleepRatio <= 0 || parameters.perceptionWithoutNightVision <= 0 || parameters.minPerceptionWithNightVision <= 0 ||
-                parameters.minMobilityMedium <= 0 || parameters.mobilityPenalty <= 0 || parameters.maxSpeed <= 0 || parameters.hornIntimidationMultiplier <= 0 ||
-                parameters.restRegenerationThreshold <= 0 || parameters.energyRegenerationThreshold <= 0 || parameters.hydrationRegenerationThreshold <= 0 || 
-                parameters.regenerationRate <= 0 || parameters.hoursTilStarvation <= 0 || parameters.thirstToHungerRatio <= 0 ||
-                parameters.maxTemperatureAggressivenessPercentage <= 0 || parameters.maxTemperatureDifference <= 0 || parameters.minHealthTemperatureDamage <= 0 || 
-                parameters.maxHealthTemperatureDamage <= 0 || parameters.hoursTilExhaustion <= 0) 
-                throw new UniverseParameterIsZeroException("The provided creature parameters must be positive");
-            if (parameters.maxRestExpense < parameters.minRestExpense)
-                throw new MinMaxValueSwappedException("The maximum amount of rest expense is lower than the minimium");
-            if (parameters.abilityUnlockPercentage > 1 || parameters.perceptionWithoutNightVision > 1 || parameters.minPerceptionWithNightVision > 1 || parameters.minMobilityMedium > 1 || parameters.mobilityPenalty > 1 || 
-                parameters.restRegenerationThreshold > 1 || parameters.energyRegenerationThreshold > 1 || parameters.hydrationRegenerationThreshold > 1 ||
-                parameters.maxTemperatureAggressivenessPercentage > 1 || parameters.minHealthTemperatureDamage > 1 || parameters.maxHealthTemperatureDamage > 1 ||
-                parameters.regenerationRate > 1)
-                throw new PercentageOverOneException("The provided creature percentages are over one");
+            if (parameters.abilityUnlockPercentage <= 0) throw new UniverseParameterIsZeroException("The provided abilityUnlockPercentage must be positive");
+            if (parameters.minHealth <= 0) throw new UniverseParameterIsZeroException("The provided minHealth must be positive");
+            if (parameters.healthGainMultiplier <= 0) throw new UniverseParameterIsZeroException("The provided healthGainMultiplier must be positive");
+            if (parameters.healthRegeneration <= 0) throw new UniverseParameterIsZeroException("The provided healthRegeneration must be positive");
+            if (parameters.maxLimbs <= 0) throw new UniverseParameterIsZeroException("The provided maxLimbs must be positive");
+            if (parameters.minRestExpense <= 0) throw new UniverseParameterIsZeroException("The provided minRestExpense must be positive");
+            if (parameters.maxRestExpense <= 0) throw new UniverseParameterIsZeroException("The provided maxRestExpense must be positive");
+            if (parameters.resourceAmount <= 0) throw new UniverseParameterIsZeroException("The provided resourceAmount must be positive");
+            if (parameters.minLifeSpan <= 0) throw new UniverseParameterIsZeroException("The provided minLifeSpan must be positive");
+            if (parameters.exhaustToSleepRatio <= 0) throw new UniverseParameterIsZeroException("The provided exhaustToSleepRatio must be positive");
+            if (parameters.perceptionWithoutNightVision <= 0) throw new UniverseParameterIsZeroException("The provided perceptionWithoutNightVision must be positive");
+            if (parameters.minPerceptionWithNightVision <= 0) throw new UniverseParameterIsZeroException("The provided minPerceptionWithNightVision must be positive");
+            if (parameters.minMobilityMedium <= 0) throw new UniverseParameterIsZeroException("The provided minMobilityMedium must be positive");
+            if (parameters.mobilityPenalty <= 0) throw new UniverseParameterIsZeroException("The provided mobilityPenalty must be positive");
+            if (parameters.maxSpeed <= 0) throw new UniverseParameterIsZeroException("The provided maxSpeed must be positive");
+            if (parameters.hornIntimidationMultiplier <= 0) throw new UniverseParameterIsZeroException("The provided hornIntimidationMultiplier must be positive");
+            if (parameters.restRegenerationThreshold <= 0) throw new UniverseParameterIsZeroException("The provided restRegenerationThreshold must be positive");
+            if (parameters.energyRegenerationThreshold <= 0) throw new UniverseParameterIsZeroException("The provided energyRegenerationThreshold must be positive");
+            if (parameters.hydrationRegenerationThreshold <= 0) throw new UniverseParameterIsZeroException("The provided hydrationRegenerationThreshold must be positive");
+            if (parameters.regenerationRate <= 0) throw new UniverseParameterIsZeroException("The provided regenerationRate must be positive");
+            if (parameters.hoursTilStarvation <= 0) throw new UniverseParameterIsZeroException("The provided hoursTilStarvation must be positive");
+            if (parameters.thirstToHungerRatio <= 0) throw new UniverseParameterIsZeroException("The provided thirstToHungerRatio must be positive");
+            if (parameters.maxTemperatureAggressivenessPercentage <= 0) throw new UniverseParameterIsZeroException("The provided maxTemperatureAggressivenessPercentage must be positive");
+            if (parameters.maxTemperatureDifference <= 0) throw new UniverseParameterIsZeroException("The provided maxTemperatureDifference must be positive");
+            if (parameters.minHealthTemperatureDamage <= 0) throw new UniverseParameterIsZeroException("The provided minHealthTemperatureDamage must be positive");
+            if (parameters.maxHealthTemperatureDamage <= 0) throw new UniverseParameterIsZeroException("The provided maxHealthTemperatureDamage must be positive");
+            if (parameters.hoursTilExhaustion <= 0) throw new UniverseParameterIsZeroException("The provided hoursTilExhaustion must be positive");
+            if (parameters.maxRestExpense < parameters.minRestExpense) throw new MinMaxValueSwappedException("The maximum amount of rest expense is lower than the minimium");
+            if (parameters.abilityUnlockPercentage > 1) throw new PercentageOverOneException("The provided abilityUnlockPercentage is over one");
+            if (parameters.perceptionWithoutNightVision > 1) throw new PercentageOverOneException("The provided perceptionWithoutNightVision is over one");
+            if (parameters.minPerceptionWithNightVision > 1) throw new PercentageOverOneException("The provided minPerceptionWithNightVision is over one");
+            if (parameters.minMobilityMedium > 1) throw new PercentageOverOneException("The provided minMobilityMedium is over one");
+            if (parameters.mobilityPenalty > 1) throw new PercentageOverOneException("The provided mobilityPenalty is over one");
+            if (parameters.restRegenerationThreshold > 1) throw new PercentageOverOneException("The provided restRegenerationThreshold is over one");
+            if (parameters.energyRegenerationThreshold > 1) throw new PercentageOverOneException("The provided energyRegenerationThreshold is over one");
+            if (parameters.hydrationRegenerationThreshold > 1) throw new PercentageOverOneException("The provided hydrationRegenerationThreshold is over one");
+            if (parameters.maxTemperatureAggressivenessPercentage > 1) throw new PercentageOverOneException("The provided maxTemperatureAggressivenessPercentage is over one");
+            if (parameters.minHealthTemperatureDamage > 1) throw new PercentageOverOneException("The provided minHealthTemperatureDamage is over one");
+            if (parameters.maxHealthTemperatureDamage > 1) throw new PercentageOverOneException("The provided maxHealthTemperatureDamage is over one");
+            if (parameters.regenerationRate > 1) throw new PercentageOverOneException("The provided regenerationRate is over one");
+
         }
 
         static void ValidateCreatureStats(UniverseParameters parameters)
@@ -533,7 +558,7 @@ namespace EvolutionSimulation
 
             if (parameters.newbornStatMultiplier <= 0 || parameters.adulthoodThreshold <= 0 || parameters.tiredThreshold <= 0 || parameters.exhaustThreshold <= 0 ||
                 parameters.hungryThreshold <= 0 || parameters.veryHungryThreshold <= 0 || parameters.thirstyThreshold <= 0 || parameters.veryThirstyThreshold <= 0 ||
-                parameters.actionPerceptionPercentage <= 0 || parameters.minPerception <= 0 || parameters.maxPerception <= 0) 
+                parameters.actionPerceptionPercentage <= 0 || parameters.minPerception <= 0 || parameters.maxPerception <= 0)
                 throw new UniverseParameterIsZeroException("The provided stat parameters must be positive");
             if (parameters.newbornStatMultiplier > 1 || parameters.adulthoodThreshold > 1 || parameters.tiredThreshold > 1 || parameters.exhaustThreshold > 1 ||
                 parameters.hungryThreshold > 1 || parameters.veryHungryThreshold > 1 || parameters.thirstyThreshold > 1 || parameters.veryThirstyThreshold > 1 ||
@@ -543,7 +568,7 @@ namespace EvolutionSimulation
 
         static void ValidateTrees(UniverseParameters parameters)
         {
-            if (parameters.treeMovementPenalty <= 0) 
+            if (parameters.treeMovementPenalty <= 0)
                 throw new UniverseParameterIsZeroException("The provided tree parameters must be positive");
             if (parameters.treeMovementPenalty > 1)
                 throw new PercentageOverOneException("The provided tree percentages are over one");
@@ -551,15 +576,15 @@ namespace EvolutionSimulation
 
         static void ValidateMemory(UniverseParameters parameters)
         {
-            if (parameters.knowledgeTickMultiplier <= 0 || /*parameters.perceptionToRadiusMultiplier <= 0 || */parameters.aggressivenessToRadiusMultiplier <= 0) 
+            if (parameters.knowledgeTickMultiplier <= 0 || /*parameters.perceptionToRadiusMultiplier <= 0 || */parameters.aggressivenessToRadiusMultiplier <= 0)
                 throw new UniverseParameterIsZeroException("The provided tree parameters must be positive");
         }
 
         static void ValidateCreatureStates(UniverseParameters parameters)
         {
             if (parameters.baseActionCost <= 0 || parameters.venomCostMultiplier <= 0 || parameters.chaseCostMultiplier <= 0 || parameters.fleeingCostMultiplier <= 0 ||
-                parameters.drinkingCostMultiplier <= 0 || parameters.eatingCostMultiplier <= 0 || parameters.sleepingCostMultiplier <= 0|| parameters.mutationChance <= 0 ||
-                 parameters.drinkingMultiplier <= 0 || parameters.adjacentLength <= 0) 
+                parameters.drinkingCostMultiplier <= 0 || parameters.eatingCostMultiplier <= 0 || parameters.sleepingCostMultiplier <= 0 || parameters.mutationChance <= 0 ||
+                 parameters.drinkingMultiplier <= 0 || parameters.adjacentLength <= 0)
                 throw new UniverseParameterIsZeroException("The provided state parameters must be positive");
             if (parameters.mutationChance > 1)
                 throw new PercentageOverOneException("The provided state percentages are over one");
@@ -567,15 +592,15 @@ namespace EvolutionSimulation
 
         static void ValidateCreatureTransitions(UniverseParameters parameters)
         {
-            if (parameters.fleeingTransitionMultiplier <= 0 || parameters.hidingTransitionMultiplier <= 0 || parameters.stopEatingTransitionEnergyMultiplier <= 0 || 
-                parameters.combatTransitionHealthThresholdMultiplier <= 0 || parameters.escapeTransitionHealthThresholdMultiplier <= 0 || 
-                parameters.safeTransitionAggressivenessThreshold <= 0 || parameters.experienceMaxAggresivenessMultiplier <= 0 || parameters.safePrefferedOverClosestResourceRatio <= 0) 
+            if (parameters.fleeingTransitionMultiplier <= 0 || parameters.hidingTransitionMultiplier <= 0 || parameters.stopEatingTransitionEnergyMultiplier <= 0 ||
+                parameters.combatTransitionHealthThresholdMultiplier <= 0 || parameters.escapeTransitionHealthThresholdMultiplier <= 0 ||
+                parameters.safeTransitionAggressivenessThreshold <= 0 || parameters.experienceMaxAggresivenessMultiplier <= 0 || parameters.safePrefferedOverClosestResourceRatio <= 0)
                 throw new UniverseParameterIsZeroException("The provided transition parameters must be positive");
         }
 
         static void ValidateCorpse(UniverseParameters parameters)
         {
-            if (parameters.rotStartMultiplier <= 0 || parameters.corpseNutritionPointsMultiplier <= 0) 
+            if (parameters.rotStartMultiplier <= 0 || parameters.corpseNutritionPointsMultiplier <= 0)
                 throw new UniverseParameterIsZeroException("The provided corpse parameters must be positive");
         }
         #endregion

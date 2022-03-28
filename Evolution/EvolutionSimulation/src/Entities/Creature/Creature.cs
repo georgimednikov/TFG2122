@@ -112,7 +112,7 @@ namespace EvolutionSimulation.Entities
             mind.UpdatePerception();
         }
 
-        
+
 
         void CheckTemperature()
         {
@@ -228,7 +228,7 @@ namespace EvolutionSimulation.Entities
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         private Fsm mfsm;
 
-        
+
 
         /// <summary>
         /// Returns the creature's current state
@@ -554,7 +554,7 @@ namespace EvolutionSimulation.Entities
         }
 
 
-        public  int timeToBeInHeat { get;  set; }
+        public int timeToBeInHeat { get; set; }
         public bool mating { get; set; }
         public bool wantMate { get; set; }
         public int matingCreature { get; set; }
@@ -767,6 +767,8 @@ namespace EvolutionSimulation.Entities
 
         public HeightLayer creatureLayer;
 
+        Vector3 finalPos;
+
         Vector3[] path;
         int pathIterator;
 
@@ -858,7 +860,7 @@ namespace EvolutionSimulation.Entities
         {
             if (!world.canMove(x, y, z)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
             if ((stats.AerialSpeed == -1 && z == HeightLayer.Air) || (stats.ArborealSpeed == -1 && z == HeightLayer.Tree)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
-            path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z), out double treeDensity); // A* to the objective
+            path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), finalPos = (new Vector3(x, y, (int)z)), out double treeDensity); // A* to the objective
             int thres = GetFlyThreshold(treeDensity);
             if (thres > 0 && path.Length >= thres)
                 path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));// Straight line to the objective
@@ -878,6 +880,7 @@ namespace EvolutionSimulation.Entities
 
             int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
             int speed;
+            //TODO: que es esto?
             switch ((int)path[pathIterator].Z)
             {
                 case 0:
@@ -902,8 +905,13 @@ namespace EvolutionSimulation.Entities
         /// <returns>Next position or (-1, -1, -1) on path end.</returns>
         public Vector3 GetNextPosOnPath()
         {
-            if (pathIterator >= path.Length) { path = null; return new Vector3(-1, -1, -1); }
-
+            if (pathIterator >= path.Length-1)
+            {
+                if (pathIterator == path.Length - 1 && path[pathIterator] != finalPos)
+                    SetPath((int)finalPos.X, (int)finalPos.Y, (HeightLayer)finalPos.Z);
+                else
+                    path = null; return new Vector3(-1, -1, -1);
+            }
             return path[pathIterator++];
         }
         #endregion

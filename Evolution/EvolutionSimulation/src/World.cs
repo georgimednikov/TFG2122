@@ -75,11 +75,18 @@ namespace EvolutionSimulation
         /// <summary>
         /// Properties of each map tile
         /// </summary>
-        public struct MapData
+        public class MapData
         {
             public double height, humidity, temperature, flora;
             public Plant plant;
             public bool isWater;
+            public int regionId = -1;
+        }
+
+        public struct MapRegion
+        {
+            public Vector2 spawnPoint;
+            public Dictionary<int, List<Vector2>> links;
         }
 
         public void Init(int size)
@@ -108,8 +115,7 @@ namespace EvolutionSimulation
             StaticEntities = new Dictionary<int, StaticEntity>();
             entitiesToDelete = new List<int>();
             chunkSize = 32;
-            int chunk = (int)Math.Floor(mapSize / (float)chunkSize) + ((mapSize % chunkSize == 0) ? 1 : 0);
-            highMap = new bool[chunk, chunk];
+            highMap = new List<MapRegion>();
             FillHighMap();
         }
 
@@ -147,7 +153,7 @@ namespace EvolutionSimulation
 
             chunkSize = 32;
             int chunk = (int)Math.Floor(mapSize / (float)chunkSize) + ((mapSize % chunkSize == 0) ? 1 : 0);
-            highMap = new bool[chunk, chunk];
+            highMap = new List<MapRegion>();
 
             if (config.heightWaves != null) heightWaves = config.heightWaves;
             else
@@ -196,23 +202,60 @@ namespace EvolutionSimulation
 
         private void FillHighMap()
         {
-            for (int i = 0; i < highMap.GetLength(0); i++)
+            int numReg = 0;
+            Queue<Vector2> regions = new Queue<Vector2>(); //TODO: Lista de nodos a encular 
+            for (int i = 0; i < map.GetLength(0) / chunkSize; i++)
             {
-                for (int j = 0; j < highMap.GetLength(1); j++)
+                for (int j = 0; j < map.GetLength(1) / chunkSize; j++)
                 {
-                    int numWater = 0;
-                    double totalNum = Math.Pow(chunkSize, 2);
-                    for (int k = 0; k < chunkSize; k++)
+                    int x, y;
+                    int tries = chunkSize * chunkSize;
+                    do
                     {
-                        for (int l = 0; l < chunkSize; l++)
+                        tries--;
+                        x = (int)((i + RandomGenerator.NextDouble()) * chunkSize);
+                        y = (int)((j + RandomGenerator.NextDouble()) * chunkSize);
+                    } while (tries > 0 && !canMove(x, y));
+                    if (tries == 0) continue;
+                    map[x, y].regionId = numReg++;
+                    MapRegion reg = new MapRegion();
+                    reg.spawnPoint = new Vector2(x, y);
+                    reg.links = new Dictionary<int, List<Vector2>>();
+                    highMap.Add(reg);
+                    regions.Enqueue(reg.spawnPoint);
+                }
+            }
+
+            while (regions.Count != 0)
+            {
+                Vector2 cur = regions.Dequeue();
+                int id = map[(int)cur.X, (int)cur.Y].regionId;
+
+                for (int j = -1; j <= 1; ++j)
+                    for (int k = -1; k <= 1; ++k)
+                    {
+                        if (j == 0 && k == 0) continue;
+                        Vector2 newPos = cur + new Vector2(j, k);
+                        if (!canMove((int)newPos.X, (int)newPos.Y)) continue; //If outside of bounds or water, ignore and don't expand.
+
+                        int nId = map[(int)newPos.X, (int)newPos.Y].regionId;
+                        if (nId == id) continue;
+
+                        if (nId != -1) //If the new tile is already in another region
                         {
-                            if (!canMove(i * chunkSize + k, j * chunkSize + l)) { totalNum--; continue; }
-                            if (map[i * chunkSize + k, j * chunkSize + l].isWater) numWater++;
+                            if (!highMap[id].links.ContainsKey(nId)) highMap[id].links.Add(nId, new List<Vector2>());
+                            if (!highMap[nId].links.ContainsKey(id)) highMap[nId].links.Add(id, new List<Vector2>());
+
+                            List<Vector2> links2 = highMap[nId].links[id];
+                            if (links2.Find((x) => { return x == newPos; }) == default(Vector2))
+                                links2.Add(newPos);
+                        }
+                        else
+                        {
+                            map[(int)newPos.X, (int)newPos.Y].regionId = id;
+                            regions.Enqueue(newPos);
                         }
                     }
-
-                    highMap[i, j] = (numWater / totalNum > 0.5);
-                }
             }
         }
 
@@ -506,6 +549,7 @@ namespace EvolutionSimulation
             {
                 for (int xIndex = 0; xIndex < sizeX; xIndex++)
                 {
+                    map[xIndex, yIndex] = new MapData();
                     map[xIndex, yIndex].height = modifiedHeight ? evaluateHeight(heightMap[xIndex, yIndex]) : heightMap[xIndex, yIndex];
 
                     double evaluation = evaluateInfluence(map[xIndex, yIndex].height);
@@ -719,7 +763,7 @@ namespace EvolutionSimulation
 
         // Map with physical properties
         public MapData[,] map { get; private set; }
-        public bool[,] highMap { get; private set; }
+        public List<MapRegion> highMap { get; private set; }
         int mapSize;
         public int chunkSize { get; private set; }
         public bool day;
