@@ -81,6 +81,15 @@ namespace EvolutionSimulation.FSM
         }
 
         /// <summary>
+        /// Triggers initial state onEntry event
+        /// </summary>
+        public void Start()
+        {
+            CurrentState = initialState;
+            CurrentState.OnEntry();
+        }
+
+        /// <summary>
         /// Recursive method for exporting the fsm
         /// </summary>
         /// <param name="accum">Accumulated string for recursion</param>

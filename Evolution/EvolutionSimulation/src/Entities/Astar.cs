@@ -52,7 +52,9 @@ namespace EvolutionSimulation.Entities
         /// <param name="treeDensity">Percentage of trees on the path</param>
         public static Vector3[] GetPath(Creature c, World w, Vector3 start, Vector3 end, out double treeDensity)
         {
+#if DEBUG
             Console.WriteLine("Empieza Astar: " + start + " " + end);
+#endif
             if (end == start) throw new InvalidOperationException("La misma pos esta mal");
             Vector3 tempEnd = HighAstar(w, start, end);
 

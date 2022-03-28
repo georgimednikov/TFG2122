@@ -69,12 +69,15 @@ namespace VisualizadorConsola
         public void Run()
         {
             //WorldToBmp();
+            int YearTicks = world.YearToTick(1.0f);
             int ticks = world.YearToTick(UserInfo.Years);
-            for (int i = 0; i < ticks; i++)
+            for (int i = 1; i <= ticks; i++)
             {
                 world.Tick();
                 //Render();
                 //Thread.Sleep(1000);
+                if (i % YearTicks == 0)
+                    Console.WriteLine("A Year has passed");
             }
             world.ExportContent();
         }

@@ -26,10 +26,10 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            do
-            {
-                posToDiscover = creature.NewPosition();
-            } while (posToDiscover.x == creature.x && creature.y == posToDiscover.y);
+            //do
+            //{
+            //} while (posToDiscover.x == creature.x && creature.y == posToDiscover.y);
+            posToDiscover = creature.NewPosition();
             creature.SetPath(posToDiscover.x, posToDiscover.y);
         }
 
