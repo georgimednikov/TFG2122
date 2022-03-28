@@ -13,19 +13,20 @@ namespace EvolutionSimulation.FSM.Creature.States
     /// </summary>
     class Explore : CreatureState
     {
+        Vector2Int posToDiscover;
         public Explore(Entities.Creature c) : base(c) 
         {
             creature = c;
         }
 
         public override int GetCost()
-        {
+        { 
             return creature.GetNextCostOnPath();
         }
 
         public override void OnEntry()
         {
-            Vector2Int posToDiscover = creature.NewPosition();
+            posToDiscover = creature.NewPosition();
             creature.SetPath(posToDiscover.x, posToDiscover.y);
         }
 
@@ -34,17 +35,16 @@ namespace EvolutionSimulation.FSM.Creature.States
             Vector3 nextPos = creature.GetNextPosOnPath();
             if (nextPos.X < 0 || nextPos.Y < 0)
             {
-                Vector2Int posToDiscover = creature.NewPosition();
+                posToDiscover = creature.NewPosition();
                 creature.SetPath(posToDiscover.x, posToDiscover.y);
-                nextPos = creature.GetNextPosOnPath();
             }
-            creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-            Console.WriteLine(creature.speciesName + " EXPLORES (" + creature.x + ", " + creature.y + ")");
+            else
+                creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
         }
 
         public override string GetInfo()
         {
-            return creature.NewPosition().ToString();
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")" + " EXPLORES AT (" + posToDiscover.x + ", " + posToDiscover.y + ")";
         }
 
         public override string ToString()

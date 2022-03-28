@@ -1,24 +1,31 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace EvolutionSimulation.FSM.Creature.Transitions
 {
     class EscapeTransition : CreatureTransition
     {
-        /// Health threshold below which the creature will flee
-        private float threshold;
-
         public EscapeTransition(Entities.Creature creature)
         {
             this.creature = creature;
-            threshold = 0.25f - (creature.stats.Aggressiveness / UniverseParametersManager.parameters.escapeTransitionHealthThresholdMultiplier); // TODO: Magical numberinos
         }
 
         public override bool Evaluate()
         {
-            return (creature.Menace() || creature.HasBeenAttacked())
-                && (creature.stats.Aggressiveness < creature.PositionDanger(creature.x, creature.y) ||         // TODO: ajustar valores
-                creature.stats.CurrHealth < creature.stats.MaxHealth * threshold)   // So even an aggresive creature has self-preservation instincts
-                && !creature.cornered;
+            Vector2Int enemyPos;
+
+            // If this creature does not have an enemy targeted for combat.
+            if (!creature.Enemy(out _, out enemyPos))
+            {
+                // The creature flees from combat if there is another creature that is considered dangerous and it is not cornered.
+                return creature.Menace() && !creature.cornered;
+            }
+            // Else if the creature's pack thinks it's too weak to fight it, they will flee.
+            else
+            {
+                List<Entities.Creature> pack = creature.CombatPack();
+                return creature.stats.Aggressiveness * pack.Count < creature.PositionDanger(enemyPos.x, enemyPos.y);
+            }
         }
 
         public override string ToString()

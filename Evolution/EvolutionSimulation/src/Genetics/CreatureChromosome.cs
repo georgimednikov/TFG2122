@@ -301,6 +301,25 @@ namespace EvolutionSimulation.Genetics
         }
 
         /// <summary>
+        /// Returns if an ability is unlocked
+        /// </summary>
+        /// <param name="unlock">Skill percentage when skill is unlocked</param>
+        public bool HasAbility(CreatureFeature feat, float unlock)
+        {
+            return unlock <= GetFeaturePercentage(feat);
+        }
+
+        /// <summary>
+        /// Returns what percentage of the given feature the creature has developed.
+        /// </summary>
+        /// <param name="feat"></param>
+        /// <returns>Returs the "percentage" from 0 to 1</returns>
+        public float GetFeaturePercentage(CreatureFeature feat)
+        {
+            return (float)GetFeature(feat) / GetFeatureMax(feat);
+        }
+
+        /// <summary>
         /// Get the numeric value of the desired feature (attribute or ability)
         /// Returns -1 if not initilized or the value asked does not exist
         /// </summary>

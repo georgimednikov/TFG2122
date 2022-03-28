@@ -25,7 +25,6 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             SetPath();
-            Console.WriteLine(creature.speciesName + " GOES TO EAT (" + creature.x + ", " + creature.y + ")");
         }
 
         public override string ToString()
@@ -34,7 +33,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         }
         public override string GetInfo()
         {
-            return foodPos.ToString();
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")GOES TO EAT AT (" + foodPos.x + ", " + foodPos.y + ")";
         }
 
         /// <summary>
@@ -43,30 +42,21 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         private void SetPath()
         {
-            int id; 
-            Vector2Int pos;
+            Vector2Int posCorpse;
+            Vector2Int posPlant;
 
-            //If there is a corpse and no plant, then it goes to the corpse.
-            if (creature.Corpse(out id, out pos) && !creature.Plant())
-                foodPos = pos;
-            //If there is a plant and no corpse, it goes to a plant.
-            else if (!creature.Corpse(out id, out pos) && creature.Plant())
-                foodPos = pos;
-            //If there is a corpse and a plant, it goes to the closest one.
+            creature.Corpse(out _, out posCorpse);
+            creature.Plant(out _, out posPlant);
+
+            // Goes to the closest food source
+            // If one of them does not exist their distance is considered infinite
+            int distCorpse = creature.DistanceToObjective(posCorpse),
+                distPlant = creature.DistanceToObjective(posPlant);
+
+            if (distPlant < distCorpse)
+                foodPos = posPlant;
             else
-            {
-                creature.Corpse(out id, out pos);
-                Vector2Int posPlant;
-                creature.Plant(out id, out posPlant);
-                // Goes to the closest food source
-                int distPlant = creature.DistanceToObjective(posPlant),
-                    distCorpse = creature.DistanceToObjective(pos);
-
-                if (distPlant < distCorpse)
-                    foodPos = posPlant;
-                else
-                    foodPos = pos;
-            }
+                foodPos = posCorpse;
             creature.SetPath(foodPos.x, foodPos.y);
         }
     }

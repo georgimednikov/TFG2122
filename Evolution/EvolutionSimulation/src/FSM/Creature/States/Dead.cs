@@ -6,7 +6,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     class Dead : CreatureState
     {
         public Dead(Entities.Creature c) : base(c) { creature = c; }
-
+        Entities.Corpse corpse;
         public override int GetCost()
         {
             return Math.Max(creature.ActionPoints, 1); // This allows for one death and prevents subsequent ones
@@ -18,15 +18,19 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override void Action()
         {
-            Console.WriteLine(creature.speciesName + " DIES");
             creature.world.Destroy(creature.ID);
-            Entities.Corpse corpse = creature.world.CreateStaticEntity<Entities.Corpse>(creature.x, creature.y, 50);    // TODO: no poner el hp a pelo
+            corpse = creature.world.CreateStaticEntity<Entities.Corpse>(creature.x, creature.y, 50);    // TODO: no poner el hp a pelo
             corpse.SetTraits(creature);
         }
 
         public override string ToString()
         {
             return "DeadState";
+        }
+
+        public override string GetInfo()
+        {
+            return creature.speciesName + "with ID " + creature.ID + " DIES\nCORPSE CREATED WITH ID: " + corpse.ID + "IN POSITION: (" + creature.x + ", " + creature.y + ")";
         }
     }
 }

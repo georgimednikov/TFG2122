@@ -9,11 +9,15 @@ namespace EvolutionSimulation.FSM.Creature.States
     class Eating : CreatureState
     {
         int foodID;
+        Vector2Int foodPos;
+        string foodType;
         public Eating(Entities.Creature c) : base(c) { creature = c; }
 
         public override void OnEntry()
         {
             creature.stats.ActionPerceptionPercentage = UniverseParametersManager.parameters.actionPerceptionPercentage;
+            foodID = -1;
+            foodPos = new Vector2Int(0, 0);
         }
 
         public override int GetCost()
@@ -30,7 +34,6 @@ namespace EvolutionSimulation.FSM.Creature.States
                 EatPlant();
                 creature.SafeEdiblePlant();
             }
-            //TODO: Omnivore?
         }
 
         public override void OnExit()
@@ -49,10 +52,10 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         protected void EatPlant()
         {
-            creature.Plant(out foodID, out _);
+            foodType = "EdiblePlant";
+            creature.Plant(out foodID, out foodPos);
             Entities.EdiblePlant closest = creature.world.GetStaticEntity(foodID) as Entities.EdiblePlant;
             closest.ReceiveInteraction(creature, Entities.Interactions.eat);    // TODO GORDO: ¿Distingue entre plantas ya comidas para no comer aire?
-            Console.WriteLine(creature.speciesName + " EATS FRUIT AT (" + closest.x + ", " + closest.y + ")");
         }
 
         /// <summary>
@@ -61,20 +64,20 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         protected void EatCorpse()
         {
+            foodType = "Corpse";
             Entities.Corpse closest;
-            creature.Corpse(out foodID, out _);
+            creature.Corpse(out foodID, out foodPos);
             closest = creature.world.GetStaticEntity(foodID) as Entities.Corpse;
-                
-            closest.ReceiveInteraction(creature, Entities.Interactions.eat);
-            Console.WriteLine(creature.speciesName + " EATS CORPSE AT (" + closest.x + ", " + closest.y + ")");
+            if(closest != null) // TODO: puede desaparecerle el corpse al llegar aqui
+                closest.ReceiveInteraction(creature, Entities.Interactions.eat);
         }
 
         /// <summary>
         /// Text used to display state in simulation
         /// </summary>
         public override string GetInfo() 
-        { 
-            return "EATING"; 
+        {
+            return creature.speciesName + " with ID: " + creature.ID + " EATS " + foodType + " at position: (" + foodPos.x + ", " + foodPos.y + ")"; 
         }
     }
 }

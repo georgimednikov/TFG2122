@@ -6,6 +6,7 @@ namespace EvolutionSimulation
     {        
         public Vector2Int() { x = y = 0; }
         public Vector2Int(int xv, int yv) { x = xv; y = yv; }
+        public Vector2Int(Vector2Int v) { x = v.x; y = v.y; }
 
         public int x, y;
 

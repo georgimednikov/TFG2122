@@ -31,11 +31,10 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (nextPos.X != -1 || nextPos.Y != -1 || nextPos.Z != -1)
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             SetPos();
-            Console.WriteLine(creature.speciesName + " FOLLOWS PARENT (" + creature.x + ", " + creature.y + ")");
         }
         public override string GetInfo()
         {
-            return parentPos.ToString();
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ") FOLLOWS PARENT AT (" + parentPos.x + ", " + parentPos.y + ")";
         }
 
         public override string ToString()

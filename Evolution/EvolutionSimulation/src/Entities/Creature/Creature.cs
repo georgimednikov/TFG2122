@@ -55,11 +55,12 @@ namespace EvolutionSimulation.Entities
             this.x = x;
             this.y = y;
             timeToBeInHeat = stats.TimeBetweenHeats;
+            halfMaxMobility = this.chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2;
 
             ConfigureStateMachine();
             // Attack
             AddInteraction(Interactions.attack, ReceiveDamage);
-            if (HasAbility(CreatureFeature.Thorns, CreatureChromosome.AbilityUnlock[CreatureFeature.Thorns]))
+            if (this.chromosome.HasAbility(CreatureFeature.Thorns, CreatureChromosome.AbilityUnlock[CreatureFeature.Thorns]))
                 AddInteraction(Interactions.attack, RetalliateDamage);
 
             // Poison
@@ -78,7 +79,7 @@ namespace EvolutionSimulation.Entities
         public void Tick()
         {
             Expend();
-            Regen();
+            ManageHealth();
             CheckTemperature();
             FemaleTick();
 
@@ -95,7 +96,11 @@ namespace EvolutionSimulation.Entities
             {
                 mfsm.CurrentState.Action();
                 ActionPoints -= cost;
+#if DEBUG
+                Console.WriteLine(GetStateInfo());
+#endif
             }
+
             Clear();
         }
 
@@ -184,19 +189,26 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         void Expend()
         {
-            stats.CurrHydration -= stats.HydrationExpense;
-            stats.CurrRest -= stats.RestExpense;
-            stats.CurrEnergy -= stats.EnergyExpense;
+            stats.CurrHydration = Math.Max(stats.CurrHydration - stats.HydrationExpense, 0);
+            stats.CurrRest = Math.Max(stats.CurrRest - stats.RestExpense, 0);
+            stats.CurrEnergy = Math.Max(stats.CurrEnergy - stats.EnergyExpense, 0);
+            stats.CurrAge++;
         }
 
         /// <summary>
-        /// Attempts to regenrate the creature's health
+        /// Attempts to regenrate the creature's health if is healthy, 
+        /// if the stats are 0 then reduce his health.
         /// Checks first if it can with current energy and rest
         /// And then regenrates a percentage of the creature's max hp
         /// </summary>
-        void Regen()
+        void ManageHealth()
         {
-            if (stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
+            
+            if(stats.CurrEnergy <= 0 || stats.CurrRest <= 0 || stats.CurrHydration <= 0)
+            {
+                stats.CurrHealth--;
+            }
+            else if (stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
                 stats.CurrRest >= (stats.MaxRest * UniverseParametersManager.parameters.restRegenerationThreshold) &&
                 stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold))
             {
@@ -456,6 +468,28 @@ namespace EvolutionSimulation.Entities
             float threshold = 0.25f - (stats.Aggressiveness / UniverseParametersManager.parameters.combatTransitionHealthThresholdMultiplier); // TODO: A mayor agresividad mas se arriesga, revisar cifras
             return stats.CurrHealth >= stats.MaxHealth * threshold;
         }
+        /// <summary>
+        /// Determines whether the creature has enough health to fight or if it's too weak.
+        /// </summary>
+        /// <returns></returns>
+        public List<Creature> CombatPack()
+        {
+            //If the creature has enough allies to put up a fight the gank him together.
+            List<int> allies = mind.NearbyAllies();
+            List<Creature> pack = new List<Creature>();
+            foreach (int ally in allies)
+            {
+                Creature a = world.GetCreature(ally);
+                if (a != null && a.AbleToFight())
+                    pack.Add(a);
+            }
+            if (AbleToFight()) pack.Add(this);
+            return pack;
+        }
+        public bool ShouldPackFight(List<Creature> pack, float danger)
+        {
+            return stats.Aggressiveness * pack.Count >= danger;
+        }
 
         // Standard reactions to interactions
 
@@ -480,20 +514,11 @@ namespace EvolutionSimulation.Entities
         {
             stats.CurrHealth -= ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
 
-            //If the creature has enough allies to put up a fight the gank him together.
-            List<int> allies = mind.NearbyAllies();
-            List<Creature> fighters = new List<Creature>();
-            foreach (int ally in allies)
-            {
-                Creature a = world.GetCreature(ally);
-                if (a != null && a.AbleToFight())
-                    fighters.Add(a);
-            }
-
             // If the pack is aggressive enought they will fight, else nothing happens.
             Vector2Int enemyPos; Enemy(out _, out enemyPos);
-            if (stats.Aggressiveness * (fighters.Count + (AbleToFight() ? 1 : 0)) >= PositionDanger(enemyPos.x, enemyPos.y))
-                foreach (Creature fighter in fighters)
+            List<Creature> pack = CombatPack();
+            if (ShouldPackFight(pack, PositionDanger(enemyPos.x, enemyPos.y)))
+                foreach (Creature fighter in pack)
                 {
                     fighter.TargetEnemy(interacter.ID);
                 }
@@ -505,7 +530,9 @@ namespace EvolutionSimulation.Entities
         private void RetalliateDamage(Creature interacter)
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
+#if DEBUG
             Console.WriteLine(speciesName + " RETURNS " + stats.Counter + " DMG");
+#endif
         }
 
         /// <summary>
@@ -545,10 +572,11 @@ namespace EvolutionSimulation.Entities
         private void StopMating(Creature interacter)
         {
             Creature mate = world.GetCreature(matingCreature);
-            if (mate != null)
-            {
-                mate.ReceiveInteraction(this, Interactions.stopMate);
-            }
+            // TODO: crea un stack overflow al parecer, y no necesita estar ya que las dos criaturas ya han parado de matear
+            //if (mate != null)
+            //{
+            //    mate.ReceiveInteraction(this, Interactions.stopMate);
+            //}
             matingCreature = -1;
             mating = false;
         }
@@ -619,17 +647,6 @@ namespace EvolutionSimulation.Entities
         {
             return stats.CurrRest <= stats.exhaustThreshold * stats.MaxRest;
         }
-
-        /// <summary>
-        /// Returns if an ability is unlocked
-        /// </summary>
-        /// <param name="unlock">Skill percentage when skill is unlocked</param>
-        public bool HasAbility(CreatureFeature feat, float unlock)
-        {
-            float f = chromosome.GetFeature(feat);
-            float mF = chromosome.GetFeatureMax(feat);
-            return unlock <= f / mF;
-        }
         #endregion
 
         #region Mind
@@ -698,7 +715,8 @@ namespace EvolutionSimulation.Entities
         public bool Parent(out int id, out Vector2Int position) { return mind.Parent(out id, out position); }
         public bool Parent() { return Parent(out _, out _); }
         /// <summary>
-        /// Gets the information of the closest prey the creature wants engage in combat
+        /// Gets the information of the closest prey the creature wants engage in combat.
+        /// If the creature is herbivorous, it always returns non valid information.
         /// </summary>
         /// <param name="id"> The prey ID </param>
         /// <param name="position"> The prey position </param>
@@ -771,6 +789,7 @@ namespace EvolutionSimulation.Entities
 
         Vector3[] path;
         int pathIterator;
+        int halfMaxMobility;
 
         public bool cornered { get; set; }  // This determines if the creature cannot flee fruther and must fight back
 
@@ -807,12 +826,7 @@ namespace EvolutionSimulation.Entities
         public int DistanceToObjective(IEntity entity)
         {
             if (entity == null) return int.MaxValue;
-
-            int x1, y1;
-            x1 = Math.Abs(x - entity.x);
-            y1 = Math.Abs(y - entity.y);
-
-            return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
+            return DistanceToObjective(entity.x, entity.y);
         }
 
         /// <summary>
@@ -821,13 +835,13 @@ namespace EvolutionSimulation.Entities
         /// <returns> Distance between creature and pos. intMaxValue if out of the map </returns>
         public int DistanceToObjective(Vector2Int pos)
         {
-            if (!world.checkBounds(pos.x, pos.y)) return int.MaxValue;
-
-            int x1, y1;
-            x1 = Math.Abs(x - pos.x);
-            y1 = Math.Abs(y - pos.y);
-
-            return (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
+            if (pos == null) return int.MaxValue;
+            return DistanceToObjective(pos.x, pos.y);
+        }
+        public int DistanceToObjective(int ox, int oy)
+        {
+            if (!world.checkBounds(ox, oy)) return int.MaxValue;
+            return Math.Max(Math.Abs(ox - x), Math.Abs(oy - y));
         }
 
         /// <summary>
@@ -835,8 +849,8 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public int GetTreeThreshold(double treeDensity)
         {
-            double a = 2 * (int)HeightLayer.Tree * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2));
-            double b = treeDensity * (stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) + Tree.movementPenalty - stats.ArborealSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) - 1);
+            double a = 2 * (int)HeightLayer.Tree * (treeDensity * (1 - Tree.movementPenalty) - stats.GroundSpeed / halfMaxMobility);
+            double b = treeDensity * (stats.GroundSpeed / halfMaxMobility + Tree.movementPenalty - stats.ArborealSpeed / halfMaxMobility - 1);
             return (int)Math.Floor((a / b) + 0.5);
         }
 
@@ -845,9 +859,9 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         int GetFlyThreshold(double treeDensity)
         {
-            double a = 2 * (int)HeightLayer.Air * (stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) * (1 - treeDensity) + treeDensity * stats.AerialSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2));
-            double b = -2 * stats.AerialSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) * (int)HeightLayer.Tree * treeDensity;
-            double c = stats.AerialSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) + stats.GroundSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2) * (treeDensity - 1) - treeDensity * stats.ArborealSpeed / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2);
+            double a = 2 * (int)HeightLayer.Air * (stats.GroundSpeed / halfMaxMobility * (1 - treeDensity) + treeDensity * stats.AerialSpeed / halfMaxMobility);
+            double b = -2 * stats.AerialSpeed / halfMaxMobility * (int)HeightLayer.Tree * treeDensity;
+            double c = stats.AerialSpeed / halfMaxMobility + stats.GroundSpeed / halfMaxMobility * (treeDensity - 1) - treeDensity * stats.ArborealSpeed / halfMaxMobility;
             return (int)Math.Floor(((a + b) / c) + 0.5);
         }
 
@@ -877,8 +891,6 @@ namespace EvolutionSimulation.Entities
             // TODO Hay que tener en cuenta el path sea de longuitud 0
             if (path == null || path.Length == 0 || pathIterator == path.Length) // TODO: que los estados tengan cuidado de cuando el coste que les dan es -1
                 return -1;
-
-            int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
             int speed;
             //TODO: que es esto?
             switch ((int)path[pathIterator].Z)
@@ -894,9 +906,11 @@ namespace EvolutionSimulation.Entities
                     speed = stats.GroundSpeed;
                     break;
             }
+
+            int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
             if (world.map[x, y].plant is Tree || world.map[x, y].plant is EdibleTree)
-                return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed * (2 - Tree.movementPenalty)) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2)));
-            return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed) / (chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2)));
+                return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed * (2 - Tree.movementPenalty)) / halfMaxMobility));
+            return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed) / halfMaxMobility));
         }
 
         /// <summary>

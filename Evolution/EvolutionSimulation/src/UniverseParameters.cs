@@ -37,7 +37,7 @@ namespace EvolutionSimulation
         public float energyRegenerationThreshold = 0.85f;   // Threshold at which energy must be for the creature to be able to regenerate health
         public float hydrationRegenerationThreshold = 0.85f;    // Threshold at which hysration must be for the creature to be able to regenerate health
         public float regenerationRate = 0.01f;  // Perceentage of maximum health whichthe creature regenerates each tick
-        public float hoursTilStarvation = 24f;  // Maximum time until the creature reached 0 energy
+        public float hoursTilStarvation = 124f;  // Maximum time until the creature reached 0 energy
         public float thirstToHungerRatio = 3f;  // Rate at wich thisrts increases in relation to hunger
         public float maxTemperatureAggressivenessPercentage = 0.5f; //Max percentage of the creature's aggressiveness that is used as danger in tiles with extreme temperature
         public float maxTemperatureDifference = 0.2f; //How many degrees over the limit influence the damage until it reaches the limit.
@@ -80,7 +80,7 @@ namespace EvolutionSimulation
         public int hidingTransitionMultiplier = 4;
         public float stopEatingTransitionEnergyMultiplier = 1;
         public float combatTransitionHealthThresholdMultiplier = 50;
-        public float escapeTransitionHealthThresholdMultiplier = 50;
+        public float maxMenaceIntimidationMultiplierBasedOnMissingHealth = 2;
         public float safeTransitionAggressivenessThreshold = 1;
         public float experienceMaxAggresivenessMultiplier = 0.2f; //Percentage of the max aggressiveness used to create experiences
         public float safePrefferedOverClosestResourceRatio = 1.25f; //Acceptable max distance of the closest safe resource compared to the closest

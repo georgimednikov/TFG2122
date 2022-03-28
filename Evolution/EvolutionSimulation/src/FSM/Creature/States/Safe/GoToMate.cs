@@ -41,13 +41,11 @@ namespace EvolutionSimulation.FSM.Creature.States
                 matePos.y = tmpPos.y;
                 creature.SetPath(matePos.x, matePos.y);
             }
-            Console.WriteLine(creature.speciesName + " GOES TO MATE (" + creature.x + ", " + creature.y + ")");
         }
-
 
         public override string GetInfo()
         {
-            return matePos.ToString();
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ") GOES TO MATE AT (" + matePos.x + ", " + matePos.y + ")";
         }
         public override string ToString()
         {

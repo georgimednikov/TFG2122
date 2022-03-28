@@ -11,25 +11,35 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            Vector2Int preyPos;
-            // If it has not been attacked and has no creature to hunt it does not engage in combat.
-            if (!creature.Prey(out _, out preyPos) && !creature.HasBeenAttacked()) return false;
+            int advID; Vector2Int advPos;
 
-            // Else if attacked it considers its nearby allies in combat.
-            if (creature.HasBeenAttacked() &&
-                (creature.AbleToFight() ||   // So it does not immediately return to combat while fleeing
-                creature.cornered))    // So it fights as a last resort when fleeing
+            // If it has no enemy and has no creature to hunt it does not engage in combat.
+            if (!creature.Enemy() && !creature.Prey(out _, out _))
+                return false;
+
+            // If it has an enemy and enough strength between it and its allies to fight it, it engages in combat.
+            if (creature.Enemy(out _, out advPos) && creature.ShouldPackFight(creature.CombatPack(), creature.PositionDanger(advPos.x, advPos.y)))
                 return true;
 
-            // Else it is trying to hunt
-            if (!creature.IsHerbivorous() && creature.Prey(out _, out preyPos) && creature.IsHungry() &&
-                creature.stats.Aggressiveness >= creature.PositionDanger(preyPos.x, preyPos.y) &&  // TODO: ajustar valor
-                creature.AbleToFight())
+            // If a dangerous creature is nearby and it cannot run away, it engages in combat,
+            if (creature.Menace(out advID, out _) && creature.cornered)
             {
-                if (creature.IsCarnivorous())
+                //TODO quitar esta comprobacion, no debería hacerse, está solo para debugear algun fallo.
+                if(creature.world.GetCreature(advID) == null)
+                    return false;
+                creature.TargetEnemy(advID);
+                return true;
+            }
+
+            // Else it may want to hunt. If there is an available prey and is hungry.
+            if (creature.Prey(out advID, out advPos) && creature.IsHungry())
+            {
+                // It goes for the prey if there is no plant or it is closer.
+                if (!creature.Plant(out _, out Vector2Int plantPos) || creature.DistanceToObjective(plantPos) > creature.DistanceToObjective(advPos))
+                {
+                    creature.TargetEnemy(advID);   // The Prey becomes the Enemy, beginning combat
                     return true;
-                else if (!creature.Plant(out _, out Vector2Int plantPos) || creature.DistanceToObjective(plantPos) > creature.DistanceToObjective(preyPos))
-                    return true;
+                }
             }
 
             return false;

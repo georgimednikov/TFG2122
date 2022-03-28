@@ -7,10 +7,13 @@ namespace EvolutionSimulation.FSM.Creature.States
     {
         // How costly it is to move compared to regular safe movement
         private float modifier;
-        // Position of the objective
-        int objX, objY;
+        // Position and ID of the objective
+        int objectiveID;
+        Vector2Int objective;
+        string speciesName;
+
         // In case the chase ends and it does not end up attacking
-        bool brake = false;
+        bool brake = false; // TODO: esto en teoria no deberia pasar nunca ?
 
         public ChaseEnemy(Entities.Creature c) : base(c) 
         { 
@@ -30,10 +33,9 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            Vector2Int objective; creature.Enemy(out _, out objective);
-            objX = objective.x;
-            objY = objective.y; 
-            creature.SetPath(objX, objY);   // This MUST be set up for the cost of the action to work
+            creature.Enemy(out objectiveID, out objective);
+            speciesName = creature.world.GetCreature(objectiveID).speciesName;
+            creature.SetPath(objective);   // This MUST be set up for the cost of the action to work
         }
 
         public override void Action()
@@ -43,30 +45,40 @@ namespace EvolutionSimulation.FSM.Creature.States
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             }
 
-            int enemyID; Vector2Int objective;
-            creature.Enemy(out enemyID, out objective);   // This is NOT cached because objective can change to another creature
-            if (objX != objective.x ||  // If objective is somewhere else,
-                objY != objective.y)    // adjust path accordingly
-            {
-                objX = objective.x;
-                objY = objective.y;
-                creature.SetPath(objX, objY);   // Set the path the creature must follow
+            int otherID; Vector2Int obj;
+            creature.Enemy(out otherID, out obj);   // This is NOT cached because objective can change to another creature
+
+            if(otherID == -1)   // Target has died! This entails looking for another ONLY if there is a menace, or none if there is not
+            {                   // This will only take place when the creature still feels threatened and is cornered, because it won't be able to flee
+                creature.Menace(out otherID, out obj);  
+                if(Math.Abs(obj.x - creature.x) >= creature.stats.Perception / 2 || Math.Abs(obj.y - creature.y) >= creature.stats.Perception / 2)
+                {   // Creature is sufficiently far away to not pose immediate danger
+                    creature.cornered = false;
+                    brake = false;
+                    return;
+                }
             }
-            Console.WriteLine(creature.speciesName + " CHASES " + creature.world.GetCreature(enemyID).speciesName);
-            // All of this is done AFTER the action due to the fact that GetCost reflects the cost of the older path
-            // Were it to be changed BEFORE, the new position's cost may not be the same as the one returned before
+
+            if (otherID != objectiveID)  // If objective is a different one, adjust accordingly
+            {
+                objectiveID = otherID;
+                speciesName = creature.world.GetCreature(objectiveID).speciesName;
+                objective = obj;
+                creature.TargetEnemy(otherID);  // Redundant, except when current target dies
+                creature.SetPath(objective);    // Set the path the creature must follow
+            }
             brake = false;
         }
 
-        //// No longer cornered, as combat is done
-        //public override void OnExit()
-        //{
-        //    creature.cornered = false;
-        //}
+        // No longer cornered, as combat is done
+        public override void OnExit()
+        {
+            creature.cornered = false;
+        }
 
         public override string GetInfo()
         {
-            return "Objective: " + objX + ", " + objY;
+            return creature.speciesName + " with ID: " + creature.ID + " CHASES " + speciesName + " with ID: " + objectiveID;
         }
 
         public override string ToString()
