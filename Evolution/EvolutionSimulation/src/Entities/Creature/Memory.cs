@@ -48,8 +48,9 @@ namespace EvolutionSimulation.Entities
         public EntityResource Enemy { get; private set; }   //Creature that has attacked this creature or an ally of its.
         public EntityResource Menace { get => menace; }     //Closest creature that is not part of the creature's "family" regarding its species.
         private EntityResource menace;
-        public EntityResource Father { //If the father is forgotten or dead, his position is lost but not his ID so
-                                       //it can be recognized, but in practice it is the same as returning null until found again.
+        public EntityResource Father
+        { //If the father is forgotten or dead, his position is lost but not his ID so
+          //it can be recognized, but in practice it is the same as returning null until found again.
             get
             {
                 if (father != null && father.position.x >= 0)
@@ -149,7 +150,7 @@ namespace EvolutionSimulation.Entities
 
             //The list of creatures is also needed to calculate danger so it is done here too.
             //The danger in each tile seen by the creature caused by other creatures.
-            float[,] intimidationFelt = new float[1 + perceptionRadius * 2,1 + perceptionRadius * 2]; //* 2 to make it the diameter and +1 to account for the center.
+            float[,] intimidationFelt = new float[1 + perceptionRadius * 2, 1 + perceptionRadius * 2]; //* 2 to make it the diameter and +1 to account for the center.
             foreach (Creature creature in perceivedCreatures)
             {
                 EntityResource resource = new EntityResource(creature.x, creature.y, creature.ID, maxExperienceTicks);
@@ -173,10 +174,10 @@ namespace EvolutionSimulation.Entities
                     int dist = thisCreature.DistanceToObjective(creature);
 
                     //The intimidation of the perceived creature increases based on how much health this one is missing, up to a value defined in UniverseParameters.
-                    float intimidation = creature.stats.Intimidation * 
+                    float intimidation = creature.stats.Intimidation *
                         (UniverseParametersManager.parameters.maxMenaceIntimidationMultiplierBasedOnMissingHealth - thisCreature.stats.CurrHealth / thisCreature.stats.MaxHealth);
                     if (intimidation > thisCreature.stats.Aggressiveness &&
-                        (menace == null || menace == resource || thisCreature.DistanceToObjective(menace.position) >= dist) ) //This is equal to update the rival information if it is the same
+                        (menace == null || menace == resource || thisCreature.DistanceToObjective(menace.position) >= dist)) //This is equal to update the rival information if it is the same
                     {
                         menace = resource;
                     }
@@ -280,7 +281,7 @@ namespace EvolutionSimulation.Entities
             }
 
             SortAndAdjustLists();
-            if(menace != null && menace.ticks != maxExperienceTicks && thisCreature.DistanceToObjective(menace.position) <= perceptionRadius)
+            if (menace != null && menace.ticks != maxExperienceTicks && thisCreature.DistanceToObjective(menace.position) <= perceptionRadius)
                 menace = null;
 
             Mate = null; //By default there is no mate available.
@@ -331,44 +332,43 @@ namespace EvolutionSimulation.Entities
         public Vector2Int FindNewPosition()
         {
             Vector3 vector = Vector3.Zero;
-            if (dangersRemembered.Count > 0 || explorePositionsRemembered.Count > 0)
-            {
-                // The average position of this creature's path so far is calculated and the used as a reference
-                // to get a direction vector that is used to guide the creature away from places already visited.
-                int x = thisCreature.x;
-                int y = thisCreature.y;
-                int averageX = 0;
-                int averageY = 0;
 
-                // The dangers encountered, whether good or bad, represent positions that the creature does not want
-                // to visit when exploring, either because it is dangerous or because it is a safe place it frequents.
-                foreach (Position p in dangersRemembered)
-                {
-                    averageX += p.position.x;
-                    averageY += p.position.y;
-                }
-                // These positions are used to further avoid positions previously visited, updated every so often
-                // and only when moving as to not stagnate when the creature is static.
-                foreach (Vector2Int p in explorePositionsRemembered)
-                {
-                    averageX += p.x;
-                    averageY += p.y;
-                }
-                averageX /= dangersRemembered.Count + explorePositionsRemembered.Count;
-                averageY /= dangersRemembered.Count + explorePositionsRemembered.Count;
-                vector = new Vector3(x - averageX, y - averageY, 0);
-                if(vector.X != 0 || vector.Y != 0)
-                    vector = Vector3.Normalize(vector);
+            // The average position of this creature's path so far is calculated and the used as a reference
+            // to get a direction vector that is used to guide the creature away from places already visited.
+            int x = thisCreature.x;
+            int y = thisCreature.y;
+            int averageX = x;
+            int averageY = y;
+
+            // The dangers encountered, whether good or bad, represent positions that the creature does not want
+            // to visit when exploring, either because it is dangerous or because it is a safe place it frequents.
+            foreach (Position p in dangersRemembered)
+            {
+                averageX += p.position.x;
+                averageY += p.position.y;
             }
+            // These positions are used to further avoid positions previously visited, updated every so often
+            // and only when moving as to not stagnate when the creature is static.
+            foreach (Vector2Int p in explorePositionsRemembered)
+            {
+                averageX += p.x;
+                averageY += p.y;
+            }
+            averageX /= dangersRemembered.Count + explorePositionsRemembered.Count + 1;
+            averageY /= dangersRemembered.Count + explorePositionsRemembered.Count + 1;
+            vector = new Vector3(x - averageX, y - averageY, 0);
+            if (vector.X != 0 || vector.Y != 0)
+                vector = Vector3.Normalize(vector);
+
             // If no positions are remebered or the resulting vector is zero, the creature chooses a random direction
             if (vector.Length() == 0)
-                vector = RandomDir();            
+                vector = RandomDir();
 
             float radius = perceptionRadius;
             float degreesInc = (float)(Math.PI / 4.0);  // 45 degrees
 
             Vector2Int finalPosition;
-            
+
             int cont = 0;
             float r = radius;
             float d = degreesInc;
@@ -380,10 +380,10 @@ namespace EvolutionSimulation.Entities
                     if (++cont % 2 == 0)    // TODO: these numbers are magic
                         degreesInc /= 2;
                     else
-                        radius *= 0.75f;                    
+                        radius *= 0.75f;
                 }
                 //TODO: quitar mas adelante / si molesta. Si entra aquí deberia ser bucle infinito. hablar con pablo o andres
-                if(cont > 100)
+                if (cont > 100)
                 {
                     cont = 0;
                     radius = r;
@@ -397,7 +397,7 @@ namespace EvolutionSimulation.Entities
             return finalPosition;
         }
 
-       
+
         private Vector3 RandomDir()
         {
             int dirX, dirY;
@@ -424,14 +424,14 @@ namespace EvolutionSimulation.Entities
             finalPosition = new Vector2Int();
             double dot = Vector3.Dot(dir, Vector3.UnitX);
             double acos = Math.Acos(dot);
-            float angleAcum = 0, 
+            float angleAcum = 0,
                 actualAngle = (float)acos;
             int inc = 1;
             do
             {
                 finalPosition.x = thisCreature.x + (int)Math.Round(Math.Cos(actualAngle) * radius, MidpointRounding.AwayFromZero);
                 finalPosition.y = thisCreature.y + (int)Math.Round(Math.Sin(actualAngle) * radius, MidpointRounding.AwayFromZero);
-                
+
                 inc *= -1;
                 angleAcum += angleInc;
                 actualAngle += angleAcum * inc;
@@ -570,7 +570,7 @@ namespace EvolutionSimulation.Entities
         }
         private void AdjustList<T>(int max, List<T> list) where T : Resource
         {
-            if(list.Count > max)
+            if (list.Count > max)
                 list.RemoveRange(max, list.Count - max);
         }
         // TODO: si tarda mucho hacer priority queue
@@ -753,7 +753,7 @@ namespace EvolutionSimulation.Entities
         }
         private class ResourceValueComparer : Comparer<ValueResource>
         {
-            public ResourceValueComparer() {}
+            public ResourceValueComparer() { }
 
             public override int Compare(ValueResource a, ValueResource b)
             {

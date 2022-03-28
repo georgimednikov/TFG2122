@@ -341,8 +341,10 @@ namespace EvolutionSimulation
             taxonomy.AddCreatureToSpecies(ent);
 
             Creatures.Add(entitiesID, ent);
+#if DEBUG
+            Console.WriteLine("CREATURE HAS BORN AT "+x+", " + y +" WITH ID: "+ entitiesID);
+#endif
             entitiesID++;
-
             // TODO: devolver el id, una copia o un wrap del objeto creado
             return ent;
         }

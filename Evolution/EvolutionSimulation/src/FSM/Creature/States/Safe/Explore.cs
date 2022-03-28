@@ -14,13 +14,13 @@ namespace EvolutionSimulation.FSM.Creature.States
     class Explore : CreatureState
     {
         Vector2Int posToDiscover;
-        public Explore(Entities.Creature c) : base(c) 
+        public Explore(Entities.Creature c) : base(c)
         {
             creature = c;
         }
 
         public override int GetCost()
-        { 
+        {
             return creature.GetNextCostOnPath();
         }
 
@@ -29,7 +29,6 @@ namespace EvolutionSimulation.FSM.Creature.States
             do
             {
                 posToDiscover = creature.NewPosition();
-
             } while (posToDiscover.x == creature.x && creature.y == posToDiscover.y);
             creature.SetPath(posToDiscover.x, posToDiscover.y);
         }
@@ -37,17 +36,15 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void Action()
         {
             Vector3 nextPos = creature.GetNextPosOnPath();
-            if (nextPos.X < 0 || nextPos.Y < 0)
+            creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+            if (creature.GetNextCostOnPath() <= 0 || (nextPos.X == creature.x && nextPos.Y == creature.y))
             {
                 do
                 {
                     posToDiscover = creature.NewPosition();
-
                 } while (posToDiscover.x == creature.x && creature.y == posToDiscover.y);
                 creature.SetPath(posToDiscover.x, posToDiscover.y);
             }
-            else
-                creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
         }
 
         public override string GetInfo()

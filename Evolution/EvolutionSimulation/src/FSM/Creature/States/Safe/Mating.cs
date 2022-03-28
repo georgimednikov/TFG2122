@@ -54,8 +54,9 @@ namespace EvolutionSimulation.FSM.Creature.States
                             nx = creature.x + RandomGenerator.Next(-1, 2);
                             ny = creature.y + RandomGenerator.Next(-1, 2);
                         }while(creature.world.canMove(nx,ny));
-                       
+                        
                         creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName, creature.matingCreature, creature.ID);
+
                     }
                     creature.timeToBeInHeat = -1;
                     creature.mating = false; //This is needed to stop mating
@@ -85,7 +86,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void OnExit()
         {
             time = startTime;
-            creature.world.GetCreature(creature.matingCreature).ReceiveInteraction(creature, Entities.Interactions.stopMate);
+            if(creature.world.GetCreature(creature.matingCreature) != null)
+                creature.world.GetCreature(creature.matingCreature).ReceiveInteraction(creature, Entities.Interactions.stopMate);
             creature.stats.ActionPerceptionPercentage = 1;
         }
 

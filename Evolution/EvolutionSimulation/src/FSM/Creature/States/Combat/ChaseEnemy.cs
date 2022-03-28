@@ -35,7 +35,10 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             creature.Enemy(out objectiveID, out objective);
             speciesName = creature.world.GetCreature(objectiveID).speciesName;
-            creature.SetPath(objective);   // This MUST be set up for the cost of the action to work
+            if(objective.x != creature.x || objective.y != creature.y)
+                creature.SetPath(objective);   // This MUST be set up for the cost of the action to work
+            else
+                brake = true;
         }
 
         public override void Action()
@@ -65,6 +68,11 @@ namespace EvolutionSimulation.FSM.Creature.States
                 speciesName = creature.world.GetCreature(objectiveID).speciesName;
                 objective = obj;
                 creature.TargetEnemy(otherID);  // Redundant, except when current target dies
+                creature.SetPath(objective);    // Set the path the creature must follow
+            }
+            if (objective != obj && obj.x != creature.x && obj.y != creature.y)
+            {
+                objective = obj;
                 creature.SetPath(objective);    // Set the path the creature must follow
             }
             brake = false;

@@ -22,7 +22,7 @@ namespace VisualizadorConsola
             world = new World();
             world.Init(512);//UserInfo.Size);
             //world.ExportContent();
-            WorldToBmp();
+            //WorldToBmp();
             //A minimum distance to leave in between species spawn points to give them some room.
             //Calculated based on the world size and amount of species to spawn, and then reduced by
             //a value to give room in the world and not fill it in a homogenous manner.

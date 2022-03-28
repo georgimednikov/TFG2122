@@ -55,7 +55,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
-            if (!creature.cornered)
+            if (!creature.cornered && pathX != creature.x && pathY != creature.y)
             {
                 Vector3 nextPos = creature.GetNextPosOnPath();
                 if (nextPos.X != -1 && nextPos.Y != -1)
