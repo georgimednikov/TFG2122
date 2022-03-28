@@ -64,51 +64,56 @@ namespace EvolutionSimulation.Entities
             Vector3 nStart = new Vector3(w.map[(int)start.X, (int)start.Y].regionId, 0, 0);
             Vector3 nEnd = new Vector3(w.map[(int)end.X, (int)end.Y].regionId, 0, 0);
 
-            List<GraphNode> list = new List<GraphNode>();
-            Utils.PriorityQueue<GraphNode> open = new Utils.PriorityQueue<GraphNode>();
-            List<GraphNode> closed = new List<GraphNode>();
-            GraphNode init = new GraphNode(nStart, null);
-            open.Insert(init);
-
-            while (open.Count > 0)
+            if (nEnd.X != nStart.X)
             {
-                GraphNode current = open.RemoveTop();
-                if (closed.Contains(current))
-                    continue;
-                closed.Add(current);
-                if (current.pos == nEnd)
-                    break;
-                foreach (GraphNode n in HighGetNeighbours(w, current))
+
+
+                List<GraphNode> list = new List<GraphNode>();
+                Utils.PriorityQueue<GraphNode> open = new Utils.PriorityQueue<GraphNode>();
+                List<GraphNode> closed = new List<GraphNode>();
+                GraphNode init = new GraphNode(nStart, null);
+                open.Insert(init);
+
+                while (open.Count > 0)
                 {
-                    n.estimatedCost = current.costSoFar + manhattanHeuristic(w, n.pos, nEnd);
-                    if (!open.Contains(n))
-                        open.Insert(n);
+                    GraphNode current = open.RemoveTop();
+                    if (closed.Contains(current))
+                        continue;
+                    closed.Add(current);
+                    if (current.pos == nEnd)
+                        break;
+                    foreach (GraphNode n in HighGetNeighbours(w, current))
+                    {
+                        n.estimatedCost = current.costSoFar + manhattanHeuristic(w, n.pos, nEnd);
+                        if (!open.Contains(n))
+                            open.Insert(n);
+                    }
                 }
-            }
 
-            GraphNode aux = closed[closed.Count - 1];
-            while (aux != null)
-            {
-                list.Add(aux);
-                aux = aux.prev;
-            }
-            list.Reverse();
-
-            Vector3 finalPos = new Vector3();
-            double bestDist = double.MaxValue;
-            List<Vector2> pos = w.highMap[(int)list[0].pos.X].links[(int)nStart.X];
-
-            for (int i = 0; i < pos.Count; i++)
-            {
-                Vector3 nPos = new Vector3(pos[i].X, pos[i].Y, 0);
-                if ((nPos - start).Length() < bestDist)
+                GraphNode aux = closed[closed.Count - 1];
+                while (aux != null)
                 {
-                    bestDist = (nPos - start).Length();
-                    finalPos = nPos;
+                    list.Add(aux);
+                    aux = aux.prev;
                 }
-            }
+                list.Reverse();
 
-            return finalPos;
+                Vector3 finalPos = new Vector3();
+                double bestDist = double.MaxValue;
+                List<Vector2> pos = w.highMap[(int)list[1].pos.X].links[(int)nStart.X];
+
+                for (int i = 0; i < pos.Count; i++)
+                {
+                    Vector3 nPos = new Vector3(pos[i].X, pos[i].Y, 0);
+                    if ((nPos - start).Length() < bestDist)
+                    {
+                        bestDist = (nPos - start).Length();
+                        finalPos = nPos;
+                    }
+                }
+                return finalPos;
+            }
+            return end;
         }
 
         private static Vector3[] LowAstar(Creature c, World w, Vector3 start, Vector3 end, out double treeDensity)

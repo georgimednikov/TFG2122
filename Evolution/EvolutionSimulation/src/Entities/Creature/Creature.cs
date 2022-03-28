@@ -900,10 +900,10 @@ namespace EvolutionSimulation.Entities
                     speed = stats.GroundSpeed;
                     break;
                 case 1:
-                    speed = stats.GroundSpeed;
+                    speed = stats.ArborealSpeed;
                     break;
                 case 2:
-                    speed = stats.GroundSpeed;
+                    speed = stats.AerialSpeed;
                     break;
             }
 
