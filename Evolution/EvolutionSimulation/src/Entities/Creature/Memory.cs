@@ -190,7 +190,7 @@ namespace EvolutionSimulation.Entities
                         creature.creatureLayer == Creature.HeightLayer.Ground &&
                         creatureDanger < thisCreature.stats.Aggressiveness)
                     {
-                        float preyValue = world.GetCreature(resource.ID).stats.Size / Math.Max(1, creature.DistanceToObjective(resource.position));
+                        float preyValue = world.GetCreature(resource.ID).stats.Size / Math.Max(1.0f, creature.DistanceToObjective(resource.position));
                         ValueResource prey = new ValueResource(resource.position, resource.ID, preyValue, resource.ticks);
                         UpdateList(Preys, prey, maxExperienceTicks);
                     }
@@ -389,14 +389,16 @@ namespace EvolutionSimulation.Entities
                     angleIncrement = Math.PI / 4.0;
                     maxAngle = Math.PI / 2.0;   // 90 degrees, the area that the creature should have come from
                 }
+                //TODO: quitar esto
                 if(cont >= 1000)
                 {
                     // no deberia de pasar aqui pero xd
                     Console.WriteLine("bucle infinito");
                 }
+
             }
-            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) 
-                || (finalPosition.x == thisCreature.x && finalPosition.y == thisCreature.y));
+            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) // Repeat if it cannot move to the calculated destiny
+                || (finalPosition.x == thisCreature.x && finalPosition.y == thisCreature.y));                // or the destiny is the same position as the creature position
 
             return finalPosition;
         }
@@ -429,7 +431,7 @@ namespace EvolutionSimulation.Entities
             double dot = Vector3.Dot(dir, Vector3.UnitX);
             double acos = Math.Acos(dot);
             double angleAcum = 0,
-                actualAngle = (double)acos;
+                actualAngle = acos;
             int inc = 1;
             do
             {
