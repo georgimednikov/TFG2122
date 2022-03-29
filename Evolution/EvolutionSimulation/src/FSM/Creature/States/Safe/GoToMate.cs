@@ -9,6 +9,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     class GoToMate : CreatureState
     {
         Vector2Int matePos;
+        bool hasMateAndNotInSamePos;
 
         public GoToMate(Entities.Creature c) : base(c) { creature = c; }
 
@@ -19,10 +20,10 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            if(creature.Mate(out _, out matePos))
-                creature.SetPath(matePos.x, matePos.y);
-            else//just in case, that should not happend
-                creature.SetPath(creature.x, creature.y);
+            // If the mate is has not spontaneously died or the creature forgor, and it isn not already there; it can set the path to the mate
+            hasMateAndNotInSamePos = creature.Mate(out _, out matePos) && (matePos.x != creature.x || matePos.y != creature.y);
+            if (hasMateAndNotInSamePos)
+                creature.SetPath(matePos.x, matePos.y);        
         }
 
         /// <summary>
@@ -30,16 +31,25 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override void Action()
         {
-            Vector3 nextPos = creature.GetNextPosOnPath();
-            if (nextPos.X != -1 && nextPos.Y != -1)
-                creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-            
-            Vector2Int tmpPos;            
-            if (creature.Mate(out _, out tmpPos) && matePos != tmpPos)
+            if (hasMateAndNotInSamePos)
             {
-                matePos.x = tmpPos.x;
-                matePos.y = tmpPos.y;
-                creature.SetPath(matePos.x, matePos.y);
+                Vector3 nextPos = creature.GetNextPosOnPath();
+                if (nextPos.X != -1 && nextPos.Y != -1) // TODO: esta comp no haria falta ahora con el alreadyThere
+                    creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+
+                Vector2Int tmpPos;
+                bool hasMate = creature.Mate(out _, out tmpPos);
+                bool notAtDestiny = tmpPos.x != creature.x || tmpPos.y != creature.y;
+                // If the mate position changed (i.e. other better mate is near or the mate has changed its position), the creature updates its destiny.
+                if (hasMate && matePos != tmpPos)
+                {
+                    matePos.x = tmpPos.x;
+                    matePos.y = tmpPos.y;
+                    // Check if the new mate is not already at the creature position
+                    if(notAtDestiny)
+                        creature.SetPath(matePos.x, matePos.y);
+                }
+                hasMateAndNotInSamePos = hasMate && notAtDestiny;
             }
         }
 

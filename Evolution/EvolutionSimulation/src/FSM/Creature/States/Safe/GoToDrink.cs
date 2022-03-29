@@ -6,6 +6,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     class GoToDrink : CreatureState
     {
         Vector2Int waterPosition;
+        bool notAtDestiny;
         public GoToDrink(Entities.Creature c) : base(c) { creature = c; }
 
         public override int GetCost()
@@ -21,12 +22,13 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void Action()
         {
             if (waterPosition == creature.WaterPosition())
-            {
                 FindShore();
+            if (notAtDestiny)
+            {
+                Vector3 nextPos = creature.GetNextPosOnPath();
+                if (nextPos.X < 0) return; //TODO: lo mismo que con los otros gotos
+                creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             }
-            Vector3 nextPos = creature.GetNextPosOnPath();
-            if (nextPos.X < 0) return; //If it is already in the right spot it should not move.
-            creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
         }
         public override string GetInfo()
         {
@@ -69,7 +71,10 @@ namespace EvolutionSimulation.FSM.Creature.States
                 waterPosition = SectorToPosition(originalPos, sector);
             }
 
-            creature.SetPath(waterPosition.x, waterPosition.y);
+            // If the creature is not already at destiny, the path is set
+            notAtDestiny = creature.x != waterPosition.x || creature.y != waterPosition.y;
+            if (notAtDestiny)
+                creature.SetPath(waterPosition.x, waterPosition.y);
         }
 
         private Vector2Int SectorToPosition(Vector2Int pos, int sector)

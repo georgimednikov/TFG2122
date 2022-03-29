@@ -9,7 +9,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     class GoToSafePlace : CreatureState
     {
         Vector2Int safePos;
-
+        bool hasSafePosAndNotInSamePos;
         public GoToSafePlace(Entities.Creature c) : base(c) { creature = c; }
 
         public override int GetCost()
@@ -20,24 +20,35 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void OnEntry()
         {
             safePos = creature.SafePosition();
-            creature.SetPath(safePos.x, safePos.y);
+            hasSafePosAndNotInSamePos = safePos != null && (safePos.x != creature.x || safePos.y != creature.y);
+            if (hasSafePosAndNotInSamePos)
+                creature.SetPath(safePos.x, safePos.y);
         }
 
         public override void Action()
         {
-            Vector3 nextPos = creature.GetNextPosOnPath();
-            if (nextPos.X != -1 && nextPos.Y != -1)
-                creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-            if (safePos != creature.SafePosition())
+            // If no safe position is found or the creature is already at the safe position, other transition must trigger the next tick
+            if (hasSafePosAndNotInSamePos)  
             {
-                safePos = creature.SafePosition();
-                creature.SetPath(safePos.x, safePos.y);
+                Vector3 nextPos = creature.GetNextPosOnPath();
+                if (nextPos.X != -1 && nextPos.Y != -1) // TODO: no haria falta
+                    creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+                
+                Vector2Int tmpPos = creature.SafePosition();
+                bool hasSafePos = tmpPos != null;
+                bool notAtDestiny = tmpPos.x != creature.x || tmpPos.y != creature.y;
+                // If the safe position changed (i.e. other better safe pos is near), the creature updates its destiny.
+                if (hasSafePos && tmpPos != safePos)
+                {
+                    safePos.x = tmpPos.x;
+                    safePos.y = tmpPos.y;
+                    // Check if the new safe pos is not already at the creature position
+                    if (notAtDestiny)
+                        creature.SetPath(safePos.x, safePos.y);
+                }
+                hasSafePosAndNotInSamePos = hasSafePos && notAtDestiny;
             }
-#if DEBUG
-            Console.WriteLine(creature.speciesName + " GOES TO SAFE PLACE (" + creature.x + ", " + creature.y + ")");
-#endif
         }
-
 
         public override string GetInfo()
         {
