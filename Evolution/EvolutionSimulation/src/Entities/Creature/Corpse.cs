@@ -37,9 +37,9 @@ namespace EvolutionSimulation.Entities
         public void SetTraits(Creature creature)
         {
             // From an hour to two weeks of lifetime, depending on size
-            lifeTime = World.ticksHour
-                        + ((creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size) * World.ticksHour * World.hoursDay * 7) - World.ticksHour)
-                        * (creature.stats.Size / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size)); 
+            double minVal = World.ticksHour * World.hoursDay * (RandomGenerator.NextDouble() + 2);  // TODO: Numeros arcanos
+            double maxVal = World.ticksHour * World.hoursDay * (RandomGenerator.NextDouble() + 7);  // TODO: Numeros arcanos
+            lifeTime =  (int)(minVal + ((maxVal - minVal)  * (creature.stats.Size / (double)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size)))); 
 
             // The less health, the faster the rot
             float putridStart = creature.stats.MaxHealth * UniverseParametersManager.parameters.rotStartMultiplier;   

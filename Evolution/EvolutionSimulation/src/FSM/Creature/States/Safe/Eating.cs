@@ -77,7 +77,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override string GetInfo() 
         {
-            return creature.speciesName + " with ID: " + creature.ID + " EATS " + foodType + " at position: (" + foodPos.x + ", " + foodPos.y + ")"; 
+            return creature.speciesName + " with ID: " + creature.ID + " EATS " + foodType + " with ID: " + foodID + " at position: (" + foodPos.x + ", " + foodPos.y + ")"; 
         }
     }
 }
