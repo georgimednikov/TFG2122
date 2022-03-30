@@ -6,6 +6,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     class GoToDrink : CreatureState
     {
         Vector2Int waterPosition;
+        Vector2Int ogWaterPos;
         bool notAtDestiny;
         public GoToDrink(Entities.Creature c) : base(c) { creature = c; }
 
@@ -16,12 +17,13 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            FindShore();
+            FindShore(); 
+            ogWaterPos = waterPosition;
         }
 
         public override void Action()
         {
-            if (waterPosition != creature.WaterPosition())
+            if (waterPosition == creature.WaterPosition() || ogWaterPos != waterPosition)
                 FindShore();
             if (notAtDestiny)
             {
@@ -42,7 +44,9 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         private void FindShore()
         {
+            ogWaterPos = waterPosition;
             waterPosition = creature.WaterPosition();
+
 
             //Angle between the creatures position and the position of the water from 0 to 180 positive or negative.
             double degrees = Math.Atan2(waterPosition.y - creature.y, waterPosition.x - creature.x) * (180 / Math.PI);
@@ -72,7 +76,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             }
 
             // If the creature is not already at destiny, the path is set
-            notAtDestiny = creature.x != waterPosition.x || creature.y != waterPosition.y;
+            notAtDestiny = creature.x != waterPosition.x || creature.y != waterPosition.y || creature.creatureLayer != 0;
             if (notAtDestiny)
                 creature.SetPath(waterPosition.x, waterPosition.y);
         }
