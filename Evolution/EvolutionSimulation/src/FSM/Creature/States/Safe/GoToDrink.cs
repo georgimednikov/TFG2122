@@ -21,7 +21,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
-            if (waterPosition == creature.WaterPosition())
+            if (waterPosition != creature.WaterPosition())
                 FindShore();
             if (notAtDestiny)
             {

@@ -21,9 +21,13 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         {
             int range = UniverseParametersManager.parameters.adjacentLength;
 #if DEBUG
-            Console.WriteLine("TRANSICION BEBER: " + creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")" + " IS NEXT TO (" + creature.WaterPosition().x + ", " + creature.WaterPosition().y + ")?");
+            Console.Write("TRANSICION BEBER: " + creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")" + " IS NEXT TO (" + creature.WaterPosition().x + ", " + creature.WaterPosition().y + ")? ");
 #endif
-            return (Math.Abs(creature.WaterPosition().x - creature.x) <= range && Math.Abs(creature.WaterPosition().y - creature.y) <= range);
+            bool a = (Math.Abs(creature.WaterPosition().x - creature.x) <= range && Math.Abs(creature.WaterPosition().y - creature.y) <= range);
+#if DEBUG
+            Console.WriteLine(a);
+#endif
+            return a;
         }
 
         public override string ToString()
