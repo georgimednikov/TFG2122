@@ -19,6 +19,14 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public int ID { get; protected set; }
 
+#if DEBUG
+        /// <summary>
+        /// Variable used to somewhat accurately determine the cuas eof the creature's death
+        /// at the time of the creation of its corpse
+        /// </summary>
+        public string causeOfDeath = "";
+#endif
+
         /// <summary>
         /// Constructor for factories
         /// </summary>
@@ -117,8 +125,6 @@ namespace EvolutionSimulation.Entities
             mind.UpdatePerception();
         }
 
-
-
         void CheckTemperature()
         {
             double tileTemperature = world.map[x, y].temperature;
@@ -141,6 +147,11 @@ namespace EvolutionSimulation.Entities
                 ((range * (UniverseParametersManager.parameters.maxHealthTemperatureDamage - UniverseParametersManager.parameters.minHealthTemperatureDamage)) +
                 UniverseParametersManager.parameters.minHealthTemperatureDamage);
             stats.CurrHealth -= (float)damage;
+
+#if DEBUG            
+            causeOfDeath = "temperature difference, which dealt " + damage + " damage";
+#endif
+
             mind.CreateDanger();
         }
 
@@ -512,7 +523,12 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         private void ReceiveDamage(Creature interacter)
         {
-            stats.CurrHealth -= ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
+            float damage = ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
+            stats.CurrHealth -= damage;
+
+#if DEBUG
+            causeOfDeath = "attack from " + interacter.speciesName + " with ID: " + interacter.ID + ", which dealt " + damage + " damage";
+#endif
 
             // If the pack is aggressive enought they will fight, else nothing happens.
             Vector2Int enemyPos; Enemy(out _, out enemyPos);
@@ -530,7 +546,9 @@ namespace EvolutionSimulation.Entities
         private void RetalliateDamage(Creature interacter)
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
+
 #if DEBUG
+            interacter.causeOfDeath = "retalliation from " + speciesName + " with ID: " + ID + ", which dealt " + stats.Counter + " damage";
             Console.WriteLine(speciesName + " RETURNS " + stats.Counter + " DMG");
 #endif
         }
