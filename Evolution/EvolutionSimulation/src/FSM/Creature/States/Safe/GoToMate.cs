@@ -36,8 +36,8 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (hasMateAndNotInSamePos)
             {
                 Vector3 nextPos = creature.GetNextPosOnPath();
-                if (nextPos.X != -1 && nextPos.Y != -1) // TODO: esta comp no haria falta ahora con el alreadyThere
-                    creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+                //if (nextPos.X != -1 && nextPos.Y != -1) // TODO: esta comp no haria falta ahora con el alreadyThere
+                creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
 
                 Vector2Int tmpPos;
                 bool hasMate = creature.Mate(out _, out tmpPos);
