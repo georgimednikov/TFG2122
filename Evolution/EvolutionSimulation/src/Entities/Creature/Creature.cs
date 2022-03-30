@@ -818,9 +818,8 @@ namespace EvolutionSimulation.Entities
         {
             this.x += x;
             this.y += y;
-            if (world.isTree(x, y))
-                creatureLayer = z;
-            else if (creatureLayer != HeightLayer.Air)
+            creatureLayer = z;
+            if (!world.isTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
         }
 
@@ -831,9 +830,8 @@ namespace EvolutionSimulation.Entities
         {
             this.x = x;
             this.y = y;
-            if (world.isTree(x, y))
-                creatureLayer = z;
-            else if (creatureLayer != HeightLayer.Air)
+            creatureLayer = z;
+            if (!world.isTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
         }
 
@@ -910,6 +908,7 @@ namespace EvolutionSimulation.Entities
             if (path == null || path.Length == 0 || pathIterator == path.Length) // TODO: que los estados tengan cuidado de cuando el coste que les dan es -1
                 return -1;
             int speed;
+            int layer = (int)path[pathIterator].Z;
             //TODO: que es esto?
             switch ((int)path[pathIterator].Z)
             {
@@ -926,7 +925,7 @@ namespace EvolutionSimulation.Entities
             }
 
             int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
-            if (world.map[x, y].plant is Tree || world.map[x, y].plant is EdibleTree)
+            if (layer == (int)HeightLayer.Tree && (world.map[x, y].plant is Tree || world.map[x, y].plant is EdibleTree))
                 return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed * (2 - Tree.movementPenalty)) / halfMaxMobility));
             return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed) / halfMaxMobility));
         }

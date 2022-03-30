@@ -35,7 +35,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             creature.Enemy(out objectiveID, out objective);
             objSpecies = creature.world.GetCreature(objectiveID).speciesName;
-            if (objective.x != creature.x && objective.y != creature.y)
+            if (objective.x != creature.x && objective.y != creature.y) // TODO: considerar alturas
             {
                 creature.SetPath(objective);   // This MUST be set up for the cost of the action to work
             }

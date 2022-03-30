@@ -31,11 +31,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override string GetInfo()
         {
             string template = creature.speciesName + " with ID " + creature.ID + " DIES; CAUSE OF DEATH: ";
-            if(creature.stats.CurrHealth <= 0)
-            {
-                template += creature.causeOfDeath;
-            }
-            else if(creature.stats.CurrEnergy <= 0)
+
+            if(creature.stats.CurrEnergy <= 0)
             {
                 template += " starved to death";
             }
@@ -43,9 +40,13 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 template += " died of thirst";
             }
-            else if (creature.stats.CurrEnergy <= 0)
+            else if (creature.stats.CurrRest <= 0)
             {
                 template += " died of exhaustion";
+            }
+            else if (creature.stats.CurrHealth <= 0)
+            {
+                template += creature.causeOfDeath;
             }
 
             return template + "\nCORPSE CREATED WITH ID: " + corpse.ID + " IN POSITION: (" + creature.x + ", " + creature.y + ")";
