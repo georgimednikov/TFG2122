@@ -74,6 +74,7 @@ namespace EvolutionSimulation
         public float mutationChance = 0.1f;
         public int adjacentLength = 1;
         public float actionPerceptionPercentage = 0.75f;
+        public float sleepingExpenseReduction = 0.1f;
 
         // Transitions
         public int fleeingTransitionMultiplier = 4;

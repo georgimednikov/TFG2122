@@ -5,8 +5,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 {
     class GoToDrink : CreatureState
     {
-        Vector2Int waterPosition;
-        Vector2Int ogWaterPos;
+        Vector2Int ogWaterPos = new Vector2Int(-1, -1);
+        Vector2Int waterPosition = new Vector2Int(-1, -1);
         bool notAtDestiny;
         public GoToDrink(Entities.Creature c) : base(c) { creature = c; }
 
@@ -17,8 +17,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            FindShore(); 
-            ogWaterPos = waterPosition;
+            FindShore();
+            ogWaterPos.x = waterPosition.x; ogWaterPos.y = waterPosition.y;
         }
 
         public override void Action()
@@ -44,7 +44,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         private void FindShore()
         {
-            ogWaterPos = waterPosition;
+            ogWaterPos.x = waterPosition.x; ogWaterPos.y = waterPosition.y;
             waterPosition = creature.WaterPosition();
 
 

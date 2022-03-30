@@ -12,6 +12,11 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void OnEntry()
         {
             creature.stats.ActionPerceptionPercentage = UniverseParametersManager.parameters.actionPerceptionPercentage;
+
+            // Sleeping reduces the expense of being active
+            creature.stats.EnergyExpense *= UniverseParametersManager.parameters.sleepingExpenseReduction;
+            creature.stats.HydrationExpense *= UniverseParametersManager.parameters.sleepingExpenseReduction;
+            creature.stats.RestExpense *= UniverseParametersManager.parameters.sleepingExpenseReduction;
         }
 
         // This move is energy netural, costing the same energy that is obtained in a tick
@@ -34,6 +39,11 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void OnExit()
         {
             creature.stats.ActionPerceptionPercentage = 1;
+
+            // Waking up reestablishes the expenses to normal
+            creature.stats.EnergyExpense /= UniverseParametersManager.parameters.sleepingExpenseReduction;
+            creature.stats.HydrationExpense /= UniverseParametersManager.parameters.sleepingExpenseReduction;
+            creature.stats.RestExpense /= UniverseParametersManager.parameters.sleepingExpenseReduction;
         }
 
         public override string ToString()
