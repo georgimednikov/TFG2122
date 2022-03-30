@@ -296,7 +296,7 @@ namespace EvolutionSimulation.Entities
                     error += dx;
                 }
             }
-            path.Add(new Vector3(x1, y1, z1));
+            path.Add(new Vector3((steep ? y1 : x1), (steep ? x1 : y1), z1));
             return path.ToArray();
         }
     }

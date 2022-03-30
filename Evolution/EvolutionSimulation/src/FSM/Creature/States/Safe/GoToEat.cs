@@ -5,7 +5,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 {
     class GoToEat : CreatureState
     {
-        Vector2Int foodPos;
+        Vector3 foodPos;
         bool notAtDestiny;
         public GoToEat(Entities.Creature c) : base(c) { creature = c; }
 
@@ -26,7 +26,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 Vector3 nextPos = creature.GetNextPosOnPath();
                 if (nextPos.X != -1 && nextPos.Y != -1) // TODO: esta comp no haria falta ahora con el alreadyThere
                     creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-                SetPath();
+                else SetPath();
             }
         }
 
@@ -36,7 +36,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         }
         public override string GetInfo()
         {
-            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")GOES TO EAT AT (" + foodPos.x + ", " + foodPos.y + ")";
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")GOES TO EAT AT (" + foodPos.X + ", " + foodPos.Y + ")";
         }
 
         /// <summary>
@@ -57,14 +57,14 @@ namespace EvolutionSimulation.FSM.Creature.States
                 distPlant = creature.DistanceToObjective(posPlant);
 
             if (distPlant < distCorpse)
-                foodPos = posPlant;
+                foodPos = new Vector3(posPlant.x, posPlant.y, 0);
             else
-                foodPos = posCorpse;
+                foodPos = new Vector3(posCorpse.x, posCorpse.y, 0);
 
             // If the creature is not already at destiny, the path is set
-            notAtDestiny = foodPos.x != creature.x || foodPos.y != creature.y;
+            notAtDestiny = foodPos.X != creature.x || foodPos.Y != creature.y || foodPos.Z != (float)(creature.creatureLayer);
             if (notAtDestiny)
-                creature.SetPath(foodPos.x, foodPos.y);
+                creature.SetPath((int)foodPos.X, (int)foodPos.Y);
         }
     }
 }

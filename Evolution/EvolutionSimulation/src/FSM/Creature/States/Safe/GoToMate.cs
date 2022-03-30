@@ -9,6 +9,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     class GoToMate : CreatureState
     {
         Vector2Int matePos;
+        int mateid;
         bool hasMateAndNotInSamePos;
 
         public GoToMate(Entities.Creature c) : base(c) { creature = c; }
@@ -21,7 +22,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void OnEntry()
         {
             // If the mate is has not spontaneously died or the creature forgor, and it isn not already there; it can set the path to the mate
-            hasMateAndNotInSamePos = creature.Mate(out _, out matePos) && (matePos.x != creature.x || matePos.y != creature.y);
+            hasMateAndNotInSamePos = creature.Mate(out mateid, out matePos) && (matePos.x != creature.x || matePos.y != creature.y ||
+                creature.creatureLayer != creature.world.GetCreature(mateid).creatureLayer);
             if (hasMateAndNotInSamePos)
                 creature.SetPath(matePos.x, matePos.y);        
         }
@@ -39,7 +41,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 
                 Vector2Int tmpPos;
                 bool hasMate = creature.Mate(out _, out tmpPos);
-                bool notAtDestiny = tmpPos.x != creature.x || tmpPos.y != creature.y;
+                bool notAtDestiny = tmpPos.x != creature.x || tmpPos.y != creature.y ||
+                creature.creatureLayer != creature.world.GetCreature(mateid).creatureLayer;
                 // If the mate position changed (i.e. other better mate is near or the mate has changed its position), the creature updates its destiny.
                 if (hasMate && matePos != tmpPos)
                 {

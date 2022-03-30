@@ -20,7 +20,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void OnEntry()
         {
             safePos = creature.SafePosition();
-            hasSafePosAndNotInSamePos = safePos != null && (safePos.x != creature.x || safePos.y != creature.y);
+            hasSafePosAndNotInSamePos = safePos != null && (safePos.x != creature.x || safePos.y != creature.y || creature.creatureLayer != 0);
             if (hasSafePosAndNotInSamePos)
                 creature.SetPath(safePos.x, safePos.y);
         }
@@ -36,7 +36,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 
                 Vector2Int tmpPos = creature.SafePosition();
                 bool hasSafePos = tmpPos != null;
-                bool notAtDestiny = tmpPos.x != creature.x || tmpPos.y != creature.y;
+                bool notAtDestiny = tmpPos.x != creature.x || tmpPos.y != creature.y || creature.creatureLayer != 0;
                 // If the safe position changed (i.e. other better safe pos is near), the creature updates its destiny.
                 if (hasSafePos && tmpPos != safePos)
                 {
