@@ -37,7 +37,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             Vector3 nextPos = creature.GetNextPosOnPath();
             creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-            if (creature.GetNextCostOnPath() <= 0 || (nextPos.X == creature.x && nextPos.Y == creature.y))
+            // If the creature already arrived at the path, the next cost is -1 or 0, so the creature searches for other path
+            if (creature.GetNextCostOnPath() <= 0)
             {
                 //do
                 //{
