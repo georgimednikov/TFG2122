@@ -11,12 +11,14 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            Vector2Int obj; creature.Enemy(out _, out obj);
+            int id;
+            Vector2Int obj; creature.Enemy(out id, out obj);
             int deltaX = obj.x - creature.x,       // Direction of objective
                 deltaY = obj.y - creature.y;
 
-            return Math.Abs(deltaX) <= UniverseParametersManager.parameters.adjacentLength && 
-                Math.Abs(deltaY) <= UniverseParametersManager.parameters.adjacentLength;  // This implies inisde melee range
+            return Math.Abs(deltaX) <= UniverseParametersManager.parameters.adjacentLength &&   // This implies inside attacking range
+                Math.Abs(deltaY) <= UniverseParametersManager.parameters.adjacentLength &&
+                creature.CanReach(creature.world.GetCreature(id).creatureLayer);    // This assumes an airborne creature can hit every layer below it, and so on
         }
 
         public override string ToString()

@@ -185,9 +185,7 @@ namespace EvolutionSimulation.Entities
                     //If the creature is reachable and not considered too dangerous it is considered possible prey.
                     float creatureDanger = GetPositionDanger(creature.x, creature.y);
                     if (!creature.IsHerbivorous() &&
-                        (creature.creatureLayer == Creature.HeightLayer.Air && thisCreature.stats.AirReach) ||
-                        (creature.creatureLayer == Creature.HeightLayer.Tree && thisCreature.stats.TreeReach) ||
-                        creature.creatureLayer == Creature.HeightLayer.Ground &&
+                        thisCreature.CanReach(creature.creatureLayer) &&
                         creatureDanger < thisCreature.stats.Aggressiveness)
                     {
                         float preyValue = world.GetCreature(resource.ID).stats.Size / Math.Max(1.0f, creature.DistanceToObjective(resource.position));

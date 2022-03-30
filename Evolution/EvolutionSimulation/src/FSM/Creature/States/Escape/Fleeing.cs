@@ -25,7 +25,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override int GetCost()   // TODO: con 0 de coste podria funcionar por el cornered
         {
             int cost = creature.GetNextCostOnPath();
-            if(cost < 0) {
+            if(cost <= 0) {
                 creature.cornered = true;
                 return UniverseParametersManager.parameters.baseActionCost;
             } else return creature.cornered? UniverseParametersManager.parameters.baseActionCost : (int)(cost * modifier);

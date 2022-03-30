@@ -12,8 +12,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         Vector2Int objective;
         string objSpecies;
 
-        // In case the chase ends and it does not end up attacking
-        bool brake = false; // TODO: esto en teoria no deberia pasar nunca ?
+        // In case the chase ends and it does not/cannot attack
+        bool await = false;
 
         public ChaseEnemy(Entities.Creature c) : base(c) 
         { 
@@ -25,10 +25,16 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override int GetCost()
         {
             int cost = creature.GetNextCostOnPath();
-            if (cost < 0) {
-                brake = true;
+            if (cost <= 0)
+            {
+                await = true;
                 return UniverseParametersManager.parameters.baseActionCost;
-            } else return (int)(creature.GetNextCostOnPath() * modifier);
+            }
+            else
+            {
+                await = false;
+                return (int)(creature.GetNextCostOnPath() * modifier);
+            }
         }
 
         public override void OnEntry()
@@ -41,13 +47,13 @@ namespace EvolutionSimulation.FSM.Creature.States
             }
             else
             {
-                brake = true;
+                await = true;
             }
         }
 
         public override void Action()
         {
-            if (!brake) {
+            if (!await) {
                 Vector3 nextPos = creature.GetNextPosOnPath();  // Follow the specified path
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             }
@@ -61,7 +67,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 if(Math.Abs(otherObj.x - creature.x) >= creature.stats.Perception / 2 || Math.Abs(otherObj.y - creature.y) >= creature.stats.Perception / 2)    // TODO: ajustar criterio de no cornered
                 {   // Creature is sufficiently far away to not pose immediate danger
                     creature.cornered = false;
-                    brake = false;
+                    await = false;
                     return;
                 }
             }
@@ -79,7 +85,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 creature.SetPath(objective);    // Set the path the creature must follow
             }
 
-            brake = false;
+            await = false;
         }
 
         // No longer cornered, as combat is done

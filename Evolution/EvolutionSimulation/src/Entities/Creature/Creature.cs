@@ -479,6 +479,7 @@ namespace EvolutionSimulation.Entities
             float threshold = 0.25f - (stats.Aggressiveness / UniverseParametersManager.parameters.combatTransitionHealthThresholdMultiplier); // TODO: A mayor agresividad mas se arriesga, revisar cifras
             return stats.CurrHealth >= stats.MaxHealth * threshold;
         }
+
         /// <summary>
         /// Determines whether the creature has enough health to fight or if it's too weak.
         /// </summary>
@@ -497,6 +498,7 @@ namespace EvolutionSimulation.Entities
             if (AbleToFight()) pack.Add(this);
             return pack;
         }
+
         public bool ShouldPackFight(List<Creature> pack, float danger)
         {
             return stats.Aggressiveness * pack.Count >= danger;
@@ -943,6 +945,20 @@ namespace EvolutionSimulation.Entities
             if (pathIterator == path.Length - 1 && path[pathIterator] != finalPos)
                 SetPath((int)finalPos.X, (int)finalPos.Y, (HeightLayer)finalPos.Z);
             return path[pathIterator++];
+        }
+
+        /// <summary>
+        /// Checks if the creature can access a given layer
+        /// Based on its current layer and stats
+        /// </summary>
+        public bool CanReach(HeightLayer layer)
+        {
+            if (creatureLayer < layer)
+            {
+                if (layer == HeightLayer.Air) return stats.AirReach;
+                if (layer == HeightLayer.Tree) return stats.TreeReach;
+                return false;
+            } else return true;
         }
         #endregion
 
