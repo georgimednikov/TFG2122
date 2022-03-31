@@ -44,6 +44,7 @@ namespace EvolutionSimulation.Entities
         PositionComparer positionComparer;
 
         Queue<Vector2Int> explorePositionsRemembered;       //All the dangers the creature remembers, with their dangers and ticks left.
+        Dictionary<int, int> exploredRegions;               // Map regions that the creature has explored
         List<Position> dangersRemembered;                   //All the dangers the creature remembers, with their dangers and ticks left.
 
         public EntityResource Enemy { get; private set; }   //Creature that has attacked this creature or an ally of its.
@@ -104,6 +105,7 @@ namespace EvolutionSimulation.Entities
             FreshCorpses = new List<EntityResource>();
             RottenCorpses = new List<EntityResource>();
             dangersRemembered = new List<Position>();
+            exploredRegions = new Dictionary<int, int>();
             explorePositionsRemembered = new Queue<Vector2Int>();
             WaterPositions = new List<Resource>();
             SafeWaterPositions = new List<Resource>();
@@ -238,7 +240,7 @@ namespace EvolutionSimulation.Entities
                     Vector2Int p = new Vector2Int(x + i, y + j);
                     if (!world.checkBounds(p.x, p.y)) continue;
 
-                   
+
 
                     if (world.map[p.x, p.y].isWater)
                     {
@@ -285,6 +287,13 @@ namespace EvolutionSimulation.Entities
                 }
             }
 
+            // Check if the creature changed region
+            int currentRegion = thisCreature.world.map[thisCreature.x, thisCreature.y].regionId;
+            if (!exploredRegions.ContainsKey(currentRegion))
+                exploredRegions.Add(currentRegion, maxExperienceTicks);
+            else
+                exploredRegions[currentRegion] = maxExperienceTicks;
+
             SortAndAdjustLists();
             if (menace != null && menace.ticks != maxExperienceTicks && thisCreature.DistanceToObjective(menace.position) <= perceptionRadius)
                 menace = null;
@@ -312,6 +321,30 @@ namespace EvolutionSimulation.Entities
             }
         }
 
+        internal int NewExplorePosition()
+        {
+            int unexploredRegion = -1;
+            Queue<int> regionsQueue = new Queue<int>();
+            int currentRegion = thisCreature.world.map[thisCreature.x, thisCreature.y].regionId;
+            regionsQueue.Enqueue(currentRegion);
+            while(regionsQueue.Count > 0 && unexploredRegion == -1)
+            {
+                int nextRegion = regionsQueue.Dequeue();
+                List<int> adyRegions = new List<int>(thisCreature.world.highMap[nextRegion].links.Keys);
+                Shuffle(adyRegions);    // Shuffle to add randomness
+                for (int i = 0; unexploredRegion == -1 && i < adyRegions.Count; i++)
+                {
+                    if (!exploredRegions.ContainsKey(adyRegions[i]))
+                        unexploredRegion = adyRegions[i];
+                    else if (!regionsQueue.Contains(adyRegions[i]))
+                        regionsQueue.Enqueue(adyRegions[i]);
+                }           
+            }
+            if (unexploredRegion == -1)
+                unexploredRegion = RandomGenerator.Next(0, thisCreature.world.highMap.Count);
+            return unexploredRegion;
+        }
+
         /// <summary>
         /// Saves a close position to the creature if it's a confortable temperature to the creature
         /// </summary>
@@ -329,7 +362,7 @@ namespace EvolutionSimulation.Entities
 
                     SafeTemperaturePositions.Add(p);
                     found = true;
-                   
+
                 }
             }
         }
@@ -690,6 +723,19 @@ namespace EvolutionSimulation.Entities
             i_forgor_position(ref mother);
             i_forgor(ref menace);
 
+            // Forget regions
+            List<int> regionsToForget = new List<int>();
+            List<int> storedRegions = new List<int>(exploredRegions.Keys);
+            foreach (int region in storedRegions)
+            {
+                if (--exploredRegions[region] <= 0) //If it is time to forget.
+                    regionsToForget.Add(region);
+            }
+            foreach (int rf in regionsToForget)
+            {
+                exploredRegions.Remove(rf);
+            }
+
             //The list is iterated through from the end to the start to deal with removing elements from it while iterating.
             for (int i = dangersRemembered.Count - 1; i >= 0; i--)
             {
@@ -787,6 +833,19 @@ namespace EvolutionSimulation.Entities
                 l.Add(r);
         }
         #endregion
+
+        public void Shuffle<T>(IList<T> list)
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = RandomGenerator.Next(n);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+        }
 
         #region Comparators
         /// <summary>

@@ -209,6 +209,7 @@ namespace EvolutionSimulation.Entities
         public Vector2Int SafePosition() { return mem.SafePositions.Count > 0 ? mem.SafePositions[0] : null; }
         public Vector2Int SafeTemperaturePosition() { return mem.SafeTemperaturePositions.Count > 0 ? mem.SafeTemperaturePositions[0] : null; }
         public Vector2Int NewPosition() { return mem.FindNewPosition(); }
+        public int NewExplorePosition() { return mem.NewExplorePosition();  }
 
         private bool AssignEntityInfo(EntityResource ent, out int id, out Vector2Int position)
         {
@@ -241,7 +242,6 @@ namespace EvolutionSimulation.Entities
         public virtual bool Equals(Resource obj) { return this == obj; }
         public override int GetHashCode() { return base.GetHashCode(); }
     }
-
     public class EntityResource : Resource
     {
         public int ID;
