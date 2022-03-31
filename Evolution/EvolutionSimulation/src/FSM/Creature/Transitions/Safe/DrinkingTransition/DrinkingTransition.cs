@@ -19,6 +19,12 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
+            bool shore = false;
+            for (int k = -1; !shore && k <= 1; k++)
+                for (int h = -1; !shore && h <= 1; h++)
+                    if (creature.world.checkBounds(creature.x + k, creature.y + h) && creature.world.map[creature.x + k, creature.y + h].isWater && creature.creatureLayer == 0)
+                        shore = true;
+            return shore;
             int range = UniverseParametersManager.parameters.adjacentLength;
 #if DEBUG
             Console.Write("TRANSICION BEBER: " + creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")" + " IS NEXT TO (" + creature.WaterPosition().x + ", " + creature.WaterPosition().y + ")? ");

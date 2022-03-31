@@ -26,6 +26,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 creature.creatureLayer != creature.world.GetCreature(mateid).creatureLayer);
             if (hasMateAndNotInSamePos)
                 creature.SetPath(matePos.x, matePos.y);        
+        
         }
 
         /// <summary>
