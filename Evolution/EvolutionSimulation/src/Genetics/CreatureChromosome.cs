@@ -301,6 +301,19 @@ namespace EvolutionSimulation.Genetics
         }
 
         /// <summary>
+        /// Modify the gender of the creature to the gender given in the param
+        /// </summary>
+        public void ModifyGender(Gender gender)
+        {
+            if (GetGender() == gender)
+                return;
+            if (GetGender() == Gender.Male)
+                chromosome[0] = true;
+            else
+                chromosome[0] = false;
+        }
+
+        /// <summary>
         /// Returns if an ability is unlocked
         /// </summary>
         /// <param name="unlock">Skill percentage when skill is unlocked</param>

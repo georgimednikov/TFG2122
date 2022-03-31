@@ -224,17 +224,17 @@ namespace EvolutionSimulation.Entities
             get { return baseStats.Metabolism; }
             set { baseStats.Metabolism = value; }
         }
-        public float MinTemperature
+        public double MinTemperature
         {
             get { return baseStats.MinTemperature; }
             set { baseStats.MinTemperature = value; }
         }
-        public float MaxTemperature
+        public double MaxTemperature
         {
             get { return baseStats.MaxTemperature; }
             set { baseStats.MaxTemperature = value; }
         }
-        public float IdealTemperature
+        public double IdealTemperature
         {
             get { return baseStats.IdealTemperature; }
             set { baseStats.IdealTemperature = value; }
@@ -400,9 +400,9 @@ namespace EvolutionSimulation.Entities
         public int CurrAge;
         public int Members; //limbs
         public int Metabolism;
-        public float MinTemperature;
-        public float MaxTemperature;
-        public float IdealTemperature;
+        public double MinTemperature;
+        public double MaxTemperature;
+        public double IdealTemperature;
         public bool Hair;
 
         //Behaviour related stats
