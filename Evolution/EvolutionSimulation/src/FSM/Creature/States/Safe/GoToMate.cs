@@ -36,23 +36,23 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (hasMateAndNotInSamePos)
             {
                 Vector3 nextPos = creature.GetNextPosOnPath();
-                //if (nextPos.X != -1 && nextPos.Y != -1) // TODO: esta comp no haria falta ahora con el alreadyThere
+                if (nextPos.X != -1 && nextPos.Y != -1) // TODO: esta comp no haria falta ahora con el hasMateAndNotInSamePos
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
 
                 Vector2Int tmpPos;
-                bool hasMate = creature.Mate(out _, out tmpPos);
-                bool notAtDestiny = tmpPos.x != creature.x || tmpPos.y != creature.y ||
-                creature.creatureLayer != creature.world.GetCreature(mateid).creatureLayer;
+                bool hasMate = creature.Mate(out mateid, out tmpPos);
                 // If the mate position changed (i.e. other better mate is near or the mate has changed its position), the creature updates its destiny.
                 if (hasMate && matePos != tmpPos)
                 {
                     matePos.x = tmpPos.x;
                     matePos.y = tmpPos.y;
                     // Check if the new mate is not already at the creature position
-                    if(notAtDestiny)
+                    hasMateAndNotInSamePos = matePos.x != creature.x || matePos.y != creature.y || creature.creatureLayer != creature.world.GetCreature(mateid).creatureLayer;
+                    if (hasMateAndNotInSamePos)
                         creature.SetPath(matePos.x, matePos.y);
                 }
-                hasMateAndNotInSamePos = hasMate && notAtDestiny;
+                else
+                    hasMateAndNotInSamePos = hasMate && (matePos.x != creature.x || matePos.y != creature.y || creature.creatureLayer != creature.world.GetCreature(mateid).creatureLayer);
             }
         }
 

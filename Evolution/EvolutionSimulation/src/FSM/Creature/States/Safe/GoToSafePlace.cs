@@ -31,22 +31,23 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (hasSafePosAndNotInSamePos)  
             {
                 Vector3 nextPos = creature.GetNextPosOnPath();
-                //if (nextPos.X != -1 && nextPos.Y != -1) // TODO: no haria falta
-                creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
+                if (nextPos.X != -1 && nextPos.Y != -1) // TODO: no haria falta creo
+                    creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
                 
                 Vector2Int tmpPos = creature.SafePosition();
                 bool hasSafePos = tmpPos != null;
-                bool notAtDestiny = tmpPos.x != creature.x || tmpPos.y != creature.y || creature.creatureLayer != 0;
                 // If the safe position changed (i.e. other better safe pos is near), the creature updates its destiny.
                 if (hasSafePos && tmpPos != safePos)
                 {
                     safePos.x = tmpPos.x;
                     safePos.y = tmpPos.y;
+                    hasSafePosAndNotInSamePos = safePos.x != creature.x || safePos.y != creature.y || creature.creatureLayer != 0;
                     // Check if the new safe pos is not already at the creature position
-                    if (notAtDestiny)
+                    if (hasSafePosAndNotInSamePos)
                         creature.SetPath(safePos.x, safePos.y);
                 }
-                hasSafePosAndNotInSamePos = hasSafePos && notAtDestiny;
+                else
+                    hasSafePosAndNotInSamePos = hasSafePos && (safePos.x != creature.x || safePos.y != creature.y || creature.creatureLayer != 0);
             }
         }
 

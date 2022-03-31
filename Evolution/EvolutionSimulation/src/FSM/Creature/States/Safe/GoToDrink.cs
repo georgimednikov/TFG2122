@@ -28,14 +28,14 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (notAtDestiny)
             {
                 Vector3 nextPos = creature.GetNextPosOnPath();
-                //if (nextPos.X < 0) return; //TODO: lo mismo que con los otros gotos
+                if (nextPos.X < 0) return; //TODO: no haria falta creo
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
                 notAtDestiny = creature.x != waterPosition.x || creature.y != waterPosition.y || creature.creatureLayer != 0;
             }
         }
         public override string GetInfo()
         {
-            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")" + " GOES TO DRINK AT (" + waterPosition.x + ", " + waterPosition.y + ")";
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ", " + creature.creatureLayer + ")" + " GOES TO DRINK AT (" + waterPosition.x + ", " + waterPosition.y + ")";
         }
 
         public override string ToString()
