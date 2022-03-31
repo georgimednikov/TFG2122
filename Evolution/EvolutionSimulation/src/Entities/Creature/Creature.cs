@@ -425,8 +425,8 @@ namespace EvolutionSimulation.Entities
         Dictionary<Interactions, List<Action<Creature>>> InteractionsDict;
 
         // Handler for interaction events
-        public delegate void ReceiveInteractionHandler(Creature receiver, Creature sender, Interactions type);
-        public event ReceiveInteractionHandler ReceiveInteractionEvent; // TODO: asi?
+        //public delegate void ReceiveInteractionHandler(Creature receiver, Creature sender, Interactions type);
+        //public event ReceiveInteractionHandler ReceiveInteractionEvent; // TODO: asi?
 
         // Methods to receive and respond to interactions
         /// <summary>
@@ -438,7 +438,7 @@ namespace EvolutionSimulation.Entities
             {
                 foreach (Action<Creature> response in InteractionsDict[type])
                     response(interacter);
-                ReceiveInteractionEvent?.Invoke(this, interacter, type);
+                //ReceiveInteractionEvent?.Invoke(this, interacter, type);
             }
         }
 
@@ -959,6 +959,16 @@ namespace EvolutionSimulation.Entities
                 if (layer == HeightLayer.Tree) return stats.TreeReach;
                 return false;
             } else return true;
+        }
+
+        /// <summary>
+        /// Returns the highest layer the creature can move through
+        /// </summary>
+        public HeightLayer GetHighestLayer()
+        {
+            if (stats.AirReach) return HeightLayer.Air;
+            if (stats.TreeReach) return HeightLayer.Tree;
+            return HeightLayer.Ground;
         }
         #endregion
 

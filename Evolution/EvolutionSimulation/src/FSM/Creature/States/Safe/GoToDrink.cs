@@ -6,7 +6,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     class GoToDrink : CreatureState
     {
         Vector2Int ogWaterPos = new Vector2Int(-1, -1);
-        Vector2Int waterPosition = new Vector2Int(-1, -1);
+        Vector2Int shorePosition = new Vector2Int(-1, -1);
         bool notAtDestiny;
         public GoToDrink(Entities.Creature c) : base(c) { creature = c; }
 
@@ -18,24 +18,26 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void OnEntry()
         {
             FindShore();
-            ogWaterPos.x = waterPosition.x; ogWaterPos.y = waterPosition.y;
         }
 
         public override void Action()
         {
-            if (waterPosition == creature.WaterPosition() || ogWaterPos != waterPosition)
+            Vector2Int waterpos = creature.WaterPosition();
+            if (shorePosition == creature.WaterPosition() || ogWaterPos != creature.WaterPosition())
                 FindShore();
+            if (Math.Abs(creature.WaterPosition().x - shorePosition.x) > 1 || Math.Abs(creature.WaterPosition().y - shorePosition.y) > 1)
+                Console.WriteLine("Posicion incorrecta para beber");
             if (notAtDestiny)
             {
                 Vector3 nextPos = creature.GetNextPosOnPath();
                 if (nextPos.X < 0) return; //TODO: no haria falta creo
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-                notAtDestiny = creature.x != waterPosition.x || creature.y != waterPosition.y || creature.creatureLayer != 0;
+                notAtDestiny = creature.x != shorePosition.x || creature.y != shorePosition.y || creature.creatureLayer != 0;
             }
         }
         public override string GetInfo()
         {
-            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ", " + creature.creatureLayer + ")" + " GOES TO DRINK AT (" + waterPosition.x + ", " + waterPosition.y + ")";
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ", " + creature.creatureLayer + ")" + " GOES TO DRINK AT (" + shorePosition.x + ", " + shorePosition.y + ")";
         }
 
         public override string ToString()
@@ -45,12 +47,12 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         private void FindShore()
         {
-            ogWaterPos.x = waterPosition.x; ogWaterPos.y = waterPosition.y;
-            waterPosition = creature.WaterPosition();
+            ogWaterPos.x = creature.WaterPosition().x; ogWaterPos.y = creature.WaterPosition().y;
+            shorePosition.x = ogWaterPos.x; shorePosition.y = ogWaterPos.y;
 
 
             //Angle between the creatures position and the position of the water from 0 to 180 positive or negative.
-            double degrees = Math.Atan2(waterPosition.y - creature.y, waterPosition.x - creature.x) * (180 / Math.PI);
+            double degrees = Math.Atan2(shorePosition.y - creature.y, shorePosition.x - creature.x) * (180 / Math.PI);
 
             //Now the sector has to be accounted for.
 
@@ -63,9 +65,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 
             int sector = (int)(degrees / 45);
             int cont = 0;
-            Vector2Int originalPos = new Vector2Int(waterPosition);
-            while (!creature.world.checkBounds(waterPosition.x, waterPosition.y) ||
-                creature.world.map[waterPosition.x, waterPosition.y].isWater)
+            while (!creature.world.checkBounds(shorePosition.x, shorePosition.y) ||
+                creature.world.map[shorePosition.x, shorePosition.y].isWater)
             {
                 //The increment has to have the same sign as cont to add their values without possible substractions,
                 //but cont's sign has to be mantained to alternate between going "left" or "right" realtive to the current sector.
@@ -73,13 +74,15 @@ namespace EvolutionSimulation.FSM.Creature.States
                 cont = (cont + inc) * -1;
                 sector = (sector + cont) % 8;
                 if (sector < 0) sector += 8;
-                waterPosition = SectorToPosition(originalPos, sector);
+                shorePosition = SectorToPosition(ogWaterPos, sector);
             }
 
             // If the creature is not already at destiny, the path is set
-            notAtDestiny = creature.x != waterPosition.x || creature.y != waterPosition.y || creature.creatureLayer != 0;
+            notAtDestiny = creature.x != shorePosition.x || creature.y != shorePosition.y || creature.creatureLayer != 0;
+            if (Math.Abs(creature.WaterPosition().x - shorePosition.x) > 1 || Math.Abs(creature.WaterPosition().y - shorePosition.y) > 1)
+                Console.WriteLine("Posicion incorrecta para beber");
             if (notAtDestiny)
-                creature.SetPath(waterPosition.x, waterPosition.y);
+                creature.SetPath(shorePosition.x, shorePosition.y);
         }
 
         private Vector2Int SectorToPosition(Vector2Int pos, int sector)
