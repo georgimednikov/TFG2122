@@ -90,10 +90,17 @@ namespace EvolutionSimulation.Entities
             stats.Members = SetStatInRange(CreatureFeature.Members, maxLimbs + 1);//its not inclusive [0-11)
 
             stats.Metabolism = chromosome.GetFeature(CreatureFeature.Metabolism);
-            stats.IdealTemperature = chromosome.GetFeature(CreatureFeature.IdealTemperature);
-            stats.MinTemperature = stats.IdealTemperature - chromosome.GetFeature(CreatureFeature.TemperatureRange);
-            stats.MaxTemperature = stats.IdealTemperature + chromosome.GetFeature(CreatureFeature.TemperatureRange);
+            //Save the temperature in range [0,1] because of the map extreme values are these
+            double temperatureMax = chromosome.GetFeatureMax(CreatureFeature.IdealTemperature) + chromosome.GetFeatureMax(CreatureFeature.TemperatureRange);
+            double temperatureMin = 0 - chromosome.GetFeatureMax(CreatureFeature.TemperatureRange);
+            double maxRangeTemperature = Math.Abs(temperatureMax) + Math.Abs(temperatureMin);
 
+            stats.IdealTemperature = (chromosome.GetFeature(CreatureFeature.IdealTemperature) + Math.Abs(temperatureMin)) / maxRangeTemperature; 
+            double tempInRange = chromosome.GetFeature(CreatureFeature.TemperatureRange) / maxRangeTemperature;
+            stats.MinTemperature = stats.IdealTemperature - tempInRange;
+            stats.MaxTemperature = stats.IdealTemperature + tempInRange;
+            if (stats.IdealTemperature > 0.5)
+                Console.WriteLine("Me renta la temperatura");
             //int ones = 0;
             //foreach (bool num in chromosome.GetChromosome())
             //    if (num) ones++;
@@ -170,9 +177,12 @@ namespace EvolutionSimulation.Entities
             if (stats.Hair)
             {
                 int hairValue = chromosome.GetFeature(CreatureFeature.Hair);
-                stats.MinTemperature -= hairValue * 2;
-                stats.MaxTemperature -= hairValue;
-                //stats.Hair = hairValue;
+                double maxHairValue = chromosome.GetFeatureMax(CreatureFeature.Hair);
+                double increase = (hairValue / maxHairValue) * UniverseParametersManager.parameters.hairTemperatureMultiplier;
+                stats.MinTemperature -= increase * 2;
+                stats.MinTemperature = Math.Max(stats.MinTemperature, 0);
+                stats.MaxTemperature += increase;
+                stats.MaxTemperature = Math.Min(stats.MaxTemperature, 1);
             }
 
             //UpRight increase the perception at most 1.5

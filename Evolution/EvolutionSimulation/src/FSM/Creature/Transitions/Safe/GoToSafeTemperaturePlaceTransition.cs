@@ -1,7 +1,8 @@
 ﻿namespace EvolutionSimulation.FSM.Creature.Transitions
 {
     /// <summary>
-    /// Checks if the creature is tired and know a safe place
+    /// Checks if the creature is not in a safe temperature position and does know 
+    /// a safe temperature position
     /// Wander -> GoToSafeTemperaturePlace
     /// </summary>
     class GoToSafeTemperaturePlaceTransition : CreatureTransition
@@ -13,14 +14,13 @@
 
         public override bool Evaluate()
         {
-            bool t = creature.SafeTemperaturePosition() != null;
             return !creature.CheckTemperature(creature.x, creature.y) &&
                 creature.SafeTemperaturePosition() != null;
         }
 
         public override string ToString()
         {
-            return "GoToSafePlaceTransition";
+            return "GoToSafeTemperaturePlaceTransition";
         }
 
     }

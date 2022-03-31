@@ -162,7 +162,7 @@ namespace EvolutionSimulation.Entities
             stats.CurrHealth -= (float)damage;
 
 #if DEBUG            
-            causeOfDeath = "temperature difference, which dealt " + damage + " damage";
+            causeOfDeath = "temperature difference: "+ difference + ", which dealt " + damage + " damage";
             Console.WriteLine("CreatureId: " + ID +"  " + causeOfDeath);
 #endif
 
@@ -331,8 +331,10 @@ namespace EvolutionSimulation.Entities
             }
 
             ITransition goToSafeTempPlaceTransition = new GoToSafeTemperaturePlaceTransition(this);
+            ITransition stopGoToSafeTempPlaceTransition = new StopGoToSafeTemperaturePlaceTransition(this);
             ITransition goToSafeTempPlaceExploreTransition = new GoToSafeTemperaturePlaceExploreTransition(this);
             safeFSM.AddTransition(wander, goToSafeTempPlaceTransition, goToSafeTemperaturePlace);
+            safeFSM.AddTransition(goToSafeTemperaturePlace, stopGoToSafeTempPlaceTransition, wander);
             safeFSM.AddTransition(wander, goToSafeTempPlaceExploreTransition, explore);
             
             // Sleeping
