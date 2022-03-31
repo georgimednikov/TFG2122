@@ -818,6 +818,11 @@ namespace EvolutionSimulation.Entities
         /// it has explored it before
         /// </summary>
         public Vector2Int NewPosition() { return mind.NewPosition(); }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public int NewExploreRegion() { return mind.NewExplorePosition(); }
         #endregion
 
         #region World Info, Movement and Paths
