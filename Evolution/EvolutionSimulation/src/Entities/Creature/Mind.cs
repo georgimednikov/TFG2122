@@ -206,7 +206,8 @@ namespace EvolutionSimulation.Entities
         public bool Corpse(out int id, out Vector2Int position) { return AssignEntityInfo(worthyCorpse, out id, out position); }
         public bool Plant(out int id, out Vector2Int position) { return AssignEntityInfo(worthyPlant, out id, out position); }
         public Vector2Int WaterPosition() { return worthyWaterPosition; }
-        public Vector2Int SafePosition() { return mem.SafePosition; }
+        public Vector2Int SafePosition() { return mem.SafePositions.Count > 0 ? mem.SafePositions[0] : null; }
+        public Vector2Int SafeTemperaturePosition() { return mem.SafeTemperaturePositions.Count > 0 ? mem.SafeTemperaturePositions[0] : null; }
         public Vector2Int NewPosition() { return mem.FindNewPosition(); }
 
         private bool AssignEntityInfo(EntityResource ent, out int id, out Vector2Int position)

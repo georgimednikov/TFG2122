@@ -41,6 +41,7 @@ namespace EvolutionSimulation.Entities
 
         ResourcePositionComparer resourceComparer;
         ResourceValueComparer valueComparer;
+        PositionComparer positionComparer;
 
         Queue<Vector2Int> explorePositionsRemembered;       //All the dangers the creature remembers, with their dangers and ticks left.
         List<Position> dangersRemembered;                   //All the dangers the creature remembers, with their dangers and ticks left.
@@ -71,15 +72,16 @@ namespace EvolutionSimulation.Entities
         }
         private EntityResource mother;
         public EntityResource Mate { get; private set; }
-        public List<ValueResource> Preys { get; private set; }         //Closest reachable creature.
+        public List<ValueResource> Preys { get; private set; }              //Closest reachable creature.
         public List<EntityResource> Allies { get; private set; }
         public List<EntityResource> FreshCorpses { get; private set; }
         public List<EntityResource> RottenCorpses { get; private set; }
         public List<Resource> WaterPositions { get; private set; }
-        public List<Resource> SafeWaterPositions { get; private set; }        //List containing all safe water spots that the creature remembers.
+        public List<Resource> SafeWaterPositions { get; private set; }      //List containing all safe water spots that the creature remembers.
         public List<EntityResource> EdiblePlants { get; private set; }
         public List<EntityResource> SafeEdiblePlants { get; private set; }  //List containing all safe edible plants that the creature remembers.
-        public Vector2Int SafePosition { get; private set; }            //The closest safe location for the creature.
+        public List<Vector2Int> SafePositions { get; private set; }         //The closests safes location for the creature.
+        public List<Vector2Int> SafeTemperaturePositions { get; private set; }
 
 
         public Memory(Creature c, int fID, int mID)
@@ -107,10 +109,12 @@ namespace EvolutionSimulation.Entities
             SafeWaterPositions = new List<Resource>();
             EdiblePlants = new List<EntityResource>();
             SafeEdiblePlants = new List<EntityResource>();
+            SafePositions = new List<Vector2Int>();
+            SafeTemperaturePositions = new List<Vector2Int>();
 
             resourceComparer = new ResourcePositionComparer(c);
             valueComparer = new ResourceValueComparer();
-
+            positionComparer = new PositionComparer(c);
 
             maxResourcesRemembered = 5; //TODO: Esto bien
             maxPositionsRemembered = 10; //TODO: Esto bien
@@ -126,10 +130,14 @@ namespace EvolutionSimulation.Entities
         {
             int x = thisCreature.x, y = thisCreature.y;
 
+            if (!thisCreature.CheckTemperature(x, y) && SafeTemperaturePositions.Count == 0 && ticksElapsed % perceptionRadius == 0)
+                AddTemperaturePosition();
+
             if (++ticksElapsed == ticksToSavePosition)
             {
                 ticksElapsed = 0;
                 AddExplorePosition();
+                AddTemperaturePosition();
             }
 
             //If there is a creature targeted as the enemy and this creature loses sight or the creature dies the pointer is reset.
@@ -230,6 +238,8 @@ namespace EvolutionSimulation.Entities
                     Vector2Int p = new Vector2Int(x + i, y + j);
                     if (!world.checkBounds(p.x, p.y)) continue;
 
+                   
+
                     if (world.map[p.x, p.y].isWater)
                     {
                         //All shores adjacent to the creature are saved.
@@ -250,13 +260,11 @@ namespace EvolutionSimulation.Entities
 
                         //If this position was not remembered and there is valuable information in it (a danger level) it is remembered.
                         if (!positionWasKnown && position.intimidation != 0) dangersRemembered.Add(position);
-
                     }
                 }
             }
             // The following code also forgets, but since it does not deal with entities rather positions and danger
-            // it also serves to assign the safe place of the creature.
-            int safePlaceDist = 0;
+            // it also serves to assign safes places of the creature.
             float positionDanger;
             //The list is iterated through from the end to the start to deal with removing elements from it while iterating.
             for (int i = dangersRemembered.Count - 1; i >= 0; i--)
@@ -271,10 +279,9 @@ namespace EvolutionSimulation.Entities
                     RemoveFromSafePlant(p.position);
                 }
                 //If the tile remains in memory, it is safe and no safe place has been assigned or it is closer than the one already found, it is saved, unless that position can't be reached
-                else if (positionDanger <= 0 && world.canMove(p.position.x, p.position.y) && (SafePosition == null || safePlaceDist > thisCreature.DistanceToObjective(p.position)))
+                else if (positionDanger <= 0 && world.canMove(p.position.x, p.position.y) && !SafePositions.Contains(p.position))
                 {
-                    SafePosition = p.position;
-                    safePlaceDist = thisCreature.DistanceToObjective(p.position);
+                    SafePositions.Add(p.position);
                 }
             }
 
@@ -286,7 +293,7 @@ namespace EvolutionSimulation.Entities
             for (int i = 0; i < Allies.Count; i++) //For every ally the creature remembers the following comprobations are done:
             {
                 Creature ally = world.GetCreature(Allies[0].ID);
-                if (ally == null || ally.stats.Gender != thisCreature.stats.Gender) //This is done to ignore creatures of the same gender as this one. The gender is
+                if (ally == null || ally.stats.Gender == thisCreature.stats.Gender) //This is done to ignore creatures of the same gender as this one. The gender is
                     continue;                                                       //checked although the creature might not be in sight, but it is not modified
                                                                                     //and this way the gender is not saved (which would be inconvinient).
                 if (thisCreature.DistanceToObjective(Allies[0].position) <= perceptionRadius) //If it can see the ally and therefore exists.
@@ -304,6 +311,30 @@ namespace EvolutionSimulation.Entities
                 }
             }
         }
+
+        /// <summary>
+        /// Saves a close position to the creature if it's a confortable temperature to the creature
+        /// </summary>
+        public void AddTemperaturePosition()
+        {
+            int x = thisCreature.x, y = thisCreature.y;
+
+            bool found = false;
+            for (int i = -perceptionRadius; i <= perceptionRadius && !found; i++)
+            {
+                for (int j = -perceptionRadius; j <= perceptionRadius && !found; j++)
+                {
+                    Vector2Int p = new Vector2Int(x + i, y + j);
+                    if (!world.checkBounds(p.x, p.y) || !thisCreature.CheckTemperature(p.x, p.y) || SafeTemperaturePositions.Contains(p)) continue;
+
+                    SafeTemperaturePositions.Add(p);
+                    found = true;
+                   
+                }
+            }
+        }
+
+        #region Find explore position
         /// <summary>
         /// Saves the creature's current position if it is different from the last one in the queue.
         /// If a new position is added and the maximum number of positions saved is surpassed, the
@@ -318,6 +349,7 @@ namespace EvolutionSimulation.Entities
             if (explorePositionsRemembered.Count > maxPositionsRemembered)
                 explorePositionsRemembered.Dequeue();
         }
+
         /// <summary>
         /// To find a new unexplored position, the creature goes to
         /// a position following the opposite direction of the average
@@ -388,7 +420,7 @@ namespace EvolutionSimulation.Entities
                     maxAngle = Math.PI / 2.0;   // 90 degrees, the area that the creature should have come from
                 }
                 //TODO: quitar esto
-                if(cont >= 1000)
+                if (cont >= 1000)
                 {
                     // no deberia de pasar aqui pero xd
                     Console.WriteLine("bucle infinito");
@@ -442,9 +474,11 @@ namespace EvolutionSimulation.Entities
             }
             while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) && angleAcum <= maxAngle);
 
-            return angleAcum <= maxAngle 
+            return angleAcum <= maxAngle
                 && (finalPosition.x != thisCreature.x || finalPosition.y != thisCreature.y);
         }
+        #endregion
+
         /// <summary>
         /// This method has to be called when day changed to night nad vice versa, to update the radius the creature sees based on the
         /// new perception value, which changes at night.
@@ -578,6 +612,11 @@ namespace EvolutionSimulation.Entities
             if (list.Count > max)
                 list.RemoveRange(max, list.Count - max);
         }
+        private void AdjustPosList<T>(int max, List<T> list) where T : Vector2Int
+        {
+            if (list.Count > max)
+                list.RemoveRange(max, list.Count - max);
+        }
         // TODO: si tarda mucho hacer priority queue
         private void SortAndAdjustLists()
         {
@@ -599,6 +638,12 @@ namespace EvolutionSimulation.Entities
             RemoveFruitlessPlants();
             AdjustResourceList(maxResourcesRemembered, EdiblePlants);
             AdjustResourceList(maxResourcesRemembered, SafeEdiblePlants);
+
+            SafePositions.Sort(positionComparer);
+            AdjustPosList(maxPositionsRemembered, SafePositions);
+
+            SafeTemperaturePositions.Sort(positionComparer);
+            AdjustPosList(maxPositionsRemembered, SafeTemperaturePositions);
         }
 
         private void RemoveFakeInformation<T>(List<T> list) where T : EntityResource
@@ -626,7 +671,7 @@ namespace EvolutionSimulation.Entities
                 }
             }
         }
-
+        #region Forget
         /// <summary>
         /// Check all the resources if the creature has to forget it 
         /// </summary>
@@ -654,6 +699,8 @@ namespace EvolutionSimulation.Entities
                     RemoveFromSafeWater(p.position);
                     RemoveFromSafePlant(p.position);
                     dangersRemembered.RemoveAt(i);
+                    if (SafePositions.Contains(p.position))
+                        SafePositions.Remove(p.position);
                 }
             }
         }
@@ -679,6 +726,7 @@ namespace EvolutionSimulation.Entities
             if (res != null && --res.ticks == 0) //If it is time to forget.
                 res.position = null;
         }
+        #endregion
 
         /// <summary>
         /// Given a position, it is searched for and found in positionDangers, and before being returned, it is removed from the list.
@@ -755,6 +803,7 @@ namespace EvolutionSimulation.Entities
                 int bDist = Math.Abs(creature.x - b.position.x) + Math.Abs(creature.y - b.position.y);
                 return aDist.CompareTo(bDist);
             }
+
         }
         private class ResourceValueComparer : Comparer<ValueResource>
         {
@@ -764,6 +813,20 @@ namespace EvolutionSimulation.Entities
             {
                 return a.value.CompareTo(b.value);
             }
+        }
+
+        private class PositionComparer : Comparer<Vector2Int>
+        {
+            private Creature creature;
+            public PositionComparer(Creature creature) { this.creature = creature; }
+
+            public override int Compare(Vector2Int a, Vector2Int b)
+            {
+                int aDist = Math.Abs(creature.x - a.x) + Math.Abs(creature.y - a.y);
+                int bDist = Math.Abs(creature.x - b.x) + Math.Abs(creature.y - b.y);
+                return aDist.CompareTo(bDist);
+            }
+
         }
         #endregion
     }

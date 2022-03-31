@@ -125,6 +125,19 @@ namespace EvolutionSimulation.Entities
             mind.UpdatePerception();
         }
 
+        
+        /// <returns> Return True if the position is in a confortable temperature</returns>
+        public bool CheckTemperature(int x, int y)
+        {
+            double tileTemperature = world.map[x, y].temperature;
+            
+            return tileTemperature > stats.MinTemperature && tileTemperature < stats.MaxTemperature;
+        }
+
+        /// <summary>
+        /// Check if the creature is in a position where is confortable with the temperature
+        /// Otherwise the creature will take damage
+        /// </summary>
         void CheckTemperature()
         {
             double tileTemperature = world.map[x, y].temperature;
@@ -137,7 +150,7 @@ namespace EvolutionSimulation.Entities
                 difference = tileTemperature - stats.MaxTemperature;
             //If the creature is confortable nothing happens.
             else
-                return;
+                return ;
 
             //A range from 0 to 1 is calculated based on the difference of temperature and a max value for it.
             double range = Math.Min(difference / UniverseParametersManager.parameters.maxTemperatureDifference, 1);
@@ -150,6 +163,7 @@ namespace EvolutionSimulation.Entities
 
 #if DEBUG            
             causeOfDeath = "temperature difference, which dealt " + damage + " damage";
+            Console.WriteLine("CreatureId: " + ID +"  " + causeOfDeath);
 #endif
 
             mind.CreateDanger();
@@ -221,7 +235,8 @@ namespace EvolutionSimulation.Entities
             }
             else if (stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
                 stats.CurrRest >= (stats.MaxRest * UniverseParametersManager.parameters.restRegenerationThreshold) &&
-                stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold))
+                stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold)&&
+                CheckTemperature(x, y))
             {
                 stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth);  // TODO: Ver si esto esta bien, ingenieria de valores
                 stats.CurrHealth = Math.Min(stats.CurrHealth, stats.MaxHealth); // So it does not get over-healed
@@ -295,6 +310,7 @@ namespace EvolutionSimulation.Entities
             IState goToEat = new GoToEat(this);
             IState eat = new Eating(this);
             IState goToSafePlace = new GoToSafePlace(this);
+            IState goToSafeTemperaturePlace = new GoToSafeTemperaturePlace(this);
             IState sleep = new Sleeping(this);
             Fsm safeFSM = new Fsm(wander);
             IState safe = new CalmState("Safe", safeFSM, this);
@@ -314,6 +330,11 @@ namespace EvolutionSimulation.Entities
                 safeFSM.AddTransition(followParent, stopFollowParentTransition, wander);
             }
 
+            ITransition goToSafeTempPlaceTransition = new GoToSafeTemperaturePlaceTransition(this);
+            ITransition goToSafeTempPlaceExploreTransition = new GoToSafeTemperaturePlaceExploreTransition(this);
+            safeFSM.AddTransition(wander, goToSafeTempPlaceTransition, goToSafeTemperaturePlace);
+            safeFSM.AddTransition(wander, goToSafeTempPlaceExploreTransition, explore);
+            
             // Sleeping
             ITransition goToSafePlaceTransition = new GoToSafePlaceTransition(this);
             ITransition stopGoToSafePlaceTransition = new StopGoToSafePlaceTransition(this);
@@ -787,6 +808,11 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         /// <returns> Null if the creature does not have or does not remember any safe spot </returns>
         public Vector2Int SafePosition() { return mind.SafePosition(); }
+        /// <summary>
+        /// Gets the position of the most valid safe temperature position to the creature
+        /// </summary>
+        /// <returns> Null if the creature does not have or does not remember any safe temperature spot </returns>
+        public Vector2Int SafeTemperaturePosition() { return mind.SafeTemperaturePosition(); }
         /// <summary>
         /// Gets a new position that the creature has not explored yet or that it does not remember that 
         /// it has explored it before
