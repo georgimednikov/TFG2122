@@ -239,9 +239,7 @@ namespace EvolutionSimulation.Entities
                 {
                     Vector2Int p = new Vector2Int(x + i, y + j);
                     if (!world.checkBounds(p.x, p.y)) continue;
-
-
-
+                    
                     if (world.map[p.x, p.y].isWater)
                     {
                         //All shores adjacent to the creature are saved.
@@ -384,6 +382,54 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
+        /// Find the tile that the creature perceive that will deal less damage to him
+        /// </summary>
+        /// <returns> </returns>
+        public Vector2Int BestTemperaturePosition()
+        {
+            int x = thisCreature.x, y = thisCreature.y;
+            double range, damage, lessDamage = Double.PositiveInfinity;
+            Vector2Int goal = new Vector2Int();
+            bool found = false;
+            Vector2Int checkPos = new Vector2Int();
+            for (int i = -perceptionRadius; i <= perceptionRadius && !found; i++)
+            {
+                for (int j = -perceptionRadius; j <= perceptionRadius && !found; j++)
+                {
+                    checkPos.x = x + i; checkPos.y = y + j;
+                    if (!world.checkBounds(checkPos.x, checkPos.y) || !world.canMove(checkPos.x, checkPos.y) || (i == 0 && j ==0)) continue;
+                    
+                    double tileTemperature = world.map[checkPos.x, checkPos.y].temperature;
+                    double difference = 1;
+
+                    //The difference between the extreme acceptable temperature an the tile temperature is calculated.
+                    if (tileTemperature < thisCreature.stats.MinTemperature)
+                        difference = thisCreature.stats.MinTemperature - tileTemperature;
+                    else if (tileTemperature > thisCreature.stats.MaxTemperature)
+                        difference = tileTemperature - thisCreature.stats.MaxTemperature;
+
+                    //A range from 0 to 1 is calculated based on the difference of temperature and a max value for it.
+                    range = Math.Min(difference / UniverseParametersManager.parameters.maxTemperatureDifference, 1);
+                    //The base damage of being in an area with a temperature that cannot be stand is a porcentage of the max health each tick.
+                    //To that, another instance of damage is added depending on how much this temperature supasses that acceptable for the creature.
+                    damage = thisCreature.stats.MaxHealth *
+                        ((range * (UniverseParametersManager.parameters.maxHealthTemperatureDamage - UniverseParametersManager.parameters.minHealthTemperatureDamage)) +
+                        UniverseParametersManager.parameters.minHealthTemperatureDamage);
+
+                    if (damage < lessDamage)
+                    {
+                        lessDamage = damage;
+                        goal.x = checkPos.x;
+                        goal.y = checkPos.y;
+                    }
+
+                }
+            }
+
+            return goal;
+        }
+
+        /// <summary>
         /// To find a new unexplored position, the creature goes to
         /// a position following the opposite direction of the average
         /// of the most recent positions that the creature has visited.
@@ -394,12 +440,16 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public Vector2Int FindNewPosition()
         {
+            int x = thisCreature.x;
+            int y = thisCreature.y;
+
+            if (!thisCreature.CheckTemperature(x, y) && SafeTemperaturePositions.Count == 0)
+                return BestTemperaturePosition();
+
             Vector3 vector = Vector3.Zero;
 
             // The average position of this creature's path so far is calculated and the used as a reference
             // to get a direction vector that is used to guide the creature away from places already visited.
-            int x = thisCreature.x;
-            int y = thisCreature.y;
             int averageX = x;
             int averageY = y;
 
