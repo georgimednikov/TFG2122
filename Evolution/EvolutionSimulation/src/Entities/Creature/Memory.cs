@@ -239,7 +239,7 @@ namespace EvolutionSimulation.Entities
                 {
                     Vector2Int p = new Vector2Int(x + i, y + j);
                     if (!world.checkBounds(p.x, p.y)) continue;
-                    
+
                     if (world.map[p.x, p.y].isWater)
                     {
                         //All shores adjacent to the creature are saved.
@@ -319,16 +319,33 @@ namespace EvolutionSimulation.Entities
             }
         }
 
+        /// <summary>
+        /// Returns a new unexplored region for the creature.
+        /// In extreme cases (it has explored an it remebers all regions
+        /// or it is in the middle of a huge mass of water) it returns a random region
+        /// </summary>
         internal int NewExplorePosition()
         {
             int unexploredRegion = -1;
             Queue<int> regionsQueue = new Queue<int>();
-            int currentRegion = thisCreature.world.map[thisCreature.x, thisCreature.y].regionId;
+            int currentRegion = world.map[thisCreature.x, thisCreature.y].regionId;
+
+            // If the creature is over the water, it searches for the nearest land position
+            if (currentRegion == -1)
+            {
+                Vector2Int landPos;
+
+                // If no land position is found, it returns a random region
+                if (!SearchForLand(out landPos)) return RandomGenerator.Next(0, world.highMap.Count);
+                currentRegion = world.map[landPos.x, landPos.y].regionId;
+            }
             regionsQueue.Enqueue(currentRegion);
-            while(regionsQueue.Count > 0 && unexploredRegion == -1)
+
+            // It searches for a unexplored region using BFS
+            while (regionsQueue.Count > 0 && unexploredRegion == -1)
             {
                 int nextRegion = regionsQueue.Dequeue();
-                List<int> adyRegions = new List<int>(thisCreature.world.highMap[nextRegion].links.Keys);
+                List<int> adyRegions = new List<int>(world.highMap[nextRegion].links.Keys);
                 Shuffle(adyRegions);    // Shuffle to add randomness
                 for (int i = 0; unexploredRegion == -1 && i < adyRegions.Count; i++)
                 {
@@ -336,13 +353,47 @@ namespace EvolutionSimulation.Entities
                         unexploredRegion = adyRegions[i];
                     else if (!regionsQueue.Contains(adyRegions[i]))
                         regionsQueue.Enqueue(adyRegions[i]);
-                }           
+                }
             }
             if (unexploredRegion == -1)
-                unexploredRegion = RandomGenerator.Next(0, thisCreature.world.highMap.Count);
+                unexploredRegion = RandomGenerator.Next(0, world.highMap.Count);
             return unexploredRegion;
         }
-
+        /// <summary>
+        /// Searches for a land position in the eight directions based on the creature position.
+        /// Returns false if no position is found, true otherwise.
+        /// </summary>
+        /// <param name="landPos"> Returns a land position, if it is not founded, the position that returns is not valid</param>
+        private bool SearchForLand(out Vector2Int landPos)
+        {
+            Vector2Int[] Dirs =
+            {
+                new Vector2Int(-1, -1), new Vector2Int(0, -1), new Vector2Int(1, -1),
+                new Vector2Int(-1, 0),                       new Vector2Int(1, 0),
+                new Vector2Int(-1, 1), new Vector2Int(0, 1), new Vector2Int(1, 1)
+            };
+            // The map is sqare, pithagoras to get diagonal, the maximum distance to search
+            double mapDiag = Math.Sqrt(2 * Math.Pow(world.map.GetLength(0), 2)); 
+            bool landFound = false;
+            int indx = Dirs.Length - 1;
+            int distInc = Math.Max(1, world.chunkSize / 2);
+            int rad = distInc;  // TOOD: haciendo saltos de la mitad de tamanio de chunk es menos preciso, se puede poner de 1 a 1.
+            Vector2Int creaturePos = new Vector2Int(thisCreature.x, thisCreature.y);
+            landPos = new Vector2Int();
+            while (!landFound && rad < mapDiag)
+            {
+                while (indx >= 0 && !landFound)
+                {
+                    landPos = creaturePos + Dirs[indx] * rad;
+                    landFound = thisCreature.world.canMove(landPos.x, landPos.y);
+                    indx--;
+                }
+                indx = Dirs.Length - 1;
+                rad += distInc;
+            }
+            
+            return landFound;
+        }
         /// <summary>
         /// Saves a close position to the creature if it's a confortable temperature to the creature
         /// </summary>
@@ -397,8 +448,8 @@ namespace EvolutionSimulation.Entities
                 for (int j = -perceptionRadius; j <= perceptionRadius && !found; j++)
                 {
                     checkPos.x = x + i; checkPos.y = y + j;
-                    if (!world.checkBounds(checkPos.x, checkPos.y) || !world.canMove(checkPos.x, checkPos.y) || (i == 0 && j ==0)) continue;
-                    
+                    if (!world.checkBounds(checkPos.x, checkPos.y) || !world.canMove(checkPos.x, checkPos.y) || (i == 0 && j == 0)) continue;
+
                     double tileTemperature = world.map[checkPos.x, checkPos.y].temperature;
                     double difference = 1;
 

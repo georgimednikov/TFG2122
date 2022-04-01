@@ -14,6 +14,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     class Explore : CreatureState
     {
         Vector2 posToDiscover;
+        int regionID;
         public Explore(Entities.Creature c) : base(c)
         {
             creature = c;
@@ -26,7 +27,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            posToDiscover = creature.world.highMap[creature.NewExploreRegion()].spawnPoint; // Region spawn point is always at ground height
+            regionID = creature.NewExploreRegion();
+            posToDiscover = creature.world.highMap[regionID].spawnPoint; // Region spawn point is always at ground height
             creature.SetPath((int)posToDiscover.X, (int)posToDiscover.Y, Entities.Creature.HeightLayer.Ground);
         }
 
@@ -37,14 +39,17 @@ namespace EvolutionSimulation.FSM.Creature.States
             // If the creature already arrived at the path, the next cost is -1 or 0, so the creature searches for other path
             if (creature.GetNextCostOnPath() <= 0)
             {
-                posToDiscover = creature.world.highMap[creature.NewExploreRegion()].spawnPoint; // Region spawn point is always at ground height
+                regionID = creature.NewExploreRegion();
+                posToDiscover = creature.world.highMap[regionID].spawnPoint; // Region spawn point is always at ground height
                 creature.SetPath((int)posToDiscover.X, (int)posToDiscover.Y, Entities.Creature.HeightLayer.Ground);
             }
         }
 
         public override string GetInfo()
         {
-            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ", " + creature.creatureLayer + ")" + " EXPLORES AT (" + posToDiscover.X + ", " + posToDiscover.Y + ")";
+            return creature.speciesName + " with ID: " + creature.ID + " IN REGION: " 
+                + creature.world.map[creature.x, creature.y].regionId + " IN (" + creature.x + ", " + creature.y + ", " + creature.creatureLayer + ")" 
+                + " EXPLORES AT (" + posToDiscover.X + ", " + posToDiscover.Y + ", " + regionID + ")";
         }
 
         public override string ToString()
