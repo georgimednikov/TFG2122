@@ -52,7 +52,7 @@ namespace EvolutionSimulation.Entities
                 poisonProb = 0;
 
             poisonDuration = (int)creature.stats.Venom;
-            poisonTickDamage = creature.stats.Venom * 0.25f;    // TODO: Nº magico aqui ojo
+            poisonTickDamage = creature.stats.Venom * UniverseParametersManager.parameters.venomDamageMultiplier; 
 
             // TODO: testiar
             maxNutritionPoints = UniverseParametersManager.parameters.corpseNutritionPointsMultiplier 

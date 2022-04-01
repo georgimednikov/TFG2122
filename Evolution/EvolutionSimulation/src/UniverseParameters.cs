@@ -13,6 +13,11 @@ namespace EvolutionSimulation
         public float morningStart = 6.5f;
         public float nightStart = 20;
 
+        //Plant
+        public int grassHp = 10;
+        public int bushHp = 20;
+        public int eTreeHp = 50;
+
         // Creature
         public float abilityUnlockPercentage = 0.4f; //The percentage of an ability that has to be had in order to unlock it
         public int minHealth = 10; //Minimum amount of health
@@ -44,6 +49,7 @@ namespace EvolutionSimulation
         public float maxTemperatureDifference = 0.2f; //How many degrees over the limit influence the damage until it reaches the limit.
         public double minHealthTemperatureDamage = 0.01; //Minimum max health damage for being in extreme temperatures.
         public double maxHealthTemperatureDamage = 0.02; //Maximum max health damage for being in extreme temperatures.
+        public float venomDamageMultiplier = 0.25f;
 
         // CreatureStats
         public float newbornStatMultiplier = 0.33f; //Starting multiplier of newborns

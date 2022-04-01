@@ -291,8 +291,7 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
-        /// Configures the creature's state machine with the given states.
-        /// TODO: We are forcefully cramming these states down the FSM's throat
+        /// Configures the creature's state machine with default states.
         /// </summary>
         void ConfigureStateMachine()
         {

@@ -203,7 +203,7 @@ namespace EvolutionSimulation
         private void FillHighMap()
         {
             int numReg = 0;
-            Queue<Vector2> regions = new Queue<Vector2>(); //TODO: Lista de nodos a encular 
+            Queue<Vector2> regions = new Queue<Vector2>(); //TODO: Lista de nodos a encolar 
             for (int i = 0; i < map.GetLength(0) / chunkSize; i++)
             {
                 for (int j = 0; j < map.GetLength(1) / chunkSize; j++)
@@ -652,10 +652,10 @@ namespace EvolutionSimulation
                         switch (plantType)
                         {
                             case 0:
-                                map[xIndex, yIndex].plant = CreateStaticEntity<Grass>(xIndex, yIndex, 10); // TODO: Numeros arcanos
+                                map[xIndex, yIndex].plant = CreateStaticEntity<Grass>(xIndex, yIndex, UniverseParametersManager.parameters.grassHp);
                                 break;
                             case 1:
-                                map[xIndex, yIndex].plant = CreateStaticEntity<Bush>(xIndex, yIndex, 10); // TODO: Numeros arcanos
+                                map[xIndex, yIndex].plant = CreateStaticEntity<Bush>(xIndex, yIndex, UniverseParametersManager.parameters.bushHp);
                                 break;
                             case 2:
                                 maxTrees++;
@@ -664,7 +664,7 @@ namespace EvolutionSimulation
                             case 3:
                                 maxTrees++;
                                 trees++;
-                                map[xIndex, yIndex].plant = CreateStaticEntity<EdibleTree>(xIndex, yIndex, 50);  // TODO: Numeros arcanos
+                                map[xIndex, yIndex].plant = CreateStaticEntity<EdibleTree>(xIndex, yIndex, UniverseParametersManager.parameters.eTreeHp);
                                 break;
                             default:
                                 break;

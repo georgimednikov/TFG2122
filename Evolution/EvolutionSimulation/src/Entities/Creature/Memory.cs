@@ -218,7 +218,8 @@ namespace EvolutionSimulation.Entities
                 if (entity is Corpse && !thisCreature.IsHerbivorous())
                 {
                     Corpse newCorpse = entity as Corpse;
-                    if (thisCreature.chromosome.HasAbility(Genetics.CreatureFeature.Scavenger, 0.4f) || newCorpse.Edible) //TODO cambiar 0.4
+                    if (thisCreature.chromosome.HasAbility(Genetics.CreatureFeature.Scavenger, Genetics.CreatureChromosome.AbilityUnlock[Genetics.CreatureFeature.Scavenger]) 
+                        || newCorpse.Edible)
                         UpdateList(FreshCorpses, resource, maxExperienceTicks);
                     else
                         UpdateList(RottenCorpses, resource, maxExperienceTicks);
@@ -469,13 +470,6 @@ namespace EvolutionSimulation.Entities
                     angleIncrement = Math.PI / 4.0;
                     maxAngle = Math.PI / 2.0;   // 90 degrees, the area that the creature should have come from
                 }
-                //TODO: quitar esto
-                if (cont >= 1000)
-                {
-                    // no deberia de pasar aqui pero xd
-                    Console.WriteLine("bucle infinito");
-                }
-
             }
             while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) // Repeat if it cannot move to the calculated destiny
                 || (finalPosition.x == thisCreature.x && finalPosition.y == thisCreature.y));                // or the destiny is the same position as the creature position
