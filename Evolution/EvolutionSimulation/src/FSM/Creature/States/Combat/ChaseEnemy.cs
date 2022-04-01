@@ -81,7 +81,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 
             if (otherObj.x != objective.x || otherObj.y != objective.y)  // If objective position is a different one, adjust accordingly
             {
-                objective = otherObj;
+                objective.x = otherObj.x;
+                objective.y = otherObj.y;
                 creature.SetPath(objective);    // Set the path the creature must follow
             }
 

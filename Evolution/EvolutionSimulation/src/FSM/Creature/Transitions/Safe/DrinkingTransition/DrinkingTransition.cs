@@ -27,11 +27,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             //return shore;
             int range = UniverseParametersManager.parameters.adjacentLength;
 #if DEBUG
-            Console.Write("TRANSICION BEBER: " + creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")" + " IS NEXT TO (" + creature.WaterPosition().x + ", " + creature.WaterPosition().y + ")? ");
+            //Console.Write("TRANSICION BEBER: " + creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")" + " IS NEXT TO (" + creature.WaterPosition().x + ", " + creature.WaterPosition().y + ")? ");
 #endif
             bool a = (Math.Abs(creature.WaterPosition().x - creature.x) <= range && Math.Abs(creature.WaterPosition().y - creature.y) <= range);
 #if DEBUG
-            Console.WriteLine(a);
+            //Console.WriteLine(a);
 #endif
             return a;
         }
