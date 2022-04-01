@@ -375,20 +375,20 @@ namespace EvolutionSimulation.Entities
             // The map is sqare, pithagoras to get diagonal, the maximum distance to search
             double mapDiag = Math.Sqrt(2 * Math.Pow(world.map.GetLength(0), 2)); 
             bool landFound = false;
-            int indx = Dirs.Length - 1;
+            int indx = 0;
             int distInc = Math.Max(1, world.chunkSize / 2);
             int rad = distInc;  // TOOD: haciendo saltos de la mitad de tamanio de chunk es menos preciso, se puede poner de 1 a 1.
             Vector2Int creaturePos = new Vector2Int(thisCreature.x, thisCreature.y);
             landPos = new Vector2Int();
             while (!landFound && rad < mapDiag)
             {
-                while (indx >= 0 && !landFound)
+                while (indx < Dirs.Length && !landFound)
                 {
                     landPos = creaturePos + Dirs[indx] * rad;
                     landFound = thisCreature.world.canMove(landPos.x, landPos.y);
-                    indx--;
+                    indx++;
                 }
-                indx = Dirs.Length - 1;
+                indx = 0;
                 rad += distInc;
             }
             
