@@ -525,6 +525,7 @@ namespace EvolutionSimulation
             if (parameters.mobilityPenalty <= 0) throw new UniverseParameterIsZeroException("The provided mobilityPenalty must be positive");
             if (parameters.maxSpeed <= 0) throw new UniverseParameterIsZeroException("The provided maxSpeed must be positive");
             if (parameters.hornIntimidationMultiplier <= 0) throw new UniverseParameterIsZeroException("The provided hornIntimidationMultiplier must be positive");
+            if (parameters.hairTemperatureMultiplier < 0 || parameters.hairTemperatureMultiplier > 1) throw new UniverseParameterIsZeroException("The provided hairTemperatureMultiplier must be between 0 and 1");
             if (parameters.restRegenerationThreshold <= 0) throw new UniverseParameterIsZeroException("The provided restRegenerationThreshold must be positive");
             if (parameters.energyRegenerationThreshold <= 0) throw new UniverseParameterIsZeroException("The provided energyRegenerationThreshold must be positive");
             if (parameters.hydrationRegenerationThreshold <= 0) throw new UniverseParameterIsZeroException("The provided hydrationRegenerationThreshold must be positive");

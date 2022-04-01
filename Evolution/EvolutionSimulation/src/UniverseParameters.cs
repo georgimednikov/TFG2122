@@ -33,6 +33,7 @@ namespace EvolutionSimulation
         public float mobilityPenalty = 0.7f; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
         public float maxSpeed = 1.5f;
         public float hornIntimidationMultiplier = 1.5f;
+        public float hairTemperatureMultiplier = 0.2f;//The temperature multiplier is the creature has the hair ability
         public float restRegenerationThreshold = 0.7f;  // Threshold at which rest must be for the creature to be able to regenerate health
         public float energyRegenerationThreshold = 0.85f;   // Threshold at which energy must be for the creature to be able to regenerate health
         public float hydrationRegenerationThreshold = 0.85f;    // Threshold at which hysration must be for the creature to be able to regenerate health
