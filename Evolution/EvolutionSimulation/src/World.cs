@@ -304,10 +304,11 @@ namespace EvolutionSimulation
         /// <summary>
         /// Performs a step of the simulation.
         /// </summary>
-        public void Tick()
+        /// <returns>True if ther are any remaining creatures</returns>
+        public bool Tick()
         {
             CycleDayNight();
-            EntitiesTick();
+            return EntitiesTick();
         }
 
         // TODO: que devuelva una criatura no soluciona el problema de la destrucción, a no ser que sea una copia u otro objeto
@@ -391,7 +392,8 @@ namespace EvolutionSimulation
         /// Performs a tick of the simulation of every entity.
         /// Deletes all entities that need to be destroyed after the tick
         /// </summary>
-        private void EntitiesTick()
+        /// <returns>True if ther are any remaining creatures</returns>
+        private bool EntitiesTick()
         {
             // Tick for every creature, ordered by metabolism
             List<Creature> sortedCreatures = new List<Creature>(Creatures.Values);
@@ -414,6 +416,8 @@ namespace EvolutionSimulation
             }
             );
             entitiesToDelete.Clear();
+
+            return sortedCreatures.Count > 0;
         }
 
         /// <summary>
