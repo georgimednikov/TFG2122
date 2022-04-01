@@ -448,8 +448,8 @@ namespace EvolutionSimulation.Entities
         Dictionary<Interactions, List<Action<Creature>>> InteractionsDict;
 
         // Handler for interaction events
-        //public delegate void ReceiveInteractionHandler(Creature receiver, Creature sender, Interactions type);
-        //public event ReceiveInteractionHandler ReceiveInteractionEvent; // TODO: asi?
+        public delegate void ReceiveInteractionHandler(Creature receiver, Creature sender, Interactions type);
+        public event ReceiveInteractionHandler ReceiveInteractionEvent; // TODO: asi?
 
         // Methods to receive and respond to interactions
         /// <summary>
@@ -461,7 +461,7 @@ namespace EvolutionSimulation.Entities
             {
                 foreach (Action<Creature> response in InteractionsDict[type])
                     response(interacter);
-                //ReceiveInteractionEvent?.Invoke(this, interacter, type);
+                ReceiveInteractionEvent?.Invoke(this, interacter, type);
             }
         }
 
