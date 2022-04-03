@@ -56,12 +56,12 @@ namespace EvolutionSimulation.Entities
             Console.WriteLine("Empieza Astar: " + start + " " + end);
 #endif
             if (end == start) throw new InvalidOperationException("La misma pos esta mal");
-            Vector3 tempEnd = HighAstar(w, start, end);
+            Vector3 tempEnd = HighAstar(w, start, end, out int endRegion);
 
-            return LowAstar(c, w, start, tempEnd, out treeDensity);
+            return LowAstar(c, w, start, tempEnd, endRegion, out treeDensity);
         }
 
-        private static Vector3 HighAstar(World w, Vector3 start, Vector3 end)
+        private static Vector3 HighAstar(World w, Vector3 start, Vector3 end, out int endRegion)
         {
             Vector3 nStart = new Vector3(w.map[(int)start.X, (int)start.Y].regionId, 0, 0);
             Vector3 nEnd = new Vector3(w.map[(int)end.X, (int)end.Y].regionId, 0, 0);
@@ -113,12 +113,14 @@ namespace EvolutionSimulation.Entities
                         finalPos = nPos;
                     }
                 }
+                endRegion = (int)list[1].pos.X;
                 return finalPos;
             }
+            endRegion = -1;
             return end;
         }
 
-        private static Vector3[] LowAstar(Creature c, World w, Vector3 start, Vector3 end, out double treeDensity)
+        private static Vector3[] LowAstar(Creature c, World w, Vector3 start, Vector3 end, int endRegion, out double treeDensity)
         {
             List<GraphNode> path = new List<GraphNode>();
             Utils.PriorityQueue<GraphNode> open = new Utils.PriorityQueue<GraphNode>();
@@ -136,7 +138,7 @@ namespace EvolutionSimulation.Entities
                 closed.Add(current);
                 if (current.pos == end)
                     break;
-                foreach (GraphNode n in LowGetNeighbours(treeBetter, c, w, current))
+                foreach (GraphNode n in LowGetNeighbours(treeBetter, c, w, current, endRegion))
                 {
                     n.estimatedCost = current.costSoFar + CustomHeuristic(treeBetter, c, n.pos, end, w, out double partialTreeDensity);
                     Vector3 posToEnd = end - n.pos;
@@ -204,7 +206,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="w">World where it happens</param>
         /// <param name="n">Current node</param>
         /// <returns></returns>
-        static List<GraphNode> LowGetNeighbours(bool treeBetter, Creature c, World w, GraphNode n)
+        static List<GraphNode> LowGetNeighbours(bool treeBetter, Creature c, World w, GraphNode n, int otherId)
         {
             List<GraphNode> neigh = new List<GraphNode>();
             int id = w.map[(int)n.pos.X, (int)n.pos.Y].regionId;
@@ -214,7 +216,7 @@ namespace EvolutionSimulation.Entities
                     Vector3 newPos;
                     if (i == 0 && j == 0 && w.canMove(newPos = (new Vector3(n.pos.X + i, n.pos.Y + j, n.pos.Z == (int)Creature.HeightLayer.Tree ? (int)Creature.HeightLayer.Ground : (int)Creature.HeightLayer.Tree))))
                         neigh.Add(new GraphNode(newPos, n, n.costSoFar + (treeBetter ? 0 : (int)Creature.HeightLayer.Tree) - c.PositionDanger((int)n.pos.X, (int)n.pos.Y)));
-                    else if (w.canMove(newPos = (n.pos + new Vector3(i, j, 0))) && id == w.map[(int)n.pos.X + i, (int)n.pos.Y + j].regionId)
+                    else if (w.canMove(newPos = (n.pos + new Vector3(i, j, 0))) && (id == w.map[(int)n.pos.X + i, (int)n.pos.Y + j].regionId || otherId == w.map[(int)n.pos.X + i, (int)n.pos.Y + j].regionId))
                     {
                         double costSoFar = n.costSoFar;
                         if (!w.canMove(newPos)) continue;

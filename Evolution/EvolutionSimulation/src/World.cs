@@ -65,6 +65,15 @@ namespace EvolutionSimulation
         /// Being 0 = Grass, 1 = Bush, 2 = Tree and 3 = Edible Tree
         /// </summary>
         public Func<double, int> floraSelector;
+        /// <summary>
+        /// Which type of terrain should be generated, if Custom type is not selected, only mapSize, will be used.
+        /// </summary>
+        public World.MapType type;
+
+        public WorldGenConfig(World.MapType type)
+        {
+            this.type = type;
+        }
     }
 
     /// <summary>
@@ -83,7 +92,16 @@ namespace EvolutionSimulation
             public int regionId = -1;
         }
 
-        public struct MapRegion
+        public enum MapType
+        {
+            Default,
+            Island,
+            Atoll,
+            Swamp,
+            Custom
+        }
+
+        public class MapRegion
         {
             public Vector2 spawnPoint;
             public Dictionary<int, List<Vector2>> links;
@@ -91,7 +109,7 @@ namespace EvolutionSimulation
 
         public void Init(int size)
         {
-            WorldGenConfig c = new WorldGenConfig();
+            WorldGenConfig c = new WorldGenConfig(MapType.Default);
             c.mapSize = size;
             Init(c);
         }
@@ -134,12 +152,42 @@ namespace EvolutionSimulation
 
             Validator.Validate(config);
 
-            evaluateHeight = (config.evaluateHeight != null) ? config.evaluateHeight : EvaluateHeightCurve;
+            switch (config.type)
+            {
+                case MapType.Default:
+                    complexGen = false;
+                    evaluateHeight = DefaultEvaluateHeightCurve;
+                    break;
+                case MapType.Custom:
+                    complexGen = false;
+                    if (config.evaluateHeight == null) evaluateHeight = DefaultEvaluateHeightCurve;
+                    else evaluateHeight = config.evaluateHeight;
+                    break;
+                case MapType.Island:
+                    complexGen = true;
+                    complexEvaluateHeight = IslandEvaluateHeightCurve;
+                    break;
+                case MapType.Atoll:
+                    complexGen = true;
+                    complexEvaluateHeight = AtollEvaluateHeightCurve;
+                    break;
+                case MapType.Swamp:
+                    complexGen = true;
+                    modifiedHeight = false;
+                    break;
+            }
+
+            //If Custom type is not selected, the config will be ignored
+            int tSize = config.mapSize;
+            if (config.type != MapType.Custom) config = new WorldGenConfig(config.type);
+            config.mapSize = tSize;
+
             evaluateInfluence = (config.evaluateInfluence != null) ? config.evaluateInfluence : EvaluateInfluenceCurve;
             evaluateFlora = (config.evaluateFlora != null) ? config.evaluateFlora : EvaluateFloraCurve;
             temperatureSoftener = (config.temperatureSoftener != null) ? config.temperatureSoftener : SoftenTemperatureByHeight;
             floraSelector = (config.floraSelector != null) ? config.floraSelector : ChoosePlant;
-            modifiedHeight = config.heightModifiedByFunction;
+            if (config.type == MapType.Custom) modifiedHeight = config.heightModifiedByFunction;
+
             taxonomy = new GeneticTaxonomy();
             taxonomy.Init();
             Creatures = new Dictionary<int, Creature>();
@@ -158,15 +206,30 @@ namespace EvolutionSimulation
             if (config.heightWaves != null) heightWaves = config.heightWaves;
             else
             {
-                heightWaves = new Wave[2];
-                heightWaves[0] = new Wave();
-                heightWaves[0].seed = RandomGenerator.Next(0, 10000);
-                heightWaves[0].frequency = 0.5f;
-                heightWaves[0].amplitude = 1f;
-                heightWaves[1] = new Wave();
-                heightWaves[1].seed = RandomGenerator.Next(0, 10000);
-                heightWaves[1].frequency = 20f;
-                heightWaves[1].amplitude = 0;
+                if (complexGen)
+                {
+                    heightWaves = new Wave[3];
+                    heightWaves[0] = new Wave();
+                    heightWaves[0].seed = RandomGenerator.Next(0, 10000);
+                    heightWaves[0].frequency = 1f;
+                    heightWaves[0].amplitude = 1f;
+                    heightWaves[1] = new Wave();
+                    heightWaves[1].seed = RandomGenerator.Next(0, 10000);
+                    heightWaves[1].frequency = 2f;
+                    heightWaves[1].amplitude = 0.7f;
+                    heightWaves[2] = new Wave();
+                    heightWaves[2].seed = RandomGenerator.Next(0, 10000);
+                    heightWaves[2].frequency = 4f;
+                    heightWaves[2].amplitude = 0.25f;
+                }
+                else
+                {
+                    heightWaves = new Wave[1];
+                    heightWaves[0] = new Wave();
+                    heightWaves[0].seed = RandomGenerator.Next(0, 10000);
+                    heightWaves[0].frequency = 0.5f;
+                    heightWaves[0].amplitude = 1f;
+                }
             }
 
             if (config.humidityMap != null) { humidityMap = config.humidityMap; mapSize = humidityMap.GetLength(0); }
@@ -230,7 +293,6 @@ namespace EvolutionSimulation
             {
                 Vector2 cur = regions.Dequeue();
                 int id = map[(int)cur.X, (int)cur.Y].regionId;
-
                 for (int j = -1; j <= 1; ++j)
                     for (int k = -1; k <= 1; ++k)
                     {
@@ -257,7 +319,10 @@ namespace EvolutionSimulation
                         }
                     }
             }
+
         }
+
+
 
         /// <summary>
         /// Checks if target coordinates are available in the map
@@ -499,11 +564,13 @@ namespace EvolutionSimulation
         public Wave[] temperatureWaves; // Passes performed by the Perlin noise and added to the temperature
         bool modifiedHeight = true;
         Func<double, double> evaluateHeight;
+        Func<int, int, double> complexEvaluateHeight;
         Func<double, double> evaluateInfluence;
         Func<double, double, double> evaluateFlora;
         Func<double, double, double, double> temperatureSoftener;
         Func<double, int> floraSelector;
         float[,] heightMap, humidityMap, temperatureMap;
+        bool complexGen = false;
 
         /// <summary>
         /// Function used to insert further noise into the Perlin noise
@@ -566,7 +633,19 @@ namespace EvolutionSimulation
                 for (int xIndex = 0; xIndex < sizeX; xIndex++)
                 {
                     map[xIndex, yIndex] = new MapData();
-                    map[xIndex, yIndex].height = modifiedHeight ? evaluateHeight(heightMap[xIndex, yIndex]) : heightMap[xIndex, yIndex];
+
+                    if (complexGen)
+                    {
+                        if (modifiedHeight)
+                            map[xIndex, yIndex].height = complexEvaluateHeight(xIndex, yIndex);
+                        else map[xIndex, yIndex].height = heightMap[xIndex, yIndex];
+                    }
+                    else
+                    {
+                        if (modifiedHeight)
+                            map[xIndex, yIndex].height = evaluateHeight(heightMap[xIndex, yIndex]);
+                        else map[xIndex, yIndex].height = heightMap[xIndex, yIndex];
+                    }
 
                     double evaluation = evaluateInfluence(map[xIndex, yIndex].height);
                     if (evaluation >= 0)
@@ -718,7 +797,7 @@ namespace EvolutionSimulation
         /// <summary>
         /// Evaluatues a value according to the height function
         /// </summary>
-        double EvaluateHeightCurve(double x)
+        double DefaultEvaluateHeightCurve(double x)
         {
             //A sets the end of the first slope
             //B sets the height where A stops
@@ -729,6 +808,20 @@ namespace EvolutionSimulation
             else if (x < c1) return b;
             else if (x < 1) return (b1 / 2) * Math.Sin((Math.PI / a1) * (x - a1 / 2 - c1)) + b1 / 2 + d1;
             else return 1;
+        }
+
+        double IslandEvaluateHeightCurve(int xIndex, int yIndex)
+        {
+            double e = heightMap[xIndex, yIndex];
+            double nx = (2f * xIndex / map.GetLength(0)) - 1f, ny = (2f * yIndex / map.GetLength(1)) - 1f, d = 1f - (1f - nx * nx) * (1f - ny * ny);
+            return (1 + e - d) / 2f;
+        }
+
+        double AtollEvaluateHeightCurve(int xIndex, int yIndex)
+        {
+            double e = heightMap[xIndex, yIndex];
+            double nx = (2f * xIndex / map.GetLength(0)) - 1f, ny = (2f * yIndex / map.GetLength(1)) - 1f;
+            return e * Math.Sin(3 * (nx * nx + ny * ny)) * 1.25f;
         }
 
         /// <summary>

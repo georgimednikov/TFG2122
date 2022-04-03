@@ -20,9 +20,14 @@ namespace VisualizadorConsola
             CreatureChromosome.SetChromosome();
             UniverseParametersManager.ReadJSON();
             world = new World();
-            world.Init(512);//UserInfo.Size);
-            //world.ExportContent();
-            //WorldToBmp();
+            WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
+            {
+                mapSize = 512
+            };
+
+            world.Init(config);
+            world.ExportContent();
+            WorldToBmp();
             //A minimum distance to leave in between species spawn points to give them some room.
             //Calculated based on the world size and amount of species to spawn, and then reduced by
             //a value to give room in the world and not fill it in a homogenous manner.
@@ -96,7 +101,6 @@ namespace VisualizadorConsola
             Bitmap hMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap holdRidgeMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap voronoiMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
             double val;
             for (int i = 0; i < world.map.GetLength(0) * scale; i += scale)
             {
@@ -153,11 +157,13 @@ namespace VisualizadorConsola
                     #endregion
 
                     #region TerrainTexture
+
                     float thres = 1.0f, thres2 = 0.7f;
+                    double h = world.map[j / scale, i / scale].height;
+
                     if (val >= thres) SetPixel(j, i, Color.FromArgb(0, 255, 0), floraMapMask, scale);
                     else SetPixel(j, i, Color.FromArgb((int)(150 * (thres - val)), (int)(90 + (val * 165f / thres)), 0), floraMapMask, scale);
 
-                    double h = world.map[j / scale, i / scale].height;
 
                     if (h >= thres2)
                     {
