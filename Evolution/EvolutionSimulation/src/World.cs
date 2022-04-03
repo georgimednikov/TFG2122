@@ -868,6 +868,8 @@ namespace EvolutionSimulation
             taxonomy.ExportSpecies();
             string word = JsonConvert.SerializeObject(map, Formatting.Indented);
             System.IO.File.WriteAllText(UserInfo.ExportDirectory + "World.json", word);
+            string hMap = JsonConvert.SerializeObject(highMap, Formatting.Indented);
+            System.IO.File.WriteAllText(UserInfo.ExportDirectory + "HighMap.json", word);
         }
 
         // Map with physical properties
