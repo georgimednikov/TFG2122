@@ -34,8 +34,6 @@ namespace UnitySimulation
 
         public World Generate()
         {
-            EvolutionSimulation.Genetics.CreatureChromosome.SetChromosome();
-            UniverseParametersManager.ReadJSON();
             world = new World();
 
             if (worldJson != null)

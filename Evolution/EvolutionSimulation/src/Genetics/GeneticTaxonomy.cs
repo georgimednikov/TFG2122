@@ -50,53 +50,62 @@ namespace EvolutionSimulation.Genetics
     public class GeneticTaxonomy
     {
         // The different weights of each gene when calculating the genetic similarity between two creatures
-        float[] speciesGeneWeights;
+        static float[] speciesGeneWeights;
+        // The mininum genetic similarity to be the same species
+        static float minGeneticSimilarity;
+
         // List containing the information of every species that is alive
         List<Species> existingSpecies;
         // List containing the information of every species that has spawned, dead AND alive, as well as the forming tree.
         // A new species is inserted right after its progenitor, so the order to create the tree is mantained.
         // See RenderSpeciesTree for details about the tree structure
         List<Species> speciesRecord;
-        // The mininum genetic similarity to be the same species
-        float minGeneticSimilarity;
 
 
         /// <summary>
-        /// Create the GeneticTaxonomy. Has to be initialized calling Init().
+        /// Create the GeneticTaxonomy. SetTaxonomy has to be called
+        /// before calling any other taxonomy method
         /// </summary>
-        public GeneticTaxonomy() { }
+        public GeneticTaxonomy() 
+        {
+            existingSpecies = new List<Species>();
+            speciesRecord = new List<Species>();
+        }
+
+
+        static public void SetTaxonomy()
+        {
+            //The different weights for each gene when calculating the similarities
+            //between two creatures is read from the designated json file
+            string jsonWeigths = UserInfo.GeneSimilarityFile();
+            if(jsonWeigths == null)
+                throw new Exception("Cannot find JSON with gene weights to calculate genetic similarities");
+            string jsonSimilarity = UserInfo.SpeciesSimilarityFile();   // TODO: este valor que este en el universeParameters
+            if(jsonSimilarity == null)
+                throw new Exception("Cannot find JSON with species similarity");
+                
+            SetTaxonomy(jsonWeigths, jsonSimilarity);
+        }
+
 
         /// <summary>
         /// Initialized GeneticTaxonomy reading the weights and the genetic similarity threshold from the files named
         /// SimilarityGeneWeight.json and SimilaritySpecies.json that are supposed to be found in the given Data Directory.
         /// </summary>
-        public void Init()
+        static public void SetTaxonomy(string geneWeightsRaw, string minGenSimilarityRaw)
         {
-            string jsonWeigths = UserInfo.DataDirectory + "SimilarityGeneWeight.json";
-            string jsonSimilarity = UserInfo.DataDirectory + "SimilaritySpecies.json";
-
-            //The different weights for each gene when calculating the similarities
-            //between two creatures is read from the designated json file
-            if (!File.Exists(jsonWeigths))
-                throw new Exception("Cannot find JSON with gene weights to calculate genetic similarities");
-            if (!File.Exists(jsonSimilarity))
-                throw new Exception("Cannot find JSON with species similarity");
-            string file = File.ReadAllText(jsonWeigths);
             //In tuples to facilitate the modification of the file
             //(the feature name is written instead of a number)
-            Tuple<CreatureFeature, float>[] weights = JsonConvert.DeserializeObject<Tuple<CreatureFeature, float>[]>(file);
+            Tuple<CreatureFeature, float>[] weights = JsonConvert.DeserializeObject<Tuple<CreatureFeature, float>[]>(geneWeightsRaw);
             Validator.Validate(weights);
             speciesGeneWeights = new float[weights.Length];
             foreach (var t in weights)
             {
                 speciesGeneWeights[(int)t.Item1] = t.Item2;
             }
-            existingSpecies = new List<Species>();
-            speciesRecord = new List<Species>();
 
-            file = File.ReadAllText(jsonSimilarity);
-            minGeneticSimilarity = JsonConvert.DeserializeObject<float>(file);
-            Validator.Validate(minGeneticSimilarity);            
+            minGeneticSimilarity = JsonConvert.DeserializeObject<float>(minGenSimilarityRaw);
+            Validator.Validate(minGeneticSimilarity);
         }
 
 

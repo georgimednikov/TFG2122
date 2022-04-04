@@ -11,12 +11,14 @@ namespace Visualizador
         [STAThread]
         static void Main()
         {
+            Simulation s = new Simulation();
 #if DEBUG
-            UserInfo.SetDebugInfo();
+            s.Init(10, 10, 10, "../../ProgramData/", "../../ResultingData/");
 #else
             if (!UserInfo.AskInfoUsingWindows())
                 return;
 #endif
+            s.Run();
             //Application.EnableVisualStyles();
             //Application.SetCompatibleTextRenderingDefault(false);
             //EvolutionSimulation.Genetics.CreatureChromosome.SetChromosome("../../Chromosome.json");

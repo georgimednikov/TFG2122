@@ -7,14 +7,13 @@ namespace VisualizadorConsola
     {
         static void Main(string[] args)
         {
+            Simulation s = new Simulation();
 #if DEBUG
-            UserInfo.SetDebugInfo();
+            s.Init(10, 10, 10, "../../ProgramData/", "../../ResultingData/");
 #else
             if (!UserInfo.AskInfoUsingConsole())
                 return;
 #endif
-            ISimulation s = new ConsoleSimulation();
-            s.Init();
             s.Run();
         }
     }

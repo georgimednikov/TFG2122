@@ -96,20 +96,20 @@ namespace EvolutionSimulation
             Init(c);
         }
 
-        public void Init(string json)
+        // TODO: se va a poder inicializar asi o solo con un config?
+        public void Init(string rawWorldData)
         {
-            // TODO: poneer un orden para inicializar las cosas
+            map = JsonConvert.DeserializeObject<MapData[,]>(rawWorldData);
+            // TODO: validar
+
             ticksHour = UniverseParametersManager.parameters.ticksPerHour;
             hoursDay = UniverseParametersManager.parameters.hoursPerDay;
             daysYear = UniverseParametersManager.parameters.daysPerYear;
             morning = UniverseParametersManager.parameters.morningStart;
             night = UniverseParametersManager.parameters.nightStart;
 
-            map = JsonConvert.DeserializeObject<MapData[,]>(json);
             mapSize = map.GetLength(0);
-            // TODO: comprobar que el json es valido
             taxonomy = new GeneticTaxonomy();
-            taxonomy.Init();
             Creatures = new Dictionary<int, Creature>();
             metabolismComparer = new Utils.SortByMetabolism();
             StaticEntities = new Dictionary<int, StaticEntity>();
@@ -141,7 +141,6 @@ namespace EvolutionSimulation
             floraSelector = (config.floraSelector != null) ? config.floraSelector : ChoosePlant;
             modifiedHeight = config.heightModifiedByFunction;
             taxonomy = new GeneticTaxonomy();
-            taxonomy.Init();
             Creatures = new Dictionary<int, Creature>();
             metabolismComparer = new Utils.SortByMetabolism();
             StaticEntities = new Dictionary<int, StaticEntity>();

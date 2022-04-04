@@ -90,7 +90,7 @@ namespace UnitySimulation
         /// <param name="animals"> Number of animals that are initially created </param>
         public void SetInitialParameters(GenerateWorld worldGenerator, int years, int species, int individuals, string dataDirectory, string exportDirectory)
         {
-            UserInfo.SetInformation(0, years, species, individuals, dataDirectory, exportDirectory);
+            UserInfo.SetUp(years, species, individuals, dataDirectory, exportDirectory);
             // TODO: ehhh???
             world = worldGenerator.Generate();
             UserInfo.Size = world.map.GetLength(0);

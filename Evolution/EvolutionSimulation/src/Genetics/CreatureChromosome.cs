@@ -105,38 +105,45 @@ namespace EvolutionSimulation.Genetics
         public static Dictionary<CreatureFeature, float> AbilityUnlock { get => abilityUnlock; set => abilityUnlock = value; }
 
         /// <summary>
-        /// Sets the chromosome structure reading the values of the given JSON file.
+        /// Sets the chromosome structure reading the values of the JSON files
+        /// in the provided data directory 
         /// </summary>
-        /// <param name="json">Address of the JSON file</param>
         static public void SetChromosome()
         {
-            //TODO: Actualizar directorios con el nuevo sistema
-            string json = UserInfo.DataDirectory + "Chromosome.json";
-            string jsonAbilityUnlock = UserInfo.DataDirectory + "AbilityUnlock.json";
+            string chromosomeRaw = UserInfo.ChromosomeFile();
+            if(chromosomeRaw == null)
+                throw new Exception("Cannot find JSON with chromosome information");    // TODO: generar el cromosoma default?
+            SetChromosome(chromosomeRaw, UserInfo.AbilityUnlockFile());
+        }
 
-            if (!File.Exists(json))
-                throw new Exception("Cannot find JSON with chromosome information");
-            string file = File.ReadAllText(json);
-            List<Gene> genes = JsonConvert.DeserializeObject<List<Gene>>(file);
+        /// <summary>
+        /// Sets the chromosome structure reading the values of the given JSON file.
+        /// </summary>
+        /// <param name="chromosomeJson"> Chromosome raw json </param>
+        /// <param name="abilitiesJson"> Ability unlocks raw json </param>
+        static public void SetChromosome(string chromosomeJson, string abilitiesJson = null)
+        {
+            List<Gene> genes = JsonConvert.DeserializeObject<List<Gene>>(chromosomeJson);
             Validator.Validate(genes);
             SetStructure(genes);
+
             abilityUnlock = new Dictionary<CreatureFeature, float>();
-            if (!File.Exists(jsonAbilityUnlock))
-            { 
-                //TODO decidir si lanzar excepcion o ponerle valor por defecto
-                //throw new Exception("Cannot find JSON with abilities unlock information");
-                for(CreatureFeature c = CreatureFeature.Arboreal; c < CreatureFeature.Count; ++c)
+
+            // If no ability unlock file is provided, abilityies unlocks are setted to default values
+            if (abilitiesJson == null)
+            {
+                for (CreatureFeature c = CreatureFeature.Arboreal; c < CreatureFeature.Count; ++c)
                 {
                     abilityUnlock.Add(c, UniverseParametersManager.parameters.abilityUnlockPercentage);
                 }
             }
+            // If it is provided, each ability is validated
             else
             {
-                file = File.ReadAllText(jsonAbilityUnlock);
-                Tuple<CreatureFeature, float>[] abUnlock = JsonConvert.DeserializeObject<Tuple<CreatureFeature, float>[]>(file);
+                Tuple<CreatureFeature, float>[] abUnlock = JsonConvert.DeserializeObject<Tuple<CreatureFeature, float>[]>(abilitiesJson);
                 Validator.ValidateAbUnlock(abUnlock);
-                
-                foreach(Tuple<CreatureFeature,float> ab in abUnlock)
+
+                foreach (Tuple<CreatureFeature, float> ab in abUnlock)
                 {
                     abilityUnlock.Add(ab.Item1, ab.Item2);
                 }

@@ -17,8 +17,6 @@ namespace VisualizadorConsola
     {
         public void Init()
         {
-            CreatureChromosome.SetChromosome();
-            UniverseParametersManager.ReadJSON();
             world = new World();
             world.Init(512);//UserInfo.Size);
             //world.ExportContent();

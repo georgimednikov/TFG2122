@@ -12,12 +12,6 @@ namespace EvolutionSimulation
     public interface ISimulation
     {
         /// <summary>
-        /// Initialization of the simulation
-        /// TODO: Input parameters through text file
-        /// </summary>
-        void Init();
-
-        /// <summary>
         /// Starts the simualtion and keeps it running until the exit condition is met
         /// </summary>
         void Run();
