@@ -39,17 +39,30 @@ namespace VisualizadorConsola
 
             for (int i = 0; i < UserInfo.Species; i++)
             {
+                Animal a = world.CreateCreature<Animal>(0, 0);
                 bool validPosition;
+                int cont = 0;
                 do
                 {
                     validPosition = true;
                     x = RandomGenerator.Next(0, UserInfo.Size);
                     y = RandomGenerator.Next(0, UserInfo.Size);
+                    if (world.map[x, y].isWater )
+                    {
+                        validPosition = false;
+                        continue;
+                    }
+                    if (!a.CheckTemperature(x, y) && cont < 100)
+                    {
+                        validPosition = false;
+                        cont++;
+                        continue;
+                    }
 
                     foreach (Tuple<int, int> p in spawnPositions)
                     {
                         Vector2Int dist = new Vector2Int(x - p.Item1, y - p.Item2);
-                        if (world.map[x, y].isWater || dist.Magnitude() < minSpawnDist)
+                        if (dist.Magnitude() < minSpawnDist)
                         {
                             validPosition = false;
                             break;
@@ -57,9 +70,8 @@ namespace VisualizadorConsola
                     }
                 }
                 while (!validPosition);
-
+                a.Place(x, y);
                 //The specified amount of individuals of each species is created.
-                Animal a = world.CreateCreature<Animal>(x, y);
                 for (int j = 1; j < UserInfo.Individuals; j++)
                 {
                     world.CreateCreature<Animal>(x, y, a.chromosome, a.speciesName);

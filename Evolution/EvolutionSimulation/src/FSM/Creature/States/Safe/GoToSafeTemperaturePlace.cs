@@ -34,7 +34,11 @@ namespace EvolutionSimulation.FSM.Creature.States
                 Vector3 nextPos = creature.GetNextPosOnPath();
                 if (nextPos.X != -1 && nextPos.Y != -1) // TODO: no haria falta creo
                     creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-                
+                else if(nextPos.X == -2)
+                {
+                    creature.SetPath(safeTempPos.x, safeTempPos.y);
+
+                }
                 Vector2Int tmpPos = creature.SafeTemperaturePosition();
                 bool hasSafePos = tmpPos != null;
                 // If the safe temperature position changed (i.e. other better safe pos is near), the creature updates its destiny.
@@ -42,7 +46,8 @@ namespace EvolutionSimulation.FSM.Creature.States
                 {
                     safeTempPos.x = tmpPos.x;
                     safeTempPos.y = tmpPos.y;
-                    hasSafeTempPosAndNotInSamePos = safeTempPos.x != creature.x || safeTempPos.y != creature.y || creature.creatureLayer != 0;
+                    hasSafeTempPosAndNotInSamePos = safeTempPos.x != creature.x || 
+                        safeTempPos.y != creature.y || creature.creatureLayer != 0;
                     // Check if the new safe pos is not already at the creature position
                     if (hasSafeTempPosAndNotInSamePos)
                         creature.SetPath(safeTempPos.x, safeTempPos.y);
