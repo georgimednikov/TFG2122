@@ -1,5 +1,5 @@
-﻿using EvolutionSimulation;
-using System;
+﻿using System;
+using EvolutionSimulation;
 
 namespace VisualizadorConsola
 {
@@ -7,14 +7,15 @@ namespace VisualizadorConsola
     {
         static void Main(string[] args)
         {
-            Simulation s = new Simulation();
+            ConsoleSimulation s = new ConsoleSimulation();
 #if DEBUG
             s.Init(10, 10, 10, "../../ProgramData/", "../../ResultingData/");
 #else
-            if (!UserInfo.AskInfoUsingConsole())
+            if (!s.AskInfoUsingConsole())
                 return;
 #endif
             s.Run();
+            s.Export();
         }
     }
 }

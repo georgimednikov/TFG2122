@@ -16,5 +16,9 @@ namespace EvolutionSimulation
         /// </summary>
         void Run();
 
+        ///<summary>
+        /// Exports the simulation content
+        /// </summary>
+        void Export();
     }
 }

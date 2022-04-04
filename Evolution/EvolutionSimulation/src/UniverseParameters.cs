@@ -102,16 +102,9 @@ namespace EvolutionSimulation
     {
         public static void ReadJSON()
         {
-            string jsonParameters = UserInfo.UniverseParametersFile();
-            if (jsonParameters != null)
-            {
-                parameters = JsonConvert.DeserializeObject<UniverseParameters>(jsonParameters);
-                Validator.Validate(parameters);
-            }
-            else
-                SetDefaultParameters();
-
+            ReadJSON(UserInfo.UniverseParametersFile());
         }
+
         public static void ReadJSON(string uniParamsFile)
         {
             if (uniParamsFile != null)

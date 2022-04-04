@@ -75,16 +75,7 @@ namespace EvolutionSimulation.Genetics
 
         static public void SetTaxonomy()
         {
-            //The different weights for each gene when calculating the similarities
-            //between two creatures is read from the designated json file
-            string jsonWeigths = UserInfo.GeneSimilarityFile();
-            if(jsonWeigths == null)
-                throw new Exception("Cannot find JSON with gene weights to calculate genetic similarities");
-            string jsonSimilarity = UserInfo.SpeciesSimilarityFile();   // TODO: este valor que este en el universeParameters
-            if(jsonSimilarity == null)
-                throw new Exception("Cannot find JSON with species similarity");
-                
-            SetTaxonomy(jsonWeigths, jsonSimilarity);
+            SetTaxonomy(UserInfo.GeneSimilarityFile(), UserInfo.SpeciesSimilarityFile());
         }
 
 
@@ -94,6 +85,11 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         static public void SetTaxonomy(string geneWeightsRaw, string minGenSimilarityRaw)
         {
+            if (geneWeightsRaw == null)
+                throw new Exception("Cannot find JSON with gene weights to calculate genetic similarities");
+            if (minGenSimilarityRaw == null)
+                throw new Exception("Cannot find JSON with species similarity");
+
             //In tuples to facilitate the modification of the file
             //(the feature name is written instead of a number)
             Tuple<CreatureFeature, float>[] weights = JsonConvert.DeserializeObject<Tuple<CreatureFeature, float>[]>(geneWeightsRaw);

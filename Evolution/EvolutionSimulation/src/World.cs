@@ -117,6 +117,35 @@ namespace EvolutionSimulation
             chunkSize = 32;
             highMap = new List<MapRegion>();
             FillHighMap();
+
+            MapData mapData;
+            // Create plant entities from the file
+            for(int i = 0; i < mapSize; i++)
+            {
+                for (int j = 0; j < mapSize; j++) 
+                {
+                    mapData = map[i, j];
+                    if (mapData.plant == null) continue;
+
+                    Plant plant = null;
+                    switch (mapData.plant.type)
+                    {
+                        case Plant.PlantType.Tree:
+                            plant = CreateStaticEntity<Tree>(i, j, 0);
+                            break;
+                        case Plant.PlantType.EdibleTree:
+                            plant = CreateStaticEntity<EdibleTree>(i, j, UniverseParametersManager.parameters.eTreeHp);
+                            break;
+                        case Plant.PlantType.Bush:
+                            plant = CreateStaticEntity<Bush>(i, j, UniverseParametersManager.parameters.bushHp);
+                            break;
+                        case Plant.PlantType.Grass:
+                            plant = CreateStaticEntity<Grass>(i, j, UniverseParametersManager.parameters.grassHp);
+                            break;
+                    }
+                    mapData.plant = plant;
+                }
+            }
         }
 
         /// <summary>

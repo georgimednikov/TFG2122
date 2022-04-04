@@ -13,60 +13,22 @@ namespace VisualizadorConsola
     /// <summary>
     /// Implementation of a simulation with console output
     /// </summary>
-    public class ConsoleSimulation : ISimulation
+    public class ConsoleSimulation : Simulation
     {
-        public void Init()
+        override public void Init(int years, int species, int individuals, string dataDir, string exportDir)
         {
-            world = new World();
-            world.Init(512);//UserInfo.Size);
-            //world.ExportContent();
-            //WorldToBmp();
-            //A minimum distance to leave in between species spawn points to give them some room.
-            //Calculated based on the world size and amount of species to spawn, and then reduced by
-            //a value to give room in the world and not fill it in a homogenous manner.
-            int minSpawnDist = UserInfo.Size / UserInfo.Species / 15;
-
-            //List with previous spawn positions, to know if a new spot is too close to another one used.
-            List<Tuple<int, int>> spawnPositions = new List<Tuple<int, int>>();
-            int x, y;
-
-            for (int i = 0; i < UserInfo.Species; i++)
-            {
-                bool validPosition;
-                do
-                {
-                    validPosition = true;
-                    x = RandomGenerator.Next(0, UserInfo.Size);
-                    y = RandomGenerator.Next(0, UserInfo.Size);
-
-                    foreach (Tuple<int, int> p in spawnPositions)
-                    {
-                        Vector2Int dist = new Vector2Int(x - p.Item1, y - p.Item2);
-                        if (world.map[x, y].isWater || dist.Magnitude() < minSpawnDist)
-                        {
-                            validPosition = false;
-                            break;
-                        }
-                    }
-                }
-                while (!validPosition);
-
-                //The specified amount of individuals of each species is created.
-                Animal a = world.CreateCreature<Animal>(x, y);
-                for (int j = 1; j < UserInfo.Individuals; j++)
-                {
-                    world.CreateCreature<Animal>(x, y, a.chromosome, a.speciesName);
-                }
-
-                //The new position is added to the list of used.
-                spawnPositions.Add(new Tuple<int, int>(x, y));
-            }
+            base.Init(years, species, individuals, dataDir, exportDir);
             Console.WriteLine("Simulation Init done");
         }
 
-        public void Run()
+        override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string minSimilarityFile = null, string worldFile = null, string exportDir = null)
         {
-            //WorldToBmp();
+            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, minSimilarityFile, worldFile, exportDir);
+            Console.WriteLine("Simulation Init done");
+        }
+
+        override public void Run()
+        {
             int YearTicks = world.YearToTick(1.0f);
             int ticks = world.YearToTick(UserInfo.Years);
             int i = 1;
@@ -78,10 +40,75 @@ namespace VisualizadorConsola
                 if (i % YearTicks == 0)
                     Console.WriteLine("A Year has passed");
             }
-            Console.Write("Ticks elapsed: " + i);
-            world.ExportContent();
+            Console.Write("Simulation ended, ticks elapsed: " + i);
         }
 
+        override public void Export()
+        {
+            base.Export();
+            Console.Write("Simulation data has been exported");
+        }
+        /// <summary>
+        /// Asks the user where to look for the files containing the different values for the calculation of the chromosme, genes and stats,
+        /// as well as the folder in which to save the resulting species. This method uses the program's console to do so.
+        /// </summary>
+        /// <returns></returns>
+        static public bool AskInfoUsingConsole()
+        {
+            do
+            {
+                Console.WriteLine("Input a valid directory containing the necessary data files for the program (chromosome.json, etc.):\n");
+                UserInfo.DataDirectory = Console.ReadLine() + "\\";
+                Console.Clear();
+            } while (!Directory.Exists(UserInfo.DataDirectory));
+
+            Console.WriteLine("Input a valid directory in which the resulting data will be saved:\n");
+            UserInfo.ExportDirectory = Console.ReadLine() + "\\";
+            Console.Clear();
+            if (!Directory.Exists(UserInfo.ExportDirectory))
+                UserInfo.ExportDirectory = Directory.CreateDirectory(UserInfo.ExportDirectory).FullName;
+
+            do
+            {
+                Console.WriteLine("Input how many years of evolution are going to be simulated:");
+                string input = Console.ReadLine();
+                UserInfo.Years = -1;
+                if (input != "") UserInfo.Years = Int32.Parse(input);
+                Console.Clear();
+            } while (UserInfo.Years < 0);
+
+            int minSize = UserInfo.MinWorldSize();
+            do
+            {
+                Console.WriteLine("Input how big in squares the world is going to be. Must be a number larger than: " + minSize + "\n");
+                string input = Console.ReadLine();
+                UserInfo.Size = -1;
+                if (input != "") UserInfo.Size = Int32.Parse(input);
+                Console.Clear();
+            } while (UserInfo.Size < minSize);
+
+            int minSpecies = UserInfo.MinSpeciesAmount();
+            do
+            {
+                Console.WriteLine("Input how many species are going to be created initially. Must be a number larger than: " + minSpecies + "\n");
+                string input = Console.ReadLine();
+                UserInfo.Species = -1;
+                if (input != "") UserInfo.Species = Int32.Parse(input);
+                Console.Clear();
+            } while (UserInfo.Species < minSpecies);
+
+            int minIndividuals = UserInfo.MinIndividualsAmount();
+            do
+            {
+                Console.WriteLine("Input how individuals per species are going to be created. Must be a number larger than: " + minIndividuals + "\n");
+                string input = Console.ReadLine();
+                UserInfo.Individuals = -1;
+                if (input != "") UserInfo.Individuals = Int32.Parse(input);
+                Console.Clear();
+            } while (UserInfo.Individuals < minIndividuals);
+
+            return true;
+        }
 
         public void WorldToBmp()
         {
@@ -324,7 +351,5 @@ namespace VisualizadorConsola
                 }
             }
         }
-
-        World world;
     }
 }

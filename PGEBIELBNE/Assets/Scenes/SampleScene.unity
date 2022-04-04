@@ -338,9 +338,13 @@ MonoBehaviour:
   EvolutionYears: 0
   SpeciesNumber: 2
   IndividualsNumber: 2
+  UniverseParameters: {fileID: 4900000, guid: 28081e8ef8487cd40804789ee795ba64, type: 3}
+  Chromosome: {fileID: 4900000, guid: ff304230ee744c042bcd7708df05d0d2, type: 3}
+  AbilityUnlocks: {fileID: 4900000, guid: a72b0c7193b661a44a1826bf36cbbb1f, type: 3}
+  GeneSimilarity: {fileID: 4900000, guid: 720e5147ea417944ea92c6537381b5f7, type: 3}
+  SpeciesSimilarity: {fileID: 4900000, guid: c2006b07645d9d2409a73441073d6536, type: 3}
+  WorldConfig: {fileID: 4900000, guid: 0127c2171d5132b4fb5231b6ac57feae, type: 3}
   TimeBetweenSteps: 1
-  DataDirectory: ProgramData
-  ExportDirectory: ExportData
   worldCreatureManager: {fileID: 848237403}
   worldGenerator: {fileID: 848237407}
 --- !u!1 &963194225

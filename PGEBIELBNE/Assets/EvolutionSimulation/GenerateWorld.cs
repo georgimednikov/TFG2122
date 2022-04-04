@@ -32,24 +32,33 @@ namespace UnitySimulation
         public GameObject waterPlane;
         GameObject waterPlaneInstance;
 
-        public World Generate()
+        public void SetWorld(World world)
         {
-            world = new World();
-
-            if (worldJson != null)
-                world.Init(worldJson.text);
-            else
-                world.Init(worldSize);
-            if(waterPlaneInstance != null)
-                MapGen();
-            return world;
+            this.world = world;
+            //if (waterPlaneInstance != null)
+            //    MapGen();
         }
+        //public World Generate()
+        //{
+        //    world = new World();
+
+        //    if (worldJson != null)
+        //        world.Init(worldJson.text);
+        //    else
+        //        world.Init(worldSize);
+        //    if(waterPlaneInstance != null)
+        //        MapGen();
+        //    return world;
+        //}
 
         public void MapGen()
         {
-            UpdateMeshVertices(world.map);
-            GenerateFlora(world.map);
-            SetWaterPlane();
+            if (waterPlaneInstance != null)
+            {
+                UpdateMeshVertices(world.map);
+                GenerateFlora(world.map);
+                SetWaterPlane();
+            }
         }
 
         private void SetWaterPlane()

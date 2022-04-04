@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Windows.Forms;
 using EvolutionSimulation;
 
 namespace Visualizador
@@ -15,40 +17,104 @@ namespace Visualizador
 #if DEBUG
             s.Init(10, 10, 10, "../../ProgramData/", "../../ResultingData/");
 #else
-            if (!UserInfo.AskInfoUsingWindows())
+            if (!AskInfoUsingWindows())
                 return;
 #endif
             s.Run();
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
-            //EvolutionSimulation.Genetics.CreatureChromosome.SetChromosome("../../Chromosome.json");
+        }
 
-            //EvolutionSimulation.Entities.Animal c = new EvolutionSimulation.Entities.Animal();
-            //EvolutionSimulation.World w = new EvolutionSimulation.World();
-            //c.Init(w, 0, 0);
-            //int a = 20;
-            //while (a > 0)
-            //{
-            //    --a;
-            //    c.Tick();
-            //}
 
-            //AlgoritmoEvolutivo.TestFSM testFSM = new AlgoritmoEvolutivo.TestFSM();
+        /// <summary>
+        /// Asks the user where to look for the files containing the different values for the calculation of the chromosme, genes and stats,
+        /// as well as the folder in which to save the resulting species. This method uses a Windows window to do so.
+        /// </summary>
+        /// <returns></returns>
+        static public bool AskInfoUsingWindows()
+        {
+            FolderBrowserDialog browser = new FolderBrowserDialog();
+            browser.Description = "Choose the folder where the program will search for the data files. " +
+                "After this window a new one will open; if it does not show, minimize any other application open.";
+            browser.SelectedPath = Path.GetFullPath("../../ProgramData");
+            DialogResult result = browser.ShowDialog();
+            UserInfo.DataDirectory = browser.SelectedPath + "\\";
 
-            //var result = MessageBox.Show("State: " + testFSM.GetState().ToString() + "\nKill?", "TestFSM",
-            //         MessageBoxButtons.YesNo,
-            //         MessageBoxIcon.Question);
+            if (result == DialogResult.OK)
+                UserInfo.DataDirectory = browser.SelectedPath + "\\";
+            else
+                return false;
 
-            //if (result == System.Windows.Forms.DialogResult.Yes)
-            //{
-            //    testFSM.Fire(AlgoritmoEvolutivo.Trigger.Die);
-            //}
+            browser.Description = "Choose the folder where the program will save the program's resulting data.";
+            browser.SelectedPath = Path.GetFullPath("../../ResultingSpecies");
+            result = browser.ShowDialog();
+            UserInfo.ExportDirectory = browser.SelectedPath + "\\";
 
-            //result = MessageBox.Show("State: " + testFSM.GetState().ToString(), "TestFSM",
-            //                MessageBoxButtons.OK,
-            //                MessageBoxIcon.Information);
+            if (result == DialogResult.OK)
+                UserInfo.ExportDirectory = browser.SelectedPath + "\\";
+            else
+                return false;
 
-            //Application.Run(new Form1());
+            int userEntry = -1;
+            do
+            {
+                if (!InstantiatePrompt("Input how many years of evolution are going to be\nsimulated:", out userEntry))
+                    return false;
+            } while (userEntry < 1);
+            UserInfo.Years = userEntry;
+
+            do
+            {
+                if (!InstantiatePrompt("Input how big in squares the world is going to be.\nMust be a number larger than: " + UserInfo.MinWorldSize(), out userEntry))
+                    return false;
+            } while (userEntry < UserInfo.MinWorldSize());
+            UserInfo.Size = userEntry;
+
+            do
+            {
+                if (!InstantiatePrompt("Input how many species are going to be created\ninitially. Must be a number larger than: " + UserInfo.MinSpeciesAmount(), out userEntry))
+                    return false;
+            } while (userEntry < UserInfo.MinSpeciesAmount());
+            UserInfo.Species = userEntry;
+
+            do
+            {
+                if (!InstantiatePrompt("Input how individuals per species are going to be\ncreated. Must be a number larger than: " + UserInfo.MinIndividualsAmount(), out userEntry))
+                    return false;
+            } while (userEntry < UserInfo.MinIndividualsAmount());
+
+            return true;
+        }
+
+        static private bool InstantiatePrompt(string text, out int value)
+        {
+            Form prompt = new Form()
+            {
+                Width = 280,
+                Height = 150,
+                FormBorderStyle = FormBorderStyle.FixedDialog,
+                Text = "Evolution Simulation",
+                StartPosition = FormStartPosition.CenterScreen
+            };
+            Label textLabel = new Label() { Left = 0, Top = 0, Text = text };
+            textLabel.AutoSize = true;
+            TextBox textBox = new TextBox() { Left = 65, Top = 40, Width = 150 };
+            Button confirmation = new Button() { Text = "Ok", Left = 90, Width = 100, Top = 70, DialogResult = DialogResult.OK };
+            confirmation.Click += (sender, e) => { prompt.Close(); };
+            prompt.Controls.Add(textBox);
+            prompt.Controls.Add(confirmation);
+            prompt.Controls.Add(textLabel);
+            prompt.AcceptButton = confirmation;
+            DialogResult result = prompt.ShowDialog();
+
+            if (result == DialogResult.OK && textBox.Text != "")
+            {
+                value = Int32.Parse(textBox.Text);
+                return true;
+            }
+            else
+            {
+                value = -1;
+                return false;
+            }
         }
     }
 }

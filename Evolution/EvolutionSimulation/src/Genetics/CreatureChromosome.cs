@@ -110,10 +110,7 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         static public void SetChromosome()
         {
-            string chromosomeRaw = UserInfo.ChromosomeFile();
-            if(chromosomeRaw == null)
-                throw new Exception("Cannot find JSON with chromosome information");    // TODO: generar el cromosoma default?
-            SetChromosome(chromosomeRaw, UserInfo.AbilityUnlockFile());
+            SetChromosome(UserInfo.ChromosomeFile(), UserInfo.AbilityUnlockFile());
         }
 
         /// <summary>
@@ -123,6 +120,9 @@ namespace EvolutionSimulation.Genetics
         /// <param name="abilitiesJson"> Ability unlocks raw json </param>
         static public void SetChromosome(string chromosomeJson, string abilitiesJson = null)
         {
+            if (chromosomeJson == null)
+                throw new Exception("Cannot find JSON with chromosome information");    // TODO: se puede/deberia generar el cromosoma default?
+
             List<Gene> genes = JsonConvert.DeserializeObject<List<Gene>>(chromosomeJson);
             Validator.Validate(genes);
             SetStructure(genes);

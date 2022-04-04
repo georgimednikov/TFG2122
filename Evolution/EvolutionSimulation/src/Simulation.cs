@@ -18,7 +18,7 @@ namespace EvolutionSimulation
         /// <param name="individuals"> Initial number of creatures per original specie </param>
         /// <param name="dataDir"> Directory where all the files with the simulation info are stored </param>
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends </param>
-        public void Init(int years, int species, int individuals, string dataDir, string exportDir)
+        virtual public void Init(int years, int species, int individuals, string dataDir, string exportDir)
         {
             UserInfo.SetUp(years, species, individuals, dataDir, exportDir);
             // Universe Parameters
@@ -32,11 +32,18 @@ namespace EvolutionSimulation
             string worldData = UserInfo.WorldConfigFile();
             if (worldData != null)
             {
-                WorldGenConfig worldConfig = Newtonsoft.Json.JsonConvert.DeserializeObject<WorldGenConfig>(worldData);
-                if (worldConfig != null)
+                WorldGenConfig worldConfig;
+                // TODO: hacerlo asi o poner otro parametro para diferenciar un json de configuracion y de mundo como tal
+                try 
+                { 
+                    worldConfig = Newtonsoft.Json.JsonConvert.DeserializeObject<WorldGenConfig>(worldData);
                     world.Init(worldConfig);
-                else
+                }
+                catch( Newtonsoft.Json.JsonSerializationException e)
+                {
                     world.Init(worldData);
+                }
+
             }
             else
                world.Init(UserInfo.Size);
@@ -56,7 +63,7 @@ namespace EvolutionSimulation
         /// <param name="minSimilarityFile"> Raw file with the species' similarity parameter </param>
         /// <param name="abilitiesFile"> Raw file with each ability unlock percentage. If not provided, default information is setted</param>
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends. If not provided, default export directory is setted</param>
-        public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string minSimilarityFile = null, string worldFile = null, string exportDir = null)
+        virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string minSimilarityFile = null, string worldFile = null, string exportDir = null)
         {
             UserInfo.SetUp(years, species, individuals, _exportDir: exportDir);
             // Universe Parameters
@@ -69,11 +76,16 @@ namespace EvolutionSimulation
             world = new World();
             if (worldFile != null) 
             {
-                WorldGenConfig worldConfig = Newtonsoft.Json.JsonConvert.DeserializeObject<WorldGenConfig>(worldFile);
-                if (worldConfig != null)
+                WorldGenConfig worldConfig;
+                try
+                {
+                    worldConfig = Newtonsoft.Json.JsonConvert.DeserializeObject<WorldGenConfig>(worldFile);
                     world.Init(worldConfig);
-                else
+                }
+                catch (Newtonsoft.Json.JsonSerializationException e)
+                {
                     world.Init(worldFile);
+                }
             }
             else
                 world.Init(UserInfo.Size);
@@ -81,28 +93,22 @@ namespace EvolutionSimulation
             CreateCreatures();
         }
 
-        public void Run()
+        virtual public void Run()
         {
-            Init(2, 3, 2, uniParamsFile: "this", abilitiesFile: "something");
-            while (true)
+            int ticks = world.YearToTick(UserInfo.Years);
+            int i = 1;
+            for (; i <= ticks; i++)
             {
-                int YearTicks = world.YearToTick(1.0f);
-                int ticks = world.YearToTick(UserInfo.Years);
-                int i = 1;
-                for (; i <= ticks; i++)
-                {
-                    if (!world.Tick()) break;
-                    //Render();
-                    //Thread.Sleep(1000);
-                    if (i % YearTicks == 0)
-                        Console.WriteLine("A Year has passed");
-                }
-                Console.Write("Ticks elapsed: " + i);
-                world.ExportContent();
+                if (!world.Tick()) break;
             }
         }
 
-        private void CreateCreatures()
+        virtual public void Export()
+        {
+            world.ExportContent();
+        }
+
+        virtual protected void CreateCreatures()
         {
             //A minimum distance to leave in between species spawn points to give them some room.
             //Calculated based on the world size and amount of species to spawn, and then reduced by
@@ -144,11 +150,9 @@ namespace EvolutionSimulation
                 //The new position is added to the list of used.
                 spawnPositions.Add(new Tuple<int, int>(x, y));
             }
-#if DEBUG
-            Console.WriteLine("Simulation Init done");  // TODO: quitar esto
-#endif
+
         }
 
-        World world;
+        protected World world;
     }
 }
