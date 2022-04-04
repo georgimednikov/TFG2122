@@ -46,7 +46,14 @@ namespace EvolutionSimulation
 
             }
             else
-               world.Init(UserInfo.Size);
+            {
+                WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
+                {
+                    mapSize = 512
+                };
+
+                world.Init(config);
+            }
 
             CreateCreatures();
         }
@@ -74,7 +81,7 @@ namespace EvolutionSimulation
             Genetics.GeneticTaxonomy.SetTaxonomy(sGeneWeightFile, minSimilarityFile);
             // World
             world = new World();
-            if (worldFile != null) 
+            if (worldFile != null)
             {
                 WorldGenConfig worldConfig;
                 try
@@ -88,7 +95,14 @@ namespace EvolutionSimulation
                 }
             }
             else
-                world.Init(UserInfo.Size);
+            {
+                WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
+                {
+                    mapSize = 512
+                };
+
+                world.Init(config);
+            }
 
             CreateCreatures();
         }

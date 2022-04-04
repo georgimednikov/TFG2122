@@ -107,6 +107,7 @@ namespace EvolutionSimulation
             public Dictionary<int, List<Vector2>> links;
         }
 
+        // TODO: esta constructora se puede ir?
         public void Init(int size)
         {
             WorldGenConfig c = new WorldGenConfig(MapType.Default);
