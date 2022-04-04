@@ -27,7 +27,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void Action()
         {
-            if (creature.Corpse())
+            if (creature.Corpse(out _, out foodPos) && creature.DistanceToObjective(foodPos) <= UniverseParametersManager.parameters.adjacentLength)
                 EatCorpse();
             else if (creature.Plant())
             {

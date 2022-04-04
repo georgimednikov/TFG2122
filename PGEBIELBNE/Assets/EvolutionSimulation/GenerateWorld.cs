@@ -2,6 +2,7 @@ using UnityEngine;
 using EvolutionSimulation;
 using System.Collections.Generic;
 using UnityEditor;
+using Newtonsoft.Json;
 
 namespace UnitySimulation
 {
@@ -17,7 +18,7 @@ namespace UnitySimulation
 
             if (GUILayout.Button("Update"))
             {
-                myScript.MapGen();
+                myScript.MapGenSkipEvolution();
             }
         }
     }
@@ -50,6 +51,14 @@ namespace UnitySimulation
         //        MapGen();
         //    return world;
         //}
+
+        public void MapGenSkipEvolution()
+        {
+            World.MapData[,] map = JsonConvert.DeserializeObject<World.MapData[,]>(worldJson.ToString());
+            UpdateMeshVertices(map);
+            GenerateFlora(map);
+            SetWaterPlane();
+        }
 
         public void MapGen()
         {
@@ -117,7 +126,6 @@ namespace UnitySimulation
                     tree.heightScale = 1;// Random.Range(0.75f, 2.25f);
                     tree.widthScale = 1;//Random.Range(0.5f, 1f);
                     tree.position = new Vector3((z + 0.5f + Random.Range(-0.5f, 0.5f)) / (float)tileWidth, 0, 1 - (x + 0.5f + Random.Range(-0.5f, 0.5f)) / (float)tileDepth);
-                    Debug.Log("Pongo una puta planta en: " + tree.position);
                     trees.Add(tree);
                 }
 
@@ -131,9 +139,8 @@ namespace UnitySimulation
             int size = terrain.heightmapResolution;
             int tileDepth = heightMap.GetLength(0);
             int tileWidth = heightMap.GetLength(1);
-            terrain.size = new Vector3(tileDepth * 2, terrain.size.y, tileWidth * 2);
+            //terrain.size = new Vector3(tileDepth * 2, terrain.size.y, tileWidth * 2);
             float[,] h = terrain.GetHeights(0, 0, size, size);
-            Vector3 mapSize = terrain.size;
             for (int zIndex = 0; zIndex < size; zIndex++)
                 for (int xIndex = 0; xIndex < size; xIndex++)
                 {

@@ -296,26 +296,28 @@ namespace EvolutionSimulation.Entities
             SortAndAdjustLists();
             if (menace != null && menace.ticks != maxExperienceTicks && thisCreature.DistanceToObjective(menace.position) <= perceptionRadius)
                 menace = null;
-
-            Mate = null; //By default there is no mate available.
-            for (int i = 0; i < Allies.Count; i++) //For every ally the creature remembers the following comprobations are done:
+            if (thisCreature.stats.Gender == Genetics.Gender.Male)
             {
-                Creature ally = world.GetCreature(Allies[0].ID);
-                if (ally == null || ally.stats.Gender == thisCreature.stats.Gender) //This is done to ignore creatures of the same gender as this one. The gender is
-                    continue;                                                       //checked although the creature might not be in sight, but it is not modified
-                                                                                    //and this way the gender is not saved (which would be inconvinient).
-                if (thisCreature.DistanceToObjective(Allies[0].position) <= perceptionRadius) //If it can see the ally and therefore exists.
+                Mate = null; //By default there is no mate available.
+                for (int i = 0; i < Allies.Count; i++) //For every ally the creature remembers the following comprobations are done:
                 {
-                    if (ally.wantMate) //If it wants to mate and is of the opposite danger, it is a match.
+                    Creature ally = world.GetCreature(Allies[0].ID);
+                    if (ally == null || ally.stats.Gender == thisCreature.stats.Gender) //This is done to ignore creatures of the same gender as this one. The gender is
+                        continue;                                                       //checked although the creature might not be in sight, but it is not modified
+                                                                                        //and this way the gender is not saved (which would be inconvinient).
+                    if (thisCreature.DistanceToObjective(Allies[0].position) <= perceptionRadius) //If it can see the ally and therefore exists.
+                    {
+                        if (ally.wantMate) //If it wants to mate and is of the opposite danger, it is a match.
+                        {
+                            Mate = Allies[i];
+                            break;
+                        }
+                    }
+                    else //If the creature cannot see the next ally, since they are ordered by distance, it goes to the position it remembers.
                     {
                         Mate = Allies[i];
                         break;
                     }
-                }
-                else //If the creature cannot see the next ally, since they are ordered by distance, it goes to the position it remembers.
-                {
-                    Mate = Allies[i];
-                    break;
                 }
             }
         }
@@ -408,7 +410,8 @@ namespace EvolutionSimulation.Entities
                 for (int j = -perceptionRadius; j <= perceptionRadius && !found; j++)
                 {
                     Vector2Int p = new Vector2Int(x + i, y + j);
-                    if (!world.checkBounds(p.x, p.y) || !thisCreature.CheckTemperature(p.x, p.y) || SafeTemperaturePositions.Contains(p)) continue;
+                    if (!world.canMove(p.x, p.y) || !thisCreature.CheckTemperature(p.x, p.y) || SafeTemperaturePositions.Contains(p)) 
+                        continue;
 
                     SafeTemperaturePositions.Add(p);
                     found = true;
@@ -449,7 +452,7 @@ namespace EvolutionSimulation.Entities
                 for (int j = -perceptionRadius; j <= perceptionRadius && !found; j++)
                 {
                     checkPos.x = x + i; checkPos.y = y + j;
-                    if (!world.checkBounds(checkPos.x, checkPos.y) || !world.canMove(checkPos.x, checkPos.y) || (i == 0 && j == 0)) continue;
+                    if (!world.canMove(checkPos.x, checkPos.y) || (i == 0 && j == 0)) continue;
 
                     double tileTemperature = world.map[checkPos.x, checkPos.y].temperature;
                     double difference = 1;

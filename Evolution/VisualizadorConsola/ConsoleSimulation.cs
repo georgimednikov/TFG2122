@@ -121,7 +121,6 @@ namespace VisualizadorConsola
             Bitmap hMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap holdRidgeMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap voronoiMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-
             double val;
             for (int i = 0; i < world.map.GetLength(0) * scale; i += scale)
             {
@@ -178,11 +177,13 @@ namespace VisualizadorConsola
                     #endregion
 
                     #region TerrainTexture
+
                     float thres = 1.0f, thres2 = 0.7f;
+                    double h = world.map[j / scale, i / scale].height;
+
                     if (val >= thres) SetPixel(j, i, Color.FromArgb(0, 255, 0), floraMapMask, scale);
                     else SetPixel(j, i, Color.FromArgb((int)(150 * (thres - val)), (int)(90 + (val * 165f / thres)), 0), floraMapMask, scale);
 
-                    double h = world.map[j / scale, i / scale].height;
 
                     if (h >= thres2)
                     {

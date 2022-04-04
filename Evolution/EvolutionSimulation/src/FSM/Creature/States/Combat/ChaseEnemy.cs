@@ -79,7 +79,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 creature.TargetEnemy(otherID);  // Redundant, except when current target is the menace
             }
 
-            if (otherObj.x != objective.x || otherObj.y != objective.y)  // If objective position is a different one, adjust accordingly
+            if ((otherObj.x != objective.x || otherObj.y != objective.y) && (otherObj.x != creature.x || otherObj.y != creature.y))  // If objective position is a different one, adjust accordingly
             {
                 objective.x = otherObj.x;
                 objective.y = otherObj.y;

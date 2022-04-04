@@ -38,7 +38,10 @@ namespace EvolutionSimulation.FSM.Creature.States
                 if (creature.stats.Gender == Genetics.Gender.Female)
                 {
                     // The creature whom it was mating has died or something
-                    if (creature.world.GetCreature(creature.matingCreature) == null) { mateSpecies = ""; matePos = new Vector2Int(-1, -1); return; }
+                    if (creature.world.GetCreature(creature.matingCreature) == null) {
+                        StopMating(); 
+                        return; 
+                    }
                     // Create a random number of childs
                     int numberChilds = RandomGenerator.Next(1, 5);//TODO: que el numero de hijos dependa de algo del cromosoma?
                     for (int i = 0; i < numberChilds; ++i)
@@ -53,16 +56,29 @@ namespace EvolutionSimulation.FSM.Creature.States
                         do{
                             nx = creature.x + RandomGenerator.Next(-1, 2);
                             ny = creature.y + RandomGenerator.Next(-1, 2);
-                        }while(creature.world.canMove(nx,ny));
+                        }while(!creature.world.canMove(nx,ny));
                         
                         creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName, creature.matingCreature, creature.ID);
 
                     }
                     creature.timeToBeInHeat = -1;
-                    creature.mating = false; //This is needed to stop mating
+                    creature.mating = false;
                     creature.CreateDanger();
                 }
+                else
+                {
+                    // The creature whom it was mating has died or something
+                    if (creature.world.GetCreature(creature.matingCreature) == null) {
+                        StopMating();
+                    }
+                }
             }
+        }
+
+        void StopMating()
+        {
+            creature.matingCreature = -1;
+            creature.mating = false;
         }
 
         private void SetInfo()
@@ -89,6 +105,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             if(creature.world.GetCreature(creature.matingCreature) != null)
                 creature.world.GetCreature(creature.matingCreature).ReceiveInteraction(creature, Entities.Interactions.stopMate);
             creature.stats.ActionPerceptionPercentage = 1;
+            creature.matingCreature = -1;
         }
 
         public override string ToString()

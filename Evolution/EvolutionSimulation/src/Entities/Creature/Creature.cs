@@ -300,12 +300,12 @@ namespace EvolutionSimulation.Entities
             // Safe-state configuration
             // States
             IState wander = new Wander(this);
-            IState explore = new Explore(this); // TODO: este estado
+            IState explore = new Explore(this); 
             IState goToDrink = new GoToDrink(this);
             IState drink = new Drinking(this);
             IState goToMate = new GoToMate(this);
             IState tryMate = new TryMate(this);
-            IState mating = new Mating(this, 100);//TODO que 100 lo coja del cromosoma, es el tiempo que tardan en reproducirse
+            IState mating = new Mating(this, 20);//TODO que 20 lo coja del cromosoma, es el tiempo que tardan en reproducirse
             IState goToEat = new GoToEat(this);
             IState eat = new Eating(this);
             IState goToSafePlace = new GoToSafePlace(this);
@@ -390,6 +390,7 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(tryMate, matingTransition, mating);
             safeFSM.AddTransition(tryMate, stopTryMateTransition, wander);
             safeFSM.AddTransition(mating, stopMatingTransition, wander);
+            safeFSM.AddTransition(wander, matingTransition, mating);
             safeFSM.AddTransition(goToDrink, matingTransition, mating);
             safeFSM.AddTransition(goToEat, matingTransition, mating);
             safeFSM.AddTransition(goToSafePlace, matingTransition, mating);
@@ -593,6 +594,8 @@ namespace EvolutionSimulation.Entities
         /// <param name="interacter"> The creature that sends the interaction </param>
         private void OnMate(Creature interacter)
         {
+            if (matingCreature != -1 && matingCreature != 0)
+                return;
             if (wantMate && stats.Gender == Gender.Female)
             {
                 wantMate = false;
@@ -613,12 +616,6 @@ namespace EvolutionSimulation.Entities
         /// <param name="interacter"> Creature who has sent the interaction </param>
         private void StopMating(Creature interacter)
         {
-            Creature mate = world.GetCreature(matingCreature);
-            // TODO: crea un stack overflow al parecer, y no necesita estar ya que las dos criaturas ya han parado de matear
-            //if (mate != null)
-            //{
-            //    mate.ReceiveInteraction(this, Interactions.stopMate);
-            //}
             matingCreature = -1;
             mating = false;
         }
@@ -970,6 +967,8 @@ namespace EvolutionSimulation.Entities
         /// <returns>Next position or (-1, -1, -1) on path end.</returns>
         public Vector3 GetNextPosOnPath()
         {
+            if (path == null)
+                return new Vector3(-2,-1,-1);
             if (pathIterator >= path.Length)
             {
                 path = null; return new Vector3(-1, -1, -1);
