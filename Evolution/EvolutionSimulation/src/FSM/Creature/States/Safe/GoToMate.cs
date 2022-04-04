@@ -42,7 +42,6 @@ namespace EvolutionSimulation.FSM.Creature.States
                 else if (nextPos.X == -2)
                 {
                     creature.SetPath(matePos.x, matePos.y);
-
                 }
                 Vector2Int tmpPos;
                 bool hasMate = creature.Mate(out mateid, out tmpPos);
