@@ -154,11 +154,10 @@ namespace EvolutionSimulation.Genetics
                 {
                     found = true;
                 }
-                else if(found && speciesRecord[i].name != newSpecies.progenitor)
+                else if(found && speciesRecord[i].progenitor != newSpecies.progenitor)
                 {
-                    speciesRecord.Insert(i + 1, newSpecies);
+                    speciesRecord.Insert(i, newSpecies);
                     break;
-
                 }
             }
             if (i == speciesRecord.Count)
