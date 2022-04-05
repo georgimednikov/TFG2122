@@ -302,9 +302,11 @@ namespace EvolutionSimulation.Entities
                 for (int i = 0; i < Allies.Count; i++) //For every ally the creature remembers the following comprobations are done:
                 {
                     Creature ally = world.GetCreature(Allies[0].ID);
-                    if (ally == null || ally.stats.Gender == thisCreature.stats.Gender) //This is done to ignore creatures of the same gender as this one. The gender is
+                    if (ally == null || ally.stats.Gender == thisCreature.stats.Gender ||
+                        !thisCreature.CanReach(ally.creatureLayer))                     //This is done to ignore creatures of the same gender as this one. The gender is
                         continue;                                                       //checked although the creature might not be in sight, but it is not modified
                                                                                         //and this way the gender is not saved (which would be inconvinient).
+                                                                                        //The creature has to be able to reach de ally to considere it as a mate
                     if (thisCreature.DistanceToObjective(Allies[0].position) <= perceptionRadius) //If it can see the ally and therefore exists.
                     {
                         if (ally.wantMate) //If it wants to mate and is of the opposite danger, it is a match.

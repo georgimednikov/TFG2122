@@ -144,14 +144,21 @@ namespace EvolutionSimulation.Genetics
                 speciesRecord.Add(newSpecies);
                 return;
             }
-            //If not, it is added after its progenitor, following the tree structure of speciesRecord
+            //If not, it is added after its progenitor as the last of the derivated species
+            //of the progenitor to keep the chronological order, following the tree structure of speciesRecord
             int i = 0;
+            bool found = false;
             for (; i < speciesRecord.Count; ++i)
             {
-                if (speciesRecord[i].name == newSpecies.progenitor)
+                if (!found && speciesRecord[i].name == newSpecies.progenitor)
+                {
+                    found = true;
+                }
+                else if(found && speciesRecord[i].name != newSpecies.progenitor)
                 {
                     speciesRecord.Insert(i + 1, newSpecies);
                     break;
+
                 }
             }
             if (i == speciesRecord.Count)
