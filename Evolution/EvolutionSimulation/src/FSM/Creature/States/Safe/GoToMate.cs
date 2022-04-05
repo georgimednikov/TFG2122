@@ -53,7 +53,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                     // Check if the new mate is not already at the creature position
                     hasMateAndNotInSamePos = matePos.x != creature.x || matePos.y != creature.y || creature.creatureLayer != creature.world.GetCreature(mateid).creatureLayer;
                     if (hasMateAndNotInSamePos)
-                        creature.SetPath(matePos.x, matePos.y);
+                        creature.SetPath(matePos.x, matePos.y, creature.world.GetCreature(mateid).creatureLayer);
                 }
                 else
                     hasMateAndNotInSamePos = hasMate && (matePos.x != creature.x || matePos.y != creature.y || creature.creatureLayer != creature.world.GetCreature(mateid).creatureLayer);

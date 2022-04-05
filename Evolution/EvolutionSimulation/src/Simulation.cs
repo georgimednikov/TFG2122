@@ -34,12 +34,12 @@ namespace EvolutionSimulation
             {
                 WorldGenConfig worldConfig;
                 // TODO: hacerlo asi o poner otro parametro para diferenciar un json de configuracion y de mundo como tal
-                try 
-                { 
+                try
+                {
                     worldConfig = Newtonsoft.Json.JsonConvert.DeserializeObject<WorldGenConfig>(worldData);
                     world.Init(worldConfig);
                 }
-                catch( Newtonsoft.Json.JsonSerializationException e)
+                catch(Newtonsoft.Json.JsonSerializationException e)
                 {
                     world.Init(worldData);
                 }
@@ -136,26 +136,28 @@ namespace EvolutionSimulation
             for (int i = 0; i < UserInfo.Species; i++)
             {
                 bool validPosition;
+                Animal a = world.CreateCreature<Animal>(0, 0);
+                int cont = 0;
                 do
                 {
                     validPosition = true;
                     x = RandomGenerator.Next(0, UserInfo.Size);
                     y = RandomGenerator.Next(0, UserInfo.Size);
-
-                    foreach (Tuple<int, int> p in spawnPositions)
+                    if (world.map[x, y].isWater)
                     {
-                        Vector2Int dist = new Vector2Int(x - p.Item1, y - p.Item2);
-                        if (world.map[x, y].isWater || dist.Magnitude() < minSpawnDist)
-                        {
-                            validPosition = false;
-                            break;
-                        }
+                        validPosition = false;
+                        continue;
+                    }
+                    if (!a.CheckTemperature(x, y) && cont < UserInfo.Size)
+                    {
+                        validPosition = false;
+                        cont++;
+                        continue;
                     }
                 }
                 while (!validPosition);
 
                 //The specified amount of individuals of each species is created.
-                Animal a = world.CreateCreature<Animal>(x, y);
                 for (int j = 1; j < UserInfo.Individuals; j++)
                 {
                     world.CreateCreature<Animal>(x, y, a.chromosome, a.speciesName);
