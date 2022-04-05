@@ -133,9 +133,6 @@ namespace EvolutionSimulation
             metabolismComparer = new Utils.SortByMetabolism();
             StaticEntities = new Dictionary<int, StaticEntity>();
             entitiesToDelete = new List<int>();
-            chunkSize = 32;
-            highMap = new List<MapRegion>();
-            FillHighMap();
 
             MapData mapData;
             // Create plant entities from the file
@@ -165,6 +162,11 @@ namespace EvolutionSimulation
                     mapData.plant = plant;
                 }
             }
+
+            chunkSize = 32;
+            highMap = new List<MapRegion>();
+            FillHighMap();
+
         }
 
         /// <summary>

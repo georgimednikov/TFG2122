@@ -32,6 +32,7 @@ namespace UnitySimulation
         //public string ExportDirectory;
 
         public WorldCreaturesManager worldCreatureManager;
+        public WorldCorpseManager worldCorpseManager;
         public GenerateWorld worldGenerator;
 
         UnitySimulation simulation;
@@ -53,6 +54,7 @@ namespace UnitySimulation
             simulation.Run();
 
             simulation.Subscribe(worldCreatureManager);
+            simulation.Subscribe(worldCorpseManager);
             StartCoroutine(StepWorld());
         }
 

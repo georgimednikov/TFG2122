@@ -11,40 +11,37 @@ namespace UnitySimulation
     {
         public GameObject creaturePrefab;
 
-        Dictionary<Creature, GameObject> _creatures = new Dictionary<Creature, GameObject>();
+        Dictionary<int, GameObject> _creatures = new Dictionary<int, GameObject>();
 
         public void OnNotify(World info)
         {
-            CheckCreatures(new List<Creature>(info.Creatures.Values));
+            CheckCreatures(info, new List<int>(info.Creatures.Keys));
         }
 
-        // TODO: esto es tope de ineficiente mejor luego hacer eventos
-        // que notifiquen cuando se ha creado una creatura y cuando se ha destruido
-        void CheckCreatures(List<Creature> creatures)
+        void CheckCreatures(World w, List<int> creatures)
         {
             // Check if a creature has died
-            List<Creature> managedCreatures = new List<Creature>(_creatures.Keys);
-            foreach (Creature c in managedCreatures)
+            foreach (int c in _creatures.Keys)
             {
-                if (!creatures.Contains(c))
+                if (w.GetCreature(c) == null)
                 {
                     Destroy(_creatures[c]);
                     _creatures.Remove(c);
                 }
             }
 
-
             // Check if a new creature has been born
             // and update every position with the new info
-            foreach (Creature c in creatures)
+            foreach (int c in creatures)
             {
+                Creature creature = w.GetCreature(c);
                 if (!_creatures.ContainsKey(c))
                 {
                     // Instantiate creatura
-                    _creatures.Add(c, SpawnCreature(c));
+                    _creatures.Add(c, SpawnCreature(creature));
                 }
                 // Update creature GO position
-                UpdateCreature(c, _creatures[c]);
+                UpdateCreature(creature, _creatures[c]);
             }
         }
 
@@ -70,7 +67,7 @@ namespace UnitySimulation
         {
             if(type == Interactions.attack)
             {
-                _creatures[receiver].GetComponent<CreatureEffects>().Bite();
+                _creatures[receiver.ID].GetComponent<CreatureEffects>().Bite();
             }
         }
 
