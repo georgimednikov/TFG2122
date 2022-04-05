@@ -14,10 +14,10 @@ public class WorldCorpseManager : MonoBehaviour, IListener<World>
     public void OnNotify(World info)
     {
         List<int> currCorpses = new List<int>();
-
+        
         foreach(KeyValuePair<int, StaticEntity> se in info.StaticEntities)
         {
-            if (se.Value is Plant) break;
+            if (se.Value is Plant) continue;
             currCorpses.Add(se.Key);
         }
         

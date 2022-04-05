@@ -75,6 +75,7 @@ namespace UnitySimulation
         {
             // Position
             gO.GetComponent<CreatureLerpPosition>().LerpToPosition(new Vector3(c.x, gO.transform.position.y, c.y));
+            
             // State visualization
             string state = c.GetState();
             gO.GetComponent<CreatureManager>().statusBar.GetComponent<StatusBar>().SetStatus(state);
