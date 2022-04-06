@@ -29,25 +29,15 @@ namespace EvolutionSimulation
             Genetics.GeneticTaxonomy.SetTaxonomy();
             // World
             world = new World();
-            string worldData = UserInfo.WorldConfigFile();
-            if (worldData != null)
+            string worldData = UserInfo.WorldFile();
+            string regionData = UserInfo.RegionFile();
+            if (worldData != null && regionData != null)
             {
-                WorldGenConfig worldConfig;
-                // TODO: hacerlo asi o poner otro parametro para diferenciar un json de configuracion y de mundo como tal
-                try
-                {
-                    worldConfig = Newtonsoft.Json.JsonConvert.DeserializeObject<WorldGenConfig>(worldData);
-                    world.Init(worldConfig);
-                }
-                catch(Newtonsoft.Json.JsonSerializationException e)
-                {
-                    world.Init(worldData);
-                }
-
+                world.Init(worldData, regionData);
             }
             else
             {
-                WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
+                WorldGenConfig config = new WorldGenConfig(World.MapType.Atoll)
                 {
                     mapSize = 512
                 };
@@ -70,7 +60,7 @@ namespace EvolutionSimulation
         /// <param name="minSimilarityFile"> Raw file with the species' similarity parameter </param>
         /// <param name="abilitiesFile"> Raw file with each ability unlock percentage. If not provided, default information is setted</param>
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends. If not provided, default export directory is setted</param>
-        virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string minSimilarityFile = null, string worldFile = null, string exportDir = null)
+        virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string minSimilarityFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
         {
             UserInfo.SetUp(years, species, individuals, _exportDir: exportDir);
             // Universe Parameters
@@ -81,18 +71,9 @@ namespace EvolutionSimulation
             Genetics.GeneticTaxonomy.SetTaxonomy(sGeneWeightFile, minSimilarityFile);
             // World
             world = new World();
-            if (worldFile != null)
+            if (worldFile != null && regionMap != null)
             {
-                WorldGenConfig worldConfig;
-                try
-                {
-                    worldConfig = Newtonsoft.Json.JsonConvert.DeserializeObject<WorldGenConfig>(worldFile);
-                    world.Init(worldConfig);
-                }
-                catch (Newtonsoft.Json.JsonSerializationException e)
-                {
-                    world.Init(worldFile);
-                }
+                world.Init(worldFile, regionMap);
             }
             else
             {
@@ -157,6 +138,7 @@ namespace EvolutionSimulation
                 }
                 while (!validPosition);
 
+                a.Place(x, y);
                 //The specified amount of individuals of each species is created.
                 for (int j = 1; j < UserInfo.Individuals; j++)
                 {

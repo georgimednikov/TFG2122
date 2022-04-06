@@ -21,7 +21,7 @@ namespace VisualizadorConsola
             Console.WriteLine("Simulation Init done");
         }
 
-        override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string minSimilarityFile = null, string worldFile = null, string exportDir = null)
+        override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string minSimilarityFile = null, string worldFile = null, string highMap = null, string exportDir = null)
         {
             base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, minSimilarityFile, worldFile, exportDir);
             Console.WriteLine("Simulation Init done");

@@ -41,6 +41,10 @@ namespace EvolutionSimulation
         /// </summary>
         public float[,] temperatureMap;
         /// <summary>
+        /// Already generated region Astar map.
+        /// </summary>
+        public List<World.MapRegion> regionMap;
+        /// <summary>
         /// Should the provided heightmap or the generated be modified by the EvaluateHeight function.
         /// </summary>
         public bool heightModifiedByFunction = true;
@@ -116,10 +120,26 @@ namespace EvolutionSimulation
         }
 
         // TODO: se va a poder inicializar asi o solo con un config?
-        public void Init(string rawWorldData)
+        public void Init(string rawWorldData, string regionMap)
         {
+            WorldGenConfig config = new WorldGenConfig(MapType.Custom);
             map = JsonConvert.DeserializeObject<MapData[,]>(rawWorldData);
-            // TODO: validar
+            int n = map.GetLength(0);
+            float[,] heightMap = new float[n, n];
+            float[,] temperatureMap = new float[n, n];
+            for(int i = 0; i < n; ++i)
+            {
+                for (int j = 0; j < n; ++j)
+                {
+                    heightMap[i, j] = (float)map[i, j].height;
+                    temperatureMap[i, j] = (float)map[i, j].temperature;
+                }
+            }
+            config.heightMap = heightMap;
+            config.temperatureMap = temperatureMap;
+            highMap = JsonConvert.DeserializeObject<List<MapRegion>>(regionMap);
+            config.regionMap = highMap;
+            Validator.Validate(config);
 
             ticksHour = UniverseParametersManager.parameters.ticksPerHour;
             hoursDay = UniverseParametersManager.parameters.hoursPerDay;
@@ -162,11 +182,6 @@ namespace EvolutionSimulation
                     mapData.plant = plant;
                 }
             }
-
-            chunkSize = 32;
-            highMap = new List<MapRegion>();
-            FillHighMap();
-
         }
 
         /// <summary>
@@ -230,10 +245,6 @@ namespace EvolutionSimulation
             if (config.heightMap != null) { heightMap = config.heightMap; mapSize = heightMap.GetLength(0); }
             else mapSize = config.mapSize;
 
-            chunkSize = 32;
-            int chunk = (int)Math.Floor(mapSize / (float)chunkSize) + ((mapSize % chunkSize == 0) ? 1 : 0);
-            highMap = new List<MapRegion>();
-
             if (config.heightWaves != null) heightWaves = config.heightWaves;
             else
             {
@@ -291,7 +302,17 @@ namespace EvolutionSimulation
             }
 
             InitMap();
-            FillHighMap();
+
+            if (config.regionMap == null)
+            {
+                chunkSize = 32;
+                int chunk = (int)Math.Floor(mapSize / (float)chunkSize) + ((mapSize % chunkSize == 0) ? 1 : 0);
+                highMap = new List<MapRegion>();
+                FillHighMap();
+            } else
+            {
+                highMap = config.regionMap;
+            }
         }
 
         private void FillHighMap()
@@ -901,7 +922,7 @@ namespace EvolutionSimulation
             string word = JsonConvert.SerializeObject(map, Formatting.Indented);
             System.IO.File.WriteAllText(UserInfo.ExportDirectory + "World.json", word);
             string hMap = JsonConvert.SerializeObject(highMap, Formatting.Indented);
-            System.IO.File.WriteAllText(UserInfo.ExportDirectory + "HighMap.json", word);
+            System.IO.File.WriteAllText(UserInfo.ExportDirectory + "HighMap.json", hMap);
         }
 
         // Map with physical properties

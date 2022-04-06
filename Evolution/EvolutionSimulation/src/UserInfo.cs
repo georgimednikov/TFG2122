@@ -41,6 +41,10 @@ namespace EvolutionSimulation
         /// Returns the raw world file, if the file does not exist, returns null
         /// </summary>
         static public string WorldFile() { return LoadFile("World.json"); }
+        /// <summary>
+        /// Returns the Astar region file, if the file does not exist, returns null
+        /// </summary>
+        static public string RegionFile() { return LoadFile("HighMap.json"); }
 
         /// <summary>
         /// Loads a file form the Data directory and returns its raw data.

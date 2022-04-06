@@ -20,7 +20,8 @@ namespace UnitySimulation
         public TextAsset AbilityUnlocks;
         public TextAsset GeneSimilarity;
         public TextAsset SpeciesSimilarity;
-        public TextAsset WorldConfig;
+        public TextAsset WorldMap;
+        public TextAsset RegionMap;
 
 
         public float TimeBetweenSteps = 1;
@@ -47,7 +48,7 @@ namespace UnitySimulation
                 UniverseParameters.text,
                 Chromosome.text, AbilityUnlocks.text,
                 GeneSimilarity.text, SpeciesSimilarity.text,
-                WorldConfig.text,
+                WorldMap.text, RegionMap.text,
                 Application.dataPath + "/Export/"
                 );
             

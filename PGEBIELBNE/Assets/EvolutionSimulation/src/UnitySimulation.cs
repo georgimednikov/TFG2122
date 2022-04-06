@@ -16,9 +16,9 @@ namespace UnitySimulation
             generateWorld.MapGen();
         }
 
-        public override void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string minSimilarityFile = null, string worldFile = null, string exportDir = null)
+        public override void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string minSimilarityFile = null, string worldFile = null, string highMap = null, string exportDir = null)
         {
-            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, minSimilarityFile, worldFile, exportDir);
+            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, minSimilarityFile, worldFile, highMap, exportDir);
             generateWorld.SetWorld(world);
             generateWorld.MapGen();
         }

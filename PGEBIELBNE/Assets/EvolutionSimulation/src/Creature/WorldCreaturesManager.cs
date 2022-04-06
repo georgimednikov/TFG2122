@@ -15,7 +15,13 @@ namespace UnitySimulation
 
         public void OnNotify(World info)
         {
-            CheckCreatures(info, new List<int>(info.Creatures.Keys));
+            List<int> l = new List<int>(info.Creatures.Keys);
+            for (int i = 0; i < l.Count; ++i)
+            {
+                Creature c = info.GetCreature(l[i]);
+                if (info.map[c.x, c.y].isWater) Debug.Log("In water");
+            }
+            CheckCreatures(info, l);
         }
 
         void CheckCreatures(World w, List<int> creatures)

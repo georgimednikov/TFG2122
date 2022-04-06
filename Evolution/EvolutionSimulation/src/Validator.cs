@@ -58,6 +58,7 @@ namespace EvolutionSimulation
             FloraFunc(configuration);
             TemperatureSoftenerFunc(configuration);
             FloraSelectorFunc(configuration);
+            RegionMap(configuration);
         }
 
         static void NonZeroSize(WorldGenConfig config)
@@ -193,6 +194,12 @@ namespace EvolutionSimulation
                 if (val < 0 || val > 4) throw new FunctionIncorrectOutputRangeException("The provided flora selector function has an incorrect output range");
             }
             return;
+        }
+
+        static void RegionMap(WorldGenConfig config)
+        {
+            if (config.regionMap == null) return;
+
         }
         #endregion
 
