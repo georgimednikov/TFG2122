@@ -47,7 +47,6 @@ namespace EvolutionSimulation.Entities
         public int y { get; protected set; }
 
         // Maximum and current health of the entity
-        // TODO: esto es solo para las entidades edible
         public float maxHp { get; protected set; }
         public float curHp { get; protected set; }
 

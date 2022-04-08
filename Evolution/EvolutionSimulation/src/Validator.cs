@@ -444,7 +444,7 @@ namespace EvolutionSimulation
         }
         #endregion
 
-        #region UniverseParameters
+        #region UniverseParameters  
         public class UniverseParameterIsZeroException : Exception
         {
             public UniverseParameterIsZeroException() { }
@@ -504,7 +504,7 @@ namespace EvolutionSimulation
             ValidateCorpse(parameters);
         }
 
-        static void ValidateWorld(UniverseParameters parameters)
+        static void ValidateWorld(UniverseParameters parameters) // TODO: REVISAR QUE ESTAN TODOS
         {
             if (parameters.ticksPerHour <= 0 || parameters.hoursPerDay <= 0 || parameters.daysPerYear <= 0 || parameters.morningStart <= 0 || parameters.nightStart <= 0)
                 throw new UniverseParameterIsZeroException("The provided time parameters must be positive");

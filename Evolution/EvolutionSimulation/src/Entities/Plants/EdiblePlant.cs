@@ -7,8 +7,6 @@ namespace EvolutionSimulation.Entities
         public bool eaten { get; protected set; } = false;
         protected int regrowthTime;
         protected float nutritionalValue;
-
-
         override public void Tick()
         {
             if (eaten)  // If it is eaten, it remains so until it is fully grown back

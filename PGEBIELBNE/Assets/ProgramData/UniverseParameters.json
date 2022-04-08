@@ -21,6 +21,7 @@
   "nightPerceptionPenalty": 0.4,
   "minMobilityMedium": 0.6,
   "mobilityPenalty": 0.7,
+  "yearsBetweenHeats": 0.8;
   "maxSpeed": 1.5,
   "hornIntimidationMultiplier": 1.5,
   "restRegenerationThreshold": 0.7,

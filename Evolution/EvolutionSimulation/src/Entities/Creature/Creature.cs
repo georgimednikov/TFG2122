@@ -305,7 +305,7 @@ namespace EvolutionSimulation.Entities
             IState drink = new Drinking(this);
             IState goToMate = new GoToMate(this);
             IState tryMate = new TryMate(this);
-            IState mating = new Mating(this, 20);//TODO que 20 lo coja del cromosoma, es el tiempo que tardan en reproducirse
+            IState mating = new Mating(this, UniverseParametersManager.parameters.ticksToReproduce);    //TODO que 20 lo coja del cromosoma, es el tiempo que tardan en reproducirse
             IState goToEat = new GoToEat(this);
             IState eat = new Eating(this);
             IState goToSafePlace = new GoToSafePlace(this);
@@ -482,7 +482,6 @@ namespace EvolutionSimulation.Entities
         /// If the interaction type or the response is not registered, it does nothing.
         /// If no responses remain after the removal, it removes the interaction entry
         /// </summary>
-        // TODO: Quitamos la entrada del diccionario si no quedan reacciones?
         public void RemoveInteraction(Interactions type, Action<Creature> response)
         {
             if (!InteractionsDict.ContainsKey(type)) return;

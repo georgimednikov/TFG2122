@@ -30,7 +30,7 @@ namespace EvolutionSimulation.Entities
                                                                                           //An aerial creature moves fast in the air, but arborealSpeed = aerialSpeed * mobilityPenalty and groundSpeed = arborealSpeed * mobilityPenalty
 
             //TODO: Poner esto en el cromosoma, tiempo de embarazo, tiempo entre celos, tiempo en celo
-            float timeBetweenHeats = 0.8f; //time in years between two heats or give birth and the next heat 
+            float timeBetweenHeats = UniverseParametersManager.parameters.yearsBetweenHeats; //time in years between two heats or give birth and the next heat 
 
             stats.TimeBetweenHeats = world.YearToTick(timeBetweenHeats);
 
