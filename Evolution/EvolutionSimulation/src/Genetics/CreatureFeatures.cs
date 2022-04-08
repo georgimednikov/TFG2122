@@ -39,13 +39,13 @@ namespace EvolutionSimulation.Genetics
         Longevity,
         [EnumMember(Value = "Diet")]
         Diet,
-        [EnumMember(Value = "Members")]
+        [EnumMember(Value = "Members")] //TODO: limbs no members
         Members,
 
         //Abilities
         [EnumMember(Value = "Arboreal")]
         Arboreal,
-        [EnumMember(Value = "Wings")]
+        [EnumMember(Value = "Wings")] //TODO: Mejor aereal que wings
         Wings,
         [EnumMember(Value = "Venomous")]
         Venomous,
@@ -53,7 +53,7 @@ namespace EvolutionSimulation.Genetics
         NightVision,
         [EnumMember(Value = "Horns")]
         Horns,
-        [EnumMember(Value = "Mimic")]
+        [EnumMember(Value = "Mimic")] //TODO: Mimicry no mimic
         Mimic,
         [EnumMember(Value = "Upright")]
         Upright,
