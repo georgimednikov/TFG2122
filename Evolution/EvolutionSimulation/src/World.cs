@@ -790,7 +790,7 @@ namespace EvolutionSimulation
                                 break;
                             case 2:
                                 maxTrees++;
-                                map[xIndex, yIndex].plant = CreateStaticEntity<Tree>(xIndex, yIndex, 0); //TODO: el Tree no necesita hp
+                                map[xIndex, yIndex].plant = CreateStaticEntity<Tree>(xIndex, yIndex, 0);
                                 break;
                             case 3:
                                 maxTrees++;
