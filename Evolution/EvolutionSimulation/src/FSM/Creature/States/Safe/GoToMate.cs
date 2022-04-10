@@ -39,12 +39,18 @@ namespace EvolutionSimulation.FSM.Creature.States
                 Vector3 nextPos = creature.GetNextPosOnPath();
                 if (nextPos.X != -1 && nextPos.Y != -1) // TODO: no haria falta creo
                     creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-                else if (nextPos.X == -2)
-                {
-                    creature.SetPath(matePos.x, matePos.y);
-                }
+
                 Vector2Int tmpPos;
                 bool hasMate = creature.Mate(out mateid, out tmpPos);
+                if (!hasMate)
+                {
+                    int a = 12;
+                }
+                if (nextPos.X == -1)
+                {
+                    creature.SetPath(tmpPos.x, tmpPos.y);
+                }
+
                 // If the mate position changed (i.e. other better mate is near or the mate has changed its position), the creature updates its destiny.
                 if (hasMate && matePos != tmpPos)
                 {

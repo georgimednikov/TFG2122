@@ -33,7 +33,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                
                 if (nextPos.X != -1 && nextPos.Y != -1) // TODO: no haria falta creo
                     creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-                else if (nextPos.X == -2)
+                if (nextPos.X == -1)
                 {
                     creature.SetPath(shorePosition.x, shorePosition.y);
                 }

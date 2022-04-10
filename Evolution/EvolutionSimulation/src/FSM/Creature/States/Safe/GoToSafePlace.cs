@@ -35,6 +35,10 @@ namespace EvolutionSimulation.FSM.Creature.States
                     creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
                 
                 Vector2Int tmpPos = creature.SafePosition();
+                if (nextPos.X == -1)
+                {
+                    creature.SetPath(tmpPos.x, tmpPos.y);
+                }
                 bool hasSafePos = tmpPos != null;
                 // If the safe position changed (i.e. other better safe pos is near), the creature updates its destiny.
                 if (hasSafePos && tmpPos != safePos)

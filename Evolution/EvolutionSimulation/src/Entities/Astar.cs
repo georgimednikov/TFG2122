@@ -7,6 +7,13 @@ using System.Threading.Tasks;
 
 namespace EvolutionSimulation.Entities
 {
+    public struct DebugPathInfo
+    {
+        public Vector3[] path;
+        public int[] regionPath;
+        public Vector3 start, end, borderEnd;
+    }
+
     class GraphNode : IComparable<GraphNode>, IEquatable<GraphNode>
     {
         public GraphNode(Vector3 p, GraphNode pr, double csf = 0, double ec = 0, double ed = 0)
@@ -50,18 +57,28 @@ namespace EvolutionSimulation.Entities
         /// <param name="c">Creature that moves.</param>
         /// <param name="w">World where it happens</param>
         /// <param name="treeDensity">Percentage of trees on the path</param>
-        public static Vector3[] GetPath(Creature c, World w, Vector3 start, Vector3 end, out double treeDensity)
+        public static Vector3[] GetPath(Creature c, World w, Vector3 start, Vector3 end, out double treeDensity, DebugPathInfo info = default(DebugPathInfo))
         {
 #if DEBUG
             Console.WriteLine("Empieza Astar: " + start + " " + end);
 #endif
-            if (end == start) throw new InvalidOperationException("La misma pos esta mal");
-            Vector3 tempEnd = HighAstar(w, start, end, out int endRegion);
+            info.start = start;
+            info.end = end;
+            if((end-start).LengthSquared() <= 2)
+            {
+                Vector3[] path = new Vector3[1];
+                path[0] = end;
+                treeDensity = 0;
+                return path;
+            }
 
-            return LowAstar(c, w, start, tempEnd, endRegion, out treeDensity);
+            if (end == start) throw new InvalidOperationException("La misma pos esta mal");
+            Vector3 tempEnd = HighAstar(w, start, end, out int endRegion, info);
+
+            return LowAstar(c, w, start, tempEnd, endRegion, out treeDensity, info);
         }
 
-        private static Vector3 HighAstar(World w, Vector3 start, Vector3 end, out int endRegion)
+        private static Vector3 HighAstar(World w, Vector3 start, Vector3 end, out int endRegion, DebugPathInfo info)
         {
             Vector3 nStart = new Vector3(w.map[(int)start.X, (int)start.Y].regionId, 0, 0);
             Vector3 nEnd = new Vector3(w.map[(int)end.X, (int)end.Y].regionId, 0, 0);
@@ -102,6 +119,13 @@ namespace EvolutionSimulation.Entities
 
                 Vector3 finalPos = new Vector3();
                 double bestDist = double.MaxValue;
+
+                info.regionPath = new int[list.Count];
+                for (int i = 0; i < info.regionPath.Length; i++)
+                {
+                    info.regionPath[i] = (int)list[i].pos.X;
+                }
+
                 List<Vector2> pos = w.highMap[(int)list[1].pos.X].links[(int)nStart.X];
 
                 for (int i = 0; i < pos.Count; i++)
@@ -120,7 +144,7 @@ namespace EvolutionSimulation.Entities
             return end;
         }
 
-        private static Vector3[] LowAstar(Creature c, World w, Vector3 start, Vector3 end, int endRegion, out double treeDensity)
+        private static Vector3[] LowAstar(Creature c, World w, Vector3 start, Vector3 end, int endRegion, out double treeDensity, DebugPathInfo info)
         {
             List<GraphNode> path = new List<GraphNode>();
             Utils.PriorityQueue<GraphNode> open = new Utils.PriorityQueue<GraphNode>();
@@ -164,6 +188,7 @@ namespace EvolutionSimulation.Entities
             {
                 retPath[i - 1] = path[i].pos;
             }
+            info.path = retPath;
             //Console.WriteLine("Acaba Astar");
             return retPath;
         }

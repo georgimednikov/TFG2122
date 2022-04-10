@@ -966,8 +966,8 @@ namespace EvolutionSimulation.Entities
         /// <returns>Next position or (-1, -1, -1) on path end.</returns>
         public Vector3 GetNextPosOnPath()
         {
-            if (path == null)
-                return new Vector3(-2,-1,-1);
+            //if (path == null)
+            //    return new Vector3(-2,-1,-1);
             if (pathIterator >= path.Length)
             {
                 path = null; return new Vector3(-1, -1, -1);
