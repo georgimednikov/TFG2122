@@ -41,14 +41,27 @@ namespace UnitySimulation
         {
             if (worldGenerator == null)
                 Debug.LogError("WorldGenerator is not assigned");
+            if (worldCreatureManager == null)
+                Debug.LogError("WorldCreatureManager is not assigned");
+            if (worldCorpseManager == null)
+                Debug.LogError("WorldCorpseManager is not assigned");
+
+            string universeFileRaw = UniverseParameters == null ? null : UniverseParameters.text;
+            string chromosomeFileRaw = Chromosome == null ? null : Chromosome.text;
+            string abilitiesFileRaw = AbilityUnlocks == null ? null : AbilityUnlocks.text;
+            string geneFileRaw = GeneSimilarity == null ? null : GeneSimilarity.text;
+            string speciesFileRaw = SpeciesSimilarity == null ? null : SpeciesSimilarity.text;
+            string worldFileRaw = WorldMap == null ? null : WorldMap.text;
+            string regionFileRaw = RegionMap == null ? null : RegionMap.text;
+           
             simulation = new UnitySimulation();
             simulation.generateWorld = worldGenerator;
             simulation.Init(
                 EvolutionYears, SpeciesNumber, IndividualsNumber,
-                UniverseParameters.text,
-                Chromosome.text, AbilityUnlocks.text,
-                GeneSimilarity.text, SpeciesSimilarity.text,
-                WorldMap.text, RegionMap.text,
+                universeFileRaw,
+                chromosomeFileRaw, abilitiesFileRaw,
+                geneFileRaw, speciesFileRaw,
+                worldFileRaw, regionFileRaw,
                 Application.dataPath + "/Export/"
                 );
             
