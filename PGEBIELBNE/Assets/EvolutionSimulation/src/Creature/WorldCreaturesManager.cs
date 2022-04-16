@@ -11,7 +11,19 @@ namespace UnitySimulation
     {
         public GameObject creaturePrefab;
 
+        [Tooltip(" Additional distance from the ground where the creatures will fly")]
+        public float AirHeight;
+        [Tooltip(" Additional distance from the ground where the creature move through trees")]
+        public float TreeHeight;
+
         Dictionary<int, GameObject> _creatures = new Dictionary<int, GameObject>();
+        Terrain terrain;
+
+        private void Start()
+        {
+            terrain = GetComponent<Terrain>();
+            AirHeight += terrain.terrainData.size.y;
+        }
 
         public void OnNotify(World info)
         {
@@ -54,8 +66,6 @@ namespace UnitySimulation
 
         GameObject SpawnCreature(Creature c)
         {
-            Terrain terrain = GetComponent<Terrain>();
-
             RaycastHit hit;
             // Position in Y axis + 10 (no specific reason for that number) => No point in the world will be higher.  
             Physics.Raycast(new Vector3(c.x, terrain.terrainData.size.y + 10, c.y), Vector3.down, out hit, Mathf.Infinity, LayerMask.GetMask("World"));
@@ -80,7 +90,20 @@ namespace UnitySimulation
         void UpdateCreature(Creature c, GameObject gO)
         {
             // Position
-            gO.GetComponent<CreatureLerpPosition>().LerpToPosition(new Vector3(c.x, gO.transform.position.y, c.y));
+            Vector3 nextPos = new Vector3(c.x, 0, c.y);
+            switch (c.creatureLayer)
+            {
+                case Creature.HeightLayer.Air:
+                    nextPos.y = AirHeight;
+                    break;
+                case Creature.HeightLayer.Tree:
+                    nextPos.y = terrain.SampleHeight(nextPos) + TreeHeight;
+                    break;
+                case Creature.HeightLayer.Ground:
+                    nextPos.y = terrain.SampleHeight(nextPos);
+                    break;
+            }
+            gO.GetComponent<CreatureLerpPosition>().LerpToPosition(nextPos);
             
             // State visualization
             string state = c.GetState();

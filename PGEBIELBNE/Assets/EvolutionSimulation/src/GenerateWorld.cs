@@ -28,7 +28,6 @@ namespace UnitySimulation
     public class GenerateWorld : MonoBehaviour
     {
         public TextAsset worldJson;
-        public int worldSize;   // TODO: ocultarlo si hay json y viceversa
         World world;
         public GameObject waterPlane;
         GameObject waterPlaneInstance;
