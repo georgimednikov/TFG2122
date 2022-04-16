@@ -196,7 +196,7 @@ namespace EvolutionSimulation.Entities
             }
 
             //Intimidation has to be calculed here because of modifyStatByAge
-            float intimidation = stats.Size / 2 * ((int)stats.Diet + 1);
+            float intimidation = stats.Size / 2 * ((int)stats.Diet + 1); //TODO: por que
 
             //Horns. Increase damage and intimidation
             if (chromosome.HasAbility(CreatureFeature.Horns, CreatureChromosome.AbilityUnlock[CreatureFeature.Horns]))
