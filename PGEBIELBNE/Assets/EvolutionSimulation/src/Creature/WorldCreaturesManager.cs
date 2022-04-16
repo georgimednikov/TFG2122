@@ -91,6 +91,9 @@ namespace UnitySimulation
         {
             // Position
             Vector3 nextPos = new Vector3(c.x, 0, c.y);
+            //Debug.Log("NextPos: " + nextPos);
+            //Debug.Log("Layer " + c.creatureLayer);
+            //Debug.Log(c.GetStateInfo());
             switch (c.creatureLayer)
             {
                 case Creature.HeightLayer.Air:
@@ -102,7 +105,7 @@ namespace UnitySimulation
                 case Creature.HeightLayer.Ground:
                     nextPos.y = terrain.SampleHeight(nextPos);
                     break;
-            }
+            }      
             gO.GetComponent<CreatureLerpPosition>().LerpToPosition(nextPos);
             
             // State visualization

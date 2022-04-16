@@ -61,12 +61,10 @@ namespace UnitySimulation
 
         public void MapGen()
         {
-            if (waterPlaneInstance != null)
-            {
-                UpdateMeshVertices(world.map);
-                GenerateFlora(world.map);
-                SetWaterPlane();
-            }
+            UpdateMeshVertices(world.map);
+            GenerateFlora(world.map);
+            SetWaterPlane();
+            Debug.Log("Map generation done");
         }
 
         private void SetWaterPlane()
