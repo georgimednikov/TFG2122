@@ -362,6 +362,8 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToDrink, stopGoToDrinkTransition, wander);
             safeFSM.AddTransition(goToDrink, drinkingTransition, drink);
             safeFSM.AddTransition(drink, stopDrinkingTransition, wander);
+            safeFSM.AddTransition(sleep, drinkingExploreTransition, explore);
+            safeFSM.AddTransition(sleep, thirstyTransition, goToDrink);
 
             // Eating
             ITransition hungerTransition = new HungerTransition(this);
@@ -374,6 +376,8 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToEat, stopGoToEatTransition, wander);
             safeFSM.AddTransition(goToEat, eatingTransition, eat);
             safeFSM.AddTransition(eat, stopEatingTransition, wander);
+            safeFSM.AddTransition(sleep, hungerExploreTransition, explore);
+            safeFSM.AddTransition(sleep, hungerTransition, goToEat);
 
             // Mating
             ITransition mateTransition = new GoToMateTransition(this);
