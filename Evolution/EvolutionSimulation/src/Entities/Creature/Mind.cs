@@ -136,8 +136,11 @@ namespace EvolutionSimulation.Entities
                     worthyPlant = mem.SafeEdiblePlants[0];
                 return;
             }
-
-            worthyPlant = BestBetweenCloseAndSafe(mem.EdiblePlants, mem.SafeEdiblePlants, Criteria);
+            if (mem.SafeEdiblePlants.Count != 0 && !(world.GetStaticEntity(mem.SafeEdiblePlants[0].ID) as EdiblePlant).eaten)
+                worthyPlant = BestBetweenCloseAndSafe(mem.EdiblePlants, mem.SafeEdiblePlants, Criteria);
+            else if (mem.EdiblePlants.Count != 0)
+                worthyPlant = mem.EdiblePlants[0];
+            else worthyPlant = null;
         }
         private T BestBetweenCloseAndSafe<T>(List<T> close, List<T> safe, Func<T, T, T> criteria) where T : Resource
         {

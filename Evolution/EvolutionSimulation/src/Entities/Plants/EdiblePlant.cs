@@ -24,7 +24,7 @@ namespace EvolutionSimulation.Entities
         {
             if (type != Interactions.eat || eaten)
             {
-                throw new Exception("Plant is unable to be eaten");
+                Console.WriteLine("TRIED EATING EATEN PLANT");
             }
 
             float dealt = Math.Min(other.stats.Damage, curHp);

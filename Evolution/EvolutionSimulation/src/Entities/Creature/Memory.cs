@@ -220,15 +220,21 @@ namespace EvolutionSimulation.Entities
                 if (entity is Corpse && !thisCreature.IsHerbivorous())
                 {
                     Corpse newCorpse = entity as Corpse;
-                    if (thisCreature.chromosome.HasAbility(Genetics.CreatureFeature.Scavenger, Genetics.CreatureChromosome.AbilityUnlock[Genetics.CreatureFeature.Scavenger]) 
+                    if (thisCreature.chromosome.HasAbility(Genetics.CreatureFeature.Scavenger, Genetics.CreatureChromosome.AbilityUnlock[Genetics.CreatureFeature.Scavenger])
                         || newCorpse.Edible)
                         UpdateList(FreshCorpses, resource, maxExperienceTicks);
                     else
                         UpdateList(RottenCorpses, resource, maxExperienceTicks);
                 }
-                else if (entity is EdiblePlant && !(entity as EdiblePlant).eaten && !thisCreature.IsCarnivorous())
-                {
-                    UpdateList(EdiblePlants, resource, maxExperienceTicks);
+                else if (entity is EdiblePlant && !thisCreature.IsCarnivorous()) {
+                    if (!(entity as EdiblePlant).eaten)
+                    {
+                        UpdateList(EdiblePlants, resource, maxExperienceTicks);
+                    }
+                    else // This removes a perceived and already seen plant
+                    {
+                        EdiblePlants.Remove(resource);
+                    }
                 }
             }
             //This for structure is recurrent all throughtout this class and is explained with the following example:
