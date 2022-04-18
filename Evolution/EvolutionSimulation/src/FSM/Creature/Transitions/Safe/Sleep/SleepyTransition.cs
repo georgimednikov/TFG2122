@@ -14,7 +14,7 @@
 
         public override bool Evaluate()
         {
-            return creature.IsExhausted();
+            return creature.IsExhausted() && !creature.IsVeryHungry() && !creature.IsVeryThirsty();
         }
 
         public override string ToString()

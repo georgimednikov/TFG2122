@@ -266,8 +266,6 @@ namespace EvolutionSimulation.Entities
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         private Fsm mfsm;
 
-
-
         /// <summary>
         /// Returns the creature's current state
         /// </summary>

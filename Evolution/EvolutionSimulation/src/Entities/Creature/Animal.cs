@@ -119,12 +119,12 @@ namespace EvolutionSimulation.Entities
 
             stats.MaxRest = resourceAmount;
             stats.CurrRest = stats.MaxRest;
-            float re = 1f / (UniverseParametersManager.parameters.hoursTilExhaustion * UniverseParametersManager.parameters.ticksPerHour);
+            float re = stats.MaxRest / (UniverseParametersManager.parameters.hoursTilExhaustion * UniverseParametersManager.parameters.ticksPerHour);
             stats.RestExpense = re / 2f +   // TODO: Numeros arcanos
                 (re / 2f * (1 - chromosome.GetFeaturePercentage(CreatureFeature.Resistance)));
             //    minRestExpense + (maxRestExpense - minRestExpense) * 
             //    (1 - (float)chromosome.GetFeature(CreatureFeature.Resistance) / chromosome.GetFeatureMax(CreatureFeature.Resistance));
-            //stats.RestRecovery = stats.RestExpense * exhaustToSleepRatio;
+            stats.RestRecovery = stats.RestExpense * exhaustToSleepRatio;
 
             //Environment related stats
             stats.Camouflage = chromosome.GetFeature(CreatureFeature.Camouflage);
