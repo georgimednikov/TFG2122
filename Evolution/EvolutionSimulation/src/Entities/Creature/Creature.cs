@@ -691,7 +691,7 @@ namespace EvolutionSimulation.Entities
 
         #region Mind
         // Memory related information
-        Mind mind;
+        public Mind mind { get; private set; }
 
         /// <summary>
         /// Check if the eating objective is not null

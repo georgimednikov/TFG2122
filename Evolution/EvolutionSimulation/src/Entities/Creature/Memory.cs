@@ -28,7 +28,7 @@ namespace EvolutionSimulation.Entities
         Creature thisCreature;
         World world;
 
-        int perceptionRadius;
+        public int perceptionRadius { get; private set; }
         int dangerRadius;
         float danger;                   //Value representing the danger remembered in a position when something bad happens to the creature.
 
@@ -40,6 +40,7 @@ namespace EvolutionSimulation.Entities
         int ticksElapsed;               //How many ticks have gone by, used along with ticksToSavePosition.
 
         ResourcePositionComparer resourceComparer;
+        ResourcePositionEdibleComparer resourceEdibleComparer;
         ResourceValueComparer valueComparer;
         PositionComparer positionComparer;
 
@@ -115,6 +116,7 @@ namespace EvolutionSimulation.Entities
             SafeTemperaturePositions = new List<Vector2Int>();
 
             resourceComparer = new ResourcePositionComparer(c);
+            resourceEdibleComparer = new ResourcePositionEdibleComparer(c);
             valueComparer = new ResourceValueComparer();
             positionComparer = new PositionComparer(c);
 
@@ -626,6 +628,7 @@ namespace EvolutionSimulation.Entities
         {
             perceptionRadius = thisCreature.stats.Perception;
         }
+        
         /// <summary>
         /// Sets a creature to be the enemy of this one, that is to say, its combat target. This creature is forgotten when it leaves
         /// the perception radius or is dead.
@@ -699,7 +702,6 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void SafeEdiblePlant()
         {
-            // TODO: puede olvidarse de todas las plantas al llegar aqui
             if (EdiblePlants.Count == 0) return;
 
             Position posDanger = GetFromPositionDangers(EdiblePlants[0].position);
@@ -713,8 +715,9 @@ namespace EvolutionSimulation.Entities
                 posDanger = new Position(EdiblePlants[0].position, 0, -danger, maxExperienceTicks);
                 dangersRemembered.Add(posDanger);
             }
-
-            SafeEdiblePlants.Add(EdiblePlants[0]);
+            if (!SafeEdiblePlants.Contains(EdiblePlants[0]))
+                SafeEdiblePlants.Add(EdiblePlants[0]);
+            else SafeEdiblePlants.Find(x => x == EdiblePlants[0]).ticks = maxExperienceTicks;
         }
         public void DangerousPosition()
         {
@@ -743,6 +746,12 @@ namespace EvolutionSimulation.Entities
         private void AdjustResourceList<T>(int max, List<T> list) where T : Resource
         {
             list.Sort(resourceComparer);
+            if (list.Count > max)
+                list.RemoveRange(max, list.Count - max);
+        }
+        private void AdjustResourceList<T>(int max, List<T> list, IComparer<T> comparer) where T : Resource
+        {
+            list.Sort(comparer);
             if (list.Count > max)
                 list.RemoveRange(max, list.Count - max);
         }
@@ -776,7 +785,7 @@ namespace EvolutionSimulation.Entities
 
             RemoveFruitlessPlants();
             AdjustResourceList(maxResourcesRemembered, EdiblePlants);
-            AdjustResourceList(maxResourcesRemembered, SafeEdiblePlants);
+            AdjustResourceList(maxResourcesRemembered, SafeEdiblePlants, resourceEdibleComparer);
 
             SafePositions.Sort(positionComparer);
             AdjustPosList(maxPositionsRemembered, SafePositions);
@@ -968,7 +977,34 @@ namespace EvolutionSimulation.Entities
                 int bDist = Math.Abs(creature.x - b.position.x) + Math.Abs(creature.y - b.position.y);
                 return aDist.CompareTo(bDist);
             }
+        }
+        /// <summary>
+        /// Given a list of edible plants, these are ordered based on if they are perceived
+        /// and eaten or the distance from it. The shortest that is not eaten goes first.
+        /// </summary>
+        private class ResourcePositionEdibleComparer : Comparer<EntityResource>
+        {
+            private Creature creature;
+            public ResourcePositionEdibleComparer(Creature creature) { this.creature = creature; }
 
+            public override int Compare(EntityResource a, EntityResource b)
+            {
+                StaticEntity aSE = creature.world.GetStaticEntity(a.ID);
+                StaticEntity bSE = creature.world.GetStaticEntity(b.ID);
+                //check if the creature is perceiveing the plants and their are eaten
+                List<StaticEntity> perceivedEntities = creature.world.PerceiveEntities(creature.ID, creature.mind.mem.perceptionRadius);
+                if (perceivedEntities.Contains(aSE) && (aSE as EdiblePlant).eaten &&
+                    perceivedEntities.Contains(bSE) && (bSE as EdiblePlant).eaten)
+                    return 0;
+                else if (perceivedEntities.Contains(aSE) && (aSE as EdiblePlant).eaten)
+                    return -1;
+                else if (perceivedEntities.Contains(bSE) && (bSE as EdiblePlant).eaten)
+                    return 1;
+                //Otherwise just check the distance
+                int aDist = Math.Abs(creature.x - a.position.x) + Math.Abs(creature.y - a.position.y);
+                int bDist = Math.Abs(creature.x - b.position.x) + Math.Abs(creature.y - b.position.y);
+                return aDist.CompareTo(bDist);
+            }
         }
         private class ResourceValueComparer : Comparer<ValueResource>
         {

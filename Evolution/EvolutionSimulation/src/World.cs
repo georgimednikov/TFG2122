@@ -584,7 +584,8 @@ namespace EvolutionSimulation
         /// <summary>
         /// Returns the entities in an area with a determined radius.
         /// </summary>
-        /// <param name="c">The creature that is perceiving</param>
+        /// <param name="cID">The creature's ID that is perceiving</param>
+        /// <param name="radius">The radius to perceive</param>
         public List<StaticEntity> PerceiveEntities(int cID, int radius)
         {
             List<StaticEntity> results = new List<StaticEntity>();

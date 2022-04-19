@@ -22,7 +22,8 @@ namespace EvolutionSimulation.Entities
         /// <returns> Return the nutritional value</returns>
         public void ReceiveInteraction(Creature other, Interactions type)
         {
-            if (type != Interactions.eat || eaten) return;
+            if (type != Interactions.eat || eaten) 
+                return;
 
             float dealt = Math.Min(other.stats.Damage, curHp);
             other.stats.CurrEnergy += (dealt / maxHp) * nutritionalValue;
