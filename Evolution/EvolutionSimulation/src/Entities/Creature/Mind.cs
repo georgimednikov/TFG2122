@@ -88,7 +88,7 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Check what corpse is the best to eat
         /// </summary>
-        public void UpdateCorpse()
+        private void UpdateCorpse()
         {
             if (mem.FreshCorpses.Count == 0 && mem.RottenCorpses.Count == 0) //If there are no corpses, null.
             {
