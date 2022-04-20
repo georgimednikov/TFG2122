@@ -374,8 +374,6 @@ namespace EvolutionSimulation
 
         }
 
-
-
         /// <summary>
         /// Checks if target coordinates are available in the map
         /// </summary>

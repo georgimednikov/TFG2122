@@ -34,13 +34,19 @@ namespace VisualizadorConsola
             int i = 1;
             for (; i <= ticks; i++)
             {
-                if (!world.Tick()) break;
+                if (!world.Tick())
+                {
+                    CreateCreatures();
+                    Console.WriteLine("APOCALYPSIS: Generating new set of creatures");
+                    Export();
+                };
+
                 //Render();
                 //Thread.Sleep(1000);
                 if (i % YearTicks == 0)
                     Console.WriteLine("A Year has passed");
             }
-            Console.Write("Simulation ended, ticks elapsed: " + i);
+            Console.Write("Simulation ended, ticks elapsed: " + i + "\n");
         }
 
         override public void Export()
