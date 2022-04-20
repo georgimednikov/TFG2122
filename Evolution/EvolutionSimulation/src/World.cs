@@ -536,6 +536,7 @@ namespace EvolutionSimulation
             {
                 if (Creatures.ContainsKey(id))
                 {
+                    taxonomy.RemoveCreatureToSpecies(Creatures[id]);
                     Creatures.Remove(id);
                 }
                 else

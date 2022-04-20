@@ -72,7 +72,7 @@ namespace EvolutionSimulation.Entities
                 return path;
             }
 
-            if (end == start) throw new InvalidOperationException("La misma pos esta mal");
+            if (end == start) throw new InvalidOperationException("It cannot be the same position");
             Vector3 tempEnd = HighAstar(w, start, end, out int endRegion, info);
 
             return LowAstar(c, w, start, tempEnd, endRegion, out treeDensity, info);
