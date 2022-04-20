@@ -32,7 +32,7 @@ namespace VisualizadorConsola
             int YearTicks = world.YearToTick(1.0f);
             int ticks = world.YearToTick(UserInfo.Years);
             int i = 1;
-            int apocalypsisCont = 0, a = 0;
+            int apocalypsisCont = 0;
             for (; i <= ticks; i++)
             {
                 if (!world.Tick(i) )
@@ -40,7 +40,6 @@ namespace VisualizadorConsola
                     ApocalypseExport(apocalypsisCont++);
                     Console.WriteLine("APOCALYPSIS: Generating new set of creatures");
                     CreateCreatures();
-                    a = i;
                 };
 
                 //Render();
