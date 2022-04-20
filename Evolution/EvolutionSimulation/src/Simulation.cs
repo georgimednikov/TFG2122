@@ -57,10 +57,9 @@ namespace EvolutionSimulation
         /// <param name="uniParamsFile"> Raw file with the parameters of the simulation universe. If not provided, default information is setted </param>
         /// <param name="chromosomeFile"> Raw File with the chromosome information </param>
         /// <param name="sGeneWeightFile"> Raw file with each genes' weight for the chromosome </param>
-        /// <param name="minSimilarityFile"> Raw file with the species' similarity parameter </param>
         /// <param name="abilitiesFile"> Raw file with each ability unlock percentage. If not provided, default information is setted</param>
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends. If not provided, default export directory is setted</param>
-        virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string minSimilarityFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
+        virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
         {
             UserInfo.SetUp(years, species, individuals, _exportDir: exportDir);
             // Universe Parameters
@@ -68,7 +67,7 @@ namespace EvolutionSimulation
             // Chromosome and ability unlocks
             Genetics.CreatureChromosome.SetChromosome(chromosomeFile, abilitiesFile);
             // Similarity Gene Weight
-            Genetics.GeneticTaxonomy.SetTaxonomy(sGeneWeightFile, minSimilarityFile);
+            Genetics.GeneticTaxonomy.SetTaxonomy(sGeneWeightFile);
             // World
             world = new World();
             if (worldFile != null && regionMap != null)
@@ -94,13 +93,17 @@ namespace EvolutionSimulation
             int i = 1;
             for (; i <= ticks; i++)
             {
-                if (!world.Tick()) break;
+                if (!world.Tick(i)) break;
             }
         }
 
         virtual public void Export()
         {
             world.ExportContent();
+        }
+        virtual public void ApocalypseExport(int cont)
+        {
+            world.ApocalypseExportContent(cont);
         }
 
         virtual protected void CreateCreatures()

@@ -19,6 +19,10 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public int ID { get; protected set; }
 
+        /// <summary>
+        /// The tick when the creature is born during the simulation
+        /// </summary>
+        public int bornTick { get; protected set; }
 #if DEBUG
         /// <summary>
         /// Variable used to somewhat accurately determine the cuas eof the creature's death
@@ -45,7 +49,7 @@ namespace EvolutionSimulation.Entities
         {
             this.ID = ID;
             world = w;
-
+            bornTick = world.tick;
             if (chromosome == null)
             {
                 this.chromosome = new CreatureChromosome();
@@ -851,7 +855,7 @@ namespace EvolutionSimulation.Entities
             this.x += x;
             this.y += y;
             creatureLayer = z;
-            if (!world.isTree(x, y) && z == HeightLayer.Tree)
+            if (!world.IsTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
         }
 
@@ -863,7 +867,7 @@ namespace EvolutionSimulation.Entities
             this.x = x;
             this.y = y;
             creatureLayer = z;
-            if (!world.isTree(x, y) && z == HeightLayer.Tree)
+            if (!world.IsTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
         }
 
@@ -888,7 +892,7 @@ namespace EvolutionSimulation.Entities
         }
         public int DistanceToObjective(int ox, int oy)
         {
-            if (!world.checkBounds(ox, oy)) return int.MaxValue;
+            if (!world.CheckBounds(ox, oy)) return int.MaxValue;
             return Math.Max(Math.Abs(ox - x), Math.Abs(oy - y));
         }
 
@@ -920,7 +924,7 @@ namespace EvolutionSimulation.Entities
         /// <returns>The cost for moving to the first position on the path.</returns>
         public int SetPath(int x, int y, HeightLayer z = HeightLayer.Ground)
         {
-            if (!world.canMove(x, y, z)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
+            if (!world.CanMove(x, y, z)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
             if ((stats.AerialSpeed == -1 && z == HeightLayer.Air) || (stats.ArborealSpeed == -1 && z == HeightLayer.Tree)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
             path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), finalPos = (new Vector3(x, y, (int)z)), out double treeDensity); // A* to the objective
             int thres = GetFlyThreshold(treeDensity);

@@ -176,7 +176,7 @@ namespace EvolutionSimulation.Entities
             int passedTrees = 0;
             while (aux != null)
             {
-                if (w.isTree((int)Math.Round(aux.pos.X), (int)Math.Round(aux.pos.Y))) passedTrees = passedTrees + 1;
+                if (w.IsTree((int)Math.Round(aux.pos.X), (int)Math.Round(aux.pos.Y))) passedTrees = passedTrees + 1;
                 path.Add(aux);
                 aux = aux.prev;
             }
@@ -210,7 +210,7 @@ namespace EvolutionSimulation.Entities
             treeDensity = 0;
             while ((dirAux - end).Length() > 0.6f)
             {
-                if (w.isTree((int)Math.Round(dirAux.X), (int)Math.Round(dirAux.Y)))
+                if (w.IsTree((int)Math.Round(dirAux.X), (int)Math.Round(dirAux.Y)))
                     treeDensity++;
                 ntiles++;
                 dirAux += dirN;

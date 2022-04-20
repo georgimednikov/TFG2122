@@ -381,18 +381,7 @@ namespace EvolutionSimulation
               System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
         }
 
-        static public void Validate(float similarity)
-        {
-            SimilarityThresholdFunc(similarity);
-        }
-
-        static void SimilarityThresholdFunc(float similarity)
-        {
-            if (similarity < 0 || similarity >= 1)
-                throw new SimilarityThesholdNotValid("The provided similarity species threshold must be a positive number smaller than one to allow reproduction");
-
-            return;
-        }
+       
         #endregion
 
         #region AbilityUnlock
@@ -502,6 +491,8 @@ namespace EvolutionSimulation
             ValidateCreatureTransitions(parameters);
 
             ValidateCorpse(parameters);
+
+            ValidateTaxonomy(parameters);
         }
 
         static void ValidateWorld(UniverseParameters parameters) // TODO: REVISAR QUE ESTAN TODOS
@@ -632,6 +623,17 @@ namespace EvolutionSimulation
         {
             if (parameters.rotStartMultiplier <= 0 || parameters.corpseNutritionPointsMultiplier <= 0)
                 throw new UniverseParameterIsZeroException("The provided corpse parameters must be positive");
+        }
+
+        static void ValidateTaxonomy(UniverseParameters parameters)
+        {
+            if (parameters.percentageOfSpeciesToExport <= 0)
+                throw new UniverseParameterIsZeroException("The provided taxonomy parameters species to export must be positive");
+            if (parameters.percentageOfSpeciesToExport > 1)
+                throw new PercentageOverOneException("The provided taxonomy parameters species to export cannot be over 1");
+
+            if (parameters.percentageSimilaritySpecies < 0 || parameters.percentageSimilaritySpecies >= 1)
+                throw new SimilarityThesholdNotValid("The provided similarity species threshold must be a positive number smaller than one to allow reproduction");
         }
         #endregion
     }

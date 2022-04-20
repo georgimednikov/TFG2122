@@ -98,6 +98,12 @@ namespace EvolutionSimulation
         // Corpse
         public float rotStartMultiplier = 0.01f;
         public float corpseNutritionPointsMultiplier = 80f;
+
+        //Taxonomy
+        public float percentageSimilaritySpecies = 0.9f;// If 2 creatures's chromose similarity are under this percentage, it means their are two species
+        // it is use just when an apocalypse occurs. Of all the species that has been among the simulation
+        // export this percentage of the species.
+        public float percentageOfSpeciesToExport = 0.35f;
     }
 
     public static class UniverseParametersManager

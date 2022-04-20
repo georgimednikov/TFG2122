@@ -71,7 +71,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
             int sector = (int)(degrees / 45);
             int cont = 0;
-            while (!creature.world.checkBounds(shorePosition.x, shorePosition.y) ||
+            while (!creature.world.CheckBounds(shorePosition.x, shorePosition.y) ||
                 creature.world.map[shorePosition.x, shorePosition.y].isWater)
             {
                 //The increment has to have the same sign as cont to add their values without possible substractions,

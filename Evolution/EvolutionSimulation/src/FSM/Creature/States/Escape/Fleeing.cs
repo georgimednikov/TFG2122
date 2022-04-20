@@ -103,7 +103,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             // Attempts to find the point furthest away from attacker
             while (Math.Abs(xSum) <= creature.stats.Perception && Math.Abs(ySum) <= creature.stats.Perception)
             {
-                if (creature.world.canMove(creature.x + xSum, creature.y + ySum))
+                if (creature.world.CanMove(creature.x + xSum, creature.y + ySum))
                 {
                     fX = creature.x + xSum;
                     fY = creature.y + ySum;
