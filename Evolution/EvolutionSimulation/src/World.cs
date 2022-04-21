@@ -588,7 +588,11 @@ namespace EvolutionSimulation
                 if (cID == e.ID) continue;
                 if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius)// Square vision
                 {
-
+                    if (c.speciesName == e.speciesName)
+                    {
+                        results.Add(e);
+                        continue;
+                    }
                     float perception = c.stats.Perception / (float)c.stats.MaxPerception;
                     float camouflage = e.stats.Camouflage / (float)e.chromosome.GetFeatureMax(CreatureFeature.Camouflage);
                     // Perceive the creature if your perception percentage is greater than him camouflage percentage
