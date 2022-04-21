@@ -566,7 +566,7 @@ namespace EvolutionSimulation.Entities
             if (ShouldPackFight(pack, PositionDanger(enemyPos.x, enemyPos.y)))
                 foreach (Creature fighter in pack)
                 {
-                    fighter.TargetEnemy(interacter.ID);
+                    fighter.TargetEnemy(interacter.ID, new Vector2Int(interacter.x, interacter.y));
                 }
         }
 
@@ -710,7 +710,7 @@ namespace EvolutionSimulation.Entities
         /// Gives the creature an enemy to target in combat related activities.
         /// </summary>
         /// <param name="creature">Creature to consider an enemy</param>
-        public void TargetEnemy(int creature) { mind.TargetEnemy(creature); }
+        public void TargetEnemy(int creature, Vector2Int pos) { mind.TargetEnemy(creature, pos); }
         /// <summary>
         /// Returns true if this creature or an ally in sight has been attacked;
         /// </summary>

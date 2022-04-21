@@ -56,7 +56,7 @@ namespace EvolutionSimulation.Entities
           //it can be recognized, but in practice it is the same as returning null until found again.
             get
             {
-                if (father != null && father.position.x >= 0)
+                if (father != null && father.ticks >= 0)
                     return father;
                 return null;
             }
@@ -67,7 +67,7 @@ namespace EvolutionSimulation.Entities
         {
             get
             {
-                if (mother != null && mother.position.x >= 0)
+                if (mother != null && mother.ticks >= 0)
                     return mother;
                 return null;
             }
@@ -628,10 +628,11 @@ namespace EvolutionSimulation.Entities
         /// Sets a creature to be the enemy of this one, that is to say, its combat target. This creature is forgotten when it leaves
         /// the perception radius or is dead.
         /// </summary>
-        /// <param name="creature"></param>
-        public void TargetEnemy(Creature creature)
+        /// <param name="creatureID"> target's ID</param>
+        /// <param name="pos"> target's creature</param>
+        public void TargetEnemy(int creatureID, Vector2Int pos)
         {
-            Enemy = new EntityResource(creature.x, creature.y, creature.ID, maxExperienceTicks);
+            Enemy = new EntityResource(pos.x, pos.y, creatureID, maxExperienceTicks);
         }
 
         public List<int> NearbyAllies()
