@@ -343,7 +343,7 @@ namespace EvolutionSimulation
                             tries--;
                             x = (int)((i + RandomGenerator.NextDouble()) * chunkSize);
                             y = (int)((j + RandomGenerator.NextDouble()) * chunkSize);
-                        } while (tries > 0 && (!canMove(x, y) || map[x, y].regionId != -1));
+                        } while (tries > 0 && (!CanMove(x, y) || map[x, y].regionId != -1));
                         if (tries == 0) continue;
                         map[x, y].regionId = numReg++;
                         MapRegion reg = new MapRegion();
@@ -363,7 +363,7 @@ namespace EvolutionSimulation
                         {
                             if (j == 0 && k == 0) continue;
                             Vector2 newPos = cur + new Vector2(j, k);
-                            if (!canMove((int)newPos.X, (int)newPos.Y)) continue; //If outside of bounds or water, ignore and don't expand.
+                            if (!CanMove((int)newPos.X, (int)newPos.Y)) continue; //If outside of bounds or water, ignore and don't expand.
 
                             int nId = map[(int)newPos.X, (int)newPos.Y].regionId;
                             if (nId == id) continue;
