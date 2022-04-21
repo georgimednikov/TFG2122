@@ -34,7 +34,7 @@ namespace VisualizadorConsola
             DateTime time = DateTime.Now;
             int ticks = world.YearToTick(UserInfo.Years);
             int i = 1;
-            int apocalypsisCont = 0;
+            int apocalypsisCont = 0, lastNum = world.Creatures.Count, births = 0;
             for (; i <= ticks; i++)
             {
                 if (!world.Tick(i) )
@@ -42,9 +42,12 @@ namespace VisualizadorConsola
                     ApocalypseExport(apocalypsisCont++);
                     Console.WriteLine("APOCALYPSIS: Generating new set of creatures");
                     CreateCreatures();
+                    lastNum = world.Creatures.Count;
                 };
 
-                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} Apocalipsis: {3}", i, world.Creatures.Count, ticks, apocalypsisCont);
+                if (lastNum < world.Creatures.Count) births += world.Creatures.Count - lastNum;
+                lastNum = world.Creatures.Count;
+                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} Apocalipsis: {3} Births: {4}", i, world.Creatures.Count, ticks, apocalypsisCont, births);
                 //Render();
                 //Thread.Sleep(1000);
                 if (i % YearTicks == 0)
