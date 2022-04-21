@@ -33,7 +33,7 @@ namespace EvolutionSimulation.Entities
         public void SafeWaterSource() { mem.SafeWaterSource(); }
         public void SafeEdiblePlant() { mem.SafeEdiblePlant(); }
         public void UpdatePerception() { mem.CalculatePerceptionRadius(); }
-        public void TargetEnemy(int cID) { mem.TargetEnemy(world.GetCreature(cID)); }
+        public void TargetEnemy(int cID, Vector2Int pos) { mem.TargetEnemy(cID, pos); }
         public float PositionDanger(int x, int y) { return mem.GetPositionDanger(x, y); }
         public List<int> NearbyAllies() { return mem.NearbyAllies(); }
         public int FatherID() { return mem.Father.ID; }

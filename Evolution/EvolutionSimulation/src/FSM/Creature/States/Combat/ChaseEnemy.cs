@@ -76,7 +76,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 objectiveID = otherID;
                 objSpecies = creature.world.GetCreature(objectiveID).speciesName;
-                creature.TargetEnemy(otherID);  // Redundant, except when current target is the menace
+                creature.TargetEnemy(otherID, otherObj);  // Redundant, except when current target is the menace
             }
 
             if ((otherObj.x != objective.x || otherObj.y != objective.y) && (otherObj.x != creature.x || otherObj.y != creature.y))  // If objective position is a different one, adjust accordingly

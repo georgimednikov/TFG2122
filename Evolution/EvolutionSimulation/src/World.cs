@@ -593,7 +593,11 @@ namespace EvolutionSimulation
                 if (cID == e.ID) continue;
                 if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius)// Square vision
                 {
-
+                    if (c.speciesName == e.speciesName)
+                    {
+                        results.Add(e);
+                        continue;
+                    }
                     float perception = c.stats.Perception / (float)c.stats.MaxPerception;
                     float camouflage = e.stats.Camouflage / (float)e.chromosome.GetFeatureMax(CreatureFeature.Camouflage);
                     // Perceive the creature if your perception percentage is greater than him camouflage percentage
@@ -623,9 +627,11 @@ namespace EvolutionSimulation
 
             Creature c = Creatures[cID];
             for (int i = c.x - radius; i < c.x + radius; i++)
+            {
+                if (i < 0 || i >= map.GetLength(0)) continue;
                 for (int j = c.y - radius; j < c.y + radius; j++)
                 {
-                    if (i < 0 || j < 0 || j >= map.GetLength(1) || i >= map.GetLength(0)) continue;
+                    if ( j < 0 || j >= map.GetLength(1) ) continue;
                     if (map[i, j].plant != null)
                         results.Add(map[i, j].plant);
 
@@ -635,6 +641,7 @@ namespace EvolutionSimulation
                             results.Add(entityMap[i, j][k] as StaticEntity);
                     }
                 }
+            }
 
             return results;
         }

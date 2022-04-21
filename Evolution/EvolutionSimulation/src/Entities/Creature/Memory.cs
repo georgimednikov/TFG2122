@@ -56,7 +56,7 @@ namespace EvolutionSimulation.Entities
           //it can be recognized, but in practice it is the same as returning null until found again.
             get
             {
-                if (father != null && father.position.x >= 0)
+                if (father != null && father.ticks >= 0)
                     return father;
                 return null;
             }
@@ -67,7 +67,7 @@ namespace EvolutionSimulation.Entities
         {
             get
             {
-                if (mother != null && mother.position.x >= 0)
+                if (mother != null && mother.ticks >= 0)
                     return mother;
                 return null;
             }
@@ -336,8 +336,6 @@ namespace EvolutionSimulation.Entities
         {
             int unexploredRegion = -1;
             Queue<int> regionsQueue = new Queue<int>();
-            bool[] visited = new bool[world.highMap.Count];
-
             int currentRegion = world.map[thisCreature.x, thisCreature.y].regionId;
 
             // If the creature is over the water, it searches for the nearest land position
@@ -346,39 +344,25 @@ namespace EvolutionSimulation.Entities
                 Vector2Int landPos;
 
                 // If no land position is found, it returns a random region
-                if (!SearchForLand(out landPos)) 
-                    return RandomGenerator.Next(0, world.highMap.Count);
+                if (!SearchForLand(out landPos)) return RandomGenerator.Next(0, world.highMap.Count);
                 currentRegion = world.map[landPos.x, landPos.y].regionId;
-
-                // If the land found is unexplored, no further search is needed
-                if (!exploredRegions.ContainsKey(currentRegion))
-                    unexploredRegion = currentRegion;
             }
-
             regionsQueue.Enqueue(currentRegion);
-            visited[currentRegion] = true;
 
-            // It searches for a unexplored region using an adapted BFS
+            // It searches for a unexplored region using BFS
             while (regionsQueue.Count > 0 && unexploredRegion == -1)
             {
                 int nextRegion = regionsQueue.Dequeue();
                 List<int> adyRegions = new List<int>(world.highMap[nextRegion].links.Keys);
                 Shuffle(adyRegions);    // Shuffle to add randomness
-                for (int i = 0; i < adyRegions.Count && unexploredRegion == -1; i++)
+                for (int i = 0; unexploredRegion == -1 && i < adyRegions.Count; i++)
                 {
-                    if (!visited[adyRegions[i]])
-                    {
-                        if (!exploredRegions.ContainsKey(adyRegions[i]))
-                            unexploredRegion = adyRegions[i];
-                        else
-                        {
-                            visited[adyRegions[i]] = true;
-                            regionsQueue.Enqueue(adyRegions[i]);
-                        }
-                    }
+                    if (!exploredRegions.ContainsKey(adyRegions[i]))
+                        unexploredRegion = adyRegions[i];
+                    else if (!regionsQueue.Contains(adyRegions[i]))
+                        regionsQueue.Enqueue(adyRegions[i]);
                 }
             }
-
             if (unexploredRegion == -1)
                 unexploredRegion = RandomGenerator.Next(0, world.highMap.Count);
             return unexploredRegion;
@@ -644,10 +628,11 @@ namespace EvolutionSimulation.Entities
         /// Sets a creature to be the enemy of this one, that is to say, its combat target. This creature is forgotten when it leaves
         /// the perception radius or is dead.
         /// </summary>
-        /// <param name="creature"></param>
-        public void TargetEnemy(Creature creature)
+        /// <param name="creatureID"> target's ID</param>
+        /// <param name="pos"> target's creature</param>
+        public void TargetEnemy(int creatureID, Vector2Int pos)
         {
-            Enemy = new EntityResource(creature.x, creature.y, creature.ID, maxExperienceTicks);
+            Enemy = new EntityResource(pos.x, pos.y, creatureID, maxExperienceTicks);
         }
 
         public List<int> NearbyAllies()

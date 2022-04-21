@@ -36,7 +36,7 @@ namespace EvolutionSimulation
         public float minPerceptionWithNightVision = 0.7f; //Percentage of the max Perception lost at night
         public float minMobilityMedium = 0.6f; //When moving through a special medium the slowest speed possible is its mobility * (0.6 - 1.0) depending on proficiency
         public float mobilityPenalty = 0.7f; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
-        public float yearsBetweenHeats = 0.5f;  // How many years between each heat period
+        public float yearsBetweenHeats = 0.1f;  // How many years between each heat period
         public int ticksToReproduce = 20; // How many ticks the creatures must be reproducing for to be able to bear offspring
         public float maxSpeed = 1.5f;
         public float hornIntimidationMultiplier = 1.5f;
