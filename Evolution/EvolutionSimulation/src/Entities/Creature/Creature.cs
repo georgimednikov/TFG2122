@@ -719,6 +719,7 @@ namespace EvolutionSimulation.Entities
         /// If its positive, it is a good experience, if it is negative, a bad one.
         /// </summary>
         public void CreateDanger() { mind.CreateDanger(); }
+        public void CreateSafety() { mind.CreateSafety(); }
         /// <summary>
         /// Saves in memory a safe drinking spot and updates the danger levels around it.
         /// </summary>

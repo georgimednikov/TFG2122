@@ -28,7 +28,8 @@ namespace EvolutionSimulation.Entities
         }
 
         #region Memory
-        public void CreateDanger() { mem.DangerousPosition(); }
+        public void CreateDanger() { mem.DangerousPosition(true); }
+        public void CreateSafety() { mem.DangerousPosition(false); }
         public void SafeWaterSource() { mem.SafeWaterSource(); }
         public void SafeEdiblePlant() { mem.SafeEdiblePlant(); }
         public void UpdatePerception() { mem.CalculatePerceptionRadius(); }
@@ -110,6 +111,7 @@ namespace EvolutionSimulation.Entities
                 worthyWaterPosition = null;
                 return;
             }
+            // If the creature is desperate it goes to the closest one
             if (creature.IsVeryThirsty())
             {
                 if (mem.WaterPositions.Count != 0)
@@ -119,6 +121,7 @@ namespace EvolutionSimulation.Entities
                 return;
             }
 
+            // Else it goes to the best option
             worthyWaterPosition = BestBetweenCloseAndSafe(mem.WaterPositions, mem.SafeWaterPositions, Criteria).position; 
         }
         private void UpdatePlant()
@@ -128,6 +131,7 @@ namespace EvolutionSimulation.Entities
                 worthyPlant = null;
                 return;
             }
+            // If the creature is desperate it goes to the closest one
             if (creature.IsVeryHungry())
             {
                 if (mem.EdiblePlants.Count != 0)
@@ -137,6 +141,7 @@ namespace EvolutionSimulation.Entities
                 return;
             }
 
+            // Else it goes to the best option
             worthyPlant = BestBetweenCloseAndSafe(mem.EdiblePlants, mem.SafeEdiblePlants, Criteria);
         }
         private T BestBetweenCloseAndSafe<T>(List<T> close, List<T> safe, Func<T, T, T> criteria) where T : Resource
@@ -175,7 +180,7 @@ namespace EvolutionSimulation.Entities
 
             float aDist = creature.DistanceToObjective(w1.position);
             float bDist = creature.DistanceToObjective(w2.position);
-            total = Math.Max(Math.Max(aDist, bDist), 0.1f);
+            total = Math.Max(aDist, bDist);
             float aRelDist = aDist / total;
             float bRelDist = bDist / total;
 

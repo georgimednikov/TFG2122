@@ -280,7 +280,7 @@ namespace EvolutionSimulation.Entities
                     RemoveFromSafePlant(p.position);
                 }
                 //If the tile remains in memory, it is safe and no safe place has been assigned or it is closer than the one already found, it is saved, unless that position can't be reached
-                else if (positionDanger <= 0 && world.canMove(p.position.x, p.position.y) && !SafePositions.Contains(p.position))
+                else if (positionDanger < 0 && world.canMove(p.position.x, p.position.y) && !SafePositions.Contains(p.position))
                 {
                     SafePositions.Add(p.position);
                 }
@@ -710,18 +710,20 @@ namespace EvolutionSimulation.Entities
 
             SafeEdiblePlants.Add(EdiblePlants[0]);
         }
-        public void DangerousPosition()
+        public void DangerousPosition(bool isDangerous)
         {
+            float value = danger;
+            if (!isDangerous) value = -danger;
             Vector2Int thisPos = new Vector2Int(thisCreature.x, thisCreature.y);
             Position posDanger = GetFromPositionDangers(thisPos);
             if (posDanger != null) //If the position is already in the list it is updated.
             {
-                posDanger.danger += danger;
+                posDanger.danger += value;
                 posDanger.ticks = maxExperienceTicks; //The number of ticks until erasure is reset.
             }
             else //Else it is created and added.
             {
-                posDanger = new Position(thisPos, danger, 0, maxExperienceTicks);
+                posDanger = new Position(thisPos, value, 0, maxExperienceTicks);
                 dangersRemembered.Add(posDanger);
             }
         }
