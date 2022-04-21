@@ -336,8 +336,6 @@ namespace EvolutionSimulation.Entities
         {
             int unexploredRegion = -1;
             Queue<int> regionsQueue = new Queue<int>();
-            bool[] visited = new bool[world.highMap.Count];
-
             int currentRegion = world.map[thisCreature.x, thisCreature.y].regionId;
 
             // If the creature is over the water, it searches for the nearest land position
@@ -346,39 +344,25 @@ namespace EvolutionSimulation.Entities
                 Vector2Int landPos;
 
                 // If no land position is found, it returns a random region
-                if (!SearchForLand(out landPos)) 
-                    return RandomGenerator.Next(0, world.highMap.Count);
+                if (!SearchForLand(out landPos)) return RandomGenerator.Next(0, world.highMap.Count);
                 currentRegion = world.map[landPos.x, landPos.y].regionId;
-
-                // If the land found is unexplored, no further search is needed
-                if (!exploredRegions.ContainsKey(currentRegion))
-                    unexploredRegion = currentRegion;
             }
-
             regionsQueue.Enqueue(currentRegion);
-            visited[currentRegion] = true;
 
-            // It searches for a unexplored region using an adapted BFS
+            // It searches for a unexplored region using BFS
             while (regionsQueue.Count > 0 && unexploredRegion == -1)
             {
                 int nextRegion = regionsQueue.Dequeue();
                 List<int> adyRegions = new List<int>(world.highMap[nextRegion].links.Keys);
                 Shuffle(adyRegions);    // Shuffle to add randomness
-                for (int i = 0; i < adyRegions.Count && unexploredRegion == -1; i++)
+                for (int i = 0; unexploredRegion == -1 && i < adyRegions.Count; i++)
                 {
-                    if (!visited[adyRegions[i]])
-                    {
-                        if (!exploredRegions.ContainsKey(adyRegions[i]))
-                            unexploredRegion = adyRegions[i];
-                        else
-                        {
-                            visited[adyRegions[i]] = true;
-                            regionsQueue.Enqueue(adyRegions[i]);
-                        }
-                    }
+                    if (!exploredRegions.ContainsKey(adyRegions[i]))
+                        unexploredRegion = adyRegions[i];
+                    else if (!regionsQueue.Contains(adyRegions[i]))
+                        regionsQueue.Enqueue(adyRegions[i]);
                 }
             }
-
             if (unexploredRegion == -1)
                 unexploredRegion = RandomGenerator.Next(0, world.highMap.Count);
             return unexploredRegion;
