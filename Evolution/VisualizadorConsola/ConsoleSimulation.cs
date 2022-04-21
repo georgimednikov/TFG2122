@@ -44,7 +44,7 @@ namespace VisualizadorConsola
                     CreateCreatures();
                 };
 
-                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
+                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} Apocalipsis: {3}", i, world.Creatures.Count, ticks, apocalypsisCont);
                 //Render();
                 //Thread.Sleep(1000);
                 if (i % YearTicks == 0)

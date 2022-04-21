@@ -101,7 +101,7 @@ namespace EvolutionSimulation.Entities
         /// Destroys the corpse when it reaches the end of its lifetime
         /// or if it is completely eaten
         /// </summary>
-        override public void Tick()
+        override public bool Tick()
         {
             lifeTime--;
             Edible = lifeTime > putridTime;
@@ -109,6 +109,7 @@ namespace EvolutionSimulation.Entities
             if (lifeTime <= 0 || curHp <= 0)
                 world.Destroy(this.ID);
             //else Console.WriteLine("Ticks to corpse disappearance: " + lifeTime);
+            return true;
         }
 
         // Copse state: it is edible until it starts putrefying

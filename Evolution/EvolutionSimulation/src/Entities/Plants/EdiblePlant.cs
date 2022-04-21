@@ -7,13 +7,16 @@ namespace EvolutionSimulation.Entities
         public bool eaten { get; protected set; } = false;
         protected int regrowthTime;
         protected float nutritionalValue;
-        override public void Tick()
+        override public bool Tick()
         {
+
             if (eaten)  // If it is eaten, it remains so until it is fully grown back
                 eaten = curHp < maxHp;
 
             // It regrows steadily even while not fully eaten
             curHp = Math.Min(curHp + (1 / (float)regrowthTime) * maxHp, maxHp);
+
+            return !eaten;
         }
 
         /// <summary>
@@ -24,7 +27,7 @@ namespace EvolutionSimulation.Entities
         {
             if (type != Interactions.eat || eaten) 
                 return;
-
+            world.StaticEntitiesToUpdate.Add(this);
             float dealt = Math.Min(other.stats.Damage, curHp);
             other.stats.CurrEnergy += (dealt / maxHp) * nutritionalValue;
             curHp -= dealt;

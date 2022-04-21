@@ -88,7 +88,7 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Simulation step
         /// </summary>
-        public void Tick()
+        public bool Tick()
         {
             Expend();
             ManageHealth();
@@ -114,6 +114,7 @@ namespace EvolutionSimulation.Entities
             }
 
             Clear();
+            return true;
         }
 
         public void CycleDayNight()
@@ -129,12 +130,12 @@ namespace EvolutionSimulation.Entities
             mind.UpdatePerception();
         }
 
-        
+
         /// <returns> Return True if the position is in a confortable temperature</returns>
         public bool CheckTemperature(int x, int y)
         {
             double tileTemperature = world.map[x, y].temperature;
-            
+
             return tileTemperature > stats.MinTemperature && tileTemperature < stats.MaxTemperature;
         }
 
@@ -154,7 +155,7 @@ namespace EvolutionSimulation.Entities
                 difference = tileTemperature - stats.MaxTemperature;
             //If the creature is confortable nothing happens.
             else
-                return ;
+                return;
 
             //A range from 0 to 1 is calculated based on the difference of temperature and a max value for it.
             double range = Math.Min(difference / UniverseParametersManager.parameters.maxTemperatureDifference, 1);
@@ -239,7 +240,7 @@ namespace EvolutionSimulation.Entities
             }
             else if (stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
                 stats.CurrRest >= (stats.MaxRest * UniverseParametersManager.parameters.restRegenerationThreshold) &&
-                stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold)&&
+                stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold) &&
                 CheckTemperature(x, y))
             {
                 stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth);  // TODO: Ver si esto esta bien, ingenieria de valores
@@ -302,7 +303,7 @@ namespace EvolutionSimulation.Entities
             // Safe-state configuration
             // States
             IState wander = new Wander(this);
-            IState explore = new Explore(this); 
+            IState explore = new Explore(this);
             IState goToDrink = new GoToDrink(this);
             IState drink = new Drinking(this);
             IState goToMate = new GoToMate(this);
@@ -337,7 +338,7 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(wander, goToSafeTempPlaceTransition, goToSafeTemperaturePlace);
             safeFSM.AddTransition(goToSafeTemperaturePlace, stopGoToSafeTempPlaceTransition, wander);
             safeFSM.AddTransition(wander, goToSafeTempPlaceExploreTransition, explore);
-            
+
             // Sleeping
             ITransition goToSafePlaceTransition = new GoToSafePlaceTransition(this);
             ITransition stopGoToSafePlaceTransition = new StopGoToSafePlaceTransition(this);
@@ -928,26 +929,33 @@ namespace EvolutionSimulation.Entities
         /// <returns>The cost for moving to the first position on the path.</returns>
         public int SetPath(int x, int y, HeightLayer z = HeightLayer.Ground)
         {
-            if (!world.CanMove(x, y, z)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
-            if ((stats.AerialSpeed == -1 && z == HeightLayer.Air) || (stats.ArborealSpeed == -1 && z == HeightLayer.Tree)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
-            
-            //If the creature is already in the air, we cannot assert that A* is doable.
-            if(creatureLayer == HeightLayer.Air)
+            if (PathEnded())
             {
-                path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));
-                pathIterator = 0;
-                return GetNextCostOnPath();
-            }
+                if (!world.CanMove(x, y, z)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
+                if ((stats.AerialSpeed == -1 && z == HeightLayer.Air) || (stats.ArborealSpeed == -1 && z == HeightLayer.Tree)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
 
-            path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), finalPos = (new Vector3(x, y, (int)z)), out double treeDensity); // A* to the objective
-            int thres = GetFlyThreshold(treeDensity);
-            if (thres > 0 && path.Length >= thres)
-                path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));// Straight line to the objective
-            pathIterator = 0;
+                //If the creature is already in the air, we cannot assert that A* is doable.
+                if (creatureLayer == HeightLayer.Air)
+                {
+                    path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));
+                    pathIterator = 0;
+                    return GetNextCostOnPath();
+                }
+
+                path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), finalPos = (new Vector3(x, y, (int)z)), out double treeDensity); // A* to the objective
+                int thres = GetFlyThreshold(treeDensity);
+                if (thres > 0 && path.Length >= thres)
+                    path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));// Straight line to the objective
+                pathIterator = 0;
+            }
             return GetNextCostOnPath();
         }
         public int SetPath(Vector2Int p, HeightLayer z = HeightLayer.Ground) { return SetPath(p.x, p.y, z); }
 
+        public bool PathEnded()
+        {
+            return (path == null || pathIterator >= path.Length);
+        }
         /// <summary>
         /// Returns the cost for moving to the next position on the path. Does not advance the path iterator.
         /// </summary>
@@ -1007,7 +1015,8 @@ namespace EvolutionSimulation.Entities
                 if (layer == HeightLayer.Air) return stats.AirReach;
                 if (layer == HeightLayer.Tree) return stats.TreeReach;
                 return false;
-            } else return true;
+            }
+            else return true;
         }
 
         /// <summary>

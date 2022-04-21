@@ -250,6 +250,7 @@ namespace EvolutionSimulation
             metabolismComparer = new Utils.SortByMetabolism();
             StaticEntities = new Dictionary<int, StaticEntity>();
             entitiesToDelete = new List<int>();
+            StaticEntitiesToUpdate = new List<StaticEntity>();
 
             p = new Perlin();
             if (config.heightMap != null) { heightMap = config.heightMap; mapSize = heightMap.GetLength(0); }
@@ -462,7 +463,7 @@ namespace EvolutionSimulation
         public T CreateCreature<T>(int x, int y, CreatureChromosome chromosome = null, string name = "None", int fatherID = -1, int motherID = -1) where T : Creature, new()
         {
             T ent = new T();
-            
+
             ent.Init(entitiesID, this, x, y, chromosome, name, fatherID, motherID);
             // Progenitors start being adults and a half is male and the other half female
             if (fatherID == -1)
@@ -521,7 +522,7 @@ namespace EvolutionSimulation
 
             entityMap[ent.x, ent.y].Remove(ent);
             entitiesToDelete.Add(entityID);
-            
+
         }
 
         /// <summary>
@@ -550,10 +551,14 @@ namespace EvolutionSimulation
             List<Creature> sortedCreatures = new List<Creature>(Creatures.Values);
             sortedCreatures.Sort(metabolismComparer);
             sortedCreatures.ForEach(delegate (Creature e) { e.Tick(); });
-
+            List<StaticEntity> staticEntitiesToStopUpdating = new List<StaticEntity>();
             // Tick for every static entity
-            foreach (StaticEntity sEnt in StaticEntities.Values)
-                sEnt.Tick();
+            foreach (StaticEntity sEnt in StaticEntitiesToUpdate)
+                if (sEnt.Tick())
+                    staticEntitiesToStopUpdating.Add(sEnt);
+
+            foreach (StaticEntity del in staticEntitiesToStopUpdating)
+                StaticEntitiesToUpdate.Remove(del);
 
             // Entity deletion
             entitiesToDelete.ForEach(delegate (int id)
@@ -639,7 +644,7 @@ namespace EvolutionSimulation
         Comparer<Creature> metabolismComparer;
 
         public Dictionary<int, StaticEntity> StaticEntities { get; private set; }
-
+        public List<StaticEntity> StaticEntitiesToUpdate;
         List<int> entitiesToDelete;
 
         #endregion
@@ -973,7 +978,7 @@ namespace EvolutionSimulation
         /// <param name="cont"></param>
         public void ApocalypseExportContent(int cont)
         {
-            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory +"/Apocalyse" + cont + "Tree.txt", tick);            
+            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + "/Apocalyse" + cont + "Tree.txt", tick);
             taxonomy.ExportSpecies(cont);
         }
 

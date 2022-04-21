@@ -8,7 +8,7 @@ namespace EvolutionSimulation
 {
     public interface IEntity
     {
-        void Tick();
+        bool Tick();
         int ID { get; }
         int x { get; }
         int y { get; }

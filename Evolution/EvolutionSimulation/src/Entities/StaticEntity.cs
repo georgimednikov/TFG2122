@@ -37,9 +37,9 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Stable Entities tick every world tick
         /// </summary>
-        virtual public void Tick()
+        virtual public bool Tick()
         {
-
+            return true;
         }
 
         // World tile position
