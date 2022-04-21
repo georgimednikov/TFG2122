@@ -31,7 +31,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             return "DeadState";
         }
-
+#if DEBUG
         public override string GetInfo()
         {
             string template = creature.speciesName + " with ID " + creature.ID + " DIES; CAUSE OF DEATH: ";
@@ -55,5 +55,6 @@ namespace EvolutionSimulation.FSM.Creature.States
 
             return template + "\nCORPSE CREATED WITH ID: " + corpse.ID + " IN POSITION: (" + creature.x + ", " + creature.y + ")";
         }
+#endif
     }
 }

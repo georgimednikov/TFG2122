@@ -848,8 +848,10 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void Move(int x, int y, HeightLayer z = HeightLayer.Ground)
         {
+            world.entityMap[this.x, this.y].Remove(this);
             this.x += x;
             this.y += y;
+            world.entityMap[this.x, this.y].Add(this);
             creatureLayer = z;
             if (!world.isTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
@@ -860,8 +862,10 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void Place(int x, int y, HeightLayer z = HeightLayer.Ground)
         {
+            world.entityMap[this.x, this.y].Remove(this);
             this.x = x;
             this.y = y;
+            world.entityMap[this.x, this.y].Add(this);
             creatureLayer = z;
             if (!world.isTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
@@ -922,6 +926,15 @@ namespace EvolutionSimulation.Entities
         {
             if (!world.canMove(x, y, z)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
             if ((stats.AerialSpeed == -1 && z == HeightLayer.Air) || (stats.ArborealSpeed == -1 && z == HeightLayer.Tree)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
+            
+            //If the creature is already in the air, we cannot assert that A* is doable.
+            if(creatureLayer == HeightLayer.Air)
+            {
+                path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));
+                pathIterator = 0;
+                return GetNextCostOnPath();
+            }
+
             path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), finalPos = (new Vector3(x, y, (int)z)), out double treeDensity); // A* to the objective
             int thres = GetFlyThreshold(treeDensity);
             if (thres > 0 && path.Length >= thres)

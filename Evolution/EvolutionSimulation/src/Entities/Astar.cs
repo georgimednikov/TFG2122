@@ -64,7 +64,8 @@ namespace EvolutionSimulation.Entities
 #endif
             info.start = start;
             info.end = end;
-            if((end-start).LengthSquared() <= 2)
+
+            if ((end-start).LengthSquared() <= 2)
             {
                 Vector3[] path = new Vector3[1];
                 path[0] = end;

@@ -73,6 +73,10 @@ namespace EvolutionSimulation
         /// Which type of terrain should be generated, if Custom type is not selected, only mapSize, will be used.
         /// </summary>
         public World.MapType type;
+        /// <summary>
+        /// Number of wholly isolated landmasses per chunk (32x32). Increase if you are getting
+        /// </summary>
+        public int numPasses = 2;
 
         public WorldGenConfig(World.MapType type)
         {
@@ -127,7 +131,7 @@ namespace EvolutionSimulation
             int n = map.GetLength(0);
             float[,] heightMap = new float[n, n];
             float[,] temperatureMap = new float[n, n];
-            for(int i = 0; i < n; ++i)
+            for (int i = 0; i < n; ++i)
             {
                 for (int j = 0; j < n; ++j)
                 {
@@ -156,9 +160,9 @@ namespace EvolutionSimulation
 
             MapData mapData;
             // Create plant entities from the file
-            for(int i = 0; i < mapSize; i++)
+            for (int i = 0; i < mapSize; i++)
             {
-                for (int j = 0; j < mapSize; j++) 
+                for (int j = 0; j < mapSize; j++)
                 {
                     mapData = map[i, j];
                     if (mapData.plant == null) continue;
@@ -203,23 +207,28 @@ namespace EvolutionSimulation
             {
                 case MapType.Default:
                     complexGen = false;
+                    numPasses = 2;
                     evaluateHeight = DefaultEvaluateHeightCurve;
                     break;
                 case MapType.Custom:
                     complexGen = false;
                     if (config.evaluateHeight == null) evaluateHeight = DefaultEvaluateHeightCurve;
                     else evaluateHeight = config.evaluateHeight;
+                    numPasses = config.numPasses;
                     break;
                 case MapType.Island:
                     complexGen = true;
+                    numPasses = 3;
                     complexEvaluateHeight = IslandEvaluateHeightCurve;
                     break;
                 case MapType.Atoll:
                     complexGen = true;
+                    numPasses = 3;
                     complexEvaluateHeight = AtollEvaluateHeightCurve;
                     break;
                 case MapType.Swamp:
                     complexGen = true;
+                    numPasses = 3;
                     modifiedHeight = false;
                     break;
             }
@@ -301,15 +310,16 @@ namespace EvolutionSimulation
                 temperatureWaves[0].amplitude = 1f;
             }
 
+            entityMap = new List<IEntity>[mapSize, mapSize];
             InitMap();
-
             if (config.regionMap == null)
             {
                 chunkSize = 32;
                 int chunk = (int)Math.Floor(mapSize / (float)chunkSize) + ((mapSize % chunkSize == 0) ? 1 : 0);
                 highMap = new List<MapRegion>();
                 FillHighMap();
-            } else
+            }
+            else
             {
                 highMap = config.regionMap;
             }
@@ -319,57 +329,60 @@ namespace EvolutionSimulation
         {
             int numReg = 0;
             Queue<Vector2> regions = new Queue<Vector2>(); //TODO: Lista de nodos a encolar 
-            for (int i = 0; i < map.GetLength(0) / chunkSize; i++)
+            for (int pass = 0; pass < numPasses; pass++)
             {
-                for (int j = 0; j < map.GetLength(1) / chunkSize; j++)
+                for (int i = 0; i < map.GetLength(0) / chunkSize; i++)
                 {
-                    int x, y;
-                    int tries = chunkSize * chunkSize;
-                    do
+                    for (int j = 0; j < map.GetLength(1) / chunkSize; j++)
                     {
-                        tries--;
-                        x = (int)((i + RandomGenerator.NextDouble()) * chunkSize);
-                        y = (int)((j + RandomGenerator.NextDouble()) * chunkSize);
-                    } while (tries > 0 && !canMove(x, y));
-                    if (tries == 0) continue;
-                    map[x, y].regionId = numReg++;
-                    MapRegion reg = new MapRegion();
-                    reg.spawnPoint = new Vector2(x, y);
-                    reg.links = new Dictionary<int, List<Vector2>>();
-                    highMap.Add(reg);
-                    regions.Enqueue(reg.spawnPoint);
-                }
-            }
-
-            while (regions.Count != 0)
-            {
-                Vector2 cur = regions.Dequeue();
-                int id = map[(int)cur.X, (int)cur.Y].regionId;
-                for (int j = -1; j <= 1; ++j)
-                    for (int k = -1; k <= 1; ++k)
-                    {
-                        if (j == 0 && k == 0) continue;
-                        Vector2 newPos = cur + new Vector2(j, k);
-                        if (!canMove((int)newPos.X, (int)newPos.Y)) continue; //If outside of bounds or water, ignore and don't expand.
-
-                        int nId = map[(int)newPos.X, (int)newPos.Y].regionId;
-                        if (nId == id) continue;
-
-                        if (nId != -1) //If the new tile is already in another region
+                        int x, y;
+                        int tries = chunkSize * chunkSize;
+                        do
                         {
-                            if (!highMap[id].links.ContainsKey(nId)) highMap[id].links.Add(nId, new List<Vector2>());
-                            if (!highMap[nId].links.ContainsKey(id)) highMap[nId].links.Add(id, new List<Vector2>());
-
-                            List<Vector2> links2 = highMap[nId].links[id];
-                            if (links2.Find((x) => { return x == newPos; }) == default(Vector2))
-                                links2.Add(newPos);
-                        }
-                        else
-                        {
-                            map[(int)newPos.X, (int)newPos.Y].regionId = id;
-                            regions.Enqueue(newPos);
-                        }
+                            tries--;
+                            x = (int)((i + RandomGenerator.NextDouble()) * chunkSize);
+                            y = (int)((j + RandomGenerator.NextDouble()) * chunkSize);
+                        } while (tries > 0 && (!canMove(x, y) || map[x, y].regionId != -1));
+                        if (tries == 0) continue;
+                        map[x, y].regionId = numReg++;
+                        MapRegion reg = new MapRegion();
+                        reg.spawnPoint = new Vector2(x, y);
+                        reg.links = new Dictionary<int, List<Vector2>>();
+                        highMap.Add(reg);
+                        regions.Enqueue(reg.spawnPoint);
                     }
+                }
+
+                while (regions.Count != 0)
+                {
+                    Vector2 cur = regions.Dequeue();
+                    int id = map[(int)cur.X, (int)cur.Y].regionId;
+                    for (int j = -1; j <= 1; ++j)
+                        for (int k = -1; k <= 1; ++k)
+                        {
+                            if (j == 0 && k == 0) continue;
+                            Vector2 newPos = cur + new Vector2(j, k);
+                            if (!canMove((int)newPos.X, (int)newPos.Y)) continue; //If outside of bounds or water, ignore and don't expand.
+
+                            int nId = map[(int)newPos.X, (int)newPos.Y].regionId;
+                            if (nId == id) continue;
+
+                            if (nId != -1) //If the new tile is already in another region
+                            {
+                                if (!highMap[id].links.ContainsKey(nId)) highMap[id].links.Add(nId, new List<Vector2>());
+                                if (!highMap[nId].links.ContainsKey(id)) highMap[nId].links.Add(id, new List<Vector2>());
+
+                                List<Vector2> links2 = highMap[nId].links[id];
+                                if (links2.Find((x) => { return x == newPos; }) == default(Vector2))
+                                    links2.Add(newPos);
+                            }
+                            else
+                            {
+                                map[(int)newPos.X, (int)newPos.Y].regionId = id;
+                                regions.Enqueue(newPos);
+                            }
+                        }
+                }
             }
 
         }
@@ -465,10 +478,11 @@ namespace EvolutionSimulation
                 }
             }
             taxonomy.AddCreatureToSpecies(ent);
+            entityMap[x, y].Add(ent);
 
             Creatures.Add(entitiesID, ent);
 #if DEBUG
-            Console.WriteLine("CREATURE HAS BORN AT "+x+", " + y +" WITH ID: "+ entitiesID);
+            Console.WriteLine("CREATURE HAS BORN AT " + x + ", " + y + " WITH ID: " + entitiesID);
 #endif
             entitiesID++;
             // TODO: devolver el id, una copia o un wrap del objeto creado
@@ -486,6 +500,8 @@ namespace EvolutionSimulation
             T ent = new T();
             ent.Init(entitiesID, this, x, y, hp);
             StaticEntities.Add(entitiesID, ent);
+            entityMap[x, y].Add(ent);
+
             entitiesID++;
             return ent;
         }
@@ -495,7 +511,15 @@ namespace EvolutionSimulation
         /// </summary>
         public void Destroy(int entityID)
         {
+            IEntity ent;
+            if (Creatures.ContainsKey(entityID))
+                ent = Creatures[entityID];
+            else
+                ent = StaticEntities[entityID];
+
+            entityMap[ent.x, ent.y].Remove(ent);
             entitiesToDelete.Add(entityID);
+            
         }
 
         /// <summary>
@@ -590,11 +614,20 @@ namespace EvolutionSimulation
             if (!Creatures.ContainsKey(cID)) return results;
 
             Creature c = Creatures[cID];
-            foreach (StaticEntity e in StaticEntities.Values)
-            {
-                if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius) // Square vision
-                    results.Add(e);
-            }
+            for (int i = c.x - radius; i < c.x + radius; i++)
+                for (int j = c.y - radius; j < c.y + radius; j++)
+                {
+                    if (i < 0 || j < 0 || j >= map.GetLength(1) || i >= map.GetLength(0)) continue;
+                    if (map[i, j].plant != null)
+                        results.Add(map[i, j].plant);
+
+                    for (int k = 0; k < entityMap[i, j].Count; k++)
+                    {
+                        if (entityMap[i, j][k] is StaticEntity)
+                            results.Add(entityMap[i, j][k] as StaticEntity);
+                    }
+                }
+
             return results;
         }
 
@@ -622,6 +655,7 @@ namespace EvolutionSimulation
         Func<double, int> floraSelector;
         float[,] heightMap, humidityMap, temperatureMap;
         bool complexGen = false;
+        int numPasses;
 
         /// <summary>
         /// Function used to insert further noise into the Perlin noise
@@ -679,12 +713,13 @@ namespace EvolutionSimulation
             int sizeY = heightMap.GetLength(1);
             map = new MapData[sizeX, sizeY];
             double avgTemp = 0, avgHumidity = 0;
+            int land = 0;
             for (int yIndex = 0; yIndex < sizeY; yIndex++)
             {
                 for (int xIndex = 0; xIndex < sizeX; xIndex++)
                 {
                     map[xIndex, yIndex] = new MapData();
-
+                    entityMap[xIndex, yIndex] = new List<IEntity>();
                     if (complexGen)
                     {
                         if (modifiedHeight)
@@ -697,6 +732,7 @@ namespace EvolutionSimulation
                             map[xIndex, yIndex].height = evaluateHeight(heightMap[xIndex, yIndex]);
                         else map[xIndex, yIndex].height = heightMap[xIndex, yIndex];
                     }
+                    if (map[xIndex, yIndex].height >= 0.5) land++;
 
                     double evaluation = evaluateInfluence(map[xIndex, yIndex].height);
                     if (evaluation >= 0)
@@ -802,6 +838,7 @@ namespace EvolutionSimulation
                     }
                 }
 #if DEBUG
+            Console.WriteLine("Walkable Area: " + Math.Truncate(((float)land * 100f / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
             Console.WriteLine("Average Temperature: " + Math.Truncate((avgTemp * 100 / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
             Console.WriteLine("Average Humidity: " + Math.Truncate((avgHumidity * 100 / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
             Console.WriteLine("Average Flora: " + Math.Truncate((avgFlora * 100 / Math.Pow(mapSize, 2)) * 100) / 100 + " %");
@@ -907,7 +944,7 @@ namespace EvolutionSimulation
         #endregion
 
         /// <summary>
-        /// Guiven a year, returns the number of ticks it equals
+        /// Given a year, returns the number of ticks it equals
         /// </summary>
         public int YearToTick(float year)
         {
@@ -926,6 +963,8 @@ namespace EvolutionSimulation
 
         // Map with physical properties
         public MapData[,] map { get; private set; }
+
+        public List<IEntity>[,] entityMap;
         public List<MapRegion> highMap { get; private set; }
         int mapSize;
         public int chunkSize { get; private set; }

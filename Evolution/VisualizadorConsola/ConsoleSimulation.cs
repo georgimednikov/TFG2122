@@ -18,6 +18,7 @@ namespace VisualizadorConsola
         override public void Init(int years, int species, int individuals, string dataDir, string exportDir)
         {
             base.Init(years, species, individuals, dataDir, exportDir);
+            //WorldToBmp();
             Console.WriteLine("Simulation Init done");
         }
 
@@ -30,6 +31,7 @@ namespace VisualizadorConsola
         override public void Run()
         {
             int YearTicks = world.YearToTick(1.0f);
+            DateTime time = DateTime.Now;
             int ticks = world.YearToTick(UserInfo.Years);
             int i = 1;
             for (; i <= ticks; i++)
@@ -41,11 +43,14 @@ namespace VisualizadorConsola
                     Export();
                 };
 
+                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
                 //Render();
                 //Thread.Sleep(1000);
                 if (i % YearTicks == 0)
                     Console.WriteLine("A Year has passed");
             }
+            DateTime time2 = DateTime.Now;
+            Console.Write("Estimated Time for "+ UserInfo.Years + " years will be: " + ((time2-time).TotalMilliseconds/(i-1) * world.YearToTick(UserInfo.Years))/360000/24 + " days.\n");
             Console.Write("Simulation ended, ticks elapsed: " + i + "\n");
         }
 
@@ -291,7 +296,7 @@ namespace VisualizadorConsola
 
                     #region VoronoiDiagram
                     val = world.map[j / scale, i / scale].regionId;
-                    switch (val % 10)
+                    switch (val % 20)
                     {
                         case 0:
                             SetPixel(j, i, Color.Red, voronoiMap, scale);
@@ -322,6 +327,36 @@ namespace VisualizadorConsola
                             break;
                         case 9:
                             SetPixel(j, i, Color.LightGoldenrodYellow, voronoiMap, scale);
+                            break;
+                        case 10:
+                            SetPixel(j, i, Color.Chocolate, voronoiMap, scale);
+                            break;
+                        case 11:
+                            SetPixel(j, i, Color.Chartreuse, voronoiMap, scale);
+                            break;
+                        case 12:
+                            SetPixel(j, i, Color.BurlyWood, voronoiMap, scale);
+                            break;
+                        case 13:
+                            SetPixel(j, i, Color.DarkKhaki, voronoiMap, scale);
+                            break;
+                        case 14:
+                            SetPixel(j, i, Color.DarkOrchid, voronoiMap, scale);
+                            break;
+                        case 15:
+                            SetPixel(j, i, Color.Firebrick, voronoiMap, scale);
+                            break;
+                        case 16:
+                            SetPixel(j, i, Color.DeepSkyBlue, voronoiMap, scale);
+                            break;
+                        case 17:
+                            SetPixel(j, i, Color.IndianRed, voronoiMap, scale);
+                            break;
+                        case 18:
+                            SetPixel(j, i, Color.Ivory, voronoiMap, scale);
+                            break;
+                        case 19:
+                            SetPixel(j, i, Color.LimeGreen, voronoiMap, scale);
                             break;
                     }
                     #endregion
