@@ -52,8 +52,11 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 template += creature.causeOfDeath;
             }
-
+            if(corpse == null)
+                return template + "\nCORPSE CANNOT BE CREATED IN: POSITION: (" + creature.x + ", " + creature.y + ") CREATURE ID: " + creature.ID;
+            
             return template + "\nCORPSE CREATED WITH ID: " + corpse.ID + " IN POSITION: (" + creature.x + ", " + creature.y + ")";
+
         }
 #endif
     }

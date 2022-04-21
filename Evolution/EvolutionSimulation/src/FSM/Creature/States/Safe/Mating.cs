@@ -56,7 +56,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                         do{
                             nx = creature.x + RandomGenerator.Next(-1, 2);
                             ny = creature.y + RandomGenerator.Next(-1, 2);
-                        }while(!creature.world.canMove(nx,ny));
+                        }while(!creature.world.CanMove(nx,ny));
                         
                         creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName, creature.matingCreature, creature.ID);
 

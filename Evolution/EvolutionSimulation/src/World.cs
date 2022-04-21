@@ -89,6 +89,7 @@ namespace EvolutionSimulation
     /// </summary>
     public class World
     {
+        public int tick { get; private set; }
         /// <summary>
         /// Properties of each map tile
         /// </summary>
@@ -391,12 +392,12 @@ namespace EvolutionSimulation
         /// Checks if target coordinates are available in the map
         /// </summary>
         /// <returns>True if it is within position is available</returns>
-        public bool canMove(int x, int y, Creature.HeightLayer z = Creature.HeightLayer.Ground)
+        public bool CanMove(int x, int y, Creature.HeightLayer z = Creature.HeightLayer.Ground)
         {
             if (!(x >= 0 && x < mapSize && y >= 0 && y < mapSize) || (z != Creature.HeightLayer.Air && map[x, y].isWater))
                 return false;
             if (z == Creature.HeightLayer.Ground || z == Creature.HeightLayer.Air) return true;
-            return isTree(x, y);
+            return IsTree(x, y);
         }
 
         /// <summary>
@@ -405,12 +406,12 @@ namespace EvolutionSimulation
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns>True if it is within bounds</returns>
-        public bool checkBounds(int x, int y)
+        public bool CheckBounds(int x, int y)
         {
             return (x >= 0 && x < mapSize && y >= 0 && y < mapSize);
         }
 
-        public bool isTree(int x, int y)
+        public bool IsTree(int x, int y)
         {
             if (x < 0 || y < 0)
                 return false;
@@ -424,7 +425,7 @@ namespace EvolutionSimulation
         /// <returns>True if it is within bounds</returns>
         public bool canMove(Vector3 pos)
         {
-            return canMove((int)pos.X, (int)pos.Y, (Creature.HeightLayer)pos.Z);
+            return CanMove((int)pos.X, (int)pos.Y, (Creature.HeightLayer)pos.Z);
         }
 
         #region EntitiesManagement
@@ -433,8 +434,9 @@ namespace EvolutionSimulation
         /// Performs a step of the simulation.
         /// </summary>
         /// <returns>True if ther are any remaining creatures</returns>
-        public bool Tick()
+        public bool Tick(int tick)
         {
+            this.tick = tick;
             CycleDayNight();
             return EntitiesTick();
         }
@@ -460,7 +462,7 @@ namespace EvolutionSimulation
         public T CreateCreature<T>(int x, int y, CreatureChromosome chromosome = null, string name = "None", int fatherID = -1, int motherID = -1) where T : Creature, new()
         {
             T ent = new T();
-
+            
             ent.Init(entitiesID, this, x, y, chromosome, name, fatherID, motherID);
             // Progenitors start being adults and a half is male and the other half female
             if (fatherID == -1)
@@ -558,6 +560,7 @@ namespace EvolutionSimulation
             {
                 if (Creatures.ContainsKey(id))
                 {
+                    taxonomy.RemoveCreatureToSpecies(Creatures[id]);
                     Creatures.Remove(id);
                 }
                 else
@@ -771,7 +774,7 @@ namespace EvolutionSimulation
                             for (int j = -(int)(mapScale / 5); j <= (int)(mapScale / 5); j++)
                             {
                                 if (j == 0 && i == 0) continue;
-                                if (checkBounds(xIndex + i, yIndex + j))
+                                if (CheckBounds(xIndex + i, yIndex + j))
                                 {
                                     avgHumidity -= map[xIndex + i, yIndex + j].humidity;
                                     avgTemp -= map[xIndex + i, yIndex + j].temperature;
@@ -951,6 +954,9 @@ namespace EvolutionSimulation
             return (int)(year * daysYear * hoursDay * ticksHour);
         }
 
+        /// <summary>
+        /// Export the content information when the simulation ends
+        /// </summary>
         public void ExportContent()
         {
             taxonomy.ExportSpecies();
@@ -959,6 +965,16 @@ namespace EvolutionSimulation
             System.IO.File.WriteAllText(UserInfo.ExportDirectory + "World.json", word);
             string hMap = JsonConvert.SerializeObject(highMap, Formatting.Indented);
             System.IO.File.WriteAllText(UserInfo.ExportDirectory + "HighMap.json", hMap);
+        }
+
+        /// <summary>
+        /// Export just the especies information when an apocalyse occurs
+        /// </summary>
+        /// <param name="cont"></param>
+        public void ApocalypseExportContent(int cont)
+        {
+            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory +"/Apocalyse" + cont + "Tree.txt", tick);            
+            taxonomy.ExportSpecies(cont);
         }
 
         // Map with physical properties

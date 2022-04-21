@@ -228,7 +228,8 @@ namespace EvolutionSimulation.Entities
                     else
                         UpdateList(RottenCorpses, resource, maxExperienceTicks);
                 }
-                else if (entity is EdiblePlant && !thisCreature.IsCarnivorous()) {
+                else if (entity is EdiblePlant && !thisCreature.IsCarnivorous())
+                {
                     if (!(entity as EdiblePlant).eaten)
                     {
                         UpdateList(EdiblePlants, resource, maxExperienceTicks);
@@ -247,7 +248,7 @@ namespace EvolutionSimulation.Entities
                 for (int j = -perceptionRadius; j <= perceptionRadius; j++)
                 {
                     Vector2Int p = new Vector2Int(x + i, y + j);
-                    if (!world.checkBounds(p.x, p.y)) continue;
+                    if (!world.CheckBounds(p.x, p.y)) continue;
 
                     if (world.map[p.x, p.y].isWater)
                     {
@@ -255,7 +256,7 @@ namespace EvolutionSimulation.Entities
                         bool shore = false;
                         for (int k = -1; !shore && k <= 1; k++)
                             for (int h = -1; !shore && h <= 1; h++)
-                                if (world.checkBounds(p.x + k, p.y + h) && !world.map[p.x + k, p.y + h].isWater)
+                                if (world.CheckBounds(p.x + k, p.y + h) && !world.map[p.x + k, p.y + h].isWater)
                                     shore = true;
                         if (shore) UpdateList(WaterPositions, new Resource(p, maxExperienceTicks), maxExperienceTicks);
 
@@ -288,7 +289,7 @@ namespace EvolutionSimulation.Entities
                     RemoveFromSafePlant(p.position);
                 }
                 //If the tile remains in memory, it is safe and no safe place has been assigned or it is closer than the one already found, it is saved, unless that position can't be reached
-                else if (positionDanger <= 0 && world.canMove(p.position.x, p.position.y) && !SafePositions.Contains(p.position))
+                else if (positionDanger <= 0 && world.CanMove(p.position.x, p.position.y) && !SafePositions.Contains(p.position))
                 {
                     SafePositions.Add(p.position);
                 }
@@ -309,25 +310,19 @@ namespace EvolutionSimulation.Entities
                 Mate = null; //By default there is no mate available.
                 for (int i = 0; i < Allies.Count; i++) //For every ally the creature remembers the following comprobations are done:
                 {
-                    Creature ally = world.GetCreature(Allies[0].ID);
+                    Creature ally = world.GetCreature(Allies[i].ID);
                     if (ally == null || ally.stats.Gender == thisCreature.stats.Gender ||
                         !thisCreature.CanReach(ally.creatureLayer))                     //This is done to ignore creatures of the same gender as this one. The gender is
                         continue;                                                       //checked although the creature might not be in sight, but it is not modified
                                                                                         //and this way the gender is not saved (which would be inconvinient).
                                                                                         //The creature has to be able to reach de ally to considere it as a mate
-                    if (thisCreature.DistanceToObjective(Allies[0].position) <= perceptionRadius) //If it can see the ally and therefore exists.
-                    {
-                        if (ally.wantMate) //If it wants to mate and is of the opposite danger, it is a match.
-                        {
-                            Mate = Allies[i];
-                            break;
-                        }
-                    }
-                    else //If the creature cannot see the next ally, since they are ordered by distance, it goes to the position it remembers.
+
+                    if (ally.wantMate) //If it wants to mate and is of the opposite danger, it is a match.
                     {
                         Mate = Allies[i];
                         break;
                     }
+
                 }
             }
         }
@@ -386,7 +381,7 @@ namespace EvolutionSimulation.Entities
                 new Vector2Int(-1, 1), new Vector2Int(0, 1), new Vector2Int(1, 1)
             };
             // The map is sqare, pithagoras to get diagonal, the maximum distance to search
-            double mapDiag = Math.Sqrt(2 * Math.Pow(world.map.GetLength(0), 2)); 
+            double mapDiag = Math.Sqrt(2 * Math.Pow(world.map.GetLength(0), 2));
             bool landFound = false;
             int indx = 0;
             int distInc = Math.Max(1, world.chunkSize / 2);
@@ -398,13 +393,13 @@ namespace EvolutionSimulation.Entities
                 while (indx < Dirs.Length && !landFound)
                 {
                     landPos = creaturePos + Dirs[indx] * rad;
-                    landFound = thisCreature.world.canMove(landPos.x, landPos.y);
+                    landFound = thisCreature.world.CanMove(landPos.x, landPos.y);
                     indx++;
                 }
                 indx = 0;
                 rad += distInc;
             }
-            
+
             return landFound;
         }
         /// <summary>
@@ -420,7 +415,7 @@ namespace EvolutionSimulation.Entities
                 for (int j = -perceptionRadius; j <= perceptionRadius && !found; j++)
                 {
                     Vector2Int p = new Vector2Int(x + i, y + j);
-                    if (!world.canMove(p.x, p.y) || !thisCreature.CheckTemperature(p.x, p.y) || SafeTemperaturePositions.Contains(p)) 
+                    if (!world.CanMove(p.x, p.y) || !thisCreature.CheckTemperature(p.x, p.y) || SafeTemperaturePositions.Contains(p))
                         continue;
 
                     SafeTemperaturePositions.Add(p);
@@ -462,7 +457,7 @@ namespace EvolutionSimulation.Entities
                 for (int j = -perceptionRadius; j <= perceptionRadius && !found; j++)
                 {
                     checkPos.x = x + i; checkPos.y = y + j;
-                    if (!world.canMove(checkPos.x, checkPos.y) || (i == 0 && j == 0)) continue;
+                    if (!world.CanMove(checkPos.x, checkPos.y) || (i == 0 && j == 0)) continue;
 
                     double tileTemperature = world.map[checkPos.x, checkPos.y].temperature;
                     double difference = 1;
@@ -568,7 +563,7 @@ namespace EvolutionSimulation.Entities
                     maxAngle = Math.PI / 2.0;   // 90 degrees, the area that the creature should have come from
                 }
             }
-            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) // Repeat if it cannot move to the calculated destiny
+            while (!thisCreature.world.CanMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) // Repeat if it cannot move to the calculated destiny
                 || (finalPosition.x == thisCreature.x && finalPosition.y == thisCreature.y));                // or the destiny is the same position as the creature position
 
             return finalPosition;
@@ -613,7 +608,7 @@ namespace EvolutionSimulation.Entities
                 angleAcum += angleInc;
                 actualAngle += angleAcum * inc;
             }
-            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) && angleAcum <= maxAngle);
+            while (!thisCreature.world.CanMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) && angleAcum <= maxAngle);
 
             return angleAcum <= maxAngle
                 && (finalPosition.x != thisCreature.x || finalPosition.y != thisCreature.y);
@@ -628,7 +623,7 @@ namespace EvolutionSimulation.Entities
         {
             perceptionRadius = thisCreature.stats.Perception;
         }
-        
+
         /// <summary>
         /// Sets a creature to be the enemy of this one, that is to say, its combat target. This creature is forgotten when it leaves
         /// the perception radius or is dead.

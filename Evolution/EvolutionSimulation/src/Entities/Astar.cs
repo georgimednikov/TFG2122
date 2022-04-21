@@ -73,7 +73,7 @@ namespace EvolutionSimulation.Entities
                 return path;
             }
 
-            if (end == start) throw new InvalidOperationException("La misma pos esta mal");
+            if (end == start) throw new InvalidOperationException("It cannot be the same position");
             Vector3 tempEnd = HighAstar(w, start, end, out int endRegion, info);
 
             return LowAstar(c, w, start, tempEnd, endRegion, out treeDensity, info);
@@ -177,7 +177,7 @@ namespace EvolutionSimulation.Entities
             int passedTrees = 0;
             while (aux != null)
             {
-                if (w.isTree((int)Math.Round(aux.pos.X), (int)Math.Round(aux.pos.Y))) passedTrees = passedTrees + 1;
+                if (w.IsTree((int)Math.Round(aux.pos.X), (int)Math.Round(aux.pos.Y))) passedTrees = passedTrees + 1;
                 path.Add(aux);
                 aux = aux.prev;
             }
@@ -211,7 +211,7 @@ namespace EvolutionSimulation.Entities
             treeDensity = 0;
             while ((dirAux - end).Length() > 0.6f)
             {
-                if (w.isTree((int)Math.Round(dirAux.X), (int)Math.Round(dirAux.Y)))
+                if (w.IsTree((int)Math.Round(dirAux.X), (int)Math.Round(dirAux.Y)))
                     treeDensity++;
                 ntiles++;
                 dirAux += dirN;

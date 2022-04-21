@@ -30,10 +30,6 @@ namespace EvolutionSimulation
         /// </summary>
         static public string GeneSimilarityFile() { return LoadFile("SimilarityGeneWeight.json"); }
         /// <summary>
-        /// Returns the raw species similarity file, if the file does not exist, returns null
-        /// </summary>
-        static public string SpeciesSimilarityFile() { return LoadFile("SimilaritySpecies.json"); }     
-        /// <summary>
         /// Returns the raw world config file, if the file does not exist, returns null
         /// </summary>
         static public string WorldConfigFile() { return LoadFile("WorldConfig.json"); }

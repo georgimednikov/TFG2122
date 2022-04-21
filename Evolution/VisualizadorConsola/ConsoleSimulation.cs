@@ -22,9 +22,9 @@ namespace VisualizadorConsola
             Console.WriteLine("Simulation Init done");
         }
 
-        override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string minSimilarityFile = null, string worldFile = null, string highMap = null, string exportDir = null)
+        override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string highMap = null, string exportDir = null)
         {
-            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, minSimilarityFile, worldFile, exportDir);
+            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, exportDir);
             Console.WriteLine("Simulation Init done");
         }
 
@@ -34,13 +34,14 @@ namespace VisualizadorConsola
             DateTime time = DateTime.Now;
             int ticks = world.YearToTick(UserInfo.Years);
             int i = 1;
+            int apocalypsisCont = 0;
             for (; i <= ticks; i++)
             {
-                if (!world.Tick())
+                if (!world.Tick(i) )
                 {
-                    CreateCreatures();
+                    ApocalypseExport(apocalypsisCont++);
                     Console.WriteLine("APOCALYPSIS: Generating new set of creatures");
-                    Export();
+                    CreateCreatures();
                 };
 
                 Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
@@ -58,6 +59,12 @@ namespace VisualizadorConsola
         {
             base.Export();
             Console.Write("Simulation data has been exported");
+        }
+
+        override public void ApocalypseExport(int cont)
+        {
+            base.ApocalypseExport(cont);
+            Console.Write("Simulation data has been exported because of Apocalysis");
         }
         /// <summary>
         /// Asks the user where to look for the files containing the different values for the calculation of the chromosme, genes and stats,

@@ -25,6 +25,12 @@ namespace EvolutionSimulation.Genetics
             return new CreatureChromosome(cc);
         }
 
+        private static void Checks(int length, ref int endIndex, ref int startIndex)
+        {
+            if (endIndex <= -1 || endIndex > length) endIndex = length;
+            if (startIndex < 0) startIndex = 0;
+        }
+
         /// <summary>
         /// Function that receives a chromosome and randomly flips bits given a probability
         /// startIndex is the start index to mutate in the chromosome and endIndex the end of it
@@ -32,9 +38,8 @@ namespace EvolutionSimulation.Genetics
         static public void FlipBitMutation(ref CreatureChromosome creature, float prob, int startIndex = 0, int endIndex = -1)
         {
             BitArray chromosome = creature.GetChromosome();
-
-            if (endIndex == -1 || endIndex > chromosome.Length) endIndex = chromosome.Length;
-            if (startIndex < 0) startIndex = 0;
+            Checks(chromosome.Length, ref endIndex, ref startIndex);
+           
             for (int i = startIndex; i < endIndex; ++i)
             {
                 if (RandomGenerator.NextDouble() < prob) chromosome[i] = !chromosome[i];
@@ -49,8 +54,7 @@ namespace EvolutionSimulation.Genetics
         static public void UniformMutation(ref CreatureChromosome creature, float prob, int startIndex = 0, int endIndex = -1)
         {
             BitArray chromosome = creature.GetChromosome();
-            if (endIndex == -1 || endIndex > chromosome.Length) endIndex = chromosome.Length;
-            if (startIndex < 0) startIndex = 0;
+            Checks(chromosome.Length, ref endIndex, ref startIndex);
             for (int i = startIndex; i < endIndex; ++i)
             {
                 if (RandomGenerator.NextDouble() < prob)
@@ -60,26 +64,6 @@ namespace EvolutionSimulation.Genetics
                     else
                         chromosome[i] = true;
                 }
-            }
-            creature.SetFeatures();
-        }
-
-
-        /// <summary>
-        /// Function that receives a chromosome and using probToIncrease modify bits given a probability
-        /// probMut is the prob to mutate a bit and probToIncrease is the prob to be 1 and not 0
-        /// probToIncrease may be more than 0.5
-        /// startIndex is the start index to mutate in the chromosome and endIndex the end of it
-        /// </summary>
-        static public void NotUniformMutation(ref CreatureChromosome creature, float prob, int startIndex = 0, int endIndex = -1)
-        {
-            Random rnd = new Random();
-            BitArray chromosome = creature.GetChromosome();
-            if (endIndex == -1 || endIndex > chromosome.Length) endIndex = chromosome.Length;
-            if (startIndex < 0) startIndex = 0;
-            for (int i = startIndex; i < endIndex; ++i)
-            {
-                if (rnd.NextDouble() < prob) chromosome[i] = !chromosome[i];
             }
             creature.SetFeatures();
         }
