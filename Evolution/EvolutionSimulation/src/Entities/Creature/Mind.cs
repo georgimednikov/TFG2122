@@ -28,7 +28,8 @@ namespace EvolutionSimulation.Entities
         }
 
         #region Memory
-        public void CreateDanger() { mem.DangerousPosition(); }
+        public void CreateDanger() { mem.DangerousPosition(true); }
+        public void CreateSafety() { mem.DangerousPosition(false); }
         public void SafeWaterSource() { mem.SafeWaterSource(); }
         public void SafeEdiblePlant() { mem.SafeEdiblePlant(); }
         public void UpdatePerception() { mem.CalculatePerceptionRadius(); }
@@ -208,7 +209,7 @@ namespace EvolutionSimulation.Entities
 
             float aDist = creature.DistanceToObjective(w1.position);
             float bDist = creature.DistanceToObjective(w2.position);
-            total = Math.Max(Math.Max(aDist, bDist), 0.1f);
+            total = Math.Max(aDist, bDist);
             float aRelDist = aDist / total;
             float bRelDist = bDist / total;
 
