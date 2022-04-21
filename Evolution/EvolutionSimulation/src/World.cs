@@ -622,9 +622,11 @@ namespace EvolutionSimulation
 
             Creature c = Creatures[cID];
             for (int i = c.x - radius; i < c.x + radius; i++)
+            {
+                if (i < 0 || i >= map.GetLength(0)) continue;
                 for (int j = c.y - radius; j < c.y + radius; j++)
                 {
-                    if (i < 0 || j < 0 || j >= map.GetLength(1) || i >= map.GetLength(0)) continue;
+                    if ( j < 0 || j >= map.GetLength(1) ) continue;
                     if (map[i, j].plant != null)
                         results.Add(map[i, j].plant);
 
@@ -634,6 +636,7 @@ namespace EvolutionSimulation
                             results.Add(entityMap[i, j][k] as StaticEntity);
                     }
                 }
+            }
 
             return results;
         }
