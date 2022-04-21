@@ -129,7 +129,7 @@ namespace EvolutionSimulation.Genetics
 
             abilityUnlock = new Dictionary<CreatureFeature, float>();
 
-            // If no ability unlock file is provided, abilityies unlocks are setted to default values
+            // If no ability unlock file is provided, ability unlocks are set to default values
             if (abilitiesJson == null)
             {
                 for (CreatureFeature c = CreatureFeature.Arboreal; c < CreatureFeature.Count; ++c)

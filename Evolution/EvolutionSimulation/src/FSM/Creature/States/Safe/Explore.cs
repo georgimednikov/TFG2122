@@ -13,7 +13,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     /// </summary>
     class Explore : CreatureState
     {
-        Vector2 posToDiscover;
+        Vector3 posToDiscover;
         int regionID;
         public Explore(Entities.Creature c) : base(c)
         {
@@ -28,7 +28,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void OnEntry()
         {
             regionID = creature.NewExploreRegion();
-            posToDiscover = creature.world.highMap[regionID].spawnPoint; // Region spawn point is always at ground height
+            posToDiscover = new Vector3(creature.world.highMap[regionID].spawnPoint, 0); // Region spawn point is always at ground height
             creature.SetPath((int)posToDiscover.X, (int)posToDiscover.Y, Entities.Creature.HeightLayer.Ground);
         }
 
@@ -39,9 +39,17 @@ namespace EvolutionSimulation.FSM.Creature.States
             // If the creature already arrived at the path, the next cost is -1 or 0, so the creature searches for other path
             if (creature.GetNextCostOnPath() <= 0)
             {
-                regionID = creature.NewExploreRegion();
-                posToDiscover = creature.world.highMap[regionID].spawnPoint; // Region spawn point is always at ground height
-                creature.SetPath((int)posToDiscover.X, (int)posToDiscover.Y, Entities.Creature.HeightLayer.Ground);
+                // Region changed but destiny not reached still
+                if (nextPos != posToDiscover)
+                    creature.SetPath((int)posToDiscover.X, (int)posToDiscover.Y, Entities.Creature.HeightLayer.Ground);
+
+                // Destiny reached, a new destiny in an unexplored region is setted
+                else
+                {
+                    regionID = creature.NewExploreRegion();
+                    posToDiscover = new Vector3(creature.world.highMap[regionID].spawnPoint, 0); // Region spawn point is always at ground height
+                    creature.SetPath((int)posToDiscover.X, (int)posToDiscover.Y, Entities.Creature.HeightLayer.Ground);
+                }
             }
         }
 
@@ -49,7 +57,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             return creature.speciesName + " with ID: " + creature.ID + " IN REGION: " 
                 + creature.world.map[creature.x, creature.y].regionId + " IN (" + creature.x + ", " + creature.y + ", " + creature.creatureLayer + ")" 
-                + " EXPLORES AT (" + posToDiscover.X + ", " + posToDiscover.Y + ", " + regionID + ")";
+                + " EXPLORES AT (" + posToDiscover.X + ", " + posToDiscover.Y + ") REGION: " + regionID;
         }
 
         public override string ToString()

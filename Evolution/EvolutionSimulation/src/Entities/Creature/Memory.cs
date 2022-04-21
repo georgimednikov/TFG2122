@@ -28,7 +28,7 @@ namespace EvolutionSimulation.Entities
         Creature thisCreature;
         World world;
 
-        int perceptionRadius;
+        public int perceptionRadius { get; private set; }
         int dangerRadius;
         float danger;                   //Value representing the danger remembered in a position when something bad happens to the creature.
 
@@ -40,6 +40,7 @@ namespace EvolutionSimulation.Entities
         int ticksElapsed;               //How many ticks have gone by, used along with ticksToSavePosition.
 
         ResourcePositionComparer resourceComparer;
+        ResourcePositionEdibleComparer resourceEdibleComparer;
         ResourceValueComparer valueComparer;
         PositionComparer positionComparer;
 
@@ -115,6 +116,7 @@ namespace EvolutionSimulation.Entities
             SafeTemperaturePositions = new List<Vector2Int>();
 
             resourceComparer = new ResourcePositionComparer(c);
+            resourceEdibleComparer = new ResourcePositionEdibleComparer(c);
             valueComparer = new ResourceValueComparer();
             positionComparer = new PositionComparer(c);
 
@@ -220,15 +222,22 @@ namespace EvolutionSimulation.Entities
                 if (entity is Corpse && !thisCreature.IsHerbivorous())
                 {
                     Corpse newCorpse = entity as Corpse;
-                    if (thisCreature.chromosome.HasAbility(Genetics.CreatureFeature.Scavenger, Genetics.CreatureChromosome.AbilityUnlock[Genetics.CreatureFeature.Scavenger]) 
+                    if (thisCreature.chromosome.HasAbility(Genetics.CreatureFeature.Scavenger, Genetics.CreatureChromosome.AbilityUnlock[Genetics.CreatureFeature.Scavenger])
                         || newCorpse.Edible)
                         UpdateList(FreshCorpses, resource, maxExperienceTicks);
                     else
                         UpdateList(RottenCorpses, resource, maxExperienceTicks);
                 }
-                else if (entity is EdiblePlant && !(entity as EdiblePlant).eaten && !thisCreature.IsCarnivorous())
+                else if (entity is EdiblePlant && !thisCreature.IsCarnivorous())
                 {
-                    UpdateList(EdiblePlants, resource, maxExperienceTicks);
+                    if (!(entity as EdiblePlant).eaten)
+                    {
+                        UpdateList(EdiblePlants, resource, maxExperienceTicks);
+                    }
+                    else // This removes a perceived and already seen plant
+                    {
+                        EdiblePlants.Remove(resource);
+                    }
                 }
             }
             //This for structure is recurrent all throughtout this class and is explained with the following example:
@@ -239,7 +248,7 @@ namespace EvolutionSimulation.Entities
                 for (int j = -perceptionRadius; j <= perceptionRadius; j++)
                 {
                     Vector2Int p = new Vector2Int(x + i, y + j);
-                    if (!world.checkBounds(p.x, p.y)) continue;
+                    if (!world.CheckBounds(p.x, p.y)) continue;
 
                     if (world.map[p.x, p.y].isWater)
                     {
@@ -247,7 +256,7 @@ namespace EvolutionSimulation.Entities
                         bool shore = false;
                         for (int k = -1; !shore && k <= 1; k++)
                             for (int h = -1; !shore && h <= 1; h++)
-                                if (world.checkBounds(p.x + k, p.y + h) && !world.map[p.x + k, p.y + h].isWater)
+                                if (world.CheckBounds(p.x + k, p.y + h) && !world.map[p.x + k, p.y + h].isWater)
                                     shore = true;
                         if (shore) UpdateList(WaterPositions, new Resource(p, maxExperienceTicks), maxExperienceTicks);
 
@@ -301,25 +310,19 @@ namespace EvolutionSimulation.Entities
                 Mate = null; //By default there is no mate available.
                 for (int i = 0; i < Allies.Count; i++) //For every ally the creature remembers the following comprobations are done:
                 {
-                    Creature ally = world.GetCreature(Allies[0].ID);
+                    Creature ally = world.GetCreature(Allies[i].ID);
                     if (ally == null || ally.stats.Gender == thisCreature.stats.Gender ||
                         !thisCreature.CanReach(ally.creatureLayer))                     //This is done to ignore creatures of the same gender as this one. The gender is
                         continue;                                                       //checked although the creature might not be in sight, but it is not modified
                                                                                         //and this way the gender is not saved (which would be inconvinient).
                                                                                         //The creature has to be able to reach de ally to considere it as a mate
-                    if (thisCreature.DistanceToObjective(Allies[0].position) <= perceptionRadius) //If it can see the ally and therefore exists.
-                    {
-                        if (ally.wantMate) //If it wants to mate and is of the opposite danger, it is a match.
-                        {
-                            Mate = Allies[i];
-                            break;
-                        }
-                    }
-                    else //If the creature cannot see the next ally, since they are ordered by distance, it goes to the position it remembers.
+
+                    if (ally.wantMate) //If it wants to mate and is of the opposite danger, it is a match.
                     {
                         Mate = Allies[i];
                         break;
                     }
+
                 }
             }
         }
@@ -378,7 +381,7 @@ namespace EvolutionSimulation.Entities
                 new Vector2Int(-1, 1), new Vector2Int(0, 1), new Vector2Int(1, 1)
             };
             // The map is sqare, pithagoras to get diagonal, the maximum distance to search
-            double mapDiag = Math.Sqrt(2 * Math.Pow(world.map.GetLength(0), 2)); 
+            double mapDiag = Math.Sqrt(2 * Math.Pow(world.map.GetLength(0), 2));
             bool landFound = false;
             int indx = 0;
             int distInc = Math.Max(1, world.chunkSize / 2);
@@ -390,13 +393,13 @@ namespace EvolutionSimulation.Entities
                 while (indx < Dirs.Length && !landFound)
                 {
                     landPos = creaturePos + Dirs[indx] * rad;
-                    landFound = thisCreature.world.canMove(landPos.x, landPos.y);
+                    landFound = thisCreature.world.CanMove(landPos.x, landPos.y);
                     indx++;
                 }
                 indx = 0;
                 rad += distInc;
             }
-            
+
             return landFound;
         }
         /// <summary>
@@ -412,7 +415,7 @@ namespace EvolutionSimulation.Entities
                 for (int j = -perceptionRadius; j <= perceptionRadius && !found; j++)
                 {
                     Vector2Int p = new Vector2Int(x + i, y + j);
-                    if (!world.canMove(p.x, p.y) || !thisCreature.CheckTemperature(p.x, p.y) || SafeTemperaturePositions.Contains(p)) 
+                    if (!world.CanMove(p.x, p.y) || !thisCreature.CheckTemperature(p.x, p.y) || SafeTemperaturePositions.Contains(p))
                         continue;
 
                     SafeTemperaturePositions.Add(p);
@@ -454,7 +457,7 @@ namespace EvolutionSimulation.Entities
                 for (int j = -perceptionRadius; j <= perceptionRadius && !found; j++)
                 {
                     checkPos.x = x + i; checkPos.y = y + j;
-                    if (!world.canMove(checkPos.x, checkPos.y) || (i == 0 && j == 0)) continue;
+                    if (!world.CanMove(checkPos.x, checkPos.y) || (i == 0 && j == 0)) continue;
 
                     double tileTemperature = world.map[checkPos.x, checkPos.y].temperature;
                     double difference = 1;
@@ -560,7 +563,7 @@ namespace EvolutionSimulation.Entities
                     maxAngle = Math.PI / 2.0;   // 90 degrees, the area that the creature should have come from
                 }
             }
-            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) // Repeat if it cannot move to the calculated destiny
+            while (!thisCreature.world.CanMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) // Repeat if it cannot move to the calculated destiny
                 || (finalPosition.x == thisCreature.x && finalPosition.y == thisCreature.y));                // or the destiny is the same position as the creature position
 
             return finalPosition;
@@ -605,7 +608,7 @@ namespace EvolutionSimulation.Entities
                 angleAcum += angleInc;
                 actualAngle += angleAcum * inc;
             }
-            while (!thisCreature.world.canMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) && angleAcum <= maxAngle);
+            while (!thisCreature.world.CanMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) && angleAcum <= maxAngle);
 
             return angleAcum <= maxAngle
                 && (finalPosition.x != thisCreature.x || finalPosition.y != thisCreature.y);
@@ -620,6 +623,7 @@ namespace EvolutionSimulation.Entities
         {
             perceptionRadius = thisCreature.stats.Perception;
         }
+
         /// <summary>
         /// Sets a creature to be the enemy of this one, that is to say, its combat target. This creature is forgotten when it leaves
         /// the perception radius or is dead.
@@ -693,7 +697,6 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void SafeEdiblePlant()
         {
-            // TODO: puede olvidarse de todas las plantas al llegar aqui
             if (EdiblePlants.Count == 0) return;
 
             Position posDanger = GetFromPositionDangers(EdiblePlants[0].position);
@@ -707,8 +710,9 @@ namespace EvolutionSimulation.Entities
                 posDanger = new Position(EdiblePlants[0].position, 0, -danger, maxExperienceTicks);
                 dangersRemembered.Add(posDanger);
             }
-
-            SafeEdiblePlants.Add(EdiblePlants[0]);
+            if (!SafeEdiblePlants.Contains(EdiblePlants[0]))
+                SafeEdiblePlants.Add(EdiblePlants[0]);
+            else SafeEdiblePlants.Find(x => x == EdiblePlants[0]).ticks = maxExperienceTicks;
         }
         public void DangerousPosition(bool isDangerous)
         {
@@ -742,6 +746,12 @@ namespace EvolutionSimulation.Entities
             if (list.Count > max)
                 list.RemoveRange(max, list.Count - max);
         }
+        private void AdjustResourceList<T>(int max, List<T> list, IComparer<T> comparer) where T : Resource
+        {
+            list.Sort(comparer);
+            if (list.Count > max)
+                list.RemoveRange(max, list.Count - max);
+        }
         private void AdjustList<T>(int max, List<T> list) where T : Resource
         {
             if (list.Count > max)
@@ -772,7 +782,7 @@ namespace EvolutionSimulation.Entities
 
             RemoveFruitlessPlants();
             AdjustResourceList(maxResourcesRemembered, EdiblePlants);
-            AdjustResourceList(maxResourcesRemembered, SafeEdiblePlants);
+            AdjustResourceList(maxResourcesRemembered, SafeEdiblePlants, resourceEdibleComparer);
 
             SafePositions.Sort(positionComparer);
             AdjustPosList(maxPositionsRemembered, SafePositions);
@@ -964,7 +974,34 @@ namespace EvolutionSimulation.Entities
                 int bDist = Math.Abs(creature.x - b.position.x) + Math.Abs(creature.y - b.position.y);
                 return aDist.CompareTo(bDist);
             }
+        }
+        /// <summary>
+        /// Given a list of edible plants, these are ordered based on if they are perceived
+        /// and eaten or the distance from it. The shortest that is not eaten goes first.
+        /// </summary>
+        private class ResourcePositionEdibleComparer : Comparer<EntityResource>
+        {
+            private Creature creature;
+            public ResourcePositionEdibleComparer(Creature creature) { this.creature = creature; }
 
+            public override int Compare(EntityResource a, EntityResource b)
+            {
+                StaticEntity aSE = creature.world.GetStaticEntity(a.ID);
+                StaticEntity bSE = creature.world.GetStaticEntity(b.ID);
+                //check if the creature is perceiveing the plants and their are eaten
+                List<StaticEntity> perceivedEntities = creature.world.PerceiveEntities(creature.ID, creature.mind.mem.perceptionRadius);
+                if (perceivedEntities.Contains(aSE) && (aSE as EdiblePlant).eaten &&
+                    perceivedEntities.Contains(bSE) && (bSE as EdiblePlant).eaten)
+                    return 0;
+                else if (perceivedEntities.Contains(aSE) && (aSE as EdiblePlant).eaten)
+                    return -1;
+                else if (perceivedEntities.Contains(bSE) && (bSE as EdiblePlant).eaten)
+                    return 1;
+                //Otherwise just check the distance
+                int aDist = Math.Abs(creature.x - a.position.x) + Math.Abs(creature.y - a.position.y);
+                int bDist = Math.Abs(creature.x - b.position.x) + Math.Abs(creature.y - b.position.y);
+                return aDist.CompareTo(bDist);
+            }
         }
         private class ResourceValueComparer : Comparer<ValueResource>
         {

@@ -81,7 +81,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 206671857242264571}
-  m_Text: WanderState
+  m_Text: ExploreState
   m_OffsetZ: 0
   m_CharacterSize: 0.01
   m_LineSpacing: 1
@@ -518,7 +518,8 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6342307553813194500}
-  m_Text: 'Sisa Selunisou with ID: 30201 WANDERS (245, 470)'
+  m_Text: 'Tasi Toenehepige with ID: 65213 IN REGION: 252 IN (496, 411, Ground) EXPLORES
+    AT (499, 385) REGION: 251'
   m_OffsetZ: 0
   m_CharacterSize: 0.01
   m_LineSpacing: 1

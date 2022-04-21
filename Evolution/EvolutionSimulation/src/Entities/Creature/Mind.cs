@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace EvolutionSimulation.Entities
 {
-    class Mind
+    public class Mind
     {
-        Memory mem;
+        public Memory mem { get; private set; }
         Creature creature;
         World world;
 
@@ -50,8 +50,8 @@ namespace EvolutionSimulation.Entities
             mem.Update();
             UpdateParent();
             UpdateCorpse();
-            UpdateWaterSource();
             UpdatePlant();
+            UpdateWaterSource();
         }
 
         /// <summary>
@@ -76,16 +76,19 @@ namespace EvolutionSimulation.Entities
                     parentToFollow = null;
             }// If the creature doesn't has a parent to follow but suddenly remember a parent
              // (the creature has seen a parent), then it start to follow the parent
-            else if((parentToFollow != null && parentToFollow.ticks <= 0) || parentToFollow == null)
+            else if ((parentToFollow != null && parentToFollow.ticks <= 0) || parentToFollow == null)
             {
                 // Remember where is the mother
-                if(mem.Mother != null && mem.Mother.ticks > 0)
+                if (mem.Mother != null && mem.Mother.ticks > 0)
                     parentToFollow = mem.Mother;
                 // Remember where is the father
                 else if (mem.Father != null && mem.Father.ticks > 0)
                     parentToFollow = mem.Father;
             }
         }
+        /// <summary>
+        /// Check what corpse is the best to eat
+        /// </summary>
         private void UpdateCorpse()
         {
             if (mem.FreshCorpses.Count == 0 && mem.RottenCorpses.Count == 0) //If there are no corpses, null.
@@ -104,6 +107,54 @@ namespace EvolutionSimulation.Entities
                 worthyCorpse = mem.FreshCorpses[0];
             }
         }
+        /// <summary>
+        /// Check what plant is the best to eat, problably the closer.
+        /// </summary>
+        public void UpdatePlant()
+        {
+            if (mem.EdiblePlants.Count == 0 && mem.SafeEdiblePlants.Count == 0)
+            {
+                worthyPlant = null;
+                return;
+            }
+            if (creature.IsVeryHungry())
+            {
+                if (mem.EdiblePlants.Count != 0)
+                    worthyPlant = mem.EdiblePlants[0];
+                else
+                    worthyPlant = mem.SafeEdiblePlants[0];
+                return;
+            }
+            List<StaticEntity> perceivedEntities = creature.world.PerceiveEntities(creature.ID, mem.perceptionRadius);
+            bool check = true;
+            if (mem.SafeEdiblePlants.Count != 0)
+            {
+                //That secures that the worthyplant is not eaten
+                StaticEntity plant = world.GetStaticEntity(mem.SafeEdiblePlants[0].ID);
+                if (perceivedEntities.Contains(plant) && !(plant as EdiblePlant).eaten || !perceivedEntities.Contains(plant))
+                {
+                    worthyPlant = BestBetweenCloseAndSafe(mem.EdiblePlants, mem.SafeEdiblePlants, Criteria);
+                    check = false;
+                }
+            }
+            if (check && mem.EdiblePlants.Count != 0)
+            {   //Search the first edible plant that is not eaten (just in case the creature has eat
+                //the plant in this tick)
+                foreach (EntityResource plant in mem.EdiblePlants)
+                {
+                    if (!(world.GetStaticEntity(plant.ID) as EdiblePlant).eaten)
+                    {
+                        worthyPlant = plant;
+                        check = false;
+                        break;
+                    }
+                }
+            }
+            else if(check) worthyPlant = null;
+        }
+        /// <summary>
+        /// Check what water is the best to drink. Check between the closer and safest that the creature knows
+        /// </summary>
         private void UpdateWaterSource()
         {
             if (mem.WaterPositions.Count == 0 && mem.SafeWaterPositions.Count == 0)
@@ -111,7 +162,6 @@ namespace EvolutionSimulation.Entities
                 worthyWaterPosition = null;
                 return;
             }
-            // If the creature is desperate it goes to the closest one
             if (creature.IsVeryThirsty())
             {
                 if (mem.WaterPositions.Count != 0)
@@ -121,28 +171,7 @@ namespace EvolutionSimulation.Entities
                 return;
             }
 
-            // Else it goes to the best option
-            worthyWaterPosition = BestBetweenCloseAndSafe(mem.WaterPositions, mem.SafeWaterPositions, Criteria).position; 
-        }
-        private void UpdatePlant()
-        {
-            if (mem.EdiblePlants.Count == 0 && mem.SafeEdiblePlants.Count == 0)
-            {
-                worthyPlant = null;
-                return;
-            }
-            // If the creature is desperate it goes to the closest one
-            if (creature.IsVeryHungry())
-            {
-                if (mem.EdiblePlants.Count != 0)
-                    worthyPlant = mem.EdiblePlants[0];
-                else
-                    worthyPlant = mem.SafeEdiblePlants[0];
-                return;
-            }
-
-            // Else it goes to the best option
-            worthyPlant = BestBetweenCloseAndSafe(mem.EdiblePlants, mem.SafeEdiblePlants, Criteria);
+            worthyWaterPosition = BestBetweenCloseAndSafe(mem.WaterPositions, mem.SafeWaterPositions, Criteria).position;
         }
         private T BestBetweenCloseAndSafe<T>(List<T> close, List<T> safe, Func<T, T, T> criteria) where T : Resource
         {
@@ -201,9 +230,9 @@ namespace EvolutionSimulation.Entities
                 return AssignEntityInfo(mem.Preys[0], out id, out position);
             return AssignEntityInfo(null, out id, out position);
         }
-        public bool Ally(out int id, out Vector2Int position) 
-        { 
-            if(mem.Allies.Count > 0) 
+        public bool Ally(out int id, out Vector2Int position)
+        {
+            if (mem.Allies.Count > 0)
                 return AssignEntityInfo(mem.Allies[0], out id, out position);
             return AssignEntityInfo(null, out id, out position);
         }
@@ -214,7 +243,7 @@ namespace EvolutionSimulation.Entities
         public Vector2Int SafePosition() { return mem.SafePositions.Count > 0 ? mem.SafePositions[0] : null; }
         public Vector2Int SafeTemperaturePosition() { return mem.SafeTemperaturePositions.Count > 0 ? mem.SafeTemperaturePositions[0] : null; }
         public Vector2Int NewPosition() { return mem.FindNewPosition(); }
-        public int NewExplorePosition() { return mem.NewExplorePosition();  }
+        public int NewExplorePosition() { return mem.NewExplorePosition(); }
 
         private bool AssignEntityInfo(EntityResource ent, out int id, out Vector2Int position)
         {

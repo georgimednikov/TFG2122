@@ -381,18 +381,7 @@ namespace EvolutionSimulation
               System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
         }
 
-        static public void Validate(float similarity)
-        {
-            SimilarityThresholdFunc(similarity);
-        }
-
-        static void SimilarityThresholdFunc(float similarity)
-        {
-            if (similarity < 0 || similarity >= 1)
-                throw new SimilarityThesholdNotValid("The provided similarity species threshold must be a positive number smaller than one to allow reproduction");
-
-            return;
-        }
+       
         #endregion
 
         #region AbilityUnlock
@@ -493,7 +482,7 @@ namespace EvolutionSimulation
 
             ValidateCreatureStats(parameters);
 
-            ValidateTrees(parameters);
+            ValidatePlants(parameters);
 
             ValidateMemory(parameters);
 
@@ -502,6 +491,8 @@ namespace EvolutionSimulation
             ValidateCreatureTransitions(parameters);
 
             ValidateCorpse(parameters);
+
+            ValidateTaxonomy(parameters);
         }
 
         static void ValidateWorld(UniverseParameters parameters) // TODO: REVISAR QUE ESTAN TODOS
@@ -523,13 +514,18 @@ namespace EvolutionSimulation
             if (parameters.maxLimbs <= 0) throw new UniverseParameterIsZeroException("The provided maxLimbs must be positive");
             if (parameters.minRestExpense <= 0) throw new UniverseParameterIsZeroException("The provided minRestExpense must be positive");
             if (parameters.maxRestExpense <= 0) throw new UniverseParameterIsZeroException("The provided maxRestExpense must be positive");
+            if (parameters.maxRestExpense < parameters.minRestExpense) throw new MinMaxValueSwappedException("The maximum amount of rest expense is lower than the minimium");
             if (parameters.resourceAmount <= 0) throw new UniverseParameterIsZeroException("The provided resourceAmount must be positive");
             if (parameters.minLifeSpan <= 0) throw new UniverseParameterIsZeroException("The provided minLifeSpan must be positive");
             if (parameters.exhaustToSleepRatio <= 0) throw new UniverseParameterIsZeroException("The provided exhaustToSleepRatio must be positive");
+            if (parameters.hoursTilExhaustion <= 0) throw new UniverseParameterIsZeroException("The provided hoursTilExhaustion must be positive");
             if (parameters.perceptionWithoutNightVision <= 0) throw new UniverseParameterIsZeroException("The provided perceptionWithoutNightVision must be positive");
             if (parameters.minPerceptionWithNightVision <= 0) throw new UniverseParameterIsZeroException("The provided minPerceptionWithNightVision must be positive");
+            // TODO: "nightPerceptionPenalty": 0.4, hay que ver que era y por que estaba en el jason
             if (parameters.minMobilityMedium <= 0) throw new UniverseParameterIsZeroException("The provided minMobilityMedium must be positive");
             if (parameters.mobilityPenalty <= 0) throw new UniverseParameterIsZeroException("The provided mobilityPenalty must be positive");
+            if (parameters.yearsBetweenHeats <= 0) throw new UniverseParameterIsZeroException("The provided yearsBetweenHeats must be positive");
+            if (parameters.ticksToReproduce <= 0) throw new UniverseParameterIsZeroException("The provided ticksToReproduce must be positive");
             if (parameters.maxSpeed <= 0) throw new UniverseParameterIsZeroException("The provided maxSpeed must be positive");
             if (parameters.hornIntimidationMultiplier <= 0) throw new UniverseParameterIsZeroException("The provided hornIntimidationMultiplier must be positive");
             if (parameters.hairTemperatureMultiplier < 0 || parameters.hairTemperatureMultiplier > 1) throw new UniverseParameterIsZeroException("The provided hairTemperatureMultiplier must be between 0 and 1");
@@ -543,8 +539,8 @@ namespace EvolutionSimulation
             if (parameters.maxTemperatureDifference <= 0) throw new UniverseParameterIsZeroException("The provided maxTemperatureDifference must be positive");
             if (parameters.minHealthTemperatureDamage <= 0) throw new UniverseParameterIsZeroException("The provided minHealthTemperatureDamage must be positive");
             if (parameters.maxHealthTemperatureDamage <= 0) throw new UniverseParameterIsZeroException("The provided maxHealthTemperatureDamage must be positive");
-            if (parameters.hoursTilExhaustion <= 0) throw new UniverseParameterIsZeroException("The provided hoursTilExhaustion must be positive");
-            if (parameters.maxRestExpense < parameters.minRestExpense) throw new MinMaxValueSwappedException("The maximum amount of rest expense is lower than the minimium");
+            if (parameters.maxHealthTemperatureDamage < parameters.minHealthTemperatureDamage) throw new MinMaxValueSwappedException("The maximum amount of temperature damage is lower than the minimium");
+            if (parameters.venomDamageMultiplier <= 0) throw new PercentageOverOneException("The provided venomDamageMultiplier must be positive");
             if (parameters.abilityUnlockPercentage > 1) throw new PercentageOverOneException("The provided abilityUnlockPercentage is over one");
             if (parameters.perceptionWithoutNightVision > 1) throw new PercentageOverOneException("The provided perceptionWithoutNightVision is over one");
             if (parameters.minPerceptionWithNightVision > 1) throw new PercentageOverOneException("The provided minPerceptionWithNightVision is over one");
@@ -562,7 +558,7 @@ namespace EvolutionSimulation
 
         static void ValidateCreatureStats(UniverseParameters parameters)
         {
-            //TODO: MIN PERCEPTION TIENE QUE SER MENOR QUE MAX PERCEPTION Y ESTOY SEGURO DE QUE MÄS VARIABLE NECESITAN ESTA COMPROBACÏÓN
+            //TODO: Hay que ver que de Creature va aqui y viceversa, pues son metodos distintos
 
             if (parameters.newbornStatMultiplier <= 0) throw new UniverseParameterIsZeroException("The provided newbornStatMultiplier must be positive");
             if (parameters.adulthoodThreshold <= 0) throw new UniverseParameterIsZeroException("The provided adulthoodThreshold must be positive");
@@ -586,10 +582,14 @@ namespace EvolutionSimulation
             if (parameters.actionPerceptionPercentage > 1) throw new PercentageOverOneException("The provided actionPerceptionPercentage is over one");
         }
 
-        static void ValidateTrees(UniverseParameters parameters)
+        static void ValidatePlants(UniverseParameters parameters)
         {
             if (parameters.treeMovementPenalty <= 0) throw new UniverseParameterIsZeroException("The provided treeMovementPenalty must be positive");
             if (parameters.treeMovementPenalty > 1) throw new PercentageOverOneException("The provided treeMovementPenalty is over one");
+
+            if(parameters.bushHp <= 0) throw new PercentageOverOneException("The provided bushHp muts be positive");
+            if(parameters.grassHp <= 0) throw new PercentageOverOneException("The provided grassHp muts be positive");
+            if(parameters.eTreeHp <= 0) throw new PercentageOverOneException("The provided eTreeHp muts be positive");
         }
 
         static void ValidateMemory(UniverseParameters parameters)
@@ -611,15 +611,29 @@ namespace EvolutionSimulation
         static void ValidateCreatureTransitions(UniverseParameters parameters)
         {
             if (parameters.fleeingTransitionMultiplier <= 0 || parameters.hidingTransitionMultiplier <= 0 || parameters.stopEatingTransitionEnergyMultiplier <= 0 ||
-                parameters.combatTransitionHealthThresholdMultiplier <= 0 ||
-                parameters.safeTransitionAggressivenessThreshold <= 0 || parameters.experienceMaxAggresivenessMultiplier <= 0 || parameters.safePrefferedOverClosestResourceRatio <= 0)
+                parameters.combatTransitionHealthThresholdMultiplier <= 0 || parameters.safeTransitionAggressivenessThreshold <= 0 || parameters.experienceMaxAggresivenessMultiplier <= 0 || 
+                parameters.safePrefferedOverClosestResourceRatio <= 0)
                 throw new UniverseParameterIsZeroException("The provided transition parameters must be positive");
+            // TODO: "combatTransitionAggressivenessThreshold": 0.5, hay que saber que era y que hacia y por que no estaba en los parameters
+            // TODO: "escapeTransitionAggressivenessThreshold": 0.5, hay que saber que era y que hacia y por que no estaba en los parameters
+            // TODO: "escapeTransitionHealthThresholdMultiplier": 50.0, hay que saber que era y que hacia y por que no estaba en los parameters
         }
 
         static void ValidateCorpse(UniverseParameters parameters)
         {
             if (parameters.rotStartMultiplier <= 0 || parameters.corpseNutritionPointsMultiplier <= 0)
                 throw new UniverseParameterIsZeroException("The provided corpse parameters must be positive");
+        }
+
+        static void ValidateTaxonomy(UniverseParameters parameters)
+        {
+            if (parameters.percentageOfSpeciesToExport <= 0)
+                throw new UniverseParameterIsZeroException("The provided taxonomy parameters species to export must be positive");
+            if (parameters.percentageOfSpeciesToExport > 1)
+                throw new PercentageOverOneException("The provided taxonomy parameters species to export cannot be over 1");
+
+            if (parameters.percentageSimilaritySpecies < 0 || parameters.percentageSimilaritySpecies >= 1)
+                throw new SimilarityThesholdNotValid("The provided similarity species threshold must be a positive number smaller than one to allow reproduction");
         }
         #endregion
     }

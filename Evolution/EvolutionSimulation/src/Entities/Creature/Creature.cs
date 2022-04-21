@@ -19,6 +19,10 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public int ID { get; protected set; }
 
+        /// <summary>
+        /// The tick when the creature is born during the simulation
+        /// </summary>
+        public int bornTick { get; protected set; }
 #if DEBUG
         /// <summary>
         /// Variable used to somewhat accurately determine the cuas eof the creature's death
@@ -45,7 +49,7 @@ namespace EvolutionSimulation.Entities
         {
             this.ID = ID;
             world = w;
-
+            bornTick = world.tick;
             if (chromosome == null)
             {
                 this.chromosome = new CreatureChromosome();
@@ -266,8 +270,6 @@ namespace EvolutionSimulation.Entities
         // Diagram: https://drive.google.com/file/d/1NLF4vdYOvJ5TqmnZLtRkrXJXqiRsnfrx/view?usp=sharing
         private Fsm mfsm;
 
-
-
         /// <summary>
         /// Returns the creature's current state
         /// </summary>
@@ -362,6 +364,8 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToDrink, stopGoToDrinkTransition, wander);
             safeFSM.AddTransition(goToDrink, drinkingTransition, drink);
             safeFSM.AddTransition(drink, stopDrinkingTransition, wander);
+            safeFSM.AddTransition(sleep, drinkingExploreTransition, explore);
+            safeFSM.AddTransition(sleep, thirstyTransition, goToDrink);
 
             // Eating
             ITransition hungerTransition = new HungerTransition(this);
@@ -374,6 +378,8 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(goToEat, stopGoToEatTransition, wander);
             safeFSM.AddTransition(goToEat, eatingTransition, eat);
             safeFSM.AddTransition(eat, stopEatingTransition, wander);
+            safeFSM.AddTransition(sleep, hungerExploreTransition, explore);
+            safeFSM.AddTransition(sleep, hungerTransition, goToEat);
 
             // Mating
             ITransition mateTransition = new GoToMateTransition(this);
@@ -689,7 +695,7 @@ namespace EvolutionSimulation.Entities
 
         #region Mind
         // Memory related information
-        Mind mind;
+        public Mind mind { get; private set; }
 
         /// <summary>
         /// Check if the eating objective is not null
@@ -847,10 +853,12 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void Move(int x, int y, HeightLayer z = HeightLayer.Ground)
         {
+            world.entityMap[this.x, this.y].Remove(this);
             this.x += x;
             this.y += y;
+            world.entityMap[this.x, this.y].Add(this);
             creatureLayer = z;
-            if (!world.isTree(x, y) && z == HeightLayer.Tree)
+            if (!world.IsTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
         }
 
@@ -859,10 +867,12 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public void Place(int x, int y, HeightLayer z = HeightLayer.Ground)
         {
+            world.entityMap[this.x, this.y].Remove(this);
             this.x = x;
             this.y = y;
+            world.entityMap[this.x, this.y].Add(this);
             creatureLayer = z;
-            if (!world.isTree(x, y) && z == HeightLayer.Tree)
+            if (!world.IsTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
         }
 
@@ -887,7 +897,7 @@ namespace EvolutionSimulation.Entities
         }
         public int DistanceToObjective(int ox, int oy)
         {
-            if (!world.checkBounds(ox, oy)) return int.MaxValue;
+            if (!world.CheckBounds(ox, oy)) return int.MaxValue;
             return Math.Max(Math.Abs(ox - x), Math.Abs(oy - y));
         }
 
@@ -919,8 +929,17 @@ namespace EvolutionSimulation.Entities
         /// <returns>The cost for moving to the first position on the path.</returns>
         public int SetPath(int x, int y, HeightLayer z = HeightLayer.Ground)
         {
-            if (!world.canMove(x, y, z)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
+            if (!world.CanMove(x, y, z)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
             if ((stats.AerialSpeed == -1 && z == HeightLayer.Air) || (stats.ArborealSpeed == -1 && z == HeightLayer.Tree)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
+            
+            //If the creature is already in the air, we cannot assert that A* is doable.
+            if(creatureLayer == HeightLayer.Air)
+            {
+                path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));
+                pathIterator = 0;
+                return GetNextCostOnPath();
+            }
+
             path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), finalPos = (new Vector3(x, y, (int)z)), out double treeDensity); // A* to the objective
             int thres = GetFlyThreshold(treeDensity);
             if (thres > 0 && path.Length >= thres)
@@ -967,8 +986,8 @@ namespace EvolutionSimulation.Entities
         /// <returns>Next position or (-1, -1, -1) on path end.</returns>
         public Vector3 GetNextPosOnPath()
         {
-            if (path == null)
-                return new Vector3(-2,-1,-1);
+            //if (path == null)
+            //    return new Vector3(-2,-1,-1);
             if (pathIterator >= path.Length)
             {
                 path = null; return new Vector3(-1, -1, -1);

@@ -56,6 +56,9 @@ namespace EvolutionSimulation.FSM.Creature.States
             creature.Plant(out foodID, out foodPos);
             Entities.EdiblePlant closest = creature.world.GetStaticEntity(foodID) as Entities.EdiblePlant;
             closest.ReceiveInteraction(creature, Entities.Interactions.eat);    // TODO GORDO: ¿Distingue entre plantas ya comidas para no comer aire?
+            //This has to be used because if the plant is eaten and the creature tries to eat again
+            //in the same tick, it will eat just the air
+            creature.mind.UpdatePlant();
         }
 
         /// <summary>

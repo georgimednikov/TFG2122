@@ -19,15 +19,19 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void Action()
         {
             creature.world.Destroy(creature.ID);
-            corpse = creature.world.CreateStaticEntity<Entities.Corpse>(creature.x, creature.y, 50);    // TODO: no poner el hp a pelo
-            corpse.SetTraits(creature);
+            //To avoid create corpses in a water tile
+            if (!creature.world.map[creature.x, creature.y].isWater)
+            {
+                corpse = creature.world.CreateStaticEntity<Entities.Corpse>(creature.x, creature.y, 50);    // TODO: no poner el hp a pelo
+                corpse.SetTraits(creature);
+            }
         }
 
         public override string ToString()
         {
             return "DeadState";
         }
-
+#if DEBUG
         public override string GetInfo()
         {
             string template = creature.speciesName + " with ID " + creature.ID + " DIES; CAUSE OF DEATH: ";
@@ -48,8 +52,12 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 template += creature.causeOfDeath;
             }
-
+            if(corpse == null)
+                return template + "\nCORPSE CANNOT BE CREATED IN: POSITION: (" + creature.x + ", " + creature.y + ") CREATURE ID: " + creature.ID;
+            
             return template + "\nCORPSE CREATED WITH ID: " + corpse.ID + " IN POSITION: (" + creature.x + ", " + creature.y + ")";
+
         }
+#endif
     }
 }

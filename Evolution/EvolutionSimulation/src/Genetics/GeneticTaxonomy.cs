@@ -9,11 +9,13 @@ namespace EvolutionSimulation.Genetics
 {
     public class Species
     {
-        //TODO que tengan un id
+        
         public string name;
         public string progenitor;
         public Creature original;
         public List<Creature> members;
+
+        public int startTick, endTick;
 
         public Species(Creature creature)
         {
@@ -26,7 +28,7 @@ namespace EvolutionSimulation.Genetics
             creature.speciesName = name;
             creature.progenitorSpeciesName = progenitor;
             members = new List<Creature>();
-            members.Add(creature);
+            members.Add(creature);            
         }
     }
 
@@ -61,6 +63,7 @@ namespace EvolutionSimulation.Genetics
         // See RenderSpeciesTree for details about the tree structure
         List<Species> speciesRecord;
 
+        TicksComparer ticksComparator;
 
         /// <summary>
         /// Create the GeneticTaxonomy. SetTaxonomy has to be called
@@ -70,12 +73,13 @@ namespace EvolutionSimulation.Genetics
         {
             existingSpecies = new List<Species>();
             speciesRecord = new List<Species>();
+            ticksComparator = new TicksComparer();
         }
 
 
         static public void SetTaxonomy()
         {
-            SetTaxonomy(UserInfo.GeneSimilarityFile(), UserInfo.SpeciesSimilarityFile());
+            SetTaxonomy(UserInfo.GeneSimilarityFile());
         }
 
 
@@ -83,12 +87,10 @@ namespace EvolutionSimulation.Genetics
         /// Initialized GeneticTaxonomy reading the weights and the genetic similarity threshold from the files named
         /// SimilarityGeneWeight.json and SimilaritySpecies.json that are supposed to be found in the given Data Directory.
         /// </summary>
-        static public void SetTaxonomy(string geneWeightsRaw, string minGenSimilarityRaw)
+        static public void SetTaxonomy(string geneWeightsRaw)
         {
             if (geneWeightsRaw == null)
                 throw new Exception("Cannot find JSON with gene weights to calculate genetic similarities");
-            if (minGenSimilarityRaw == null)
-                throw new Exception("Cannot find JSON with species similarity");
 
             //In tuples to facilitate the modification of the file
             //(the feature name is written instead of a number)
@@ -100,8 +102,8 @@ namespace EvolutionSimulation.Genetics
                 speciesGeneWeights[(int)t.Item1] = t.Item2;
             }
 
-            minGeneticSimilarity = JsonConvert.DeserializeObject<float>(minGenSimilarityRaw);
-            Validator.Validate(minGeneticSimilarity);
+            minGeneticSimilarity = UniverseParametersManager.parameters.percentageSimilaritySpecies;
+
         }
 
 
@@ -126,6 +128,7 @@ namespace EvolutionSimulation.Genetics
             //If the creature belongs to an existing species, it is added to its members
             if (mostSimilarYet != null)
             {
+                if(mostSimilarYet.endTick != creature.bornTick) mostSimilarYet.endTick += creature.bornTick;
                 mostSimilarYet.members.Add(creature);
                 creature.speciesName = mostSimilarYet.name;
                 creature.progenitorSpeciesName = mostSimilarYet.progenitor;
@@ -135,7 +138,7 @@ namespace EvolutionSimulation.Genetics
             //Else a new species is created
             Species newSpecies = new Species(creature);
             existingSpecies.Add(newSpecies);
-
+            newSpecies.startTick = newSpecies.endTick = creature.bornTick;
             //Now the new species is added to the record based on if it has a progenitor species or not
 
             //If the new species is made from scratch, it is simply added to the record
@@ -224,13 +227,14 @@ namespace EvolutionSimulation.Genetics
         /// SpeciesRecord has to be ordered, the progenitor has to be before the species or it will not work
         /// </summary>
         /// <param name="path">path to save in a file the speciesTree</param>
-        public void RenderSpeciesTree(string path)
+        public void RenderSpeciesTree(string path, int tick = 0)
         {
             StreamWriter writer = new StreamWriter(path);
             //runs through all species 
             for (int i = 0; i < speciesRecord.Count; ++i)
             {
-                i = RenderSpeciesTree(speciesRecord[i].name, 0, i, writer);
+                if (speciesRecord[i].endTick == speciesRecord[i].startTick) speciesRecord[i].endTick = tick;
+                i = RenderSpeciesTree(speciesRecord[i].name, 0, i, writer,speciesRecord[i].startTick, speciesRecord[i].endTick);
             }
             writer.Close();
         }
@@ -267,9 +271,9 @@ namespace EvolutionSimulation.Genetics
         /// <param name="index"> index in the list </param>
         /// <param name="writer"> where to save the tree</param>
         /// <returns> Returns index to not check again the same species</returns>
-        private int RenderSpeciesTree(string name, int lvl, int index, StreamWriter writer)
+        private int RenderSpeciesTree(string name, int lvl, int index, StreamWriter writer, int bornTick, int lastTick)
         {
-            SaveTree(name, lvl, writer);
+            SaveTree(name, lvl, writer, bornTick, lastTick);
 
             // Stop condition, end of the species
             if (index >= speciesRecord.Count - 1) return index;
@@ -277,10 +281,10 @@ namespace EvolutionSimulation.Genetics
 
             // child
             if (speciesRecord[index + 1].progenitor == name)
-                index = RenderSpeciesTree(speciesRecord[index + 1].name, ++lvl, ++index, writer);
+                index = RenderSpeciesTree(speciesRecord[index + 1].name, ++lvl, ++index, writer, speciesRecord[index + 1].startTick, speciesRecord[index + 1].endTick);
             // sibling without childs between them
             else if (speciesRecord[index + 1].progenitor == speciesRecord[index].progenitor && speciesRecord[index].progenitor != "None")
-                index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl, ++index, writer);
+                index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl, ++index, writer, speciesRecord[index + 1].startTick, speciesRecord[index + 1].endTick);
             // sibling with childs between them
             else if (speciesRecord[index + 1].progenitor != "None")
             {
@@ -295,7 +299,7 @@ namespace EvolutionSimulation.Genetics
                         cont--;
                 }
                 if (siblings)
-                    index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl - (index - cont), ++index, writer);
+                    index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl - (index - cont), ++index, writer, speciesRecord[index + 1].startTick, speciesRecord[index + 1].endTick);
             }
             return index;
         }
@@ -306,7 +310,7 @@ namespace EvolutionSimulation.Genetics
         /// <param name="name">Name of the species </param>
         /// <param name="lvl">Number of progenitors that the species has</param>
         /// <param name="writer">Where to save the tree</param>
-        private void SaveTree(string name, int lvl, StreamWriter writer)
+        private void SaveTree(string name, int lvl, StreamWriter writer, int bornTick, int lastTick)
         {
             if (lvl != 0)
             {
@@ -314,11 +318,11 @@ namespace EvolutionSimulation.Genetics
                 {
                     writer.Write("│" + "".PadLeft(4));
                 }
-                writer.WriteLine("└───" + name);
+                writer.WriteLine("└───" + name + "".PadLeft(4) + "First born tick: " + bornTick + "".PadLeft(4) + "Last born tick: " + lastTick);
             }
             else
             {
-                writer.WriteLine("├───" + name);
+                writer.WriteLine("├───" + name + "".PadLeft(4) + "First born tick: " + bornTick + "".PadLeft(4) + "Last born tick: " + lastTick);
             }
         }
 
@@ -335,5 +339,45 @@ namespace EvolutionSimulation.Genetics
                 File.WriteAllText(UserInfo.ExportDirectory + "Species_" + i + ".json", species);
             }
         }
+
+
+        /// <summary>
+        /// Exports the species that has live more time as JSONs in the folder "ResultingSpecies" named "SpeciesN"
+        /// being n the order of writing. This method is called when an apocalysis ocurs
+        /// </summary>
+        /// <param name="cont"> Number of apocalysis</param>
+        public void ExportSpecies(int cont)
+        {
+            speciesRecord.Sort(ticksComparator);
+            float numExport = speciesRecord.Count * UniverseParametersManager.parameters.percentageOfSpeciesToExport;
+            for (int i = 0; i < UserInfo.Species || i < numExport; i++)
+            {
+                Species sp = speciesRecord[i];
+                SpeciesExport export = new SpeciesExport(sp.name, sp.original.stats);
+                string species = JsonConvert.SerializeObject(export, Formatting.Indented);
+                File.WriteAllText(UserInfo.ExportDirectory + "/Apocalypse" + cont + "Species_" + i + ".json", species);
+            }
+
+            speciesRecord.Clear();
+            existingSpecies.Clear();
+        }
+
+        /// <summary>
+        /// Given a list of edible plants, these are ordered based on distance from it. The shortest goes first.
+        /// </summary>
+        private class TicksComparer : Comparer<Species>
+        {
+            
+            public TicksComparer() {}
+
+            public override int Compare(Species a, Species b)
+            {
+                return (b.endTick - b.startTick).CompareTo(a.endTick - a.startTick);
+            }
+        }
+
     }
+
 }
+
+
