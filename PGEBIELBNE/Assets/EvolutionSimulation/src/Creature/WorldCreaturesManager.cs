@@ -31,7 +31,12 @@ namespace UnitySimulation
             for (int i = 0; i < l.Count; ++i)
             {
                 Creature c = info.GetCreature(l[i]);
-                if (info.map[c.x, c.y].isWater) Debug.Log("In water");
+                if (info.map[c.x, c.y].isWater)
+                    Debug.Log("In water. CriatureID " + c.ID + ". pos: (" + c.x + " " + c.y + ")");
+                else if(_creatures.ContainsKey(c.ID))
+                    Debug.Log("CriatureID " + c.ID + ". pos: (" + c.x + ", " + c.y + ")\n Real pos: " + _creatures[c.ID].transform.position);
+                else 
+                    Debug.Log("CriatureID " + c.ID + ". pos: (" + c.x + ", " + c.y + ")");
             }
             CheckCreatures(info, l);
         }
@@ -40,15 +45,8 @@ namespace UnitySimulation
         {
             //Check if a creature has died
             List<int> keys = new List<int>(_creatures.Keys);
-            //foreach (int c in keys)
-            //{
-            //    if (w.GetCreature(c) == null)
-            //    {
-            //        Destroy(_creatures[c]);
-            //        _creatures.Remove(c);
-            //    }
-            //}
-            for (int i = 0; i < _creatures.Count;++i)
+
+            for (int i = 0; i < _creatures.Count; ++i)
             {
                 int c = keys[i];
                 if (w.GetCreature(c) == null)
@@ -56,7 +54,6 @@ namespace UnitySimulation
                     Destroy(_creatures[c]);
                     _creatures.Remove(c);
                 }
-               
             }
 
             // Check if a new creature has been born
@@ -82,6 +79,7 @@ namespace UnitySimulation
             Physics.Raycast(new Vector3(c.x * terrain.terrainData.size.x / c.world.map.GetLength(0), terrain.terrainData.size.y + 10, c.y * terrain.terrainData.size.z / c.world.map.GetLength(1)), Vector3.down, out hit, Mathf.Infinity, LayerMask.GetMask("World"));
             GameObject gO = Instantiate(creaturePrefab, new Vector3(hit.point.x, hit.point.y, hit.point.z), Quaternion.identity);
             gO.GetComponent<CreatureManager>().InitalizeCreature(c);
+            gO.name = c.speciesName + " " + c.ID;
             // Subscribes to the event launched when a creature receives an interaction
             c.ReceiveInteractionEvent += ReceiveInteractionListener;
             return gO;
@@ -92,7 +90,7 @@ namespace UnitySimulation
         /// <param name="type">Which interaction was sent</param>
         void ReceiveInteractionListener(Creature receiver, Creature sender, Interactions type)
         {
-            if(type == Interactions.attack)
+            if (type == Interactions.attack)
             {
                 _creatures[receiver.ID].GetComponent<CreatureEffects>().Bite();
             }
@@ -117,9 +115,9 @@ namespace UnitySimulation
                 case Creature.HeightLayer.Ground:
                     nextPos.y = terrain.SampleHeight(nextPos);
                     break;
-            }      
+            }
             gO.GetComponent<CreatureLerpPosition>().LerpToPosition(nextPos);
-            
+
             // State visualization
             string state = c.GetState();
             gO.GetComponent<CreatureManager>().statusBar.GetComponent<StatusBar>().SetStatus(state);

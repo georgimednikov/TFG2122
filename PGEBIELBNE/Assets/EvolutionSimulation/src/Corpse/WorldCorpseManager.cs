@@ -30,9 +30,12 @@ public class WorldCorpseManager : MonoBehaviour, IListener<World>
         //Debug.Log("WorldCorpses: " + corpses.Count);
 
         // Check if a corpse has despawned
-        foreach (int c in _corpses.Keys)
+        List<int> keys = new List<int>(_corpses.Keys);
+
+        for (int i = 0; i < _corpses.Count; ++i)
         {
-            if(w.GetStaticEntity(c) == null)
+            int c = keys[i];
+            if (w.GetStaticEntity(c) == null)
             {
                 Destroy(_corpses[c]);
                 _corpses.Remove(c);
