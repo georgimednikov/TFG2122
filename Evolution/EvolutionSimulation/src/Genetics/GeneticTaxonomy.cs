@@ -128,7 +128,6 @@ namespace EvolutionSimulation.Genetics
             //If the creature belongs to an existing species, it is added to its members
             if (mostSimilarYet != null)
             {
-                if(mostSimilarYet.endTick != creature.bornTick) mostSimilarYet.endTick += creature.bornTick;
                 mostSimilarYet.members.Add(creature);
                 creature.speciesName = mostSimilarYet.name;
                 creature.progenitorSpeciesName = mostSimilarYet.progenitor;
@@ -138,7 +137,7 @@ namespace EvolutionSimulation.Genetics
             //Else a new species is created
             Species newSpecies = new Species(creature);
             existingSpecies.Add(newSpecies);
-            newSpecies.startTick = newSpecies.endTick = creature.bornTick;
+            newSpecies.startTick = newSpecies.endTick = creature.world.tick;
             //Now the new species is added to the record based on if it has a progenitor species or not
 
             //If the new species is made from scratch, it is simply added to the record
@@ -164,7 +163,12 @@ namespace EvolutionSimulation.Genetics
                 }
             }
             if (i == speciesRecord.Count)
-                throw new Exception("There is a discrepancy between the new  species' progenitor name and the existing species' names");
+            {
+                if(found)//in case the species was the last 
+                    speciesRecord.Insert(i, newSpecies);
+                else
+                    throw new Exception("There is a discrepancy between the new  species' progenitor name and the existing species' names");
+            }
         }
 
         /// <summary>
@@ -182,6 +186,8 @@ namespace EvolutionSimulation.Genetics
                     if (sp.members.Count == 0)
                     {
                         existingSpecies.Remove(sp);
+                        int index = speciesRecord.FindIndex(x => x.name == sp.name);
+                        speciesRecord[index].endTick = creature.world.tick;
                     }
                     return;
                 }
@@ -233,8 +239,7 @@ namespace EvolutionSimulation.Genetics
             //runs through all species 
             for (int i = 0; i < speciesRecord.Count; ++i)
             {
-                if (speciesRecord[i].endTick == speciesRecord[i].startTick) speciesRecord[i].endTick = tick;
-                i = RenderSpeciesTree(speciesRecord[i].name, 0, i, writer,speciesRecord[i].startTick, speciesRecord[i].endTick);
+                i = RenderSpeciesTree(speciesRecord[i].name, 0, speciesRecord[i].startTick, speciesRecord[i].endTick, i, writer);
             }
             writer.Close();
         }
@@ -271,7 +276,7 @@ namespace EvolutionSimulation.Genetics
         /// <param name="index"> index in the list </param>
         /// <param name="writer"> where to save the tree</param>
         /// <returns> Returns index to not check again the same species</returns>
-        private int RenderSpeciesTree(string name, int lvl, int index, StreamWriter writer, int bornTick, int lastTick)
+        private int RenderSpeciesTree(string name, int lvl, int bornTick, int lastTick, int index, StreamWriter writer)
         {
             SaveTree(name, lvl, writer, bornTick, lastTick);
 
@@ -281,10 +286,10 @@ namespace EvolutionSimulation.Genetics
 
             // child
             if (speciesRecord[index + 1].progenitor == name)
-                index = RenderSpeciesTree(speciesRecord[index + 1].name, ++lvl, ++index, writer, speciesRecord[index + 1].startTick, speciesRecord[index + 1].endTick);
+                index = RenderSpeciesTree(speciesRecord[index + 1].name, ++lvl, speciesRecord[index + 1].startTick, speciesRecord[index + 1].endTick, ++index, writer);
             // sibling without childs between them
             else if (speciesRecord[index + 1].progenitor == speciesRecord[index].progenitor && speciesRecord[index].progenitor != "None")
-                index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl, ++index, writer, speciesRecord[index + 1].startTick, speciesRecord[index + 1].endTick);
+                index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl, speciesRecord[index + 1].startTick, speciesRecord[index + 1].endTick, ++index, writer);
             // sibling with childs between them
             else if (speciesRecord[index + 1].progenitor != "None")
             {
@@ -299,7 +304,7 @@ namespace EvolutionSimulation.Genetics
                         cont--;
                 }
                 if (siblings)
-                    index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl - (index - cont), ++index, writer, speciesRecord[index + 1].startTick, speciesRecord[index + 1].endTick);
+                    index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl - (index - cont), speciesRecord[index + 1].startTick, speciesRecord[index + 1].endTick, ++index, writer);
             }
             return index;
         }
@@ -318,11 +323,11 @@ namespace EvolutionSimulation.Genetics
                 {
                     writer.Write("│" + "".PadLeft(4));
                 }
-                writer.WriteLine("└───" + name + "".PadLeft(4) + "First born tick: " + bornTick + "".PadLeft(4) + "Last born tick: " + lastTick);
+                writer.WriteLine("└───" + name + "".PadLeft(4) + "First born tick: " + bornTick + "".PadLeft(4) + "Last alive tick: " + lastTick);
             }
             else
             {
-                writer.WriteLine("├───" + name + "".PadLeft(4) + "First born tick: " + bornTick + "".PadLeft(4) + "Last born tick: " + lastTick);
+                writer.WriteLine("├───" + name + "".PadLeft(4) + "First born tick: " + bornTick + "".PadLeft(4) + "Last alive tick: " + lastTick);
             }
         }
 

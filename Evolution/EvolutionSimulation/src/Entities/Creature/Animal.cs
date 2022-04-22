@@ -67,7 +67,7 @@ namespace EvolutionSimulation.Entities
                 stats.ArborealSpeed = Math.Max((int)((stats.AerialSpeed * mobilityPenalty) - (chromosome.GetFeaturePercentage(CreatureFeature.Size) * stats.MaxSpeed) / 2f), 0);
                 stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
             }
-            if (arboreal)
+            if (stats.TreeReach)//TODO igual es arboreal, pero no estoy seguro
             {
                 stats.ArborealSpeed = Math.Max((int)((speed * (minMobilityMedium + (1 - minMobilityMedium) * chromosome.GetFeaturePercentage(CreatureFeature.Arboreal))) - (chromosome.GetFeaturePercentage(CreatureFeature.Size) * stats.MaxSpeed) / 2f), 0);
                 stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
