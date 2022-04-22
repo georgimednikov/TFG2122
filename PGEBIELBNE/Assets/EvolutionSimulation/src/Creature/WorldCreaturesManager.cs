@@ -38,14 +38,25 @@ namespace UnitySimulation
 
         void CheckCreatures(World w, List<int> creatures)
         {
-            // Check if a creature has died
-            foreach (int c in _creatures.Keys)
+            //Check if a creature has died
+            List<int> keys = new List<int>(_creatures.Keys);
+            //foreach (int c in keys)
+            //{
+            //    if (w.GetCreature(c) == null)
+            //    {
+            //        Destroy(_creatures[c]);
+            //        _creatures.Remove(c);
+            //    }
+            //}
+            for (int i = 0; i < _creatures.Count;++i)
             {
+                int c = keys[i];
                 if (w.GetCreature(c) == null)
                 {
                     Destroy(_creatures[c]);
                     _creatures.Remove(c);
                 }
+               
             }
 
             // Check if a new creature has been born
@@ -68,7 +79,7 @@ namespace UnitySimulation
         {
             RaycastHit hit;
             // Position in Y axis + 10 (no specific reason for that number) => No point in the world will be higher.  
-            Physics.Raycast(new Vector3(c.x, terrain.terrainData.size.y + 10, c.y), Vector3.down, out hit, Mathf.Infinity, LayerMask.GetMask("World"));
+            Physics.Raycast(new Vector3(c.x * terrain.terrainData.size.x / c.world.map.GetLength(0), terrain.terrainData.size.y + 10, c.y * terrain.terrainData.size.z / c.world.map.GetLength(1)), Vector3.down, out hit, Mathf.Infinity, LayerMask.GetMask("World"));
             GameObject gO = Instantiate(creaturePrefab, new Vector3(hit.point.x, hit.point.y, hit.point.z), Quaternion.identity);
             gO.GetComponent<CreatureManager>().InitalizeCreature(c);
             // Subscribes to the event launched when a creature receives an interaction
@@ -90,7 +101,8 @@ namespace UnitySimulation
         void UpdateCreature(Creature c, GameObject gO)
         {
             // Position
-            Vector3 nextPos = new Vector3(c.x, 0, c.y);
+            //Vector3 nextPos = new Vector3(c.x, 0, c.y);
+            Vector3 nextPos = new Vector3(c.x * terrain.terrainData.size.x / c.world.map.GetLength(0), 0, c.y * terrain.terrainData.size.z / c.world.map.GetLength(1));
             //Debug.Log("NextPos: " + nextPos);
             //Debug.Log("Layer " + c.creatureLayer);
             //Debug.Log(c.GetStateInfo());
