@@ -19,10 +19,6 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public int ID { get; protected set; }
 
-        /// <summary>
-        /// The tick when the creature is born during the simulation
-        /// </summary>
-        public int bornTick { get; protected set; }
 #if DEBUG
         /// <summary>
         /// Variable used to somewhat accurately determine the cuas eof the creature's death
@@ -49,7 +45,6 @@ namespace EvolutionSimulation.Entities
         {
             this.ID = ID;
             world = w;
-            bornTick = world.tick;
             if (chromosome == null)
             {
                 this.chromosome = new CreatureChromosome();
