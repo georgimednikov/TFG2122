@@ -44,7 +44,7 @@ namespace VisualizadorConsola
 
             System.Timers.Timer timer = new System.Timers.Timer(5000);
             // TODO: Se puede hacer que sea el propio tracker el que haga el flush automatico cada x tiempo
-            timer.Elapsed += (o, args) => { Tracker.Instance.Track(new SimulationSample(i, world.Creatures.Count)); };
+            timer.Elapsed += (o, args) => { Tracker.Instance.Flush(); };
             timer.AutoReset = true;
             timer.Start();
             for (; i <= ticks; i++)
