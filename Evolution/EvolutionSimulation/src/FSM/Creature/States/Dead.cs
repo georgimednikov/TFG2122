@@ -24,6 +24,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 corpse = creature.world.CreateStaticEntity<Entities.Corpse>(creature.x, creature.y, 50);    // TODO: no poner el hp a pelo
                 corpse.SetTraits(creature);
+                corpse.AddToUpdateList();
             }
         }
 

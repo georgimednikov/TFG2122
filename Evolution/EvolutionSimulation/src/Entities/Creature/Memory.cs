@@ -665,7 +665,7 @@ namespace EvolutionSimulation.Entities
                 int x1, y1;
                 x1 = Math.Abs(x - p.position.x);
                 y1 = Math.Abs(y - p.position.y);
-                int dist = (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2));
+                int dist = (int)Math.Sqrt(Math.Pow(x1, 2) + Math.Pow(y1, 2)); //TODO: 14.23% CPU
 
                 if (dist <= dangerRadius)
                     danger += p.Danger() / (float)Math.Pow(2, dist);

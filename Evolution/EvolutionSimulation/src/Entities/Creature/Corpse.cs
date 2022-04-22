@@ -106,10 +106,18 @@ namespace EvolutionSimulation.Entities
             lifeTime--;
             Edible = lifeTime > putridTime;
 
-            if (lifeTime <= 0 || curHp <= 0)
+            if (lifeTime <= 0 || curHp <= 0) 
+            {
                 world.Destroy(this.ID);
+                return true;
+            }
             //else Console.WriteLine("Ticks to corpse disappearance: " + lifeTime);
-            return true;
+            return false;
+        }
+
+        public void AddToUpdateList()
+        {
+            world.StaticEntitiesToUpdate.Add(this);
         }
 
         // Copse state: it is edible until it starts putrefying

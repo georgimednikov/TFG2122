@@ -34,7 +34,7 @@ namespace VisualizadorConsola
             DateTime time = DateTime.Now;
             int ticks = world.YearToTick(UserInfo.Years);
             int i = 1;
-            int apocalypsisCont = 0, lastNum = world.Creatures.Count, births = 0;
+            int apocalypsisCont = 0, lastNum = world.Creatures.Count, births = 0, birthCur = 0;
             for (; i <= ticks; i++)
             {
                 if (!world.Tick(i) )
@@ -42,19 +42,20 @@ namespace VisualizadorConsola
                     ApocalypseExport(apocalypsisCont++);
                     Console.WriteLine("APOCALYPSIS: Generating new set of creatures");
                     CreateCreatures();
+                    birthCur = 0;
                     lastNum = world.Creatures.Count;
                 };
 
-                if (lastNum < world.Creatures.Count) births += world.Creatures.Count - lastNum;
+                if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
                 lastNum = world.Creatures.Count;
-                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} Apocalipsis: {3} Births: {4}", i, world.Creatures.Count, ticks, apocalypsisCont, births);
+                Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
                 //Render();
                 //Thread.Sleep(1000);
                 if (i % YearTicks == 0)
                     Console.WriteLine("A Year has passed");
             }
             DateTime time2 = DateTime.Now;
-            Console.Write("Estimated Time for "+ UserInfo.Years + " years will be: " + ((time2-time).TotalMilliseconds/(i-1) * world.YearToTick(UserInfo.Years))/360000/24 + " days.\n");
+            Console.Write("Estimated Time for "+ UserInfo.Years + " years will be: " + ((time2-time).TotalMilliseconds/(i-1) * world.YearToTick(UserInfo.Years))/360000 + " hours. " + (time2 - time) + "\n");
             Console.Write("Simulation ended, ticks elapsed: " + i + "\n");
         }
 

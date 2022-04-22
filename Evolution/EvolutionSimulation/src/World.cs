@@ -588,30 +588,21 @@ namespace EvolutionSimulation
             if (!Creatures.ContainsKey(cID)) return results;
 
             Creature c = Creatures[cID];
-            foreach (Creature e in Creatures.Values)
+            for (int i = c.x - radius; i < c.x + radius; i++)
             {
-                if (cID == e.ID) continue;
-                if (Math.Abs(e.x - c.x) <= radius && Math.Abs(e.y - c.y) <= radius)// Square vision
+                if (i < 0 || i >= map.GetLength(0)) continue;
+                for (int j = c.y - radius; j < c.y + radius; j++)
                 {
-                    if (c.speciesName == e.speciesName)
+                    if (j < 0 || j >= map.GetLength(1)) continue;
+
+                    for (int k = 0; k < entityMap[i, j].Count; k++)
                     {
-                        results.Add(e);
-                        continue;
+                        if (entityMap[i, j][k] is Creature)
+                            results.Add(entityMap[i, j][k] as Creature);
                     }
-                    float perception = c.stats.Perception / (float)c.stats.MaxPerception;
-                    float camouflage = e.stats.Camouflage / (float)e.chromosome.GetFeatureMax(CreatureFeature.Camouflage);
-                    // Perceive the creature if your perception percentage is greater than him camouflage percentage
-                    if (perception > camouflage)
-                        results.Add(e);
-                    //TODO queremos que haya una probabilidad de que perciba al otro aunque tenga el camuflaje mayor?
-                    //else
-                    //{   //a probability to perceive the other creature
-                    //    int randMax = (int)((camouflage - perception) * 100);
-                    //    if(RandomGenerator.Next(100) > randMax)
-                    //        results.Add(e);
-                    //}
                 }
             }
+
             return results;
         }
 
