@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Visualizador", "Visualizado
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VisualizadorConsola", "VisualizadorConsola\VisualizadorConsola.csproj", "{B435656D-591D-4AC4-A78C-386F8D888BD3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Telemetry", "Telemetry\Telemetry.csproj", "{8077CCE0-5EC8-4389-9A16-06104875D005}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,6 +32,10 @@ Global
 		{B435656D-591D-4AC4-A78C-386F8D888BD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B435656D-591D-4AC4-A78C-386F8D888BD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B435656D-591D-4AC4-A78C-386F8D888BD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8077CCE0-5EC8-4389-9A16-06104875D005}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8077CCE0-5EC8-4389-9A16-06104875D005}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8077CCE0-5EC8-4389-9A16-06104875D005}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8077CCE0-5EC8-4389-9A16-06104875D005}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

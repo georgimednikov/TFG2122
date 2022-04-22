@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Telemetry.Events
+﻿namespace Telemetry.Events
 {
     public class SessionStart : TrackerEvent
     {

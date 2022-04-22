@@ -7,6 +7,8 @@ using System.Threading;
 using EvolutionSimulation;
 using EvolutionSimulation.Entities;
 using EvolutionSimulation.Genetics;
+using Telemetry;
+using Telemetry.Events;
 
 namespace VisualizadorConsola
 {
@@ -20,12 +22,16 @@ namespace VisualizadorConsola
             base.Init(years, species, individuals, dataDir, exportDir);
             WorldToBmp();
             Console.WriteLine("Simulation Init done");
+            Tracker.Instance.Init();
+            Tracker.Instance.Track(new SessionStart());
         }
 
         override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string highMap = null, string exportDir = null)
         {
             base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, highMap, exportDir);
             Console.WriteLine("Simulation Init done");
+            Tracker.Instance.Init();
+            Tracker.Instance.Track(new SessionStart());
         }
 
         override public void Run()
@@ -35,9 +41,15 @@ namespace VisualizadorConsola
             int ticks = world.YearToTick(UserInfo.Years);
             int i = 1;
             int apocalypsisCont = 0;
+
+            System.Timers.Timer timer = new System.Timers.Timer(5000);
+            // TODO: Se puede hacer que sea el propio tracker el que haga el flush automatico cada x tiempo
+            timer.Elapsed += (o, args) => { Tracker.Instance.Track(new SimulationSample(i, world.Creatures.Count)); };
+            timer.AutoReset = true;
+            timer.Start();
             for (; i <= ticks; i++)
             {
-                if (!world.Tick(i) )
+                if (!world.Tick(i))
                 {
                     ApocalypseExport(apocalypsisCont++);
                     Console.WriteLine("APOCALYPSIS: Generating new set of creatures");
@@ -45,14 +57,20 @@ namespace VisualizadorConsola
                 };
 
                 Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
+                if (i % 10 == 0) 
+                    Tracker.Instance.Track(new SimulationSample(i, world.Creatures.Count));
                 //Render();
                 //Thread.Sleep(1000);
                 if (i % YearTicks == 0)
                     Console.WriteLine("A Year has passed");
             }
+            timer.Stop();
+            timer.Dispose();
             DateTime time2 = DateTime.Now;
             Console.Write("Estimated Time for "+ UserInfo.Years + " years will be: " + ((time2-time).TotalMilliseconds/(i-1) * world.YearToTick(UserInfo.Years))/360000/24 + " days.\n");
             Console.Write("Simulation ended, ticks elapsed: " + i + "\n");
+            Tracker.Instance.Track(new SessionEnd());
+            Tracker.Instance.Flush();
         }
 
         override public void Export()

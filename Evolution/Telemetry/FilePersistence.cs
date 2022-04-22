@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.IO;
 
 namespace Telemetry
@@ -15,7 +13,10 @@ namespace Telemetry
         
         public void Send(TrackerEvent tEvent)
         {
-            eventQueue.Enqueue(tEvent);
+            lock (eventQueue)
+            {
+                eventQueue.Enqueue(tEvent);
+            }
         }
 
         public void Flush()
@@ -23,12 +24,15 @@ namespace Telemetry
             if (!Directory.Exists("Output"))
                 Directory.CreateDirectory("Output");
 
-            using (StreamWriter writer = new StreamWriter($"Output/{Tracker.Instance.SessionID}.json"))
+            using (StreamWriter writer = File.AppendText($"Output/{Tracker.Instance.SessionID}.json"))
             {
-                while(eventQueue.Count > 0)
+                lock (eventQueue)
                 {
-                    TrackerEvent tEvent = eventQueue.Dequeue();
-                    writer.WriteLine(serializer.Serialize(tEvent));
+                    while (eventQueue.Count > 0)
+                    {
+                        TrackerEvent tEvent = eventQueue.Dequeue();
+                        writer.WriteLine(serializer.Serialize(tEvent));
+                    }
                 }
             }
         }
