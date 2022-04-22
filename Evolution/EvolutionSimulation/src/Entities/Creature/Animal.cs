@@ -99,8 +99,7 @@ namespace EvolutionSimulation.Entities
             double tempInRange = chromosome.GetFeature(CreatureFeature.TemperatureRange) / maxRangeTemperature;
             stats.MinTemperature = stats.IdealTemperature - tempInRange;
             stats.MaxTemperature = stats.IdealTemperature + tempInRange;
-            if (stats.IdealTemperature > 0.5)
-                Console.WriteLine("Me renta la temperatura");
+
             //int ones = 0;
             //foreach (bool num in chromosome.GetChromosome())
             //    if (num) ones++;
@@ -201,7 +200,6 @@ namespace EvolutionSimulation.Entities
             //Horns. Increase damage and intimidation
             if (chromosome.HasAbility(CreatureFeature.Horns, CreatureChromosome.AbilityUnlock[CreatureFeature.Horns]))
             {
-
                 int hornsValue = chromosome.GetFeature(CreatureFeature.Horns);
                 stats.Damage += hornsValue;
                 intimidation += hornsValue * UniverseParametersManager.parameters.hornIntimidationMultiplier;

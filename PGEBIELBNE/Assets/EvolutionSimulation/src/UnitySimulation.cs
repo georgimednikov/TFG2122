@@ -9,6 +9,7 @@ namespace UnitySimulation
 {
     public class UnitySimulation : Simulation, ISubject<World> 
     {
+
         public override void Init(int years, int species, int individuals, string dataDir, string exportDir)
         {
             base.Init(years, species, individuals, dataDir, exportDir);
@@ -16,13 +17,12 @@ namespace UnitySimulation
             generateWorld.MapGen();
         }
 
-        public override void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string minSimilarityFile = null, string worldFile = null, string highMap = null, string exportDir = null)
+        public override void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string highMap = null, string exportDir = null)
         {
-            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, minSimilarityFile, worldFile, highMap, exportDir);
+            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, highMap, exportDir);
             generateWorld.SetWorld(world);
             generateWorld.MapGen();
         }
-
         /// <summary>
         /// Performs a step of the simulation
         /// </summary>

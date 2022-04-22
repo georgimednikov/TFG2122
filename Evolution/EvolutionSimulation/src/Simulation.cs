@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using EvolutionSimulation.Entities;
-
+using System.IO;
 namespace EvolutionSimulation
 {
     /// <summary>
@@ -37,7 +37,7 @@ namespace EvolutionSimulation
             }
             else
             {
-                WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
+                WorldGenConfig config = new WorldGenConfig(World.MapType.Atoll)
                 {
                     mapSize = 512
                 };
@@ -83,7 +83,7 @@ namespace EvolutionSimulation
 
                 world.Init(config);
             }
-
+            UserInfo.Size = world.map.GetLength(0);
             CreateCreatures();
         }
 

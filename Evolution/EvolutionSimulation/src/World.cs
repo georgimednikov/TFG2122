@@ -145,6 +145,7 @@ namespace EvolutionSimulation
             highMap = JsonConvert.DeserializeObject<List<MapRegion>>(regionMap);
             config.regionMap = highMap;
             Validator.Validate(config);
+            
 
             ticksHour = UniverseParametersManager.parameters.ticksPerHour;
             hoursDay = UniverseParametersManager.parameters.hoursPerDay;
@@ -153,6 +154,14 @@ namespace EvolutionSimulation
             night = UniverseParametersManager.parameters.nightStart;
 
             mapSize = map.GetLength(0);
+            entityMap = new List<IEntity>[mapSize, mapSize];
+            for (int yIndex = 0; yIndex < mapSize; yIndex++)
+            {
+                for (int xIndex = 0; xIndex < mapSize; xIndex++)
+                {
+                    entityMap[xIndex, yIndex] = new List<IEntity>();
+                }
+            }
             taxonomy = new GeneticTaxonomy();
             Creatures = new Dictionary<int, Creature>();
             metabolismComparer = new Utils.SortByMetabolism();
@@ -434,7 +443,7 @@ namespace EvolutionSimulation
         /// Performs a step of the simulation.
         /// </summary>
         /// <returns>True if ther are any remaining creatures</returns>
-        public bool Tick(int tick)
+        public bool Tick(int tick = 0)
         {
             this.tick = tick;
             CycleDayNight();
@@ -462,7 +471,7 @@ namespace EvolutionSimulation
         public T CreateCreature<T>(int x, int y, CreatureChromosome chromosome = null, string name = "None", int fatherID = -1, int motherID = -1) where T : Creature, new()
         {
             T ent = new T();
-            
+
             ent.Init(entitiesID, this, x, y, chromosome, name, fatherID, motherID);
             // Progenitors start being adults and a half is male and the other half female
             if (fatherID == -1)
@@ -521,7 +530,7 @@ namespace EvolutionSimulation
 
             entityMap[ent.x, ent.y].Remove(ent);
             entitiesToDelete.Add(entityID);
-            
+
         }
 
         /// <summary>
@@ -626,7 +635,7 @@ namespace EvolutionSimulation
                 if (i < 0 || i >= map.GetLength(0)) continue;
                 for (int j = c.y - radius; j < c.y + radius; j++)
                 {
-                    if ( j < 0 || j >= map.GetLength(1) ) continue;
+                    if (j < 0 || j >= map.GetLength(1)) continue;
                     if (map[i, j].plant != null)
                         results.Add(map[i, j].plant);
 
@@ -980,7 +989,7 @@ namespace EvolutionSimulation
         /// <param name="cont"></param>
         public void ApocalypseExportContent(int cont)
         {
-            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory +"/Apocalyse" + cont + "Tree.txt", tick);            
+            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + "/Apocalyse" + cont + "Tree.txt", tick);
             taxonomy.ExportSpecies(cont);
         }
 

@@ -18,13 +18,13 @@ namespace VisualizadorConsola
         override public void Init(int years, int species, int individuals, string dataDir, string exportDir)
         {
             base.Init(years, species, individuals, dataDir, exportDir);
-            //WorldToBmp();
+            WorldToBmp();
             Console.WriteLine("Simulation Init done");
         }
 
         override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string highMap = null, string exportDir = null)
         {
-            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, exportDir);
+            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, highMap, exportDir);
             Console.WriteLine("Simulation Init done");
         }
 

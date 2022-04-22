@@ -19,7 +19,6 @@ namespace UnitySimulation
         public TextAsset Chromosome;
         public TextAsset AbilityUnlocks;
         public TextAsset GeneSimilarity;
-        public TextAsset SpeciesSimilarity;
         public TextAsset WorldMap;
         public TextAsset RegionMap;
 
@@ -50,7 +49,6 @@ namespace UnitySimulation
             string chromosomeFileRaw = Chromosome == null ? null : Chromosome.text;
             string abilitiesFileRaw = AbilityUnlocks == null ? null : AbilityUnlocks.text;
             string geneFileRaw = GeneSimilarity == null ? null : GeneSimilarity.text;
-            string speciesFileRaw = SpeciesSimilarity == null ? null : SpeciesSimilarity.text;
             string worldFileRaw = WorldMap == null ? null : WorldMap.text;
             string regionFileRaw = RegionMap == null ? null : RegionMap.text;
            
@@ -60,7 +58,7 @@ namespace UnitySimulation
                 EvolutionYears, SpeciesNumber, IndividualsNumber,
                 universeFileRaw,
                 chromosomeFileRaw, abilitiesFileRaw,
-                geneFileRaw, speciesFileRaw,
+                geneFileRaw,
                 worldFileRaw, regionFileRaw,
                 Application.dataPath + "/Export/"
                 );
