@@ -224,6 +224,7 @@ namespace EvolutionSimulation.Entities
         /// if the stats are 0 then reduce his health.
         /// Checks first if it can with current energy and rest
         /// And then regenrates a percentage of the creature's max hp
+        /// based on how much resources it has
         /// </summary>
         void ManageHealth()
         {
@@ -237,7 +238,16 @@ namespace EvolutionSimulation.Entities
                 stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold)&&
                 CheckTemperature(x, y))
             {
-                stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth);  // TODO: Ver si esto esta bien, ingenieria de valores
+                float pE = (stats.CurrEnergy - (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold)) /  // Percentage of surpassed thresholds
+                    (stats.MaxEnergy - (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold));
+                float pR = (stats.CurrRest - (stats.MaxRest * UniverseParametersManager.parameters.energyRegenerationThreshold)) /  
+                    (stats.MaxRest - (stats.MaxRest * UniverseParametersManager.parameters.energyRegenerationThreshold));
+                float pH = (stats.CurrHydration - (stats.MaxHydration * UniverseParametersManager.parameters.energyRegenerationThreshold)) /
+                    (stats.MaxHydration - (stats.MaxHydration * UniverseParametersManager.parameters.energyRegenerationThreshold));
+
+                float medPercent = (pE + pR + pH) / 3.0f;   // Average percentage of suprassed thresholds
+
+                stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth * medPercent);  // TODO: Ver si esto esta bien, ingenieria de valores
                 stats.CurrHealth = Math.Min(stats.CurrHealth, stats.MaxHealth); // So it does not get over-healed
             }
         }
