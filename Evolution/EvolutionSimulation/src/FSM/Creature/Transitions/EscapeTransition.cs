@@ -12,7 +12,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            Vector2Int enemyPos;
+            Vector3Int enemyPos;
 
             // If this creature does not have an enemy targeted for combat.
             if (!creature.Enemy(out _, out enemyPos))

@@ -8,7 +8,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     /// </summary>
     class FollowParent : CreatureState
     {
-        Vector2Int parentPos;
+        Vector3Int parentPos;
 
         public FollowParent(Entities.Creature c) : base(c) { creature = c; }
         

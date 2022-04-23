@@ -20,8 +20,8 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         /// <returns> True if close the an eating objective</returns>
         public override bool Evaluate()
         {
-            Vector2Int corpsePos;
-            Vector2Int plantPos;
+            Vector3Int corpsePos;
+            Vector3Int plantPos;
             creature.Corpse(out _, out corpsePos);
             creature.Plant(out _, out plantPos);
             int distPlant = creature.DistanceToObjective(plantPos), //Returns int max value if it does not exist

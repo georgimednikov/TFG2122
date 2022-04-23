@@ -9,7 +9,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     class Eating : CreatureState
     {
         int foodID;
-        Vector2Int foodPos;
+        Vector3Int foodPos;
         string foodType;
         public Eating(Entities.Creature c) : base(c) { creature = c; }
 
@@ -17,7 +17,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             creature.stats.ActionPerceptionPercentage = UniverseParametersManager.parameters.actionPerceptionPercentage;
             foodID = -1;
-            foodPos = new Vector2Int(0, 0);
+            foodPos = new Vector3Int(0, 0, 0);
         }
 
         public override int GetCost()

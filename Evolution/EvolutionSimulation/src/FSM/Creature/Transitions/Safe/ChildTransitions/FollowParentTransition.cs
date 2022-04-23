@@ -20,7 +20,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         /// <returns> True if is far from his parent </returns>
         public override bool Evaluate()
         {
-            Vector2Int parentPos;
+            Vector3Int parentPos;
             if (!creature.stats.IsNewBorn() || !creature.Parent(out _, out parentPos) || parentPos == null)
                 return false;
 

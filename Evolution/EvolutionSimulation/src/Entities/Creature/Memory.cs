@@ -21,6 +21,13 @@ namespace EvolutionSimulation.Entities
                 safety = s;
                 ticks = t;
             }
+            public Position(Vector3Int p, float d, float s, int t)
+            {
+                position = new Vector2Int(p.x, p.y);
+                danger = d;
+                safety = s;
+                ticks = t;
+            }
 
             public float Danger() { return intimidation + danger + safety; }
         }
@@ -92,14 +99,14 @@ namespace EvolutionSimulation.Entities
             world = c.world;
             Creature parent = world.GetCreature(fID);
             if (parent != null)
-                father = new EntityResource(parent.x, parent.y, parent.ID, maxExperienceTicks);
+                father = new EntityResource(parent.x, parent.y, (int)parent.creatureLayer, parent.ID, maxExperienceTicks);
             else
-                father = new EntityResource(-1, -1, -1, maxExperienceTicks);  // Impossible value to represent no parent
+                father = new EntityResource(-1, -1, -1, -1, maxExperienceTicks);  // Impossible value to represent no parent
             parent = world.GetCreature(mID);
             if (parent != null)
-                mother = new EntityResource(parent.x, parent.y, parent.ID, maxExperienceTicks);
+                mother = new EntityResource(parent.x, parent.y, (int)parent.creatureLayer, parent.ID, maxExperienceTicks);
             else
-                mother = new EntityResource(-1, -1, -1, maxExperienceTicks);  // Impossible value to represent no parent
+                mother = new EntityResource(-1, -1, -1, -1, maxExperienceTicks);  // Impossible value to represent no parent
 
             Preys = new List<ValueResource>();
             Allies = new List<EntityResource>();
@@ -151,7 +158,7 @@ namespace EvolutionSimulation.Entities
                 if (enemyEntity == null || thisCreature.DistanceToObjective(enemyEntity) > perceptionRadius)
                     Enemy = null;
                 else
-                    Enemy.position = new Vector2Int(enemyEntity.x, enemyEntity.y);
+                    Enemy.position = new Vector3Int(enemyEntity.x, enemyEntity.y,(int)enemyEntity.creatureLayer);
             }
 
             // If the tile has to be forgotten, it is removed from the creature's memory
@@ -165,7 +172,7 @@ namespace EvolutionSimulation.Entities
             float[,] intimidationFelt = new float[1 + perceptionRadius * 2, 1 + perceptionRadius * 2]; //* 2 to make it the diameter and +1 to account for the center.
             foreach (Creature creature in perceivedCreatures)
             {
-                EntityResource resource = new EntityResource(creature.x, creature.y, creature.ID, maxExperienceTicks);
+                EntityResource resource = new EntityResource(creature.x, creature.y, (int)creature.creatureLayer, creature.ID, maxExperienceTicks);
 
                 //If a creature is the same species as this creature or
                 //it belongs to a child species of this creature's or
@@ -218,7 +225,7 @@ namespace EvolutionSimulation.Entities
             //Updates the memory's information about corpses and plants
             foreach (StaticEntity entity in perceivedEntities)
             {
-                EntityResource resource = new EntityResource(entity.x, entity.y, entity.ID, maxExperienceTicks);
+                EntityResource resource = new EntityResource(entity.x, entity.y, 0, entity.ID, maxExperienceTicks);
                 if (entity is Corpse && !thisCreature.IsHerbivorous())
                 {
                     Corpse newCorpse = entity as Corpse;
@@ -258,7 +265,7 @@ namespace EvolutionSimulation.Entities
                             for (int h = -1; !shore && h <= 1; h++)
                                 if (world.CheckBounds(p.x + k, p.y + h) && !world.map[p.x + k, p.y + h].isWater)
                                     shore = true;
-                        if (shore) UpdateList(WaterPositions, new Resource(p, maxExperienceTicks), maxExperienceTicks);
+                        if (shore) UpdateList(WaterPositions, new Resource(new Vector3Int(p.x, p.y, 0), maxExperienceTicks), maxExperienceTicks);
 
                         Position position = GetFromPositionDangers(p);
                         bool positionWasKnown = position == null;
@@ -630,9 +637,9 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         /// <param name="creatureID"> target's ID</param>
         /// <param name="pos"> target's creature</param>
-        public void TargetEnemy(int creatureID, Vector2Int pos)
+        public void TargetEnemy(int creatureID, Vector3Int pos)
         {
-            Enemy = new EntityResource(pos.x, pos.y, creatureID, maxExperienceTicks);
+            Enemy = new EntityResource(pos.x, pos.y, pos.z, creatureID, maxExperienceTicks);
         }
 
         public List<int> NearbyAllies()
@@ -672,6 +679,7 @@ namespace EvolutionSimulation.Entities
             }
             return danger;
         }
+        public float GetPositionDanger(Vector3Int p) { return GetPositionDanger(p.x, p.y); }
         public float GetPositionDanger(Vector2Int p) { return GetPositionDanger(p.x, p.y); }
 
         /// <summary>
@@ -903,12 +911,18 @@ namespace EvolutionSimulation.Entities
 
             return null;
         }
+
+        private Position GetFromPositionDangers(Vector3Int position)
+        {
+            return GetFromPositionDangers(new Vector2Int(position.x, position.y));
+        }
+
         private void RemoveFromSafeWater(Vector2Int pos)
         {
             int index = 0;
             for (; index < SafeWaterPositions.Count; index++)
             {
-                if (SafeWaterPositions[index].position == pos)
+                if (SafeWaterPositions[index].position.x == pos.x && SafeWaterPositions[index].position.y == pos.y)
                     break;
             }
             if (index < SafeWaterPositions.Count)
@@ -919,12 +933,25 @@ namespace EvolutionSimulation.Entities
             int index = 0;
             for (; index < SafeEdiblePlants.Count; index++)
             {
+                if (SafeEdiblePlants[index].position.x == pos.x && SafeEdiblePlants[index].position.y == pos.y)
+                    break;
+            }
+            if (index < SafeEdiblePlants.Count)
+                SafeEdiblePlants.RemoveAt(index);
+        }
+
+        private void RemoveFromSafePlant(Vector3Int pos)
+        {
+            int index = 0;
+            for (; index < SafeEdiblePlants.Count; index++)
+            {
                 if (SafeEdiblePlants[index].position == pos)
                     break;
             }
             if (index < SafeEdiblePlants.Count)
                 SafeEdiblePlants.RemoveAt(index);
         }
+
 
         /// <summary>
         /// Add a resource to a given list and reset his ticks if the list already contains the resource

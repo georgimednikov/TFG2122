@@ -8,7 +8,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     /// </summary>
     class GoToMate : CreatureState
     {
-        Vector2Int matePos;
+        Vector3Int matePos;
         int mateid;
         bool hasMateAndNotInSamePos;
 
@@ -23,9 +23,9 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             // If the mate is has not spontaneously died or the creature forgor, and it isn not already there; it can set the path to the mate
             hasMateAndNotInSamePos = creature.Mate(out mateid, out matePos) && (matePos.x != creature.x || matePos.y != creature.y ||
-                creature.creatureLayer != creature.world.GetCreature(mateid).creatureLayer);
+                creature.creatureLayer != (Entities.Creature.HeightLayer)matePos.z);
             if (hasMateAndNotInSamePos)
-                creature.SetPath(matePos.x, matePos.y, creature.world.GetCreature(mateid).creatureLayer);        
+                creature.SetPath(matePos.x, matePos.y, (Entities.Creature.HeightLayer)matePos.z);        
         
         }
 
@@ -40,7 +40,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 if (nextPos.X != -1 && nextPos.Y != -1) // TODO: no haria falta creo
                     creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
 
-                Vector2Int tmpPos;
+                Vector3Int tmpPos;
                 bool hasMate = creature.Mate(out mateid, out tmpPos);
                 
                 if (nextPos.X == -1)
@@ -54,12 +54,12 @@ namespace EvolutionSimulation.FSM.Creature.States
                     matePos.x = tmpPos.x;
                     matePos.y = tmpPos.y;
                     // Check if the new mate is not already at the creature position
-                    hasMateAndNotInSamePos = matePos.x != creature.x || matePos.y != creature.y || creature.creatureLayer != creature.world.GetCreature(mateid).creatureLayer;
+                    hasMateAndNotInSamePos = matePos.x != creature.x || matePos.y != creature.y || creature.creatureLayer != (Entities.Creature.HeightLayer)matePos.z;
                     if (hasMateAndNotInSamePos)
-                        creature.SetPath(matePos.x, matePos.y, creature.world.GetCreature(mateid).creatureLayer);
+                        creature.SetPath(matePos.x, matePos.y, (Entities.Creature.HeightLayer)matePos.z);
                 }
                 else
-                    hasMateAndNotInSamePos = hasMate && (matePos.x != creature.x || matePos.y != creature.y || creature.creatureLayer != creature.world.GetCreature(mateid).creatureLayer);
+                    hasMateAndNotInSamePos = hasMate && (matePos.x != creature.x || matePos.y != creature.y || creature.creatureLayer != (Entities.Creature.HeightLayer)matePos.z);
             }
         }
 

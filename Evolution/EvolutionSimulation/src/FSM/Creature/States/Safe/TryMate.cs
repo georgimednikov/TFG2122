@@ -9,7 +9,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     class TryMate : CreatureState
     {
         public TryMate(Entities.Creature c) : base(c) { creature = c; }
-        int mateID; Vector2Int matePos;
+        int mateID; Vector3Int matePos;
 
         // This move is energy netural, costing the same energy that is obtained in a tick
         public override int GetCost()

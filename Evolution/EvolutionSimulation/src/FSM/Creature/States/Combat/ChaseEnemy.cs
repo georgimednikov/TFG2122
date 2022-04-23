@@ -9,7 +9,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         private float modifier;
         // Position and ID of the objective
         int objectiveID;
-        Vector2Int objective;
+        Vector3Int objective;
         string objSpecies;
 
         // In case the chase ends and it does not/cannot attack
@@ -40,8 +40,9 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void OnEntry()
         {
             creature.Enemy(out objectiveID, out objective);
-            objSpecies = creature.world.GetCreature(objectiveID).speciesName;
-            if (objective.x != creature.x && objective.y != creature.y) // TODO: considerar alturas
+            Entities.Creature tmp = creature.world.GetCreature(objectiveID);
+            objSpecies = tmp == null ? " " : creature.world.GetCreature(objectiveID).speciesName;
+            if (objective.x != creature.x && objective.y != creature.y && creature.CanReach((Entities.Creature.HeightLayer)objective.z)) // TODO: considerar alturas
             {
                 creature.SetPath(objective);   // This MUST be set up for the cost of the action to work
             }
@@ -58,7 +59,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             }
 
-            int otherID; Vector2Int otherObj;
+            int otherID; Vector3Int otherObj;
             creature.Enemy(out otherID, out otherObj);   // This is NOT cached because objective can change to another creature
 
             if(otherID == -1)   // Target has died! This entails looking for another ONLY if there is a menace, or none if there is not
@@ -75,15 +76,18 @@ namespace EvolutionSimulation.FSM.Creature.States
             if(otherID != objectiveID)  // If objective creature is a different one, adjust accordingly
             {
                 objectiveID = otherID;
-                objSpecies = creature.world.GetCreature(objectiveID).speciesName;
+                Entities.Creature tmp = creature.world.GetCreature(objectiveID);
+                objSpecies = tmp == null ? " " : creature.world.GetCreature(objectiveID).speciesName;
                 creature.TargetEnemy(otherID, otherObj);  // Redundant, except when current target is the menace
             }
 
-            if ((otherObj.x != objective.x || otherObj.y != objective.y) && (otherObj.x != creature.x || otherObj.y != creature.y))  // If objective position is a different one, adjust accordingly
+            if ((otherObj.x != objective.x || otherObj.y != objective.y || otherObj.z != objective.z) && (otherObj.x != creature.x || otherObj.y != creature.y))  // If objective position is a different one, adjust accordingly
             {
                 objective.x = otherObj.x;
                 objective.y = otherObj.y;
-                creature.SetPath(objective);    // Set the path the creature must follow
+                objective.z = otherObj.z;
+                if(creature.CanReach((Entities.Creature.HeightLayer)objective.z))
+                creature.SetPath(objective);    // Set the path the creature must follow if he can reach it
             }
 
             await = false;

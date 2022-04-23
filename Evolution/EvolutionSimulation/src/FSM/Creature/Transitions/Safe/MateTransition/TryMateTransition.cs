@@ -15,11 +15,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            Vector2Int pos;bool test =
- creature.Mate(out _, out pos)
-               && Math.Abs(pos.x - creature.x) < UniverseParametersManager.parameters.adjacentLength
-               && Math.Abs(pos.y - creature.y) < UniverseParametersManager.parameters.adjacentLength;
-            if (test) 
+            Vector3Int pos; bool test =
+                 creature.Mate(out _, out pos)
+                && Math.Abs(pos.x - creature.x) < UniverseParametersManager.parameters.adjacentLength
+                && Math.Abs(pos.y - creature.y) < UniverseParametersManager.parameters.adjacentLength;
+            if (test)
                 return true;
             return false;
         }

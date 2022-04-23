@@ -33,13 +33,13 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            Vector2Int objective; creature.Menace(out _, out objective);
+            Vector3Int objective; creature.Menace(out _, out objective);
             dngX = objective.x;
             dngY = objective.y;
             pathX = 0;
             pathY = 0;
             // It either seeks its allies or runs from its enemy
-            Vector2Int fwiend;
+            Vector3Int fwiend;
             if(creature.Ally(out _, out fwiend) && CheckIfSafe(fwiend)) {
                 pathX = fwiend.x;
                 pathY = fwiend.y;
@@ -48,7 +48,28 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (pathX == creature.x && pathY == creature.y)
                 creature.cornered = true;
             else
+            {
+                if(pathX == -1)
+                {
+                    creature.Menace(out _, out objective);
+                    dngX = objective.x;
+                    dngY = objective.y;
+                    pathX = 0;
+                    pathY = 0;
+                    // It either seeks its allies or runs from its enemy
+                    
+                    if (creature.Ally(out _, out fwiend) && CheckIfSafe(fwiend))
+                    {
+                        pathX = fwiend.x;
+                        pathY = fwiend.y;
+                    }
+                    else PositionAwayFromMe(ref pathX, ref pathY);
+
+                    if (pathX == creature.x && pathY == creature.y)
+                        creature.cornered = true;
+                }
                 creature.SetPath(pathX, pathY);
+            }
 
             creature.CreateDanger();
         }
@@ -63,13 +84,13 @@ namespace EvolutionSimulation.FSM.Creature.States
             }
 
             // Attempts to see if the escape route has changed
-            Vector2Int objective; creature.Menace(out _, out objective);
+            Vector3Int objective; creature.Menace(out _, out objective);
             if (dngX != objective.x || dngY != objective.y)  // If it has changed, reassign the path
             {
                 dngX = objective.x;
                 dngY = objective.y;
                 // It either seeks its allies or runs from its enemy
-                Vector2Int fwiend;
+                Vector3Int fwiend;
                 if (creature.Ally(out _, out fwiend) && CheckIfSafe(fwiend)) {   // If the creature must not go through the enemy, it'll go to the ally
                     pathX = fwiend.x;
                     pathY = fwiend.y;
@@ -91,7 +112,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             int normX = deltaX == 0 ? 0 : deltaX / Math.Abs(deltaX),  // Normalized direction of movement 
                 normY = deltaY == 0 ? 0 : deltaY / Math.Abs(deltaY);  // as you can only move once per action (but can have multiple actions per tick)
 
-            Vector2Int position; creature.Menace(out _, out position);
+            Vector3Int position; creature.Menace(out _, out position);
             if (creature.x == position.x && creature.y == position.y) // If it is in the same tile, go in a random direction
                 do
                 {
@@ -117,7 +138,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// Returns if it is safe to go to a position
         /// In summary, if it would entail going through the current danger position.
         /// </summary>
-        private bool CheckIfSafe(Vector2Int friendPos)
+        private bool CheckIfSafe(Vector3Int friendPos)
         {
             // Direction of possible ally
             int fwiendX = friendPos.x - creature.x,
