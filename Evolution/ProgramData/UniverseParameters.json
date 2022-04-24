@@ -73,6 +73,6 @@
   "safePrefferedOverClosestResourceRatio": 1.25,
   "rotStartMultiplier": 0.01,
   "corpseNutritionPointsMultiplier": 80.0,
-  "percentageSimilaritySpecies": 0.9,
+  "percentageSimilaritySpecies": 0.94,
   "percentageOfSpeciesToExport": 0.35
 }

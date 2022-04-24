@@ -947,7 +947,7 @@ namespace EvolutionSimulation.Entities
                 if ((stats.AerialSpeed == -1 && z == HeightLayer.Air) || (stats.ArborealSpeed == -1 && z == HeightLayer.Tree)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
 
                 //If the creature is already in the air, we cannot assert that A* is doable.
-                if (creatureLayer == HeightLayer.Air)
+                if (creatureLayer == HeightLayer.Air )
                 {
                     path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));
                     pathIterator = 0;

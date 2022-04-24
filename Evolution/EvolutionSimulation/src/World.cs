@@ -169,7 +169,7 @@ namespace EvolutionSimulation
             StaticEntities = new Dictionary<int, StaticEntity>();
             entitiesToDelete = new List<int>();
             StaticEntitiesToUpdate = new List<StaticEntity>();
-
+            deaths = new int[6];
             MapData mapData;
             // Create plant entities from the file
             for (int i = 0; i < mapSize; i++)
@@ -597,7 +597,7 @@ namespace EvolutionSimulation
             );
             entitiesToDelete.Clear();
 
-            return sortedCreatures.Count > 50;
+            return sortedCreatures.Count > 0;
         }
 
         /// <summary>
