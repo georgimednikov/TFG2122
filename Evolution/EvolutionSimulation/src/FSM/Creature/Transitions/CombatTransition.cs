@@ -11,7 +11,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            int advID; Vector2Int advPos;
+            int advID; Vector3Int advPos;
 
             // If it has no enemy and has no creature to hunt it does not engage in combat.
             if (!creature.Enemy() && !creature.Prey(out _, out _))
@@ -19,7 +19,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
             // If it has an enemy and enough strength between it and its allies to fight it, it engages in combat.
             if (creature.Enemy(out _, out advPos) && creature.ShouldPackFight(creature.CombatPack(), creature.PositionDanger(advPos.x, advPos.y)))
+            {
+                if (advPos.z == 2)
+                    return true;
                 return true;
+            }
 
             // If a dangerous creature is nearby and it cannot run away, it engages in combat,
             if (creature.Menace(out advID, out advPos) && creature.cornered)
@@ -28,6 +32,8 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
                 if(creature.world.GetCreature(advID) == null)
                     return false;
                 creature.TargetEnemy(advID, advPos);
+                if (advPos.z == 2)
+                    return true;
                 return true;
             }
 
@@ -35,7 +41,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             if (creature.Prey(out advID, out advPos) && creature.IsHungry())
             {
                 // It goes for the prey if there is no plant or it is closer.
-                if (!creature.Plant(out _, out Vector2Int plantPos) || creature.DistanceToObjective(plantPos) > creature.DistanceToObjective(advPos))
+                if (!creature.Plant(out _, out Vector3Int plantPos) || creature.DistanceToObjective(plantPos) > creature.DistanceToObjective(advPos))
                 {
                     creature.TargetEnemy(advID, advPos);   // The Prey becomes the Enemy, beginning combat
                     return true;

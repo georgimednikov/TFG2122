@@ -45,8 +45,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         private void SetPath()
         {
-            Vector2Int posCorpse;
-            Vector2Int posPlant;
+            Vector3Int posCorpse;
+            Vector3Int posPlant;
 
             creature.Corpse(out _, out posCorpse);
             creature.Plant(out _, out posPlant);
