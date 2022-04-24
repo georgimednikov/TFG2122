@@ -20,7 +20,7 @@ namespace VisualizadorConsola
         override public void Init(int years, int species, int individuals, string dataDir, string exportDir)
         {
             base.Init(years, species, individuals, dataDir, exportDir);
-            WorldToBmp();
+            //WorldToBmp();
             Console.WriteLine("Simulation Init done");
             Tracker.Instance.Init();
             Tracker.Instance.Track(new SessionStart());

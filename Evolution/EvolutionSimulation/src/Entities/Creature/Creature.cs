@@ -124,12 +124,12 @@ namespace EvolutionSimulation.Entities
             mind.UpdatePerception();
         }
 
-        
+
         /// <returns> Return True if the position is in a confortable temperature</returns>
         public bool CheckTemperature(int x, int y)
         {
             double tileTemperature = world.map[x, y].temperature;
-            
+
             return tileTemperature > stats.MinTemperature && tileTemperature < stats.MaxTemperature;
         }
 
@@ -149,7 +149,7 @@ namespace EvolutionSimulation.Entities
                 difference = tileTemperature - stats.MaxTemperature;
             //If the creature is confortable nothing happens.
             else
-                return ;
+                return;
 
             //A range from 0 to 1 is calculated based on the difference of temperature and a max value for it.
             double range = Math.Min(difference / UniverseParametersManager.parameters.maxTemperatureDifference, 1);
@@ -161,8 +161,8 @@ namespace EvolutionSimulation.Entities
             stats.CurrHealth -= (float)damage;
 
 #if DEBUG            
-            causeOfDeath = "temperature difference: "+ difference + ", which dealt " + damage + " damage";
-            Console.WriteLine("CreatureId: " + ID +"  " + causeOfDeath);
+            causeOfDeath = "temperature difference: " + difference + ", which dealt " + damage + " damage";
+            Console.WriteLine("CreatureId: " + ID + "  " + causeOfDeath);
 #endif
 
             mind.CreateDanger();
@@ -234,7 +234,7 @@ namespace EvolutionSimulation.Entities
             }
             else if (stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
                 stats.CurrRest >= (stats.MaxRest * UniverseParametersManager.parameters.restRegenerationThreshold) &&
-                stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold)&&
+                stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold) &&
                 CheckTemperature(x, y))
             {
                 stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth);  // TODO: Ver si esto esta bien, ingenieria de valores
@@ -297,7 +297,7 @@ namespace EvolutionSimulation.Entities
             // Safe-state configuration
             // States
             IState wander = new Wander(this);
-            IState explore = new Explore(this); 
+            IState explore = new Explore(this);
             IState goToDrink = new GoToDrink(this);
             IState drink = new Drinking(this);
             IState goToMate = new GoToMate(this);
@@ -332,7 +332,7 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(wander, goToSafeTempPlaceTransition, goToSafeTemperaturePlace);
             safeFSM.AddTransition(goToSafeTemperaturePlace, stopGoToSafeTempPlaceTransition, wander);
             safeFSM.AddTransition(wander, goToSafeTempPlaceExploreTransition, explore);
-            
+
             // Sleeping
             ITransition goToSafePlaceTransition = new GoToSafePlaceTransition(this);
             ITransition stopGoToSafePlaceTransition = new StopGoToSafePlaceTransition(this);
@@ -384,17 +384,18 @@ namespace EvolutionSimulation.Entities
             ITransition stopMatingTransition = new StopMatingTransition(this);
             ITransition stopGoToMateTransition = new StopGoToMateTransition(this);
             ITransition stopTryMateTransition = new StopTryMateTransition(this);
+
             safeFSM.AddTransition(wander, matingExploreTransition, explore);
             safeFSM.AddTransition(wander, mateTransition, goToMate);
             safeFSM.AddTransition(goToMate, stopGoToMateTransition, wander);
             safeFSM.AddTransition(goToMate, tryMateTransition, tryMate);
             safeFSM.AddTransition(tryMate, matingTransition, mating);
             safeFSM.AddTransition(tryMate, stopTryMateTransition, wander);
-            safeFSM.AddTransition(mating, stopMatingTransition, wander);
             safeFSM.AddTransition(wander, matingTransition, mating);
             safeFSM.AddTransition(goToDrink, matingTransition, mating);
             safeFSM.AddTransition(goToEat, matingTransition, mating);
             safeFSM.AddTransition(goToSafePlace, matingTransition, mating);
+            safeFSM.AddTransition(mating, stopMatingTransition, wander);
 
             // Escape-state Configuration
             // States
@@ -931,9 +932,9 @@ namespace EvolutionSimulation.Entities
         {
             if (!world.CanMove(x, y, z)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
             if ((stats.AerialSpeed == -1 && z == HeightLayer.Air) || (stats.ArborealSpeed == -1 && z == HeightLayer.Tree)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
-            
+
             //If the creature is already in the air, we cannot assert that A* is doable.
-            if(creatureLayer == HeightLayer.Air)
+            if (creatureLayer == HeightLayer.Air)
             {
                 path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));
                 pathIterator = 0;
@@ -1008,7 +1009,8 @@ namespace EvolutionSimulation.Entities
                 if (layer == HeightLayer.Air) return stats.AirReach;
                 if (layer == HeightLayer.Tree) return stats.TreeReach;
                 return false;
-            } else return true;
+            }
+            else return true;
         }
 
         /// <summary>

@@ -53,6 +53,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 {
                     matePos.x = tmpPos.x;
                     matePos.y = tmpPos.y;
+                    matePos.z = tmpPos.z;
                     // Check if the new mate is not already at the creature position
                     hasMateAndNotInSamePos = matePos.x != creature.x || matePos.y != creature.y || creature.creatureLayer != (Entities.Creature.HeightLayer)matePos.z;
                     if (hasMateAndNotInSamePos)
