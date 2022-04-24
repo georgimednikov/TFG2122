@@ -250,7 +250,7 @@ namespace EvolutionSimulation.Entities
                         if (p is Tree) costSoFar += (2 - Tree.movementPenalty);
                         else if (p is EdibleTree) costSoFar += (2 - EdibleTree.movementPenalty);
                         else costSoFar += 1;
-                        neigh.Add(new GraphNode(newPos, n, costSoFar - c.PositionDanger((int)n.pos.X + i, (int)n.pos.Y + j)));
+                        neigh.Add(new GraphNode(newPos, n, costSoFar - c.PositionDanger((int)n.pos.X + i, (int)n.pos.Y + j))); //TODO: Danger aqui es problematico 
                     }
                 }
             return neigh;

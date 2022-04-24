@@ -40,18 +40,24 @@ namespace EvolutionSimulation.FSM.Creature.States
             if(creature.stats.CurrEnergy <= 0)
             {
                 template += " starved to death";
+                creature.world.deaths[3]++;
             }
             else if (creature.stats.CurrHydration <= 0)
             {
                 template += " died of thirst";
+                creature.world.deaths[4]++;
             }
             else if (creature.stats.CurrRest <= 0)
             {
                 template += " died of exhaustion";
+                creature.world.deaths[5]++;
             }
             else if (creature.stats.CurrHealth <= 0)
             {
                 template += creature.causeOfDeath;
+                if(template.Contains("attack from ")) creature.world.deaths[1]++;
+                else if (template.Contains("retalliation from ")) creature.world.deaths[2]++;
+                else if (template.Contains("temperature difference: ")) creature.world.deaths[0]++;
             }
             if(corpse == null)
                 return template + "\nCORPSE CANNOT BE CREATED IN: POSITION: (" + creature.x + ", " + creature.y + ") CREATURE ID: " + creature.ID;

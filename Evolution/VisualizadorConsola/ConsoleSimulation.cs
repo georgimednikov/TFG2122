@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -39,6 +39,7 @@ namespace VisualizadorConsola
             {
                 if (!world.Tick(i) )
                 {
+                    break;
                     ApocalypseExport(apocalypsisCont++);
                     Console.WriteLine("APOCALYPSIS: Generating new set of creatures");
                     CreateCreatures();
@@ -55,7 +56,8 @@ namespace VisualizadorConsola
                     Console.WriteLine("A Year has passed");
             }
             DateTime time2 = DateTime.Now;
-            Console.Write("Estimated Time for "+ UserInfo.Years + " years will be: " + ((time2-time).TotalMilliseconds/(i-1) * world.YearToTick(UserInfo.Years))/360000 + " hours. " + (time2 - time) + "\n");
+            Console.Write("Estimated Time for "+ UserInfo.Years + " years will be: " + TimeSpan.FromMilliseconds((time2-time).TotalMilliseconds/(i-1) * world.YearToTick(UserInfo.Years)) + "\n");
+            Console.WriteLine("Deaths by: Temperature {0} Damage by others {1} Retaliation {2} Starvation {3} Thirst {4} Exhaustion {5}", world.deaths[0], world.deaths[1],world.deaths[2], world.deaths[3], world.deaths[4], world.deaths[5]);
             Console.Write("Simulation ended, ticks elapsed: " + i + "\n");
         }
 

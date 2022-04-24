@@ -89,6 +89,7 @@ namespace EvolutionSimulation
     /// </summary>
     public class World
     {
+        public int[] deaths;
         public int tick { get; private set; }
         /// <summary>
         /// Properties of each map tile
@@ -194,6 +195,7 @@ namespace EvolutionSimulation
         /// </summary>
         public void Init(WorldGenConfig config)
         {
+            deaths = new int[6];
             ticksHour = UniverseParametersManager.parameters.ticksPerHour;
             hoursDay = UniverseParametersManager.parameters.hoursPerDay;
             daysYear = UniverseParametersManager.parameters.daysPerYear;
@@ -574,7 +576,7 @@ namespace EvolutionSimulation
             );
             entitiesToDelete.Clear();
 
-            return sortedCreatures.Count > 0;
+            return sortedCreatures.Count > 50;
         }
 
         /// <summary>
