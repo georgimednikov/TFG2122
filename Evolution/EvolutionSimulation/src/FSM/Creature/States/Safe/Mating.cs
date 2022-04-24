@@ -48,7 +48,8 @@ namespace EvolutionSimulation.FSM.Creature.States
                     {
                         //TODO: cuidado con el problema del diamante
                         // Crossover with male and female chromosomes
-                        Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(creature.world.GetCreature(creature.matingCreature).chromosome, creature.chromosome);
+                        Entities.Creature father = creature.world.GetCreature(creature.matingCreature);
+                        Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(father.chromosome, creature.chromosome);
                         // Mutate the chromosome
                         Genetics.GeneticFunctions.UniformMutation(ref childC, UniverseParametersManager.parameters.mutationChance);
                         // The new creature's pos (near to the parents)
@@ -58,7 +59,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                             ny = creature.y + RandomGenerator.Next(-1, 2);
                         }while(!creature.world.CanMove(nx,ny));
                         
-                        creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName, creature.matingCreature, creature.ID);
+                        creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.world.GiveName(childC, father, creature), creature.matingCreature, creature.ID);
 
                     }
                     creature.timeToBeInHeat = -1;

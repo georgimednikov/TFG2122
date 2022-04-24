@@ -172,6 +172,23 @@ namespace EvolutionSimulation.Genetics
         }
 
         /// <summary>
+        /// Check what is the most similar choromose to the child comparing with his parents
+        /// to give his speciesName. It could be that father's species is the progenitor of the mother's species
+        /// or vice versa
+        /// </summary>
+        /// <returns> Returns the string of the species who is more similar to the child</returns>
+        public string MostSimilarityParent(CreatureChromosome childChromosome, Creature father, Creature mother)
+        {
+            if (mother.speciesName == father.speciesName)
+                return mother.speciesName;
+
+            float similarityFather = GeneticSimilarity(childChromosome, father.chromosome);
+            float similarityMother = GeneticSimilarity(childChromosome, mother.chromosome);
+            if (similarityFather > similarityMother) return father.speciesName;
+            return mother.speciesName;
+        }
+
+        /// <summary>
         /// This method is supposed to be called when a new creature dies.
         /// It is removed from its species pool of members. If it was the last one, the species is extinct.
         /// </summary>
@@ -304,7 +321,7 @@ namespace EvolutionSimulation.Genetics
                         cont--;
                 }
                 if (siblings)
-                    index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl - (index - cont), speciesRecord[index + 1].startTick, speciesRecord[index + 1].endTick, ++index, writer);
+                    index = RenderSpeciesTree(speciesRecord[index + 1].name, lvl - 1, speciesRecord[index + 1].startTick, speciesRecord[index + 1].endTick, ++index, writer);
             }
             return index;
         }

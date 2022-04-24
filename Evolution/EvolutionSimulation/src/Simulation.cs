@@ -106,6 +106,58 @@ namespace EvolutionSimulation
             world.ApocalypseExportContent(cont);
         }
 
+        
+        /*//Method to test
+        virtual protected void CreateCreaturesTest()
+        {
+            Animal a = world.CreateCreature<Animal>(10, 10);
+            a.chromosome.ModifyGender(Genetics.Gender.Male);
+            Animal b = world.CreateCreature<Animal>(10, 10, a.chromosome, a.speciesName);
+            b.chromosome.ModifyGender(Genetics.Gender.Female);
+
+            Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(a.chromosome, b.chromosome);
+            // Mutate the chromosome
+            Genetics.GeneticFunctions.UniformMutation(ref childC, UniverseParametersManager.parameters.mutationChance);
+            // The new creature's pos (near to the parents)
+
+            childC.ModifyGender(Genetics.Gender.Female);
+            Animal c = b.world.CreateCreature<Animal>(10, 10, childC, b.speciesName, a.ID, b.ID);
+            Animal c2 = world.CreateCreature<Animal>(10, 10, a.chromosome, a.speciesName);
+            c2.chromosome.ModifyGender(Genetics.Gender.Male);
+
+            Genetics.CreatureChromosome childD = Genetics.GeneticFunctions.UniformCrossover(a.chromosome, b.chromosome);
+            // Mutate the chromosome
+            Genetics.GeneticFunctions.UniformMutation(ref childD, UniverseParametersManager.parameters.mutationChance);
+            // The new creature's pos (near to the parents)
+
+            Animal d = b.world.CreateCreature<Animal>(10, 10, childD, b.speciesName, a.ID, b.ID);
+            
+            //world.ApocalypseExportContent(0);
+
+            Genetics.CreatureChromosome childCC = Genetics.GeneticFunctions.UniformCrossover(c2.chromosome, c.chromosome);
+            // Mutate the chromosome
+            Genetics.GeneticFunctions.UniformMutation(ref childCC, UniverseParametersManager.parameters.mutationChance);
+            // The new creature's pos (near to the parents)
+
+            Animal ac2 = c.world.CreateCreature<Animal>(10, 10, childCC, c.speciesName, c2.ID, c.ID);
+
+            Genetics.CreatureChromosome childCC2 = Genetics.GeneticFunctions.UniformCrossover(c2.chromosome, c.chromosome);
+            // Mutate the chromosome
+            Genetics.GeneticFunctions.UniformMutation(ref childCC2, UniverseParametersManager.parameters.mutationChance);
+            // The new creature's pos (near to the parents)
+
+            Animal ac = c.world.CreateCreature<Animal>(10, 10, childCC2, c.speciesName, c2.ID, c.ID);
+
+            Genetics.CreatureChromosome childCC3 = Genetics.GeneticFunctions.UniformCrossover(c2.chromosome, c.chromosome);
+            // Mutate the chromosome
+            Genetics.GeneticFunctions.UniformMutation(ref childCC3, UniverseParametersManager.parameters.mutationChance);
+            // The new creature's pos (near to the parents)
+
+            Animal ac3 = c.world.CreateCreature<Animal>(10, 10, childCC3, c.speciesName, c2.ID, c.ID);
+
+            world.ApocalypseExportContent(0);
+        }*/
+
         virtual protected void CreateCreatures()
         {
             //A minimum distance to leave in between species spawn points to give them some room.

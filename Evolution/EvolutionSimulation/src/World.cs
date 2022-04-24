@@ -501,6 +501,17 @@ namespace EvolutionSimulation
         }
 
         /// <summary>
+        /// When a creature is born during the simulation it could happens that 
+        /// the parents are not the same species, the father's species could be the mother's progenitor species
+        /// or vice versa. If this is the case, we need to decide which one is the most similar to the child to set the species name
+        /// </summary>
+        /// <returns> Return the name of the child species</returns>
+        public string GiveName(CreatureChromosome childChromosome, Creature father, Creature mother)
+        {
+            return taxonomy.MostSimilarityParent(childChromosome, father, mother);
+        }
+
+        /// <summary>
         /// Creates a stable entity in the world.
         /// StableEntities are enitities that do not have complex behaviours,
         /// and fulfill the same objecive during all their life-time.
