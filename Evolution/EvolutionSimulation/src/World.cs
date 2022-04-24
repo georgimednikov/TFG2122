@@ -168,6 +168,7 @@ namespace EvolutionSimulation
             metabolismComparer = new Utils.SortByMetabolism();
             StaticEntities = new Dictionary<int, StaticEntity>();
             entitiesToDelete = new List<int>();
+            StaticEntitiesToUpdate = new List<StaticEntity>();
 
             MapData mapData;
             // Create plant entities from the file

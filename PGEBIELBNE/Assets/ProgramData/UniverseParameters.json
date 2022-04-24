@@ -32,7 +32,7 @@
   "restRegenerationThreshold": 0.515,
   "energyRegenerationThreshold": 0.575,
   "hydrationRegenerationThreshold": 0.575,
-  "regenerationRate": 0.01,
+  "regenerationRate": 0.025,
   "hoursTilStarvation": 124.0,
   "thirstToHungerRatio": 3.0,
   "maxTemperatureAggressivenessPercentage": 0.5,

@@ -40,7 +40,6 @@ namespace VisualizadorConsola
             DateTime time = DateTime.Now;
             int ticks = world.YearToTick(UserInfo.Years);
             int i = 1;
-            int apocalypsisCont = 0;
 
             System.Timers.Timer timer = new System.Timers.Timer(5000);
             // TODO: Se puede hacer que sea el propio tracker el que haga el flush automatico cada x tiempo
