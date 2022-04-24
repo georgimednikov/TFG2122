@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\EvolutionSimulation\EvolutionSimulation.csproj" />
+    <ProjectReference Include="..\Telemetry\Telemetry.csproj" />
   </ItemGroup>
 
 </Project>

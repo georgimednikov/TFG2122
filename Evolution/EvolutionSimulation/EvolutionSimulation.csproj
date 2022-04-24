@@ -170,6 +170,7 @@
     <Compile Include="src\Simulation.cs" />
     <Compile Include="src\Entities\IEntity.cs" />
     <Compile Include="src\Entities\Plants\Plant.cs" />
+    <Compile Include="src\Vector3Int.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">

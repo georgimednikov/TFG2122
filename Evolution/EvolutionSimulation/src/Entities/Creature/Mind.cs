@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace EvolutionSimulation.Entities
 {
@@ -33,7 +34,7 @@ namespace EvolutionSimulation.Entities
         public void SafeWaterSource() { mem.SafeWaterSource(); }
         public void SafeEdiblePlant() { mem.SafeEdiblePlant(); }
         public void UpdatePerception() { mem.CalculatePerceptionRadius(); }
-        public void TargetEnemy(int cID, Vector2Int pos) { mem.TargetEnemy(cID, pos); }
+        public void TargetEnemy(int cID, Vector3Int pos) { mem.TargetEnemy(cID, pos); }
         public float PositionDanger(int x, int y) { return mem.GetPositionDanger(x, y); }
         public List<int> NearbyAllies() { return mem.NearbyAllies(); }
         public int FatherID() { return mem.Father.ID; }
@@ -165,13 +166,13 @@ namespace EvolutionSimulation.Entities
             if (creature.IsVeryThirsty())
             {
                 if (mem.WaterPositions.Count != 0)
-                    worthyWaterPosition = mem.WaterPositions[0].position;
+                    worthyWaterPosition = new Vector2Int(mem.WaterPositions[0].position.x, mem.WaterPositions[0].position.y);
                 else
-                    worthyWaterPosition = mem.SafeWaterPositions[0].position;
+                    worthyWaterPosition = new Vector2Int(mem.SafeWaterPositions[0].position.x, mem.SafeWaterPositions[0].position.y);
                 return;
             }
-
-            worthyWaterPosition = BestBetweenCloseAndSafe(mem.WaterPositions, mem.SafeWaterPositions, Criteria).position;
+            Vector3Int tmp = BestBetweenCloseAndSafe(mem.WaterPositions, mem.SafeWaterPositions, Criteria).position;
+            worthyWaterPosition = new Vector2Int(tmp.x, tmp.y);
         }
         private T BestBetweenCloseAndSafe<T>(List<T> close, List<T> safe, Func<T, T, T> criteria) where T : Resource
         {
@@ -221,35 +222,35 @@ namespace EvolutionSimulation.Entities
         #endregion
 
         #region Getters
-        public bool Enemy(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Enemy, out id, out position); }
-        public bool Menace(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Menace, out id, out position); }
-        public bool Parent(out int id, out Vector2Int position) { return AssignEntityInfo(parentToFollow, out id, out position); }
-        public bool Prey(out int id, out Vector2Int position)
+        public bool Enemy(out int id, out Vector3Int position) { return AssignEntityInfo(mem.Enemy, out id, out position); }
+        public bool Menace(out int id, out Vector3Int position) { return AssignEntityInfo(mem.Menace, out id, out position); }
+        public bool Parent(out int id, out Vector3Int position) { return AssignEntityInfo(parentToFollow, out id, out position); }
+        public bool Prey(out int id, out Vector3Int position)
         {
             if (mem.Preys.Count > 0)
                 return AssignEntityInfo(mem.Preys[0], out id, out position);
             return AssignEntityInfo(null, out id, out position);
         }
-        public bool Ally(out int id, out Vector2Int position)
+        public bool Ally(out int id, out Vector3Int position)
         {
             if (mem.Allies.Count > 0)
                 return AssignEntityInfo(mem.Allies[0], out id, out position);
             return AssignEntityInfo(null, out id, out position);
         }
-        public bool Mate(out int id, out Vector2Int position) { return AssignEntityInfo(mem.Mate, out id, out position); }
-        public bool Corpse(out int id, out Vector2Int position) { return AssignEntityInfo(worthyCorpse, out id, out position); }
-        public bool Plant(out int id, out Vector2Int position) { return AssignEntityInfo(worthyPlant, out id, out position); }
+        public bool Mate(out int id, out Vector3Int position) { return AssignEntityInfo(mem.Mate, out id, out position); }
+        public bool Corpse(out int id, out Vector3Int position) { return AssignEntityInfo(worthyCorpse, out id, out position); }
+        public bool Plant(out int id, out Vector3Int position) { return AssignEntityInfo(worthyPlant, out id, out position); }
         public Vector2Int WaterPosition() { return worthyWaterPosition; }
         public Vector2Int SafePosition() { return mem.SafePositions.Count > 0 ? mem.SafePositions[0] : null; }
         public Vector2Int SafeTemperaturePosition() { return mem.SafeTemperaturePositions.Count > 0 ? mem.SafeTemperaturePositions[0] : null; }
         public Vector2Int NewPosition() { return mem.FindNewPosition(); }
         public int NewExplorePosition() { return mem.NewExplorePosition(); }
 
-        private bool AssignEntityInfo(EntityResource ent, out int id, out Vector2Int position)
+        private bool AssignEntityInfo(EntityResource ent, out int id, out Vector3Int position)
         {
             if (ent == null)
             {
-                id = -1; position = new Vector2Int(-1, -1);
+                id = -1; position = new Vector3Int(-1, -1, -1);
                 return false;
             }
             id = ent.ID; position = ent.position;
@@ -260,10 +261,10 @@ namespace EvolutionSimulation.Entities
 
     public class Resource : IEquatable<Resource>
     {
-        public Vector2Int position;
+        public Vector3Int position;
         public int ticks;
 
-        public Resource(Vector2Int p, int t) { position = p; ticks = t; }
+        public Resource(Vector3Int p, int t) { position = p; ticks = t; }
 
         public static bool operator ==(Resource eR1, Resource eR2)
         {
@@ -280,8 +281,8 @@ namespace EvolutionSimulation.Entities
     {
         public int ID;
 
-        public EntityResource(Vector2Int p, int id, int t) : base(p, t) { ID = id; }
-        public EntityResource(int x, int y, int id, int t) : base(new Vector2Int(x, y), t) { ID = id; }
+        public EntityResource(Vector3Int p, int id, int t) : base(p, t) { ID = id; }
+        public EntityResource(int x, int y, int z, int id, int t) : base(new Vector3Int(x, y, z), t) { ID = id; }
 
         public static bool operator ==(EntityResource eR1, EntityResource eR2)
         {
@@ -299,8 +300,8 @@ namespace EvolutionSimulation.Entities
     {
         public float value;
 
-        public ValueResource(Vector2Int p, int id, float v, int t) : base(p, id, t) { value = v; }
-        public ValueResource(int x, int y, int id, float v, int t) : base(new Vector2Int(x, y), id, t) { value = v; }
+        public ValueResource(Vector3Int p, int id, float v, int t) : base(p, id, t) { value = v; }
+        public ValueResource(int x, int y, int z, int id, float v, int t) : base(new Vector3Int(x, y, z), id, t) { value = v; }
 
     }
 }

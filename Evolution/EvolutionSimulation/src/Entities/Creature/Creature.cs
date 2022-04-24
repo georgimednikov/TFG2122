@@ -162,8 +162,8 @@ namespace EvolutionSimulation.Entities
             stats.CurrHealth -= (float)damage;
 
 #if DEBUG            
-            causeOfDeath = "temperature difference: "+ difference + ", which dealt " + damage + " damage";
-            Console.WriteLine("CreatureId: " + ID +"  " + causeOfDeath);
+            causeOfDeath = "temperature difference: " + difference + ", which dealt " + damage + " damage";
+            Console.WriteLine("CreatureId: " + ID + "  " + causeOfDeath);
 #endif
 
             mind.CreateDanger();
@@ -225,6 +225,7 @@ namespace EvolutionSimulation.Entities
         /// if the stats are 0 then reduce his health.
         /// Checks first if it can with current energy and rest
         /// And then regenrates a percentage of the creature's max hp
+        /// based on how much resources it has
         /// </summary>
         void ManageHealth()
         {
@@ -238,7 +239,16 @@ namespace EvolutionSimulation.Entities
                 stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold) &&
                 CheckTemperature(x, y))
             {
-                stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth);  // TODO: Ver si esto esta bien, ingenieria de valores
+                float pE = (stats.CurrEnergy - (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold)) /  // Percentage of surpassed thresholds
+                    (stats.MaxEnergy - (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold));
+                float pR = (stats.CurrRest - (stats.MaxRest * UniverseParametersManager.parameters.energyRegenerationThreshold)) /  
+                    (stats.MaxRest - (stats.MaxRest * UniverseParametersManager.parameters.energyRegenerationThreshold));
+                float pH = (stats.CurrHydration - (stats.MaxHydration * UniverseParametersManager.parameters.energyRegenerationThreshold)) /
+                    (stats.MaxHydration - (stats.MaxHydration * UniverseParametersManager.parameters.energyRegenerationThreshold));
+
+                float medPercent = (pE + pR + pH) / 3.0f;   // Average percentage of suprassed thresholds
+
+                stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth * medPercent);  // TODO: Ver si esto esta bien, ingenieria de valores
                 stats.CurrHealth = Math.Min(stats.CurrHealth, stats.MaxHealth); // So it does not get over-healed
             }
         }
@@ -385,17 +395,18 @@ namespace EvolutionSimulation.Entities
             ITransition stopMatingTransition = new StopMatingTransition(this);
             ITransition stopGoToMateTransition = new StopGoToMateTransition(this);
             ITransition stopTryMateTransition = new StopTryMateTransition(this);
+
             safeFSM.AddTransition(wander, matingExploreTransition, explore);
             safeFSM.AddTransition(wander, mateTransition, goToMate);
             safeFSM.AddTransition(goToMate, stopGoToMateTransition, wander);
             safeFSM.AddTransition(goToMate, tryMateTransition, tryMate);
             safeFSM.AddTransition(tryMate, matingTransition, mating);
             safeFSM.AddTransition(tryMate, stopTryMateTransition, wander);
-            safeFSM.AddTransition(mating, stopMatingTransition, wander);
             safeFSM.AddTransition(wander, matingTransition, mating);
             safeFSM.AddTransition(goToDrink, matingTransition, mating);
             safeFSM.AddTransition(goToEat, matingTransition, mating);
             safeFSM.AddTransition(goToSafePlace, matingTransition, mating);
+            safeFSM.AddTransition(mating, stopMatingTransition, wander);
 
             // Escape-state Configuration
             // States
@@ -557,12 +568,12 @@ namespace EvolutionSimulation.Entities
 #endif
 
             // If the pack is aggressive enought they will fight, else nothing happens.
-            Vector2Int enemyPos; Enemy(out _, out enemyPos);
+            Vector3Int enemyPos; Enemy(out _, out enemyPos);
             List<Creature> pack = CombatPack();
             if (ShouldPackFight(pack, PositionDanger(enemyPos.x, enemyPos.y)))
                 foreach (Creature fighter in pack)
                 {
-                    fighter.TargetEnemy(interacter.ID, new Vector2Int(interacter.x, interacter.y));
+                    fighter.TargetEnemy(interacter.ID, new Vector3Int(interacter.x, interacter.y, (int)interacter.creatureLayer));
                 }
         }
 
@@ -706,7 +717,7 @@ namespace EvolutionSimulation.Entities
         /// Gives the creature an enemy to target in combat related activities.
         /// </summary>
         /// <param name="creature">Creature to consider an enemy</param>
-        public void TargetEnemy(int creature, Vector2Int pos) { mind.TargetEnemy(creature, pos); }
+        public void TargetEnemy(int creature, Vector3Int pos) { mind.TargetEnemy(creature, pos); }
         /// <summary>
         /// Returns true if this creature or an ally in sight has been attacked;
         /// </summary>
@@ -737,7 +748,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="id"> The enemy ID </param>
         /// <param name="position"> The enemy position </param>
         /// <returns> False if it has no enemy, true otherwise </returns>
-        public bool Enemy(out int id, out Vector2Int position) { return mind.Enemy(out id, out position); }
+        public bool Enemy(out int id, out Vector3Int position) { return mind.Enemy(out id, out position); }
         public bool Enemy() { return Enemy(out _, out _); }
         /// <summary>
         /// Gets the information of the nearest dangerous creature
@@ -745,7 +756,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="id"> The menace ID </param>
         /// <param name="position"> The menace position </param>
         /// <returns> False if it has no menace, true otherwise </returns>
-        public bool Menace(out int id, out Vector2Int position) { return mind.Menace(out id, out position); }
+        public bool Menace(out int id, out Vector3Int position) { return mind.Menace(out id, out position); }
         public bool Menace() { return Menace(out _, out _); }
         /// <summary>
         /// Gets the information of the closest parent to the creature
@@ -753,7 +764,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="id"> The parent ID </param>
         /// <param name="position"> The latest parent position that the creature remembers </param>
         /// <returns> False if it has no parent, true otherwise </returns>
-        public bool Parent(out int id, out Vector2Int position) { return mind.Parent(out id, out position); }
+        public bool Parent(out int id, out Vector3Int position) { return mind.Parent(out id, out position); }
         public bool Parent() { return Parent(out _, out _); }
         /// <summary>
         /// Gets the information of the closest prey the creature wants engage in combat.
@@ -762,7 +773,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="id"> The prey ID </param>
         /// <param name="position"> The prey position </param>
         /// <returns> False if it has no prey, true otherwise </returns>
-        public bool Prey(out int id, out Vector2Int position) { return mind.Prey(out id, out position); }
+        public bool Prey(out int id, out Vector3Int position) { return mind.Prey(out id, out position); }
         public bool Prey() { return Prey(out _, out _); }
         /// <summary>
         /// Gets the information of the closest ally to the creature
@@ -770,7 +781,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="id"> The ally ID </param>
         /// <param name="position"> The ally position </param>
         /// <returns> False if it has no ally, true otherwise </returns>
-        public bool Ally(out int id, out Vector2Int position) { return mind.Ally(out id, out position); }
+        public bool Ally(out int id, out Vector3Int position) { return mind.Ally(out id, out position); }
         public bool Ally() { return Ally(out _, out _); }
         /// <summary>
         /// Gets the information of the closest possible mate the creature has
@@ -778,7 +789,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="id"> The mate ID </param>
         /// <param name="position"> The mate position </param>
         /// <returns> False if it has no mate, true otherwise </returns>
-        public bool Mate(out int id, out Vector2Int position) { return mind.Mate(out id, out position); }
+        public bool Mate(out int id, out Vector3Int position) { return mind.Mate(out id, out position); }
         public bool Mate() { return Mate(out _, out _); }
         /// <summary>
         /// Gets the information of the closest corpse to the creature
@@ -787,7 +798,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="id"> The corpse ID </param>
         /// <param name="position"> The corpse position </param>
         /// <returns> False if it has no corpse, true otherwise </returns>
-        public bool Corpse(out int id, out Vector2Int position) { return mind.Corpse(out id, out position); }
+        public bool Corpse(out int id, out Vector3Int position) { return mind.Corpse(out id, out position); }
         public bool Corpse() { return Corpse(out _, out _); }
         /// <summary>
         /// Gets the information of the closest edible plant to the creature
@@ -796,7 +807,7 @@ namespace EvolutionSimulation.Entities
         /// <param name="id"> The plant ID </param>
         /// <param name="position"> The plant position </param>
         /// <returns> False if it has no plant, true otherwise </returns>
-        public bool Plant(out int id, out Vector2Int position) { return mind.Plant(out id, out position); }
+        public bool Plant(out int id, out Vector3Int position) { return mind.Plant(out id, out position); }
         public bool Plant() { return Plant(out _, out _); }
         /// <summary>
         /// Gets the position of the most valid water position to the creature
@@ -886,7 +897,7 @@ namespace EvolutionSimulation.Entities
         /// Calculate the distance between the creature and the given pos
         /// </summary>
         /// <returns> Distance between creature and pos. intMaxValue if out of the map </returns>
-        public int DistanceToObjective(Vector2Int pos)
+        public int DistanceToObjective(Vector3Int pos)
         {
             if (pos == null) return int.MaxValue;
             return DistanceToObjective(pos.x, pos.y);
@@ -895,6 +906,11 @@ namespace EvolutionSimulation.Entities
         {
             if (!world.CheckBounds(ox, oy)) return int.MaxValue;
             return Math.Max(Math.Abs(ox - x), Math.Abs(oy - y));
+        }
+        public int DistanceToObjective(Vector2Int pos)
+        {
+            if (pos == null) return int.MaxValue;
+            return DistanceToObjective(pos.x, pos.y);
         }
 
         /// <summary>
@@ -947,6 +963,7 @@ namespace EvolutionSimulation.Entities
             return GetNextCostOnPath();
         }
         public int SetPath(Vector2Int p, HeightLayer z = HeightLayer.Ground) { return SetPath(p.x, p.y, z); }
+        public int SetPath(Vector3Int p) { return SetPath(p.x, p.y, (HeightLayer)p.z); }
 
         public bool PathEnded()
         {

@@ -146,6 +146,7 @@ namespace EvolutionSimulation
             highMap = JsonConvert.DeserializeObject<List<MapRegion>>(regionMap);
             config.regionMap = highMap;
             Validator.Validate(config);
+            
 
             ticksHour = UniverseParametersManager.parameters.ticksPerHour;
             hoursDay = UniverseParametersManager.parameters.hoursPerDay;
@@ -154,6 +155,14 @@ namespace EvolutionSimulation
             night = UniverseParametersManager.parameters.nightStart;
 
             mapSize = map.GetLength(0);
+            entityMap = new List<IEntity>[mapSize, mapSize];
+            for (int yIndex = 0; yIndex < mapSize; yIndex++)
+            {
+                for (int xIndex = 0; xIndex < mapSize; xIndex++)
+                {
+                    entityMap[xIndex, yIndex] = new List<IEntity>();
+                }
+            }
             taxonomy = new GeneticTaxonomy();
             Creatures = new Dictionary<int, Creature>();
             metabolismComparer = new Utils.SortByMetabolism();
@@ -437,7 +446,7 @@ namespace EvolutionSimulation
         /// Performs a step of the simulation.
         /// </summary>
         /// <returns>True if ther are any remaining creatures</returns>
-        public bool Tick(int tick)
+        public bool Tick(int tick = 0)
         {
             this.tick = tick;
             CycleDayNight();
@@ -492,6 +501,17 @@ namespace EvolutionSimulation
             entitiesID++;
             // TODO: devolver el id, una copia o un wrap del objeto creado
             return ent;
+        }
+
+        /// <summary>
+        /// When a creature is born during the simulation it could happens that 
+        /// the parents are not the same species, the father's species could be the mother's progenitor species
+        /// or vice versa. If this is the case, we need to decide which one is the most similar to the child to set the species name
+        /// </summary>
+        /// <returns> Return the name of the child species</returns>
+        public string GiveName(CreatureChromosome childChromosome, Creature father, Creature mother)
+        {
+            return taxonomy.MostSimilarityParent(childChromosome, father, mother);
         }
 
         /// <summary>
@@ -624,7 +644,7 @@ namespace EvolutionSimulation
                 if (i < 0 || i >= map.GetLength(0)) continue;
                 for (int j = c.y - radius; j < c.y + radius; j++)
                 {
-                    if ( j < 0 || j >= map.GetLength(1) ) continue;
+                    if (j < 0 || j >= map.GetLength(1)) continue;
                     if (map[i, j].plant != null)
                         results.Add(map[i, j].plant);
 

@@ -7,6 +7,8 @@ using System.Threading;
 using EvolutionSimulation;
 using EvolutionSimulation.Entities;
 using EvolutionSimulation.Genetics;
+using Telemetry;
+using Telemetry.Events;
 
 namespace VisualizadorConsola
 {
@@ -20,12 +22,16 @@ namespace VisualizadorConsola
             base.Init(years, species, individuals, dataDir, exportDir);
             //WorldToBmp();
             Console.WriteLine("Simulation Init done");
+            Tracker.Instance.Init();
+            Tracker.Instance.Track(new SessionStart());
         }
 
         override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string highMap = null, string exportDir = null)
         {
-            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, exportDir);
+            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, highMap, exportDir);
             Console.WriteLine("Simulation Init done");
+            Tracker.Instance.Init();
+            Tracker.Instance.Track(new SessionStart());
         }
 
         override public void Run()
@@ -34,10 +40,17 @@ namespace VisualizadorConsola
             DateTime time = DateTime.Now;
             int ticks = world.YearToTick(UserInfo.Years);
             int i = 1;
+            int apocalypsisCont = 0;
+
+            System.Timers.Timer timer = new System.Timers.Timer(5000);
+            // TODO: Se puede hacer que sea el propio tracker el que haga el flush automatico cada x tiempo
+            timer.Elapsed += (o, args) => { Tracker.Instance.Flush(); };
+            timer.AutoReset = true;
+            timer.Start();
             int apocalypsisCont = 0, lastNum = world.Creatures.Count, births = 0, birthCur = 0;
             for (; i <= ticks; i++)
             {
-                if (!world.Tick(i) )
+                if (!world.Tick(i))
                 {
                     break;
                     ApocalypseExport(apocalypsisCont++);
@@ -47,18 +60,25 @@ namespace VisualizadorConsola
                     lastNum = world.Creatures.Count;
                 };
 
-                if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
-                lastNum = world.Creatures.Count;
-                Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
+                //if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
+                //lastNum = world.Creatures.Count;
+                //Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
+                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
+                if (i % 10 == 0) 
+                    Tracker.Instance.Track(new SimulationSample(i, world.Creatures.Count));
                 //Render();
                 //Thread.Sleep(1000);
                 if (i % YearTicks == 0)
                     Console.WriteLine("A Year has passed");
             }
+            timer.Stop();
+            timer.Dispose();
             DateTime time2 = DateTime.Now;
             Console.Write("Estimated Time for "+ UserInfo.Years + " years will be: " + TimeSpan.FromMilliseconds((time2-time).TotalMilliseconds/(i-1) * world.YearToTick(UserInfo.Years)) + "\n");
             Console.WriteLine("Deaths by: Temperature {0} Damage by others {1} Retaliation {2} Starvation {3} Thirst {4} Exhaustion {5}", world.deaths[0], world.deaths[1],world.deaths[2], world.deaths[3], world.deaths[4], world.deaths[5]);
             Console.Write("Simulation ended, ticks elapsed: " + i + "\n");
+            Tracker.Instance.Track(new SessionEnd());
+            Tracker.Instance.Flush();
         }
 
         override public void Export()

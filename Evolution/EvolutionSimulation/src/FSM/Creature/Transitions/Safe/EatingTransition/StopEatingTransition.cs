@@ -13,7 +13,7 @@
 
         public override bool Evaluate()
         {
-            Vector2Int plantPos, corpsePos; creature.Plant(out _, out plantPos); creature.Corpse(out _, out corpsePos);
+            Vector3Int plantPos, corpsePos; creature.Plant(out _, out plantPos); creature.Corpse(out _, out corpsePos);
             int distPlant = creature.DistanceToObjective(plantPos),
                 distCorpse = creature.DistanceToObjective(corpsePos);
 

@@ -16,7 +16,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            Vector2Int obj; creature.Menace(out _, out obj);
+            Vector3Int obj; creature.Menace(out _, out obj);
             int deltaX = obj.x - creature.x,       // Direction of objective
                 deltaY = obj.y - creature.y;
 

@@ -30,9 +30,12 @@ public class WorldCorpseManager : MonoBehaviour, IListener<World>
         //Debug.Log("WorldCorpses: " + corpses.Count);
 
         // Check if a corpse has despawned
-        foreach (int c in _corpses.Keys)
+        List<int> keys = new List<int>(_corpses.Keys);
+
+        for (int i = 0; i < _corpses.Count; ++i)
         {
-            if(w.GetStaticEntity(c) == null)
+            int c = keys[i];
+            if (w.GetStaticEntity(c) == null)
             {
                 Destroy(_corpses[c]);
                 _corpses.Remove(c);
@@ -57,7 +60,7 @@ public class WorldCorpseManager : MonoBehaviour, IListener<World>
 
         RaycastHit hit;
         // Position in Y axis + 10 (no specific reason for that number) => No point in the world will be higher.  
-        Physics.Raycast(new Vector3(c.x, terrain.terrainData.size.y + 10, c.y), Vector3.down, out hit, Mathf.Infinity, LayerMask.GetMask("World"));
+        Physics.Raycast(new Vector3(c.x * terrain.terrainData.size.x / c.world.map.GetLength(0), terrain.terrainData.size.y + 10, c.y * terrain.terrainData.size.z / c.world.map.GetLength(1)), Vector3.down, out hit, Mathf.Infinity, LayerMask.GetMask("World"));
         GameObject gO = Instantiate(corpsePrefab, new Vector3(hit.point.x, hit.point.y, hit.point.z), Quaternion.identity);
         return gO;
     }

@@ -8,7 +8,7 @@ namespace EvolutionSimulation.FSM.Creature.States
     /// </summary>
     class FollowParent : CreatureState
     {
-        Vector2Int parentPos;
+        Vector3Int parentPos;
 
         public FollowParent(Entities.Creature c) : base(c) { creature = c; }
         
@@ -28,7 +28,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void Action()
         {
             Vector3 nextPos = creature.GetNextPosOnPath();
-            if (nextPos.X != -1 && nextPos.Y != -1)
+            if (nextPos.X != -1 && nextPos.Y != -1 && creature.CanReach((Entities.Creature.HeightLayer)nextPos.Z))
                 creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
             SetPos();
         }
