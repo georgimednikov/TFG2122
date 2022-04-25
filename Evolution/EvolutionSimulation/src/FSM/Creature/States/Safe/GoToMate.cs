@@ -44,7 +44,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 bool hasMate = creature.Mate(out mateid, out tmpPos);
                 if (nextPos.X == -1)
                 {
-                    creature.SetPath(tmpPos.x, tmpPos.y);
+                    creature.SetPath(tmpPos.x, tmpPos.y, (Entities.Creature.HeightLayer)tmpPos.z);
                 }
 
                 // If the mate position changed (i.e. other better mate is near or the mate has changed its position), the creature updates its destiny.

@@ -355,6 +355,8 @@ namespace EvolutionSimulation.Genetics
         {
             for (int i = 0; i < existingSpecies.Count; i++)
             {
+                existingSpecies[i].endTick = existingSpecies[i].members[0].world.tick;
+                speciesRecord[speciesRecord.FindIndex(x => x == existingSpecies[i])].endTick = existingSpecies[i].endTick;
                 Species sp = existingSpecies[i];
                 SpeciesExport export = new SpeciesExport(sp.name, sp.original.stats);
                 string species = JsonConvert.SerializeObject(export, Formatting.Indented);

@@ -45,9 +45,9 @@ namespace EvolutionSimulation.FSM.Creature.States
         private void SetPos()
         {
             if (creature.Parent(out _, out parentPos))
-                creature.SetPath(parentPos.x, parentPos.y);
+                creature.SetPath(parentPos.x, parentPos.y, (Entities.Creature.HeightLayer)parentPos.z);
             else//just in case the creature does not have a parent
-                creature.SetPath(creature.x, creature.y);
+                creature.SetPath(creature.x, creature.y, (Entities.Creature.HeightLayer)parentPos.z);
         }
     }
 }
