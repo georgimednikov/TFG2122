@@ -33,7 +33,8 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            Vector3Int objective; creature.Menace(out _, out objective);
+            Vector3Int objective;
+            creature.Menace(out _, out objective);
             dngX = objective.x;
             dngY = objective.y;
             pathX = 0;
@@ -53,27 +54,6 @@ namespace EvolutionSimulation.FSM.Creature.States
                 creature.cornered = true;
             else
             {
-                if(pathX == -1 || pathX == 0 || !creature.CanReach((Entities.Creature.HeightLayer)pathZ))
-                {
-                    creature.Menace(out _, out objective);
-                    dngX = objective.x;
-                    dngY = objective.y;
-                    pathX = 0;
-                    pathY = 0;
-                    pathZ = 0;
-                    // It either seeks its allies or runs from its enemy
-                    
-                    if (creature.Ally(out _, out fwiend) && CheckIfSafe(fwiend))
-                    {
-                        pathX = fwiend.x;
-                        pathY = fwiend.y;
-                        pathZ = fwiend.z;
-                    }
-                    else PositionAwayFromMe(ref pathX, ref pathY);
-
-                    if (pathX == creature.x && pathY == creature.y)
-                        creature.cornered = true;
-                }
                 creature.SetPath(pathX, pathY, (Entities.Creature.HeightLayer)pathZ);
             }
 

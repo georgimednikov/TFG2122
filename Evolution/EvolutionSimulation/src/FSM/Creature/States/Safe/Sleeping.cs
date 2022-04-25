@@ -17,6 +17,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             creature.stats.EnergyExpense *= UniverseParametersManager.parameters.sleepingExpenseReduction;
             creature.stats.HydrationExpense *= UniverseParametersManager.parameters.sleepingExpenseReduction;
             creature.stats.RestExpense *= UniverseParametersManager.parameters.sleepingExpenseReduction;
+            
         }
 
         // This move is energy netural, costing the same energy that is obtained in a tick
@@ -28,6 +29,9 @@ namespace EvolutionSimulation.FSM.Creature.States
         // Increases current rest
         public override void Action()
         {
+
+            if (creature.stats.RestExpense >= creature.stats.RestRecovery)
+                Console.WriteLine("Problema en sleeping");
             creature.stats.CurrRest += creature.stats.RestRecovery;
             if (creature.stats.CurrRest > creature.stats.MaxRest)
             {

@@ -947,9 +947,11 @@ namespace EvolutionSimulation.Entities
                 if ((stats.AerialSpeed == -1 && z == HeightLayer.Air) || (stats.ArborealSpeed == -1 && z == HeightLayer.Tree)) throw new IndexOutOfRangeException("The creature cannot reach the position (" + x + ", " + y + ", " + z + ")");
 
                 //If the creature is already in the air, we cannot assert that A* is doable.
-                if (creatureLayer == HeightLayer.Air )
+                if (creatureLayer == HeightLayer.Air || (creatureLayer != HeightLayer.Air && z == HeightLayer.Air))
                 {
                     path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));
+                    if (path[0].X == x && path[0].Y == y)
+                        Array.Reverse(path);
                     pathIterator = 0;
                     return GetNextCostOnPath();
                 }
@@ -957,7 +959,11 @@ namespace EvolutionSimulation.Entities
                 path = Astar.GetPath(this, world, new Vector3(this.x, this.y, (int)creatureLayer), finalPos = (new Vector3(x, y, (int)z)), out double treeDensity); // A* to the objective
                 int thres = GetFlyThreshold(treeDensity);
                 if (thres > 0 && path.Length >= thres)
+                {
                     path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));// Straight line to the objective
+                    if (path[0].X == x && path[0].Y == y)
+                        Array.Reverse(path);
+                }
                 pathIterator = 0;
             }
             return GetNextCostOnPath();
