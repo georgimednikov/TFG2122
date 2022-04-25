@@ -299,33 +299,38 @@ namespace EvolutionSimulation.Entities
                 x1 = y1;
                 y1 = t;
             }
-            if (x0 > x1)
-            {
-                int t;
-                t = x0; // swap x0 and x1
-                x0 = x1;
-                x1 = t;
-                t = y0; // swap y0 and y1
-                y0 = y1;
-                y1 = t;
-            }
-            int dx = x1 - x0;
             int dy = Math.Abs(y1 - y0);
-            int error = dx / 2;
             int ystep = (y0 < y1) ? 1 : -1;
             int y = y0;
-            for (int x = x0; x <= x1; x++)
+            int dx = Math.Abs(x1 - x0);
+            int error = dx / 2;
+            if (x0 > x1) // Going left
             {
-                path.Add(new Vector3((steep ? y : x), (steep ? x : y), 2));
-                error = error - dy;
-                if (error < 0)
+                for (int x = x0; x >= x1; x--)
                 {
-                    y += ystep;
-                    error += dx;
+                    AddToPath(path, steep, dx, dy, ref error, ystep, ref y, x);
+                }
+            }
+            else // Going right
+            {
+                for (int x = x0; x <= x1; x++)
+                {
+                    AddToPath(path, steep, dx, dy, ref error, ystep, ref y, x);
                 }
             }
             path.Add(new Vector3((steep ? y1 : x1), (steep ? x1 : y1), z1));
             return path.ToArray();
+        }
+
+        private static void AddToPath(List<Vector3> path, bool steep, int dx, int dy, ref int error, int ystep, ref int y, int x)
+        {
+            path.Add(new Vector3((steep ? y : x), (steep ? x : y), 2));
+            error = error - dy;
+            if (error < 0)
+            {
+                y += ystep;
+                error += dx;
+            }
         }
     }
 }

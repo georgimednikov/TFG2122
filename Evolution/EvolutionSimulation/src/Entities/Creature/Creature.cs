@@ -950,8 +950,6 @@ namespace EvolutionSimulation.Entities
                 if (creatureLayer == HeightLayer.Air || (creatureLayer != HeightLayer.Air && z == HeightLayer.Air))
                 {
                     path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));
-                    if (path[0].X == x && path[0].Y == y)
-                        Array.Reverse(path);
                     pathIterator = 0;
                     return GetNextCostOnPath();
                 }
@@ -961,8 +959,6 @@ namespace EvolutionSimulation.Entities
                 if (thres > 0 && path.Length >= thres)
                 {
                     path = Astar.GetAirPath(new Vector3(this.x, this.y, (int)creatureLayer), new Vector3(x, y, (int)z));// Straight line to the objective
-                    if (path[0].X == x && path[0].Y == y)
-                        Array.Reverse(path);
                 }
                 pathIterator = 0;
             }
