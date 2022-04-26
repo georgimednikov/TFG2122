@@ -49,7 +49,8 @@ namespace EvolutionSimulation.Entities
         public void UpdatePriorities()
         {
             mem.Update();
-            UpdateParent();
+            if(creature.stats.Paternity != 0)
+                UpdateParent();
             UpdateCorpse();
             UpdatePlant();
             UpdateWaterSource();
