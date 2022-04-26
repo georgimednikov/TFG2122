@@ -44,7 +44,7 @@ namespace EvolutionSimulation
 
                 world.Init(config);
             }
-
+            UniverseParametersManager.WriteDefaultParameters();
             CreateCreatures();
         }
 

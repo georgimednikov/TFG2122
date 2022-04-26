@@ -300,7 +300,7 @@ namespace EvolutionSimulation.Entities
             IState drink = new Drinking(this);
             IState goToMate = new GoToMate(this);
             IState tryMate = new TryMate(this);
-            IState mating = new Mating(this, UniverseParametersManager.parameters.ticksToReproduce);    //TODO que 20 lo coja del cromosoma, es el tiempo que tardan en reproducirse
+            IState mating = new Mating(this, UniverseParametersManager.parameters.ticksToReproduce);
             IState goToEat = new GoToEat(this);
             IState eat = new Eating(this);
             IState goToSafePlace = new GoToSafePlace(this);
