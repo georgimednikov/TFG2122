@@ -477,21 +477,7 @@ namespace EvolutionSimulation
             T ent = new T();
 
             ent.Init(entitiesID, this, x, y, chromosome, name, fatherID, motherID);
-            // Progenitors start being adults and a half is male and the other half female
-            if (fatherID == -1)
-            {
-                ent.stats.CurrAge = (int)(UniverseParametersManager.parameters.adulthoodThreshold * ent.stats.LifeSpan);
-                if (Creatures.Count % 2 == 0)
-                {
-                    ent.chromosome.ModifyGender(Gender.Male);
-                    ent.stats.Gender = Gender.Male;
-                }
-                else
-                {
-                    ent.chromosome.ModifyGender(Gender.Female);
-                    ent.stats.Gender = Gender.Female;
-                }
-            }
+            
             taxonomy.AddCreatureToSpecies(ent);
             entityMap[x, y].Add(ent);
 
