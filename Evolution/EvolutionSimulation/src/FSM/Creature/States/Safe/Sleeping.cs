@@ -7,12 +7,17 @@ namespace EvolutionSimulation.FSM.Creature.States
     /// </summary>
     class Sleeping : CreatureState
     {
-        public Sleeping(Entities.Creature c) : base(c) { creature = c; }
-
+        public Sleeping(Entities.Creature c) : base(c) { 
+            creature = c; 
+            originalEnergyExpense = creature.stats.EnergyExpense;
+            originalHydrationExpense = creature.stats.HydrationExpense;
+            originalRestExpense = creature.stats.RestExpense;
+        }
+        float originalEnergyExpense, originalHydrationExpense, originalRestExpense;
         public override void OnEntry()
         {
             creature.stats.ActionPerceptionPercentage = UniverseParametersManager.parameters.actionPerceptionPercentage;
-
+            
             // Sleeping reduces the expense of being active
             creature.stats.EnergyExpense *= UniverseParametersManager.parameters.sleepingExpenseReduction;
             creature.stats.HydrationExpense *= UniverseParametersManager.parameters.sleepingExpenseReduction;
@@ -29,9 +34,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         // Increases current rest
         public override void Action()
         {
-
             if (creature.stats.RestExpense >= creature.stats.RestRecovery)
-                Console.WriteLine("Problema en sleeping");
+                throw new Exception("Problema en sleeping, se cansa más de lo que recupera");
             creature.stats.CurrRest += creature.stats.RestRecovery;
             if (creature.stats.CurrRest > creature.stats.MaxRest)
             {
@@ -45,9 +49,9 @@ namespace EvolutionSimulation.FSM.Creature.States
             creature.stats.ActionPerceptionPercentage = 1;
 
             // Waking up reestablishes the expenses to normal
-            creature.stats.EnergyExpense /= UniverseParametersManager.parameters.sleepingExpenseReduction;
-            creature.stats.HydrationExpense /= UniverseParametersManager.parameters.sleepingExpenseReduction;
-            creature.stats.RestExpense /= UniverseParametersManager.parameters.sleepingExpenseReduction;
+            creature.stats.EnergyExpense = originalEnergyExpense;
+            creature.stats.HydrationExpense = originalHydrationExpense;
+            creature.stats.RestExpense = originalRestExpense;
         }
 
         public override string ToString()
@@ -60,7 +64,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override string GetInfo()
         {
-            return creature.speciesName + " with ID: " + creature.ID + " SLEEPS AT (" + creature.x + ", " + creature.y + ")";
+            return creature.speciesName + " with ID: " + creature.ID + " SLEEPS AT (" + creature.x + ", " + creature.y + ", " + creature.creatureLayer + ")";
         }
     }
 }

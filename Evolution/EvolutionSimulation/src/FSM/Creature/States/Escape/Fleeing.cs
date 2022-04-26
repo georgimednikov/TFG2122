@@ -148,7 +148,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override string GetInfo()
         {
-            return  creature.speciesName + " with ID: " + creature.ID + " AT (" + creature.x + ", " + creature.y + ") FLEES TO (" + pathX + ", " + pathY + ")";
+            return  creature.speciesName + " with ID: " + creature.ID + " AT (" + creature.x + ", " + creature.y + ", " + creature.creatureLayer + ") FLEES TO (" + pathX + ", " + pathY + ", " + pathZ +")";
         }
 
         public override string ToString()

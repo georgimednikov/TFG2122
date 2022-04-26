@@ -14,7 +14,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         // This move is energy netural, costing the same energy that is obtained in a tick
         public override int GetCost()
         {
-            return UniverseParametersManager.parameters.baseActionCost;//TODO
+            return UniverseParametersManager.parameters.baseActionCost;
         }
 
         // Increases current rest

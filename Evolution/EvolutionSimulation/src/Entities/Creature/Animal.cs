@@ -100,10 +100,6 @@ namespace EvolutionSimulation.Entities
             stats.MinTemperature = stats.IdealTemperature - tempInRange;
             stats.MaxTemperature = stats.IdealTemperature + tempInRange;
 
-            //int ones = 0;
-            //foreach (bool num in chromosome.GetChromosome())
-            //    if (num) ones++;
-            //float ratio = ones / (float)chromosome.GetChromosome().Length;
 
             stats.MaxEnergy = resourceAmount; // minEnergy + stats.Size / sizeToEnergyRatio; TODO: en teoria es el mismo valor todos los recursos, cambia el gasto
             stats.CurrEnergy = stats.MaxEnergy;
@@ -162,14 +158,14 @@ namespace EvolutionSimulation.Entities
             if (!chromosome.HasAbility(CreatureFeature.Paternity, CreatureChromosome.AbilityUnlock[CreatureFeature.Paternity])) stats.Paternity = 0;
             else stats.Paternity = chromosome.GetFeature(CreatureFeature.Paternity);
 
-            ModifyStatsByAbilities(abilityUnlock);
+            ModifyStatsByAbilities();
         }
 
         /// <summary>
         /// Modify differents stats depending on the abilities
         /// </summary>
         /// <param name="abilityUnlock"></param>
-        private void ModifyStatsByAbilities(float abilityUnlock)
+        private void ModifyStatsByAbilities()
         {
             //Hair. Better with low temperatures and worse with high temperatures
             stats.Hair = chromosome.HasAbility(CreatureFeature.Hair, CreatureChromosome.AbilityUnlock[CreatureFeature.Hair]);
@@ -195,7 +191,7 @@ namespace EvolutionSimulation.Entities
             }
 
             //Intimidation has to be calculed here because of modifyStatByAge
-            float intimidation = stats.Size / 2 * ((int)stats.Diet + 1); //TODO: por que
+            float intimidation = stats.Size / 2; 
 
             //Horns. Increase damage and intimidation
             if (chromosome.HasAbility(CreatureFeature.Horns, CreatureChromosome.AbilityUnlock[CreatureFeature.Horns]))

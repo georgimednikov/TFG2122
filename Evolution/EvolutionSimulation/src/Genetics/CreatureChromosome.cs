@@ -121,7 +121,7 @@ namespace EvolutionSimulation.Genetics
         static public void SetChromosome(string chromosomeJson, string abilitiesJson = null)
         {
             if (chromosomeJson == null)
-                throw new Exception("Cannot find JSON with chromosome information");    // TODO: se puede/deberia generar el cromosoma default?
+                throw new Exception("Cannot find JSON with chromosome information");    
 
             List<Gene> genes = JsonConvert.DeserializeObject<List<Gene>>(chromosomeJson);
             Validator.Validate(genes);

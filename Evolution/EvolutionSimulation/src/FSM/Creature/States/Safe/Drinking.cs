@@ -42,7 +42,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override string GetInfo()
         {
-            return creature.speciesName + " with ID: " + creature.ID + " DRINKS AT (" + creature.x + ", " + creature.y + ")";
+            return creature.speciesName + " with ID: " + creature.ID + " DRINKS AT (" + creature.x + ", " + creature.y + ", " + creature.creatureLayer + ")";
         }
     }
 }

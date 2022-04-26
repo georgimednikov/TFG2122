@@ -32,7 +32,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (hasSafeTempPosAndNotInSamePos)  
             {
                 Vector3 nextPos = creature.GetNextPosOnPath();
-                if (nextPos.X != -1 && nextPos.Y != -1) // TODO: no haria falta creo
+                if (nextPos.X != -1 && nextPos.Y != -1)
                     creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
 
                 if(nextPos.X == -1)
@@ -59,7 +59,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override string GetInfo()
         {
-            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ")GOES TO SAFE TEMPERATURE PLACE AT (" + safeTempPos.x + ", " + safeTempPos.y + ")";
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ", " + creature.creatureLayer + ")GOES TO SAFE TEMPERATURE PLACE AT (" + safeTempPos.x + ", " + safeTempPos.y + ")";
         }
         public override string ToString()
         {
