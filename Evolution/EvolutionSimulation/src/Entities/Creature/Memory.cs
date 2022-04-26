@@ -684,7 +684,7 @@ namespace EvolutionSimulation.Entities
                 int x1, y1;
                 x1 = Math.Abs(x - p.position.x);
                 y1 = Math.Abs(y - p.position.y);
-                int dist = x1 + y1;
+                int dist = Math.Max(x1, y1);
 
                 if (dist <= dangerRadius)
                     danger += p.Danger() / (float)Math.Pow(2, dist);
