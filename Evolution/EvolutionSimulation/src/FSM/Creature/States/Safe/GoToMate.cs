@@ -37,14 +37,14 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (hasMateAndNotInSamePos)
             {
                 Vector3 nextPos = creature.GetNextPosOnPath();
-                if (nextPos.X != -1 && nextPos.Y != -1) // TODO: no haria falta creo
+                if (nextPos.X != -1 && nextPos.Y != -1) 
                     creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
 
                 Vector3Int tmpPos;
                 bool hasMate = creature.Mate(out mateid, out tmpPos);
                 if (nextPos.X == -1)
                 {
-                    creature.SetPath(tmpPos.x, tmpPos.y);
+                    creature.SetPath(tmpPos.x, tmpPos.y, (Entities.Creature.HeightLayer)tmpPos.z);
                 }
 
                 // If the mate position changed (i.e. other better mate is near or the mate has changed its position), the creature updates its destiny.
@@ -65,7 +65,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override string GetInfo()
         {
-            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ") GOES TO MATE AT (" + matePos.x + ", " + matePos.y + ")";
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ", " + creature.creatureLayer + ") GOES TO MATE AT (" + matePos.x + ", " + matePos.y + ", " + matePos.z +")";
         }
         public override string ToString()
         {

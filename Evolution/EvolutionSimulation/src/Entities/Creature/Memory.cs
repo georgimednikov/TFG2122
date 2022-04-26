@@ -106,7 +106,7 @@ namespace EvolutionSimulation.Entities
             if (parent != null)
                 mother = new EntityResource(parent.x, parent.y, (int)parent.creatureLayer, parent.ID, maxExperienceTicks);
             else
-                mother = new EntityResource(-1, -1, -1, -1, maxExperienceTicks);  // Impossible value to represent no parent
+                mother = new EntityResource(-1, -1, -1, -1, maxExperienceTicks);  // Impossible value to represent no mother
 
             Preys = new List<ValueResource>();
             Allies = new List<EntityResource>();
@@ -127,8 +127,8 @@ namespace EvolutionSimulation.Entities
             valueComparer = new ResourceValueComparer();
             positionComparer = new PositionComparer(c);
 
-            maxResourcesRemembered = 5; //TODO: Esto bien
-            maxPositionsRemembered = 10; //TODO: Esto bien
+            maxResourcesRemembered = thisCreature.stats.Knowledge + UniverseParametersManager.parameters.maxResourcesRemembered; 
+            maxPositionsRemembered = thisCreature.stats.Knowledge + UniverseParametersManager.parameters.maxPositionsRemembered; 
             ticksToSavePosition = 10; //TODO: Esto bien en base a action points?
             ticksElapsed = 0;
             maxExperienceTicks = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
@@ -170,6 +170,7 @@ namespace EvolutionSimulation.Entities
             //The list of creatures is also needed to calculate danger so it is done here too.
             //The danger in each tile seen by the creature caused by other creatures.
             float[,] intimidationFelt = new float[1 + perceptionRadius * 2, 1 + perceptionRadius * 2]; //* 2 to make it the diameter and +1 to account for the center.
+           
             foreach (Creature creature in perceivedCreatures)
             {
                 EntityResource resource = new EntityResource(creature.x, creature.y, (int)creature.creatureLayer, creature.ID, maxExperienceTicks);
@@ -190,8 +191,8 @@ namespace EvolutionSimulation.Entities
                 //Else they have no relation
                 else
                 {
+                    
                     int dist = thisCreature.DistanceToObjective(creature);
-
                     //The intimidation of the perceived creature increases based on how much health this one is missing, up to a value defined in UniverseParameters.
                     float intimidation = creature.stats.Intimidation *
                         (UniverseParametersManager.parameters.maxMenaceIntimidationMultiplierBasedOnMissingHealth - thisCreature.stats.CurrHealth / thisCreature.stats.MaxHealth);
@@ -310,7 +311,8 @@ namespace EvolutionSimulation.Entities
                 exploredRegions[currentRegion] = maxExperienceTicks;
 
             SortAndAdjustLists();
-            if (menace != null && menace.ticks != maxExperienceTicks && thisCreature.DistanceToObjective(menace.position) <= perceptionRadius)
+            if (menace != null && 
+                menace.ticks != maxExperienceTicks && thisCreature.DistanceToObjective(menace.position) <= perceptionRadius)
                 menace = null;
             if (thisCreature.stats.Gender == Genetics.Gender.Male)
             {
@@ -324,7 +326,7 @@ namespace EvolutionSimulation.Entities
                                                                                         //and this way the gender is not saved (which would be inconvinient).
                                                                                         //The creature has to be able to reach de ally to considere it as a mate
 
-                    if (ally.wantMate) //If it wants to mate and is of the opposite danger, it is a match.
+                    if (ally.wantMate) //If it wants to mate, it is a match.
                     {
                         Mate = Allies[i];
                         break;
@@ -929,6 +931,9 @@ namespace EvolutionSimulation.Entities
             return GetFromPositionDangers(new Vector2Int(position.x, position.y));
         }
 
+        /// <summary>
+        /// Remove a safe water that is in the given position 
+        /// </summary>
         private void RemoveFromSafeWater(Vector2Int pos)
         {
             int index = 0;
@@ -940,6 +945,9 @@ namespace EvolutionSimulation.Entities
             if (index < SafeWaterPositions.Count)
                 SafeWaterPositions.RemoveAt(index);
         }
+        /// <summary>
+        /// Remove a safePlant that is in the given position 
+        /// </summary>
         private void RemoveFromSafePlant(Vector2Int pos)
         {
             int index = 0;
@@ -951,7 +959,6 @@ namespace EvolutionSimulation.Entities
             if (index < SafeEdiblePlants.Count)
                 SafeEdiblePlants.RemoveAt(index);
         }
-
         private void RemoveFromSafePlant(Vector3Int pos)
         {
             int index = 0;
@@ -973,12 +980,12 @@ namespace EvolutionSimulation.Entities
             int index = 0;
             for (; index < l.Count; index++)
             {
-                if (l[index].Equals(r))//TODO probar que se llame al operator equals de EntityResource tb
+                if (l[index].Equals(r))
                     break;
             }
             if (index < l.Count)
             {
-                l[index].position = r.position; //TODO Actualizar posicion?
+                l[index].position = r.position; 
                 RefreshMemory(l[index], maxTicks);
             }
             else

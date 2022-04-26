@@ -25,7 +25,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
                 return false;
 
             //TODO que la distancia a empezar a seguir al padre dependa de algo (nivel de paternity, peligro...)
-            if (creature.DistanceToObjective(parentPos) > 10)
+            if (creature.DistanceToObjective(parentPos) > 10 && creature.CanReach((Entities.Creature.HeightLayer)parentPos.z))   // TODO: Numerosdalf el Gris
                 return true;
 
             return false;

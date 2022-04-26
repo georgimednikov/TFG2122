@@ -41,7 +41,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override string GetInfo()
         {
-            return creature.speciesName + " with ID: " + creature.ID + " WANDERS (" + creature.x + ", " + creature.y + ")";
+            return creature.speciesName + " with ID: " + creature.ID + " WANDERS (" + creature.x + ", " + creature.y + ", " + creature.creatureLayer + ")";
         }
     }
 }

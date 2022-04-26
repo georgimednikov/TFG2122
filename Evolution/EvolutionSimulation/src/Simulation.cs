@@ -44,7 +44,7 @@ namespace EvolutionSimulation
 
                 world.Init(config);
             }
-
+            UniverseParametersManager.WriteDefaultParameters();
             CreateCreatures();
         }
 
@@ -203,7 +203,30 @@ namespace EvolutionSimulation
                 //The new position is added to the list of used.
                 spawnPositions.Add(new Tuple<int, int>(x, y));
             }
+            SetUpInitialPopulation();
+        }
 
+        /// <summary>
+        /// The initial population start being adult and the half is male and the other is female
+        /// </summary>
+        virtual protected void SetUpInitialPopulation()
+        {
+            int i = 0;
+            foreach (Creature c in world.Creatures.Values)
+            {
+                c.stats.CurrAge = (int)(UniverseParametersManager.parameters.adulthoodThreshold * c.stats.LifeSpan);
+                if (i % 2 == 0)
+                {
+                    c.chromosome.ModifyGender(Genetics.Gender.Male);
+                    c.stats.Gender = Genetics.Gender.Male;
+                }
+                else
+                {
+                    c.chromosome.ModifyGender(Genetics.Gender.Female);
+                    c.stats.Gender = Genetics.Gender.Female;
+                }
+                i++;
+            }
         }
 
         protected World world;

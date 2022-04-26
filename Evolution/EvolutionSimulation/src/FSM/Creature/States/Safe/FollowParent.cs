@@ -34,7 +34,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         }
         public override string GetInfo()
         {
-            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ") FOLLOWS PARENT AT (" + parentPos.x + ", " + parentPos.y + ")";
+            return creature.speciesName + " with ID: " + creature.ID + " IN (" + creature.x + ", " + creature.y + ", " + creature.creatureLayer + ") FOLLOWS PARENT AT (" + parentPos.x + ", " + parentPos.y + ", " + parentPos.z +")";
         }
 
         public override string ToString()
@@ -45,9 +45,9 @@ namespace EvolutionSimulation.FSM.Creature.States
         private void SetPos()
         {
             if (creature.Parent(out _, out parentPos))
-                creature.SetPath(parentPos.x, parentPos.y);
+                creature.SetPath(parentPos.x, parentPos.y, (Entities.Creature.HeightLayer)parentPos.z);
             else//just in case the creature does not have a parent
-                creature.SetPath(creature.x, creature.y);
+                creature.SetPath(creature.x, creature.y, (Entities.Creature.HeightLayer)parentPos.z);
         }
     }
 }

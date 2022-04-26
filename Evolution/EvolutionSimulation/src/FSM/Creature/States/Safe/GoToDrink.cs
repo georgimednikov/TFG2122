@@ -31,12 +31,10 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 Vector3 nextPos = creature.GetNextPosOnPath();
                
-                if (nextPos.X != -1 && nextPos.Y != -1) // TODO: no haria falta creo
+                if (nextPos.X != -1 && nextPos.Y != -1)
                     creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
-                if (nextPos.X == -1)
-                {
-                    creature.SetPath(shorePosition.x, shorePosition.y);
-                }
+               else
+                    creature.SetPath(shorePosition.x, shorePosition.y);                
 
                 notAtDestiny = creature.x != shorePosition.x || creature.y != shorePosition.y || creature.creatureLayer != 0;
             }

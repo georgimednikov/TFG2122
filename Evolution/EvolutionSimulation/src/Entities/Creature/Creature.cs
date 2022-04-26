@@ -55,8 +55,6 @@ namespace EvolutionSimulation.Entities
             }
             speciesName = name;
             stats = new CreatureStats();
-            //TODO: Los parametros de abajo no se donde ponerlos xd
-            //speciesName = "None";
             SetStats();
             mind = new Mind(this, fatherID, motherID);
             this.x = x;
@@ -65,18 +63,7 @@ namespace EvolutionSimulation.Entities
             halfMaxMobility = this.chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2;
 
             ConfigureStateMachine();
-            // Attack
-            AddInteraction(Interactions.attack, ReceiveDamage);
-            if (this.chromosome.HasAbility(CreatureFeature.Thorns, CreatureChromosome.AbilityUnlock[CreatureFeature.Thorns]))
-                AddInteraction(Interactions.attack, RetalliateDamage);
-
-            // Poison
-            AddInteraction(Interactions.poison, Poison);
-
-            // Mate
-            AddInteraction(Interactions.mate, OnMate);
-            AddInteraction(Interactions.stopMate, StopMating);
-
+            SetUpInteractions();
             //Console.WriteLine(mfsm.ExportToDotGraph());
         }
 
@@ -241,7 +228,7 @@ namespace EvolutionSimulation.Entities
             {
                 float pE = (stats.CurrEnergy - (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold)) /  // Percentage of surpassed thresholds
                     (stats.MaxEnergy - (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold));
-                float pR = (stats.CurrRest - (stats.MaxRest * UniverseParametersManager.parameters.energyRegenerationThreshold)) /  
+                float pR = (stats.CurrRest - (stats.MaxRest * UniverseParametersManager.parameters.energyRegenerationThreshold)) /
                     (stats.MaxRest - (stats.MaxRest * UniverseParametersManager.parameters.energyRegenerationThreshold));
                 float pH = (stats.CurrHydration - (stats.MaxHydration * UniverseParametersManager.parameters.energyRegenerationThreshold)) /
                     (stats.MaxHydration - (stats.MaxHydration * UniverseParametersManager.parameters.energyRegenerationThreshold));
@@ -313,7 +300,7 @@ namespace EvolutionSimulation.Entities
             IState drink = new Drinking(this);
             IState goToMate = new GoToMate(this);
             IState tryMate = new TryMate(this);
-            IState mating = new Mating(this, UniverseParametersManager.parameters.ticksToReproduce);    //TODO que 20 lo coja del cromosoma, es el tiempo que tardan en reproducirse
+            IState mating = new Mating(this, UniverseParametersManager.parameters.ticksToReproduce);
             IState goToEat = new GoToEat(this);
             IState eat = new Eating(this);
             IState goToSafePlace = new GoToSafePlace(this);
@@ -463,6 +450,24 @@ namespace EvolutionSimulation.Entities
         // Handler for interaction events
         public delegate void ReceiveInteractionHandler(Creature receiver, Creature sender, Interactions type);
         public event ReceiveInteractionHandler ReceiveInteractionEvent; // TODO: asi?
+
+        /// <summary>
+        /// Set the interactions that the creature has
+        /// </summary>
+        protected void SetUpInteractions()
+        {
+            // Attack
+            AddInteraction(Interactions.attack, ReceiveDamage);
+            if (this.chromosome.HasAbility(CreatureFeature.Thorns, CreatureChromosome.AbilityUnlock[CreatureFeature.Thorns]))
+                AddInteraction(Interactions.attack, RetalliateDamage);
+
+            // Poison
+            AddInteraction(Interactions.poison, Poison);
+
+            // Mate
+            AddInteraction(Interactions.mate, OnMate);
+            AddInteraction(Interactions.stopMate, StopMating);
+        }
 
         // Methods to receive and respond to interactions
         /// <summary>
@@ -632,7 +637,7 @@ namespace EvolutionSimulation.Entities
             mating = false;
         }
 
-
+        // TODO: For the love of god please comment
         public int timeToBeInHeat { get; set; }
         public bool mating { get; set; }
         public bool wantMate { get; set; }

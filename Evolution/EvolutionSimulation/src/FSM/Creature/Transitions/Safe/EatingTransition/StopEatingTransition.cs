@@ -18,8 +18,8 @@
                 distCorpse = creature.DistanceToObjective(corpsePos);
 
             return creature.stats.CurrEnergy >= UniverseParametersManager.parameters.stopEatingTransitionEnergyMultiplier * creature.stats.MaxEnergy         // no hunger
-                || (distCorpse > UniverseParametersManager.parameters.adjacentLength && distPlant > UniverseParametersManager.parameters.adjacentLength)                                    // Both eating objective are far
-                || (distPlant > UniverseParametersManager.parameters.adjacentLength && creature.stats.Diet == Genetics.Diet.Herbivore)    // hervibore and plant objective is far
+                || (distCorpse > UniverseParametersManager.parameters.adjacentLength && distPlant > UniverseParametersManager.parameters.adjacentLength)                                    // Both eating objective are far    
+                || (distPlant > UniverseParametersManager.parameters.adjacentLength && creature.stats.Diet == Genetics.Diet.Herbivore)    // hervibore and plant objective is far   // TODO: Por que puede psar esto si quiera? Ningun alimento se mueve
                 || (distCorpse > UniverseParametersManager.parameters.adjacentLength && creature.stats.Diet == Genetics.Diet.Carnivore);  // carnivore and corpse objective is far
         }
 
