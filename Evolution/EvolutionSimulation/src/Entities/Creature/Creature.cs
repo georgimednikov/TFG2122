@@ -632,7 +632,7 @@ namespace EvolutionSimulation.Entities
             mating = false;
         }
 
-
+        // TODO: For the love of god please comment
         public int timeToBeInHeat { get; set; }
         public bool mating { get; set; }
         public bool wantMate { get; set; }
