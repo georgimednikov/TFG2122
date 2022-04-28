@@ -38,7 +38,7 @@ namespace VisualizadorConsola
         {
             int YearTicks = world.YearToTick(1.0f);
             DateTime time = DateTime.Now;
-            int ticks = world.YearToTick(UserInfo.Years);
+            int ticks = world.YearToTick(UserInfo.Years) ;
             int i = 1;
 
             System.Timers.Timer timer = new System.Timers.Timer(5000);
@@ -59,9 +59,9 @@ namespace VisualizadorConsola
                     lastNum = world.Creatures.Count;
                 };
 
-                //if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
-                //lastNum = world.Creatures.Count;
-                //Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
+                if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
+                lastNum = world.Creatures.Count;
+                Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
                 Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
                 if (i % 10 == 0) 
                     Tracker.Instance.Track(new SimulationSample(i, world.Creatures.Count));
@@ -74,7 +74,7 @@ namespace VisualizadorConsola
             timer.Dispose();
             DateTime time2 = DateTime.Now;
             Console.Write("Estimated Time for "+ UserInfo.Years + " years will be: " + TimeSpan.FromMilliseconds((time2-time).TotalMilliseconds/(i-1) * world.YearToTick(UserInfo.Years)) + "\n");
-            Console.WriteLine("Deaths by: Temperature {0} Damage by others {1} Retaliation {2} Starvation {3} Thirst {4} Exhaustion {5}", world.deaths[0], world.deaths[1],world.deaths[2], world.deaths[3], world.deaths[4], world.deaths[5]);
+            Console.WriteLine("Deaths by: Temperature {0} Damage by others {1} Retaliation {2} Starvation {3} Thirst {4} Exhaustion {5} Poison {6}", world.deaths[0], world.deaths[1],world.deaths[2], world.deaths[3], world.deaths[4], world.deaths[5], world.deaths[6]);
             Console.Write("Simulation ended, ticks elapsed: " + i + "\n");
             Tracker.Instance.Track(new SessionEnd());
             Tracker.Instance.Flush();
@@ -96,7 +96,7 @@ namespace VisualizadorConsola
         /// as well as the folder in which to save the resulting species. This method uses the program's console to do so.
         /// </summary>
         /// <returns></returns>
-        static public bool AskInfoUsingConsole()
+        public bool AskInfoUsingConsole()
         {
             do
             {

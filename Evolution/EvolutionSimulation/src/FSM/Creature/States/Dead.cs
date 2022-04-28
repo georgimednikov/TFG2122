@@ -1,8 +1,10 @@
 ﻿using System;
+using Telemetry;
+using Telemetry.Events;
 
 namespace EvolutionSimulation.FSM.Creature.States
 {
-    // TODO: Estado para testear, hacer el estado correctamente
+   
     class Dead : CreatureState
     {
         public Dead(Entities.Creature c) : base(c) { creature = c; }
@@ -32,32 +34,51 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             return "DeadState";
         }
-#if DEBUG
         public override string GetInfo()
         {
             string template = creature.speciesName + " with ID " + creature.ID + " DIES; CAUSE OF DEATH: ";
-
+             
             if(creature.stats.CurrEnergy <= 0)
             {
+                Tracker.Instance.Track(new Die(creature.world.tick, creature.ID, DeathType.Starved, creature.speciesName));
                 template += " starved to death";
                 creature.world.deaths[3]++;
             }
             else if (creature.stats.CurrHydration <= 0)
             {
+                Tracker.Instance.Track(new Die(creature.world.tick, creature.ID, DeathType.Dehydration, creature.speciesName));
                 template += " died of thirst";
                 creature.world.deaths[4]++;
             }
             else if (creature.stats.CurrRest <= 0)
             {
+                Tracker.Instance.Track(new Die(creature.world.tick, creature.ID, DeathType.Exhaustion, creature.speciesName));
                 template += " died of exhaustion";
                 creature.world.deaths[5]++;
             }
             else if (creature.stats.CurrHealth <= 0)
             {
                 template += creature.causeOfDeath;
-                if(template.Contains("attack from ")) creature.world.deaths[1]++;
-                else if (template.Contains("retalliation from ")) creature.world.deaths[2]++;
-                else if (template.Contains("temperature difference: ")) creature.world.deaths[0]++;
+                if (template.Contains("attack from "))
+                {
+                    Tracker.Instance.Track(new Die(creature.world.tick, creature.ID, DeathType.Attack, creature.speciesName));
+                    creature.world.deaths[1]++;
+                }
+                else if (template.Contains("retalliation from "))
+                {
+                    Tracker.Instance.Track(new Die(creature.world.tick, creature.ID, DeathType.Retalliation, creature.speciesName));
+                    creature.world.deaths[2]++;
+                }
+                else if (template.Contains("temperature difference: "))
+                {
+                    Tracker.Instance.Track(new Die(creature.world.tick, creature.ID, DeathType.Temperature, creature.speciesName));
+                    creature.world.deaths[0]++;
+                }
+                else if (template.Contains("poison, "))
+                {
+                    Tracker.Instance.Track(new Die(creature.world.tick, creature.ID, DeathType.Temperature, creature.speciesName));
+                    creature.world.deaths[6]++;
+                }
             }
             if(corpse == null)
                 return template + "\nCORPSE CANNOT BE CREATED IN: POSITION: (" + creature.x + ", " + creature.y + ") CREATURE ID: " + creature.ID;
@@ -65,6 +86,6 @@ namespace EvolutionSimulation.FSM.Creature.States
             return template + "\nCORPSE CREATED WITH ID: " + corpse.ID + " IN POSITION: (" + creature.x + ", " + creature.y + ")";
 
         }
-#endif
+
     }
 }

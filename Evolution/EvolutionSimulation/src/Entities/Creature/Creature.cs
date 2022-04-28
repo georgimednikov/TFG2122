@@ -19,13 +19,12 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public int ID { get; protected set; }
 
-#if DEBUG
         /// <summary>
         /// Variable used to somewhat accurately determine the cuas eof the creature's death
         /// at the time of the creation of its corpse
         /// </summary>
         public string causeOfDeath = "";
-#endif
+
 
         /// <summary>
         /// Constructor for factories
@@ -92,6 +91,8 @@ namespace EvolutionSimulation.Entities
                 ActionPoints -= cost;
 #if DEBUG
                 Console.WriteLine(GetStateInfo());
+#else 
+                GetStateInfo();
 #endif
             }
 
@@ -148,8 +149,8 @@ namespace EvolutionSimulation.Entities
                 UniverseParametersManager.parameters.minHealthTemperatureDamage);
             stats.CurrHealth -= (float)damage;
 
-#if DEBUG            
             causeOfDeath = "temperature difference: " + difference + ", which dealt " + damage + " damage";
+#if DEBUG            
             Console.WriteLine("CreatureId: " + ID + "  " + causeOfDeath);
 #endif
 
@@ -568,9 +569,7 @@ namespace EvolutionSimulation.Entities
             float damage = ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
             stats.CurrHealth -= damage;
 
-#if DEBUG
             causeOfDeath = "attack from " + interacter.speciesName + " with ID: " + interacter.ID + ", which dealt " + damage + " damage";
-#endif
 
             // If the pack is aggressive enought they will fight, else nothing happens.
             Vector3Int enemyPos; Enemy(out _, out enemyPos);
@@ -589,8 +588,8 @@ namespace EvolutionSimulation.Entities
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
 
-#if DEBUG
             interacter.causeOfDeath = "retalliation from " + speciesName + " with ID: " + ID + ", which dealt " + stats.Counter + " damage";
+#if DEBUG
             Console.WriteLine(speciesName + " RETURNS " + stats.Counter + " DMG");
 #endif
         }

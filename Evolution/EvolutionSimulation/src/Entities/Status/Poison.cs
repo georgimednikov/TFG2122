@@ -21,8 +21,8 @@ namespace EvolutionSimulation.Entities.Status
             owner.stats.CurrHealth -= damage;
 #if DEBUG
             Console.WriteLine("POSION DEALT " + damage.ToString() + " DMG TO " + owner.speciesName);
-            owner.causeOfDeath = "poison, which dealt " + damage + " damage last tick";
 #endif
+            owner.causeOfDeath = "poison, which dealt " + damage + " damage last tick";
             return base.OnTick();
         }
 
