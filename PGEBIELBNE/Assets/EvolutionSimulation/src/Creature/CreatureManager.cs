@@ -16,8 +16,12 @@ namespace UnitySimulation
         public GameObject[] wings;
         public GameObject statusBar;
 
+        private StatusBar _statusBar;
+
         GameObject bodyMid, bodyForward, bodyBack;
         Transform bodyEmpty;
+
+        //public string state, stateLong;
 
         float sizeScale;
 
@@ -33,6 +37,12 @@ namespace UnitySimulation
             SpeciesExport species = SpeciesExport.GetExportFromJSON(json.text);
             Init(species);
         }
+        //int cont = 0;
+        //void Update()
+        //{
+        //    statusBar.GetComponent<StatusBar>().statusText.text = state;
+        //    statusBar.GetComponent<StatusBar>().SetStatusInfo((++cont).ToString());
+        //}
         void Init(SpeciesExport species)
         {
             sizeScale = species.stats.Size / 100f;
@@ -159,10 +169,21 @@ namespace UnitySimulation
 
         private void InstantiateStatusBar(SpeciesExport creature)
         {
-            StatusBar go = Instantiate(statusBar, transform).GetComponent<StatusBar>();
-            go.SetName(creature.name);
-            go.transform.localScale = Vector3.one * sizeScale;
-            go.transform.Translate(Vector3.up * 3 * (sizeScale + baseHeight));
+            _statusBar = Instantiate(statusBar, transform).GetComponent<StatusBar>();
+            //_statusBar.transform.position = new Vector3(_statusBar.transform.position.x, _statusBar.transform.position.y, _statusBar.transform.position.z);
+            _statusBar.SetName(creature.name);
+            _statusBar.transform.localScale = Vector3.one * sizeScale;
+            _statusBar.transform.Translate(Vector3.up * 3 * (sizeScale + baseHeight));
+        }
+      
+        public void SetStatusBar(float percentage)
+        {
+            _statusBar.SetHealthBarPercentage(percentage);
+        }
+        public void SetStatusTexts(string state, string info)
+        {
+            _statusBar.SetStatus(state);
+            _statusBar.SetStatusInfo(info);
         }
         #endregion
     }

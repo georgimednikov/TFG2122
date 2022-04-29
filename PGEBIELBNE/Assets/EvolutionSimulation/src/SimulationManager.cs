@@ -24,7 +24,7 @@ namespace UnitySimulation
         public TextAsset WorldMap;
         public TextAsset RegionMap;
 
-        public static float TimeBetweenSteps = 0.1f;
+        public static float TimeBetweenSteps = 1f;
 
         //[Tooltip("Directory where genes, chromosome, world and simulation parameters files are stored")]
         //public string DataDirectory;
