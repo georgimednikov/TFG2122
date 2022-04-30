@@ -972,11 +972,11 @@ namespace EvolutionSimulation
         public void ExportContent()
         {
             taxonomy.ExportSpecies();
-            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + "Tree.txt");
+            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + UserInfo.TreeName);
             string word = JsonConvert.SerializeObject(map, Formatting.Indented);
-            System.IO.File.WriteAllText(UserInfo.ExportDirectory + "World.json", word);
+            System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.WorldName, word);
             string hMap = JsonConvert.SerializeObject(highMap, Formatting.Indented);
-            System.IO.File.WriteAllText(UserInfo.ExportDirectory + "HighMap.json", hMap);
+            System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.RegionName, hMap);
         }
 
         /// <summary>
@@ -985,7 +985,7 @@ namespace EvolutionSimulation
         /// <param name="cont"></param>
         public void ApocalypseExportContent(int cont)
         {
-            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + "/Apocalyse" + cont + "Tree.txt", tick);
+            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + "/Apocalyse" + cont + UserInfo.TreeName, tick);
             taxonomy.ExportSpecies(cont);
         }
 

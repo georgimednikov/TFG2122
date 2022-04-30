@@ -39,7 +39,7 @@ namespace EvolutionSimulation
             {
                 WorldGenConfig config = new WorldGenConfig(World.MapType.Atoll)
                 {
-                    mapSize = 512
+                    mapSize = UserInfo.Size
                 };
 
                 world.Init(config);
@@ -78,7 +78,7 @@ namespace EvolutionSimulation
             {
                 WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
                 {
-                    mapSize = 512
+                    mapSize = UserInfo.Size
                 };
 
                 world.Init(config);
