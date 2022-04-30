@@ -1,10 +1,12 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Telemetry
 {
     public class TrackerEvent
     {
         [JsonProperty(Order = -2)]
+        [JsonConverter(typeof(StringEnumConverter))]
         public EventType Type { get; private set; }
 
         [JsonProperty(Order = -2)]

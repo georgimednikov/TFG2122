@@ -11,12 +11,12 @@ namespace EvolutionSimulation
     public static class Validator
     {
         #region WorldGenConfig
-        public class NonZeroSizeMapException : Exception
+        public class MinimumWorldSizeException : Exception
         {
-            public NonZeroSizeMapException() { }
-            public NonZeroSizeMapException(string message) : base(message) { }
-            public NonZeroSizeMapException(string message, Exception inner) : base(message, inner) { }
-            protected NonZeroSizeMapException(
+            public MinimumWorldSizeException() { }
+            public MinimumWorldSizeException(string message) : base(message) { }
+            public MinimumWorldSizeException(string message, Exception inner) : base(message, inner) { }
+            protected MinimumWorldSizeException(
               System.Runtime.Serialization.SerializationInfo info,
               System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
         }
@@ -51,7 +51,7 @@ namespace EvolutionSimulation
         static double funcValidationAccuracy = 0.1;
         static public void Validate(WorldGenConfig configuration)
         {
-            NonZeroSize(configuration);
+            MinimumWorldSize(configuration);
             SameSizeMaps(configuration);
             HeightFunc(configuration);
             InfluenceFunc(configuration);
@@ -61,10 +61,10 @@ namespace EvolutionSimulation
             RegionMap(configuration);
         }
 
-        static void NonZeroSize(WorldGenConfig config)
+        static void MinimumWorldSize(WorldGenConfig config)
         {
             if (config.humidityMap != null || config.temperatureMap != null || config.heightMap != null) return;
-            if (config.mapSize <= 0) throw new NonZeroSizeMapException("The provided size is equal or less than 0");
+            if (config.mapSize <= UserInfo.MinWorldSize()) throw new MinimumWorldSizeException("The provided size is equal or less than the minimum required size: " + UserInfo.MinWorldSize());
 
             return;
         }

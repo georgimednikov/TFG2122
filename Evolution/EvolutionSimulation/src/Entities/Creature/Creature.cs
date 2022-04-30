@@ -9,6 +9,18 @@ using System.Numerics;
 
 namespace EvolutionSimulation.Entities
 {
+    public enum CauseOfDeath
+    {
+        Temperature,
+        Attack,
+        Retalliation,
+        Starved,
+        Dehydration,
+        Exhaustion,
+        Poison,
+        NONE
+    }
+
     /// <summary>
     /// ID to identify an entity in the world
     /// </summary>
@@ -19,13 +31,18 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public int ID { get; protected set; }
 
-#if DEBUG
         /// <summary>
-        /// Variable used to somewhat accurately determine the cuas eof the creature's death
-        /// at the time of the creation of its corpse
+        /// Variable used to somewhat accurately determine the cuas eof the creature's death at the time of the creation of its corpse
         /// </summary>
-        public string causeOfDeath = "";
-#endif
+        public CauseOfDeath causeOfDeath = CauseOfDeath.NONE;
+        /// <summary>
+        /// Damage that first educed the creature's health below zero
+        /// </summary>
+        public double killingBlow;
+        /// <summary>
+        /// ID of the one who dealt the killing blow, if applicable.
+        /// </summary>
+        public int killerID;
 
         /// <summary>
         /// Constructor for factories
@@ -92,6 +109,8 @@ namespace EvolutionSimulation.Entities
                 ActionPoints -= cost;
 #if DEBUG
                 Console.WriteLine(GetStateInfo());
+#else 
+                GetStateInfo();
 #endif
             }
 
@@ -148,9 +167,14 @@ namespace EvolutionSimulation.Entities
                 UniverseParametersManager.parameters.minHealthTemperatureDamage);
             stats.CurrHealth -= (float)damage;
 
+            if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
+            {
+                causeOfDeath = CauseOfDeath.Temperature;
+                killingBlow = damage;
+                killerID = ID;  // TODO: -1 o esto?
+            }
 #if DEBUG            
-            causeOfDeath = "temperature difference: " + difference + ", which dealt " + damage + " damage";
-            Console.WriteLine("CreatureId: " + ID + "  " + causeOfDeath);
+            Console.WriteLine("CreatureId: " + ID + "  " + "temperature difference: " + difference + ", which dealt " + damage + " damage");
 #endif
 
             mind.CreateDanger();
@@ -219,12 +243,25 @@ namespace EvolutionSimulation.Entities
 
             if (stats.CurrEnergy <= 0 || stats.CurrRest <= 0 || stats.CurrHydration <= 0)
             {
-                stats.CurrHealth--;
+                stats.CurrHealth -= 1;  // TODO: Numero magico
+
+                if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
+                {
+                    if (stats.CurrEnergy <= 0)
+                        causeOfDeath = CauseOfDeath.Starved;
+                    else if (stats.CurrHydration <= 0)
+                        causeOfDeath = CauseOfDeath.Dehydration;
+                    else if (stats.CurrRest <= 0)
+                        causeOfDeath = CauseOfDeath.Exhaustion;
+
+                    killingBlow = 1;
+                    killerID = ID;  // TODO: -1 o esto?
+                }
             }
             else if (stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
                 stats.CurrRest >= (stats.MaxRest * UniverseParametersManager.parameters.restRegenerationThreshold) &&
                 stats.CurrHydration >= (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold) &&
-                CheckTemperature(x, y))
+                CheckTemperature(x, y) && stats.CurrHealth > 0)
             {
                 float pE = (stats.CurrEnergy - (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold)) /  // Percentage of surpassed thresholds
                     (stats.MaxEnergy - (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold));
@@ -556,7 +593,6 @@ namespace EvolutionSimulation.Entities
             float amount;
             amount = (dmg) - Math.Max((stats.Armor - pen), 0);
             amount = Math.Max(0, amount);
-            amount = Math.Min(amount, stats.CurrHealth);
             return amount;
         }
 
@@ -568,8 +604,15 @@ namespace EvolutionSimulation.Entities
             float damage = ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
             stats.CurrHealth -= damage;
 
+            if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
+            {
+                causeOfDeath = CauseOfDeath.Attack;
+                killingBlow = damage;
+                killerID = interacter.ID;  // TODO: -1 o esto?
+            }
+
 #if DEBUG
-            causeOfDeath = "attack from " + interacter.speciesName + " with ID: " + interacter.ID + ", which dealt " + damage + " damage";
+            Console.WriteLine(speciesName + " " + ID + " TAKES " + damage + " DMG (" + stats.CurrHealth + " HP LEFT)");
 #endif
 
             // If the pack is aggressive enought they will fight, else nothing happens.
@@ -589,9 +632,14 @@ namespace EvolutionSimulation.Entities
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
 
+            if (interacter.causeOfDeath == CauseOfDeath.NONE && interacter.stats.CurrHealth <= 0)
+            {
+                interacter.causeOfDeath = CauseOfDeath.Retalliation;
+                interacter.killingBlow = stats.Counter;
+                interacter.killerID = ID;
+            }
 #if DEBUG
-            interacter.causeOfDeath = "retalliation from " + speciesName + " with ID: " + ID + ", which dealt " + stats.Counter + " damage";
-            Console.WriteLine(speciesName + " RETURNS " + stats.Counter + " DMG");
+            Console.WriteLine(speciesName + " " + ID + " RETURNS " + stats.Counter + " DMG (" + interacter.stats.CurrHealth + " HP LEFT ON " + interacter.ID + ")");
 #endif
         }
 

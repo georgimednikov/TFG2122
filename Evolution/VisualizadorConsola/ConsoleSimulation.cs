@@ -17,23 +17,21 @@ namespace VisualizadorConsola
     /// </summary>
     public class ConsoleSimulation : Simulation
     {
-        override public void Init(int years, int species, int individuals, string dataDir, string exportDir)
+        override public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig config)
         {
-            base.Init(years, species, individuals, dataDir, exportDir);
-            //WorldToBmp();
-            Console.WriteLine("Simulation Init done");
             Tracker.Instance.Init();
             Tracker.Instance.Track(new SessionStart());
+            base.Init(years, species, individuals, dataDir, exportDir, config);
+            //WorldToBmp();
+            Console.WriteLine("Simulation Init done");
         }
 
-        //Este se ejecuta
-        override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string highMap = null, string exportDir = null)
+        override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
         {
-            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, highMap, exportDir);
-            //WorldToBmp();
-            Console.WriteLine("Simulation Init done");
             Tracker.Instance.Init();
             Tracker.Instance.Track(new SessionStart());
+            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, regionMap, exportDir);
+            Console.WriteLine("Simulation Init done");
         }
 
         override public void Run()
@@ -53,7 +51,7 @@ namespace VisualizadorConsola
             {
                 if (!world.Tick(i))
                 {
-                    break;
+                    break; //TODO: NO DEJAR ESTO
                     ApocalypseExport(apocalypsisCont++);
                     Console.WriteLine("APOCALYPSIS: Generating new set of creatures");
                     CreateCreatures();
@@ -64,7 +62,7 @@ namespace VisualizadorConsola
                 if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
                 lastNum = world.Creatures.Count;
                 Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
-                //Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
+                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
                 if (i % 10 == 0)
                     Tracker.Instance.Track(new SimulationSample(i, world.Creatures.Count));
                 //Render();
@@ -76,7 +74,7 @@ namespace VisualizadorConsola
             timer.Dispose();
             DateTime time2 = DateTime.Now;
             Console.Write("Estimated Time for " + UserInfo.Years + " years will be: " + TimeSpan.FromMilliseconds((time2 - time).TotalMilliseconds / (i - 1) * world.YearToTick(UserInfo.Years)) + "\n");
-            Console.WriteLine("Deaths by: Temperature {0} Damage by others {1} Retaliation {2} Starvation {3} Thirst {4} Exhaustion {5}", world.deaths[0], world.deaths[1], world.deaths[2], world.deaths[3], world.deaths[4], world.deaths[5]);
+            Console.WriteLine("Deaths by: Temperature {0} Damage by others {1} Retaliation {2} Starvation {3} Thirst {4} Exhaustion {5} Poison {6}", world.deaths[0], world.deaths[1], world.deaths[2], world.deaths[3], world.deaths[4], world.deaths[5], world.deaths[6]);
             Console.Write("Simulation ended, ticks elapsed: " + i + "\n");
             WorldToBmp();
             Tracker.Instance.Track(new SessionEnd());
@@ -99,59 +97,73 @@ namespace VisualizadorConsola
         /// as well as the folder in which to save the resulting species. This method uses the program's console to do so.
         /// </summary>
         /// <returns></returns>
-        static public bool AskInfoUsingConsole()
+        public bool AskInfoUsingConsole(Simulation s)
         {
+            string dataDir, exportDir;
+            int years, species, individuals;
+
             do
             {
                 Console.WriteLine("Input a valid directory containing the necessary data files for the program (chromosome.json, etc.):\n");
-                UserInfo.DataDirectory = Console.ReadLine() + "\\";
+                dataDir = Console.ReadLine() + "\\";
                 Console.Clear();
-            } while (!Directory.Exists(UserInfo.DataDirectory));
+            } while (!Directory.Exists(dataDir));
 
             Console.WriteLine("Input a valid directory in which the resulting data will be saved:\n");
-            UserInfo.ExportDirectory = Console.ReadLine() + "\\";
+            exportDir = Console.ReadLine() + "\\";
             Console.Clear();
-            if (!Directory.Exists(UserInfo.ExportDirectory))
-                UserInfo.ExportDirectory = Directory.CreateDirectory(UserInfo.ExportDirectory).FullName;
+            if (!Directory.Exists(exportDir))
+                exportDir = Directory.CreateDirectory(exportDir).FullName;
 
             do
             {
                 Console.WriteLine("Input how many years of evolution are going to be simulated:");
                 string input = Console.ReadLine();
-                UserInfo.Years = -1;
-                if (input != "") UserInfo.Years = Int32.Parse(input);
+                years = -1;
+                if (input != "") years = Int32.Parse(input);
                 Console.Clear();
-            } while (UserInfo.Years < 0);
+            } while (years < 0);
 
             int minSize = UserInfo.MinWorldSize();
-            do
+
+            WorldGenConfig config = null;
+            if (!File.Exists(dataDir + UserInfo.WorldName) && !File.Exists(dataDir + UserInfo.HeightMapName))
             {
-                Console.WriteLine("Input how big in squares the world is going to be. Must be a number larger than: " + minSize + "\n");
-                string input = Console.ReadLine();
-                UserInfo.Size = -1;
-                if (input != "") UserInfo.Size = Int32.Parse(input);
-                Console.Clear();
-            } while (UserInfo.Size < minSize);
+                do
+                {
+                    Console.WriteLine("Input how big in squares the world is going to be. Must be a number larger than: " + minSize + "\n");
+                    string input = Console.ReadLine();
+                    UserInfo.Size = -1;
+                    if (input != "") UserInfo.Size = Int32.Parse(input);
+                    Console.Clear();
+                } while (UserInfo.Size < minSize);
+            }
+            else if (File.Exists(dataDir + UserInfo.HeightMapName))
+            {
+                config = new WorldGenConfig(dataDir + UserInfo.HeightMapName);
+            }
 
             int minSpecies = UserInfo.MinSpeciesAmount();
             do
             {
                 Console.WriteLine("Input how many species are going to be created initially. Must be a number larger than: " + minSpecies + "\n");
                 string input = Console.ReadLine();
-                UserInfo.Species = -1;
-                if (input != "") UserInfo.Species = Int32.Parse(input);
+                species = -1;
+                if (input != "") species = Int32.Parse(input);
                 Console.Clear();
-            } while (UserInfo.Species < minSpecies);
+            } while (species < minSpecies);
 
             int minIndividuals = UserInfo.MinIndividualsAmount();
             do
             {
                 Console.WriteLine("Input how individuals per species are going to be created. Must be a number larger than: " + minIndividuals + "\n");
                 string input = Console.ReadLine();
-                UserInfo.Individuals = -1;
-                if (input != "") UserInfo.Individuals = Int32.Parse(input);
+                individuals = -1;
+                if (input != "") individuals = Int32.Parse(input);
                 Console.Clear();
-            } while (UserInfo.Individuals < minIndividuals);
+            } while (individuals < minIndividuals);
+
+            s.Init(years, species, individuals, dataDir, exportDir, config);
 
             return true;
         }

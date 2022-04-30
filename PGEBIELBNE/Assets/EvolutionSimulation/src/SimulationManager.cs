@@ -1,5 +1,7 @@
 using System.Collections;
 using UnityEngine;
+using Telemetry;
+using Telemetry.Events;
 
 namespace UnitySimulation
 {
@@ -22,8 +24,7 @@ namespace UnitySimulation
         public TextAsset WorldMap;
         public TextAsset RegionMap;
 
-
-        public float TimeBetweenSteps = 1;
+        public static float TimeBetweenSteps = 1f;
 
         //[Tooltip("Directory where genes, chromosome, world and simulation parameters files are stored")]
         //public string DataDirectory;
@@ -44,6 +45,9 @@ namespace UnitySimulation
                 Debug.LogError("WorldCreatureManager is not assigned");
             if (worldCorpseManager == null)
                 Debug.LogError("WorldCorpseManager is not assigned");
+            
+            Tracker.Instance.Init();
+            Tracker.Instance.Track(new SessionStart());
 
             string universeFileRaw = UniverseParameters == null ? null : UniverseParameters.text;
             string chromosomeFileRaw = Chromosome == null ? null : Chromosome.text;
@@ -62,7 +66,13 @@ namespace UnitySimulation
                 worldFileRaw, regionFileRaw,
                 Application.dataPath + "/Export/"
                 );
-            
+
+            System.Timers.Timer timer = new System.Timers.Timer(5000);
+            // TODO: Se puede hacer que sea el propio tracker el que haga el flush automatico cada x tiempo
+            timer.Elapsed += (o, args) => { Tracker.Instance.Flush(); };
+            timer.AutoReset = true;
+            timer.Start();
+
             simulation.Run();
 
             simulation.Subscribe(worldCreatureManager);
@@ -76,7 +86,20 @@ namespace UnitySimulation
             {
                 simulation.Step();
                 yield return new WaitForSeconds(TimeBetweenSteps);
+                
+                //worldCreatureManager.AfterCorroutine();
             }
+        }
+
+        public static float GetTimeBetweenSteps()
+        {
+            return TimeBetweenSteps;
+        }
+
+        void OnDestroy()
+        {
+            Tracker.Instance.Track(new SessionEnd());
+            Tracker.Instance.Flush();
         }
     }
 }

@@ -4,11 +4,30 @@ namespace Telemetry
 {
     public enum EventType
     {
-        [EnumMember(Value = "SesionStart")]
+        [EnumMember(Value = "SessionStart")]
         SessionStart,
         [EnumMember(Value = "SimulationSample")]
         SimulationSample,
-        [EnumMember(Value = "SesionEnd")]
+        [EnumMember(Value = "Die")]
+        Die,
+        [EnumMember(Value = "SessionEnd")]
         SessionEnd
+    }
+    public enum DeathType
+    {
+        [EnumMember(Value = "Temperature")]
+        Temperature,
+        [EnumMember(Value = "Attack")]
+        Attack,
+        [EnumMember(Value = "Retalliation")]
+        Retalliation,
+        [EnumMember(Value = "Starved")]
+        Starved,
+        [EnumMember(Value = "Dehydration")]
+        Dehydration,
+        [EnumMember(Value = "Exhaustion")]
+        Exhaustion,
+        [EnumMember(Value = "Poisoned")]
+        Poisoned
     }
 }

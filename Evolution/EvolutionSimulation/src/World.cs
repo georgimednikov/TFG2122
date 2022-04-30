@@ -15,7 +15,7 @@ namespace EvolutionSimulation
         /// <summary>
         /// Size of the map. If a heightMap/humidityMap/temperatureMap is provided then this parameter will be ignored.
         /// </summary>
-        public int mapSize;
+        public int mapSize = UserInfo.Size;
         /// <summary>
         /// Array of waves used to generate the heightmap
         /// </summary>
@@ -81,6 +81,10 @@ namespace EvolutionSimulation
         public WorldGenConfig(World.MapType type)
         {
             this.type = type;
+        }
+        public WorldGenConfig(string file)
+        {
+            heightMap = JsonConvert.DeserializeObject<float[,]>(file);
         }
     }
 
@@ -186,10 +190,9 @@ namespace EvolutionSimulation
             StaticEntities = new Dictionary<int, StaticEntity>();
             entitiesToDelete = new List<int>();
             StaticEntitiesToUpdate = new List<StaticEntity>();
-            deaths = new int[6];
             deathsPos = new List<Death>();
             pathPos = new List<Vector2>();
-
+            deaths = new int[7];
             MapData mapData;
             // Create plant entities from the file
             for (int i = 0; i < mapSize; i++)
@@ -225,9 +228,9 @@ namespace EvolutionSimulation
         /// </summary>
         public void Init(WorldGenConfig config)
         {
-            deaths = new int[6];
             deathsPos = new List<Death>();
             pathPos = new List<Vector2>();
+            deaths = new int[7];
             ticksHour = UniverseParametersManager.parameters.ticksPerHour;
             hoursDay = UniverseParametersManager.parameters.hoursPerDay;
             daysYear = UniverseParametersManager.parameters.daysPerYear;
@@ -995,11 +998,11 @@ namespace EvolutionSimulation
         public void ExportContent()
         {
             taxonomy.ExportSpecies();
-            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + "Tree.txt");
+            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + UserInfo.TreeName);
             string word = JsonConvert.SerializeObject(map, Formatting.Indented);
-            System.IO.File.WriteAllText(UserInfo.ExportDirectory + "World.json", word);
+            System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.WorldName, word);
             string hMap = JsonConvert.SerializeObject(highMap, Formatting.Indented);
-            System.IO.File.WriteAllText(UserInfo.ExportDirectory + "HighMap.json", hMap);
+            System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.HeightMapName, hMap);
         }
 
         /// <summary>
@@ -1008,7 +1011,7 @@ namespace EvolutionSimulation
         /// <param name="cont"></param>
         public void ApocalypseExportContent(int cont)
         {
-            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + "/Apocalyse" + cont + "Tree.txt", tick);
+            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + "/Apocalyse" + cont + UserInfo.TreeName, tick);
             taxonomy.ExportSpecies(cont);
         }
 

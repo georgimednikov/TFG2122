@@ -15,9 +15,9 @@ namespace Visualizador
         {
             Simulation s = new Simulation();
 #if DEBUG
-            s.Init(10, 10, 10, "../../ProgramData/", "../../ResultingData/");
+            s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/");
 #else
-            if (!AskInfoUsingWindows())
+            if (!AskInfoUsingWindows(s))
                 return;
 #endif
             s.Run();
@@ -29,57 +29,79 @@ namespace Visualizador
         /// as well as the folder in which to save the resulting species. This method uses a Windows window to do so.
         /// </summary>
         /// <returns></returns>
-        static public bool AskInfoUsingWindows()
+        static public bool AskInfoUsingWindows(Simulation s)
         {
+            string dataDir, exportDir;
+            int years, species, individuals;
+
             FolderBrowserDialog browser = new FolderBrowserDialog();
             browser.Description = "Choose the folder where the program will search for the data files. " +
                 "After this window a new one will open; if it does not show, minimize any other application open.";
             browser.SelectedPath = Path.GetFullPath("../../ProgramData");
             DialogResult result = browser.ShowDialog();
-            UserInfo.DataDirectory = browser.SelectedPath + "\\";
+            //UserInfo.DataDirectory = browser.SelectedPath + "\\";
 
             if (result == DialogResult.OK)
-                UserInfo.DataDirectory = browser.SelectedPath + "\\";
+                dataDir = browser.SelectedPath + "\\";
             else
                 return false;
 
             browser.Description = "Choose the folder where the program will save the program's resulting data.";
             browser.SelectedPath = Path.GetFullPath("../../ResultingSpecies");
             result = browser.ShowDialog();
-            UserInfo.ExportDirectory = browser.SelectedPath + "\\";
+            //UserInfo.ExportDirectory = browser.SelectedPath + "\\";
 
             if (result == DialogResult.OK)
-                UserInfo.ExportDirectory = browser.SelectedPath + "\\";
+                exportDir = browser.SelectedPath + "\\";
             else
                 return false;
 
-            int userEntry = -1;
+            int userEntry;
             do
             {
                 if (!InstantiatePrompt("Input how many years of evolution are going to be\nsimulated:", out userEntry))
                     return false;
             } while (userEntry < 1);
-            UserInfo.Years = userEntry;
+            years = userEntry;
 
-            do
+            WorldGenConfig config = null;
+
+            // If a simulation world is not given, a new one has to be created.
+            if (!File.Exists(dataDir + UserInfo.WorldName) || !File.Exists(dataDir + UserInfo.HeightMapName))
             {
-                if (!InstantiatePrompt("Input how big in squares the world is going to be.\nMust be a number larger than: " + UserInfo.MinWorldSize(), out userEntry))
-                    return false;
-            } while (userEntry < UserInfo.MinWorldSize());
-            UserInfo.Size = userEntry;
+                // If a height map is provided, it is not created from scratch.
+                if (File.Exists(dataDir + UserInfo.HeightMapName))
+                {
+                    config = new WorldGenConfig(dataDir + UserInfo.HeightMapName);
+                }
+                else // if nothing is given, a size has to be asked of the user. 
+                {
+                    do
+                    {
+                        if (!InstantiatePrompt("Input how big in squares the world is going to be.\nMust be a number larger than: " + UserInfo.MinWorldSize(), out userEntry))
+                            return false;
+                    } while (userEntry < UserInfo.MinWorldSize());
+                    UserInfo.Size = userEntry;
+                }
+            } 
 
             do
             {
                 if (!InstantiatePrompt("Input how many species are going to be created\ninitially. Must be a number larger than: " + UserInfo.MinSpeciesAmount(), out userEntry))
                     return false;
             } while (userEntry < UserInfo.MinSpeciesAmount());
-            UserInfo.Species = userEntry;
+            species = userEntry;
 
             do
             {
                 if (!InstantiatePrompt("Input how individuals per species are going to be\ncreated. Must be a number larger than: " + UserInfo.MinIndividualsAmount(), out userEntry))
                     return false;
             } while (userEntry < UserInfo.MinIndividualsAmount());
+            individuals = userEntry;
+
+        
+
+            s.Init(years, species, individuals, dataDir, exportDir, config);
 
             return true;
         }

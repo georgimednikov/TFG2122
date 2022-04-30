@@ -18,7 +18,8 @@ namespace EvolutionSimulation
         /// <param name="individuals"> Initial number of creatures per original specie </param>
         /// <param name="dataDir"> Directory where all the files with the simulation info are stored </param>
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends </param>
-        virtual public void Init(int years, int species, int individuals, string dataDir, string exportDir)
+        /// <param name="worldConfig"> World configuration to generate the world map. If it is provided, no other world files are considered </param>
+        virtual public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig worldConfig)
         {
             UserInfo.SetUp(years, species, individuals, dataDir, exportDir);
             // Universe Parameters
@@ -29,21 +30,30 @@ namespace EvolutionSimulation
             Genetics.GeneticTaxonomy.SetTaxonomy();
             // World
             world = new World();
-            string worldData = UserInfo.WorldFile();
-            string regionData = UserInfo.RegionFile();
-            if (worldData != null && regionData != null)
-            {
-                world.Init(worldData, regionData);
-            }
-            else
-            {
-                WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
-                {
-                    mapSize = 512
-                };
 
-                world.Init(config);
+            // If the is no custom world configuration
+            if (worldConfig == null)
+            {
+                string worldData = UserInfo.WorldFile();
+                string regionData = UserInfo.RegionFile();
+                // If a simulation world is provided, that one is used.
+                if (worldData != null && regionData != null)
+                {
+                    world.Init(worldData, regionData);
+                }
+                else // Else a new one has to be created from scratch with the given parameters, in this case only size.
+                {
+                    WorldGenConfig config = new WorldGenConfig(World.MapType.Atoll)
+                    {
+                        mapSize = UserInfo.Size
+                    };
+
+                    world.Init(config);
+                }
             }
+            else // There is a custom world configuration, which in this case means that a height map is provided.
+                world.Init(worldConfig);
+
             UniverseParametersManager.WriteDefaultParameters();
             CreateCreatures();
         }
@@ -78,7 +88,7 @@ namespace EvolutionSimulation
             {
                 WorldGenConfig config = new WorldGenConfig(World.MapType.Swamp)
                 {
-                    mapSize = 512
+                    mapSize = UserInfo.Size
                 };
 
                 world.Init(config);
@@ -106,7 +116,7 @@ namespace EvolutionSimulation
             world.ApocalypseExportContent(cont);
         }
 
-        
+
         /*//Method to test
         virtual protected void CreateCreaturesTest()
         {

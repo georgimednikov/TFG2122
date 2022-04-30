@@ -60,7 +60,7 @@ public class WorldCorpseManager : MonoBehaviour, IListener<World>
 
         RaycastHit hit;
         // Position in Y axis + 10 (no specific reason for that number) => No point in the world will be higher.  
-        Physics.Raycast(new Vector3(c.x * terrain.terrainData.size.x / c.world.map.GetLength(0), terrain.terrainData.size.y + 10, c.y * terrain.terrainData.size.z / c.world.map.GetLength(1)), Vector3.down, out hit, Mathf.Infinity, LayerMask.GetMask("World"));
+        Physics.Raycast(new Vector3(c.x * terrain.terrainData.size.x / c.world.map.GetLength(0), terrain.terrainData.size.y + 10, (c.world.map.GetLength(1) - c.y) * terrain.terrainData.size.z / c.world.map.GetLength(1)), Vector3.down, out hit, Mathf.Infinity, LayerMask.GetMask("World"));
         GameObject gO = Instantiate(corpsePrefab, new Vector3(hit.point.x, hit.point.y, hit.point.z), Quaternion.identity);
         return gO;
     }

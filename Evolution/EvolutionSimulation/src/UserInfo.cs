@@ -13,34 +13,44 @@ namespace EvolutionSimulation
         static public string DataDirectory = "./";
         static public string ExportDirectory = "./";
 
+        static public string UniverseParametersName = "UniverseParameters.json";
+        static public string ChromosomeName = "Chromosome.json";
+        static public string AbilityUnlockName = "AbilityUnlock.json";
+        static public string GeneSimilarityName = "SimilarityGeneWeight.json";
+        static public string WorldConfigName = "WorldConfig.json";
+        static public string WorldName = "World.json";
+        static public string RegionMapName = "RegionMap.json";
+        static public string HeightMapName = "HeightMap.json";
+        static public string TreeName = "Tree.txt";
+
         /// <summary>
         /// Returns the raw universe parameters file, if the file does not exist, returns null
         /// </summary>
-        static public string UniverseParametersFile() { return LoadFile("UniverseParameters.json"); }
+        static public string UniverseParametersFile() { return LoadFile(UniverseParametersName); }
         /// <summary>
         /// Returns the raw chromosome file, if the file does not exist, returns null
         /// </summary>
-        static public string ChromosomeFile() { return LoadFile("Chromosome.json"); }
+        static public string ChromosomeFile() { return LoadFile(ChromosomeName); }
         /// <summary>
         /// Returns the raw ability unlocks file, if the file does not exist, returns null
         /// </summary>
-        static public string AbilityUnlockFile() { return LoadFile("AbilityUnlock.json"); }
+        static public string AbilityUnlockFile() { return LoadFile(AbilityUnlockName); }
         /// <summary>
         /// Returns the raw gene similarity file, if the file does not exist, returns null
         /// </summary>
-        static public string GeneSimilarityFile() { return LoadFile("SimilarityGeneWeight.json"); }
+        static public string GeneSimilarityFile() { return LoadFile(GeneSimilarityName); }
         /// <summary>
         /// Returns the raw world config file, if the file does not exist, returns null
         /// </summary>
-        static public string WorldConfigFile() { return LoadFile("WorldConfig.json"); }
+        static public string WorldConfigFile() { return LoadFile(WorldConfigName); }
         /// <summary>
         /// Returns the raw world file, if the file does not exist, returns null
         /// </summary>
-        static public string WorldFile() { return LoadFile("World.json"); }
+        static public string WorldFile() { return LoadFile(WorldName); }
         /// <summary>
         /// Returns the Astar region file, if the file does not exist, returns null
         /// </summary>
-        static public string RegionFile() { return LoadFile("HighMap.json"); }
+        static public string RegionFile() { return LoadFile(HeightMapName); }
 
         /// <summary>
         /// Loads a file form the Data directory and returns its raw data.
