@@ -90,16 +90,13 @@ namespace EvolutionSimulation.Entities
             stats.Members = SetStatInRange(CreatureFeature.Members, maxLimbs + 1);//its not inclusive [0-11)
 
             stats.Metabolism = chromosome.GetFeature(CreatureFeature.Metabolism);
-            //Save the temperature in range [0,1] because of the map extreme values are these
-            double temperatureMax = chromosome.GetFeatureMax(CreatureFeature.IdealTemperature) + chromosome.GetFeatureMax(CreatureFeature.TemperatureRange);
-            double temperatureMin = 0 - chromosome.GetFeatureMax(CreatureFeature.TemperatureRange);
-            double maxRangeTemperature = Math.Abs(temperatureMax) + Math.Abs(temperatureMin);
-
-            stats.IdealTemperature = (chromosome.GetFeature(CreatureFeature.IdealTemperature) + Math.Abs(temperatureMin)) / maxRangeTemperature; 
-            double tempInRange = chromosome.GetFeature(CreatureFeature.TemperatureRange) / maxRangeTemperature;
+            
+            stats.IdealTemperature = (chromosome.GetFeature(CreatureFeature.IdealTemperature) 
+                / (double)chromosome.GetFeatureMax(CreatureFeature.IdealTemperature));
+            double tempInRange = (chromosome.GetFeature(CreatureFeature.TemperatureRange) 
+                / (double)chromosome.GetFeatureMax(CreatureFeature.TemperatureRange)) * 0.5f; // TODO: Numero magico
             stats.MinTemperature = stats.IdealTemperature - tempInRange;
             stats.MaxTemperature = stats.IdealTemperature + tempInRange;
-
 
             stats.MaxEnergy = resourceAmount; // minEnergy + stats.Size / sizeToEnergyRatio; TODO: en teoria es el mismo valor todos los recursos, cambia el gasto
             stats.CurrEnergy = stats.MaxEnergy;
