@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using EvolutionSimulation.Entities;
 using System.IO;
+using Telemetry;
+using Telemetry.Events;
 namespace EvolutionSimulation
 {
     /// <summary>
@@ -9,6 +11,8 @@ namespace EvolutionSimulation
     /// </summary>
     public class Simulation : ISimulation
     {
+        System.Timers.Timer timer;
+
         /// <summary>
         /// Initializes the program with information provided by the user
         /// If no directories are provided, data will be looked for in the directory where the .exe is located
@@ -21,6 +25,7 @@ namespace EvolutionSimulation
         /// <param name="worldConfig"> World configuration to generate the world map. If it is provided, no other world files are considered </param>
         virtual public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig worldConfig)
         {
+            InitTracker();
             UserInfo.SetUp(years, species, individuals, dataDir, exportDir);
             // Universe Parameters
             UniverseParametersManager.ReadJSON();
@@ -56,6 +61,8 @@ namespace EvolutionSimulation
 
             UniverseParametersManager.WriteDefaultParameters();
             CreateCreatures();
+
+            StartFlusingTracker(5000);
         }
 
         /// <summary>
@@ -71,6 +78,7 @@ namespace EvolutionSimulation
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends. If not provided, default export directory is setted</param>
         virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
         {
+            InitTracker();
             UserInfo.SetUp(years, species, individuals, _exportDir: exportDir);
             // Universe Parameters
             UniverseParametersManager.ReadJSON(uniParamsFile);
@@ -95,6 +103,33 @@ namespace EvolutionSimulation
             }
             UserInfo.Size = world.map.GetLength(0);
             CreateCreatures();
+            StartFlusingTracker(5000);
+        }
+        private void InitTracker()
+        {
+            Tracker.Instance.Init();
+            Tracker.Instance.Track(new SessionStart());
+        }
+
+        /// <summary>
+        /// Seconds between each flush
+        /// </summary>
+        /// <param name="miliseconds"></param>
+        private void StartFlusingTracker(int miliseconds)
+        {
+            timer = new System.Timers.Timer(5000);
+            // TODO: Se puede hacer que sea el propio tracker el que haga el flush automatico cada x tiempo
+            timer.Elapsed += (o, args) => { Tracker.Instance.Flush(); };
+            timer.AutoReset = true;
+            timer.Start();
+        }
+
+        private void EndTracker()
+        {
+            timer.Stop();
+            timer.Dispose();
+            Tracker.Instance.Track(new SessionEnd());
+            Tracker.Instance.Flush();
         }
 
         virtual public void Run()
@@ -109,6 +144,7 @@ namespace EvolutionSimulation
 
         virtual public void Export()
         {
+            EndTracker();
             world.ExportContent();
         }
         virtual public void ApocalypseExport(int cont)

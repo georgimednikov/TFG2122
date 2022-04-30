@@ -37,12 +37,7 @@ namespace UnitySimulation
             SpeciesExport species = SpeciesExport.GetExportFromJSON(json.text);
             Init(species);
         }
-        //int cont = 0;
-        //void Update()
-        //{
-        //    statusBar.GetComponent<StatusBar>().statusText.text = state;
-        //    statusBar.GetComponent<StatusBar>().SetStatusInfo((++cont).ToString());
-        //}
+
         void Init(SpeciesExport species)
         {
             sizeScale = species.stats.Size / 100f;
