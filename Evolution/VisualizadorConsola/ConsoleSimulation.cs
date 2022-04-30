@@ -26,9 +26,11 @@ namespace VisualizadorConsola
             Tracker.Instance.Track(new SessionStart());
         }
 
+        //Este se ejecuta
         override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string highMap = null, string exportDir = null)
         {
             base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, highMap, exportDir);
+            //WorldToBmp();
             Console.WriteLine("Simulation Init done");
             Tracker.Instance.Init();
             Tracker.Instance.Track(new SessionStart());
@@ -59,11 +61,11 @@ namespace VisualizadorConsola
                     lastNum = world.Creatures.Count;
                 };
 
-                //if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
-                //lastNum = world.Creatures.Count;
-                //Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
-                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
-                if (i % 10 == 0) 
+                if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
+                lastNum = world.Creatures.Count;
+                Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
+                //Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
+                if (i % 10 == 0)
                     Tracker.Instance.Track(new SimulationSample(i, world.Creatures.Count));
                 //Render();
                 //Thread.Sleep(1000);
@@ -73,9 +75,10 @@ namespace VisualizadorConsola
             timer.Stop();
             timer.Dispose();
             DateTime time2 = DateTime.Now;
-            Console.Write("Estimated Time for "+ UserInfo.Years + " years will be: " + TimeSpan.FromMilliseconds((time2-time).TotalMilliseconds/(i-1) * world.YearToTick(UserInfo.Years)) + "\n");
-            Console.WriteLine("Deaths by: Temperature {0} Damage by others {1} Retaliation {2} Starvation {3} Thirst {4} Exhaustion {5}", world.deaths[0], world.deaths[1],world.deaths[2], world.deaths[3], world.deaths[4], world.deaths[5]);
+            Console.Write("Estimated Time for " + UserInfo.Years + " years will be: " + TimeSpan.FromMilliseconds((time2 - time).TotalMilliseconds / (i - 1) * world.YearToTick(UserInfo.Years)) + "\n");
+            Console.WriteLine("Deaths by: Temperature {0} Damage by others {1} Retaliation {2} Starvation {3} Thirst {4} Exhaustion {5}", world.deaths[0], world.deaths[1], world.deaths[2], world.deaths[3], world.deaths[4], world.deaths[5]);
             Console.Write("Simulation ended, ticks elapsed: " + i + "\n");
+            WorldToBmp();
             Tracker.Instance.Track(new SessionEnd());
             Tracker.Instance.Flush();
         }
@@ -164,6 +167,7 @@ namespace VisualizadorConsola
             Bitmap hMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap holdRidgeMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap voronoiMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+            Bitmap debugMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             double val;
             for (int i = 0; i < world.map.GetLength(0) * scale; i += scale)
             {
@@ -396,9 +400,45 @@ namespace VisualizadorConsola
                     {
                         SetPixel(j, i, Color.White, voronoiMap, scale / 2);
                     }
+
+                    if(world.map[j / scale, i / scale].isWater) SetPixel(j, i, Color.DarkBlue, debugMap, scale);
+                    else SetPixel(j, i, Color.DarkGreen, debugMap, scale);
                 }
             }
-
+            for (int i = 0; i < world.pathPos.Count; i++)
+            {
+                Vector2 vector = world.pathPos[i];
+                SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.FromKnownColor(KnownColor.White), debugMap, scale/2);
+            }
+            
+            for (int i = 0; i < world.deathsPos.Count; i++)
+            {
+                Vector2 vector = world.deathsPos[i].pos;
+                switch (world.deathsPos[i].cause)
+                {
+                    case World.DeathCause.Temperature:
+                        SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Red, debugMap, scale);
+                        break;
+                    case World.DeathCause.Others:
+                        SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Yellow, debugMap, scale);
+                        break;
+                    case World.DeathCause.Retaliation:
+                        SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Orange, debugMap, scale);
+                        break;
+                    case World.DeathCause.Starvation:
+                        SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Pink, debugMap, scale);
+                        break;
+                    case World.DeathCause.Thirst:
+                        SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.BlueViolet, debugMap, scale);
+                        break;
+                    case World.DeathCause.Exhaustion:
+                        SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Fuchsia, debugMap, scale);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            
             for (int t = 0; t < world.highMap.Count; t++)
             {
                 Vector2 vector = world.highMap[t].spawnPoint;
@@ -413,10 +453,25 @@ namespace VisualizadorConsola
             hMap.Save("humidity.bmp");
             holdRidgeMap.Save("biome.bmp");
             voronoiMap.Save("VoronoiDiagram.bmp");
+            debugMap.Save("Debug.bmp");
         }
 
         void SetPixel(int x, int y, Color color, Bitmap bitmap, int scale = 2)
         {
+            for (int i = 0; i < scale; i++)
+            {
+                for (int j = 0; j < scale; j++)
+                {
+                    bitmap.SetPixel(x + i, y + j, color);
+                }
+            }
+        }
+
+        void BlendPixel(int x, int y, Color color, Bitmap bitmap, int scale = 2)
+        {
+            int c = bitmap.GetPixel(x, y).ToArgb(), nC = color.ToArgb();
+            color = Color.FromArgb((nC + c) / 2);
+
             for (int i = 0; i < scale; i++)
             {
                 for (int j = 0; j < scale; j++)

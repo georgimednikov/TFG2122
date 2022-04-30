@@ -84,7 +84,7 @@ namespace EvolutionSimulation.Entities
             Vector3 nStart = new Vector3(w.map[(int)start.X, (int)start.Y].regionId, 0, 0);
             Vector3 nEnd = new Vector3(w.map[(int)end.X, (int)end.Y].regionId, 0, 0);
 
-            if (nEnd.X != nStart.X)
+            if (nEnd.X != nStart.X) //TODO: Si es una isla y se quiere ir de ella andando, falta ese caso
             {
 
 

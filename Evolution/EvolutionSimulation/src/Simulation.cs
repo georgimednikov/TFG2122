@@ -37,7 +37,7 @@ namespace EvolutionSimulation
             }
             else
             {
-                WorldGenConfig config = new WorldGenConfig(World.MapType.Atoll)
+                WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
                 {
                     mapSize = 512
                 };
@@ -76,7 +76,7 @@ namespace EvolutionSimulation
             }
             else
             {
-                WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
+                WorldGenConfig config = new WorldGenConfig(World.MapType.Swamp)
                 {
                     mapSize = 512
                 };

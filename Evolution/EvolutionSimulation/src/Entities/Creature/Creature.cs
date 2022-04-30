@@ -869,6 +869,9 @@ namespace EvolutionSimulation.Entities
             this.x += x;
             this.y += y;
             world.entityMap[this.x, this.y].Add(this);
+            Vector2 pos = new Vector2();
+            pos.X = this.x; pos.Y = this.y;
+            world.pathPos.Add(pos);
             creatureLayer = z;
             if (!world.IsTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
@@ -883,6 +886,9 @@ namespace EvolutionSimulation.Entities
             this.x = x;
             this.y = y;
             world.entityMap[this.x, this.y].Add(this);
+            Vector2 pos = new Vector2();
+            pos.X = this.x; pos.Y = this.y;
+            world.pathPos.Add(pos);
             creatureLayer = z;
             if (!world.IsTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;

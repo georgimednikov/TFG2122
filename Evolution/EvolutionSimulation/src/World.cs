@@ -90,6 +90,23 @@ namespace EvolutionSimulation
     public class World
     {
         public int[] deaths;
+        public List<Death> deathsPos;
+        public List<Vector2> pathPos;
+        public enum DeathCause
+        {
+            Temperature,
+            Others,
+            Retaliation,
+            Starvation,
+            Thirst,
+            Exhaustion
+        }
+        public struct Death
+        {
+            public Vector2 pos;
+            public DeathCause cause;
+        }
+
         public int tick { get; private set; }
         /// <summary>
         /// Properties of each map tile
@@ -170,6 +187,9 @@ namespace EvolutionSimulation
             entitiesToDelete = new List<int>();
             StaticEntitiesToUpdate = new List<StaticEntity>();
             deaths = new int[6];
+            deathsPos = new List<Death>();
+            pathPos = new List<Vector2>();
+
             MapData mapData;
             // Create plant entities from the file
             for (int i = 0; i < mapSize; i++)
@@ -206,6 +226,8 @@ namespace EvolutionSimulation
         public void Init(WorldGenConfig config)
         {
             deaths = new int[6];
+            deathsPos = new List<Death>();
+            pathPos = new List<Vector2>();
             ticksHour = UniverseParametersManager.parameters.ticksPerHour;
             hoursDay = UniverseParametersManager.parameters.hoursPerDay;
             daysYear = UniverseParametersManager.parameters.daysPerYear;
@@ -747,6 +769,7 @@ namespace EvolutionSimulation
                             map[xIndex, yIndex].height = evaluateHeight(heightMap[xIndex, yIndex]);
                         else map[xIndex, yIndex].height = heightMap[xIndex, yIndex];
                     }
+                    if (map[xIndex, yIndex].height > 1) map[xIndex, yIndex].height = 1;
                     if (map[xIndex, yIndex].height >= 0.5) land++;
 
                     double evaluation = evaluateInfluence(map[xIndex, yIndex].height);
