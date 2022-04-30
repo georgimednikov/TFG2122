@@ -19,7 +19,8 @@ namespace EvolutionSimulation
         static public string GeneSimilarityName = "SimilarityGeneWeight.json";
         static public string WorldConfigName = "WorldConfig.json";
         static public string WorldName = "World.json";
-        static public string RegionName = "HighMap.json";
+        static public string RegionMapName = "RegionMap.json";
+        static public string HeightMapName = "HeightMap.json";
         static public string TreeName = "Tree.txt";
 
         /// <summary>
@@ -49,7 +50,7 @@ namespace EvolutionSimulation
         /// <summary>
         /// Returns the Astar region file, if the file does not exist, returns null
         /// </summary>
-        static public string RegionFile() { return LoadFile(RegionName); }
+        static public string RegionFile() { return LoadFile(HeightMapName); }
 
         /// <summary>
         /// Loads a file form the Data directory and returns its raw data.

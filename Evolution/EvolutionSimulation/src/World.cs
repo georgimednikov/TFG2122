@@ -82,6 +82,10 @@ namespace EvolutionSimulation
         {
             this.type = type;
         }
+        public WorldGenConfig(string file)
+        {
+            heightMap = JsonConvert.DeserializeObject<float[,]>(file);
+        }
     }
 
     /// <summary>
@@ -976,7 +980,7 @@ namespace EvolutionSimulation
             string word = JsonConvert.SerializeObject(map, Formatting.Indented);
             System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.WorldName, word);
             string hMap = JsonConvert.SerializeObject(highMap, Formatting.Indented);
-            System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.RegionName, hMap);
+            System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.HeightMapName, hMap);
         }
 
         /// <summary>

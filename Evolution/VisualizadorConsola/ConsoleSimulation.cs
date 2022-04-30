@@ -17,20 +17,20 @@ namespace VisualizadorConsola
     /// </summary>
     public class ConsoleSimulation : Simulation
     {
-        override public void Init(int years, int species, int individuals, string dataDir, string exportDir)
+        override public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig config)
         {
             Tracker.Instance.Init();
             Tracker.Instance.Track(new SessionStart());
-            base.Init(years, species, individuals, dataDir, exportDir);
+            base.Init(years, species, individuals, dataDir, exportDir, config);
             //WorldToBmp();
             Console.WriteLine("Simulation Init done");
         }
 
-        override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string highMap = null, string exportDir = null)
+        override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
         {
             Tracker.Instance.Init();
             Tracker.Instance.Track(new SessionStart());
-            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, highMap, exportDir);
+            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, regionMap, exportDir);
             Console.WriteLine("Simulation Init done");
         }
 
@@ -125,7 +125,8 @@ namespace VisualizadorConsola
 
             int minSize = UserInfo.MinWorldSize();
 
-            if (!File.Exists(dataDir + UserInfo.WorldName) && !File.Exists(dataDir + UserInfo.RegionName))
+            WorldGenConfig config = null;
+            if (!File.Exists(dataDir + UserInfo.WorldName) && !File.Exists(dataDir + UserInfo.HeightMapName))
             {
                 do
                 {
@@ -135,6 +136,10 @@ namespace VisualizadorConsola
                     if (input != "") UserInfo.Size = Int32.Parse(input);
                     Console.Clear();
                 } while (UserInfo.Size < minSize);
+            }
+            else if (File.Exists(dataDir + UserInfo.HeightMapName))
+            {
+                config = new WorldGenConfig(dataDir + UserInfo.HeightMapName);
             }
 
             int minSpecies = UserInfo.MinSpeciesAmount();
@@ -157,7 +162,7 @@ namespace VisualizadorConsola
                 Console.Clear();
             } while (individuals < minIndividuals);
 
-            s.Init(years, species, individuals, dataDir, exportDir);
+            s.Init(years, species, individuals, dataDir, exportDir, config);
 
             return true;
         }

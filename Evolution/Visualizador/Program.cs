@@ -64,16 +64,26 @@ namespace Visualizador
             } while (userEntry < 1);
             years = userEntry;
 
-            // If a world is not given then a size for a random one is requested.
-            if (!File.Exists(dataDir + UserInfo.WorldName) && !File.Exists(dataDir + UserInfo.RegionName))
+            WorldGenConfig config = null;
+
+            // If a simulation world is not given, a new one has to be created.
+            if (!File.Exists(dataDir + UserInfo.WorldName) || !File.Exists(dataDir + UserInfo.HeightMapName))
             {
-                do
+                // If a height map is provided, it is not created from scratch.
+                if (File.Exists(dataDir + UserInfo.HeightMapName))
                 {
-                    if (!InstantiatePrompt("Input how big in squares the world is going to be.\nMust be a number larger than: " + UserInfo.MinWorldSize(), out userEntry))
-                        return false;
-                } while (userEntry < UserInfo.MinWorldSize());
-                UserInfo.Size = userEntry;
-            }
+                    config = new WorldGenConfig(dataDir + UserInfo.HeightMapName);
+                }
+                else // if nothing is given, a size has to be asked of the user. 
+                {
+                    do
+                    {
+                        if (!InstantiatePrompt("Input how big in squares the world is going to be.\nMust be a number larger than: " + UserInfo.MinWorldSize(), out userEntry))
+                            return false;
+                    } while (userEntry < UserInfo.MinWorldSize());
+                    UserInfo.Size = userEntry;
+                }
+            } 
 
             do
             {
@@ -89,7 +99,9 @@ namespace Visualizador
             } while (userEntry < UserInfo.MinIndividualsAmount());
             individuals = userEntry;
 
-            s.Init(years, species, individuals, dataDir, exportDir);
+        
+
+            s.Init(years, species, individuals, dataDir, exportDir, config);
 
             return true;
         }
