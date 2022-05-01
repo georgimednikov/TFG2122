@@ -1,7 +1,7 @@
 [
     {
         "feature":"Strength",
-        "maxValue":2,
+        "maxValue":50,
         "relations":[]
     },
     {
