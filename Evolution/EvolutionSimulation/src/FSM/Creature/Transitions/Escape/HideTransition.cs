@@ -11,7 +11,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         {
             this.creature = creature;
             danger = (int)((UniverseParametersManager.parameters.hidingTransitionMultiplier + 1) - creature.stats.Aggressiveness /
-                (float)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.hidingTransitionMultiplier);  // The more aggresive a creature is, the lesser its danger range
+                (float)20 * UniverseParametersManager.parameters.hidingTransitionMultiplier);  // The more aggresive a creature is, the lesser its danger range
         }                                                                                                                                               // And therefore, the less it runs away
 
         public override bool Evaluate()

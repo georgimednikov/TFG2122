@@ -228,83 +228,51 @@ namespace EvolutionSimulation.Entities
         public override void SetStats(CreatureBaseStats baseStats)
         {
             stats.TimeBetweenHeats = baseStats.TimeBetweenHeats;
-
-            //Longevity is in years so we parse it to ticks and add a minimun value 
             stats.LifeSpan = baseStats.LifeSpan;
-
-            //Multipliers
-            stats.HealthRegeneration = UniverseParametersManager.parameters.healthRegeneration;
-            stats.MaxSpeed = UniverseParametersManager.parameters.maxSpeed;
-
+            stats.HealthRegeneration = baseStats.HealthRegeneration;
+            stats.MaxSpeed = baseStats.MaxSpeed;
             stats.Gender = baseStats.Gender;
-
             stats.Diet = baseStats.Diet;
-
-            //Minimum health plus bonus health
             stats.MaxHealth = baseStats.MaxHealth;
-            // Setting CurrHealth is unnecessary
             stats.Damage = baseStats.Damage;
             stats.Armor = baseStats.Armor;
             stats.Perforation = baseStats.Perforation;
-
-            //See mobilityPenalty commentary
             stats.Upright = baseStats.Upright;
             stats.AirReach = baseStats.AirReach;
             stats.TreeReach = baseStats.TreeReach;
-
             stats.AerialSpeed = baseStats.AerialSpeed;
             stats.ArborealSpeed = baseStats.ArborealSpeed;
             stats.GroundSpeed = baseStats.GroundSpeed;
-            //Physique related stats
             stats.Size = baseStats.Size;
-
             stats.Scavenger = baseStats.Scavenger;
             stats.Venom = baseStats.Venom;
             stats.Counter = baseStats.Counter;
-
             stats.Members = baseStats.Members;
-
             stats.Metabolism = baseStats.Metabolism;
-
             stats.IdealTemperature = baseStats.IdealTemperature;
             stats.MinTemperature = baseStats.MinTemperature;
             stats.MaxTemperature = baseStats.MaxTemperature;
-
             stats.MaxEnergy = baseStats.MaxEnergy; 
             stats.CurrEnergy = stats.MaxEnergy;
             stats.EnergyExpense = baseStats.EnergyExpense;
-
             stats.MaxHydration = baseStats.MaxHydration;
             stats.CurrHydration = stats.MaxHydration;
             stats.HydrationExpense = baseStats.HydrationExpense;
-
             stats.MaxRest = baseStats.MaxRest;
             stats.CurrRest = stats.MaxRest;
             stats.RestExpense = baseStats.RestExpense;
             stats.RestRecovery = baseStats.RestRecovery;
-
-            //Environment related stats
             stats.Camouflage = baseStats.Camouflage;
             stats.Aggressiveness = baseStats.Aggressiveness;
             stats.Perception = baseStats.Perception;
             stats.MaxPerception = baseStats.MaxPerception;
-
-            stats.NightPerceptionPercentage = baseStats.;
-            //Value that multiplies perception when it is being gotten
+            stats.NightPerceptionPercentage = stats.NightPerceptionPercentage;
             stats.CurrentVision = world.day ? 1 : stats.NightPerceptionPercentage;
             stats.ActionPerceptionPercentage = 1;
-
-            //If the creature can see in the dark, that penalty is reduced the better sight it has
-            if (chromosome.HasAbility(CreatureFeature.NightVision, CreatureChromosome.AbilityUnlock[CreatureFeature.NightVision]))
-                stats.CurrentVision *= 1 - chromosome.GetFeaturePercentage(CreatureFeature.NightVision);
-
-
-            //Behaviour related stats
             stats.Knowledge = baseStats.Knowledge;
             stats.Paternity = baseStats.Paternity;
             stats.Hair = baseStats.Hair;
             stats.Intimidation = baseStats.Intimidation;
-
         }
     }
 }

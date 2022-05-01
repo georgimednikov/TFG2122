@@ -18,7 +18,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public Fleeing(Entities.Creature c) : base(c)
         {
             creature = c;
-            modifier = 1.1f - (creature.stats.GroundSpeed / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) * 
+            modifier = 1.1f - (creature.stats.GroundSpeed / 200 * 
                 UniverseParametersManager.parameters.fleeingCostMultiplier);
         }
 

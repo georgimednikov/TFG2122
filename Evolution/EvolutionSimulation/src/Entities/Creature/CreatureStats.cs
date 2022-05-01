@@ -195,7 +195,10 @@ namespace EvolutionSimulation.Entities
         /// <summary>
         /// Percentage of the creature's perception that remains when at night.
         /// </summary>
-        public float NightPerceptionPercentage { get; set; }
+        public float NightPerceptionPercentage {
+            get { return baseStats.NightPerceptionPercentage; }
+            set { baseStats.NightPerceptionPercentage = value; }
+        }
 
         //Physique related stats
         public int Size
@@ -392,6 +395,7 @@ namespace EvolutionSimulation.Entities
         public int Intimidation;
         public int Perception;
         public int MaxPerception;
+        public float NightPerceptionPercentage;
 
         //Physique related stats
         public int Size;

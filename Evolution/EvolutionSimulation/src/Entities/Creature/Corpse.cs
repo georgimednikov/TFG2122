@@ -39,15 +39,15 @@ namespace EvolutionSimulation.Entities
             // From an hour to two weeks of lifetime, depending on size
             double minVal = World.ticksHour * World.hoursDay * (RandomGenerator.NextDouble() + 2);  // TODO: Numeros arcanos
             double maxVal = World.ticksHour * World.hoursDay * (RandomGenerator.NextDouble() + 7);  // TODO: Numeros arcanos
-            lifeTime =  (int)(minVal + ((maxVal - minVal)  * (creature.stats.Size / (double)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size)))); 
+            lifeTime =  (int)(minVal + ((maxVal - minVal)  * (creature.stats.Size / (double)200))); 
 
             // The less health, the faster the rot
             float putridStart = creature.stats.MaxHealth * UniverseParametersManager.parameters.rotStartMultiplier;   
             putridTime = (int)(lifeTime * putridStart);
 
             // If it is venomous it will be more risky to eat 
-            if (creature.chromosome.HasAbility(Genetics.CreatureFeature.Venomous, UniverseParametersManager.parameters.abilityUnlockPercentage))
-                poisonProb = creature.stats.Venom / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Venomous);
+            if (creature.stats.Venom > 0)
+                poisonProb = creature.stats.Venom / 10;
             else
                 poisonProb = 0;
 
@@ -56,7 +56,7 @@ namespace EvolutionSimulation.Entities
 
             // TODO: testiar
             maxNutritionPoints = UniverseParametersManager.parameters.corpseNutritionPointsMultiplier 
-                                * creature.stats.Size / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size);  
+                                * creature.stats.Size / 200.0f;  
         }
 
         //TODO, hacer un setTraits con parametros default que se saquen del UniverseParametersManager
@@ -81,8 +81,7 @@ namespace EvolutionSimulation.Entities
                 float actualPoisonProb = Math.Min(1.0f, Math.Max(0.0f, poisonProb + 1.0f - remains));
                 float actualNutritionPoints = maxNutritionPoints * remains;
                 // Having the ability 'Scavenger' reduces the penalties of eating the corpse            
-                if (other.chromosome.HasAbility(Genetics.CreatureFeature.Scavenger, 
-                    Genetics.CreatureChromosome.AbilityUnlock[Genetics.CreatureFeature.Scavenger])) 
+                if (other.stats.Scavenger > 0) 
                 {
                     actualPoisonProb -= other.stats.Scavenger;
                     actualNutritionPoints += (maxNutritionPoints - actualNutritionPoints) * other.stats.Scavenger;

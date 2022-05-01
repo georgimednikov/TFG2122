@@ -100,7 +100,7 @@ namespace EvolutionSimulation.Entities
             this.x = x;
             this.y = y;
             timeToBeInHeat = stats.TimeBetweenHeats;
-            halfMaxMobility = this.chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2;//TODO???????????
+            halfMaxMobility = 200 / 2;//TODO???????????
 
             ConfigureStateMachine();
             SetUpInteractions();
@@ -122,7 +122,7 @@ namespace EvolutionSimulation.Entities
                 if (s.OnTick()) RemoveStatus(s, true);  // removing it when necessary
 
             // Action points added every tick 
-            ActionPoints += stats.Metabolism * (int)Math.Ceiling((float)UniverseParametersManager.parameters.baseActionCost / (chromosome.GetFeatureMax(CreatureFeature.Metabolism) / 2));
+            ActionPoints += stats.Metabolism * (int)Math.Ceiling((float)UniverseParametersManager.parameters.baseActionCost / (200 / 2));
 
             // Executes the state action if the creature has enough Action Points
             int cost = 0;
@@ -523,7 +523,7 @@ namespace EvolutionSimulation.Entities
         {
             // Attack
             AddInteraction(Interactions.attack, ReceiveDamage);
-            if (this.chromosome.HasAbility(CreatureFeature.Thorns, CreatureChromosome.AbilityUnlock[CreatureFeature.Thorns]))
+            if (stats.Counter > 0)
                 AddInteraction(Interactions.attack, RetalliateDamage);
 
             // Poison
@@ -1085,8 +1085,8 @@ namespace EvolutionSimulation.Entities
 
             int x = (int)path[pathIterator].X, y = (int)path[pathIterator].Y;
             if (layer == (int)HeightLayer.Tree && (world.map[x, y].plant is Tree || world.map[x, y].plant is EdibleTree))
-                return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed * (2 - Tree.movementPenalty)) / halfMaxMobility));
-            return (int)(UniverseParametersManager.parameters.baseActionCost * ((chromosome.GetFeatureMax(CreatureFeature.Mobility) - speed) / halfMaxMobility));
+                return (int)(UniverseParametersManager.parameters.baseActionCost * ((200 - speed * (2 - Tree.movementPenalty)) / halfMaxMobility));
+            return (int)(UniverseParametersManager.parameters.baseActionCost * ((200 - speed) / halfMaxMobility));
         }
 
         /// <summary>

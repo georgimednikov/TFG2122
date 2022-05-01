@@ -36,7 +36,6 @@ namespace EvolutionSimulation.Genetics
     {
         public string name;
         public CreatureBaseStats stats;
-
         public SpeciesExport(string name, CreatureStats stats)
         {
             this.name = name;

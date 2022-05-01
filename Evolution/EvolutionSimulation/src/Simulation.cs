@@ -25,10 +25,11 @@ namespace EvolutionSimulation
         /// <param name="dataDir"> Directory where all the files with the simulation info are stored </param>
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends </param>
         /// <param name="worldConfig"> World configuration to generate the world map. If it is provided, no other world files are considered </param>
-        virtual public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig worldConfig)
+        virtual public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig worldConfig, string chromosomePath = "")
         {
             InitTracker();
             UserInfo.SetUp(years, species, individuals, dataDir, exportDir);
+
             // Universe Parameters
             UniverseParametersManager.ReadJSON();
             // Chromosome and ability unlocks
@@ -61,9 +62,11 @@ namespace EvolutionSimulation
             else // There is a custom world configuration, which in this case means that a height map is provided.
                 world.Init(worldConfig);
 
-            UniverseParametersManager.WriteDefaultParameters();
-            CreateCreatures();
-
+            //UniverseParametersManager.WriteDefaultParameters();
+            if (chromosomePath == "")
+                CreateCreatures();
+            else
+                CreateCreaturesNoChromosome(chromosomePath);
             StartFlusingTracker(5000);
         }
 
@@ -78,7 +81,7 @@ namespace EvolutionSimulation
         /// <param name="sGeneWeightFile"> Raw file with each genes' weight for the chromosome </param>
         /// <param name="abilitiesFile"> Raw file with each ability unlock percentage. If not provided, default information is setted</param>
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends. If not provided, default export directory is setted</param>
-        virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
+        virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null, string chromosomePath = "")
         {
             InitTracker();
             UserInfo.SetUp(years, species, individuals, _exportDir: exportDir);
@@ -104,7 +107,10 @@ namespace EvolutionSimulation
                 world.Init(config);
             }
             UserInfo.Size = world.map.GetLength(0);
-            CreateCreatures();
+            if (chromosomePath == "")
+                CreateCreatures();
+            else
+                CreateCreaturesNoChromosome(chromosomePath);
             StartFlusingTracker(5000);
         }
         private void InitTracker()
@@ -254,8 +260,14 @@ namespace EvolutionSimulation
             SetUpInitialPopulation();
         }
 
-        virtual protected void CreateCreaturesNoChromosome(SpeciesExport[] sExport)
+        virtual protected void CreateCreaturesNoChromosome(string path)
         {
+            List<SpeciesExport> s = new List<SpeciesExport>();
+            for (int j = 0; j < UserInfo.Species ; ++j)
+            {
+                if (File.Exists(path + "Species_" + j + ".json"))
+                    s.Add(SpeciesExport.GetExportFromJSON(File.ReadAllText(path + "Species_" + j + ".json")));
+            }
             //A minimum distance to leave in between species spawn points to give them some room.
             //Calculated based on the world size and amount of species to spawn, and then reduced by
             //a value to give room in the world and not fill it in a homogenous manner.
@@ -265,10 +277,10 @@ namespace EvolutionSimulation
             List<Tuple<int, int>> spawnPositions = new List<Tuple<int, int>>();
             int x, y;
             int i;
-            for ( i = 0; i < sExport.Length && i < UserInfo.Species; i++)
+            for (i = 0; i < s.Count && i < UserInfo.Species; i++)
             {
                 bool validPosition;
-                Animal a = world.CreateCreature<Animal>(0, 0, sExport[i].stats);
+                Animal a = world.CreateCreature<Animal>(0, 0, s[i].stats, s[i].name);
                 int cont = 0;
                 do
                 {
@@ -293,48 +305,13 @@ namespace EvolutionSimulation
                 //The specified amount of individuals of each species is created.
                 for (int j = 1; j < UserInfo.Individuals; j++)
                 {
-                    world.CreateCreature<Animal>(x, y, a.chromosome, a.speciesName);
+                    world.CreateCreature<Animal>(x, y, a.stats.GetBaseStats(), a.speciesName);
                 }
 
                 //The new position is added to the list of used.
                 spawnPositions.Add(new Tuple<int, int>(x, y));
             }
-
-            for (; i < UserInfo.Species; i++)
-            {
-                bool validPosition;
-                Animal a = world.CreateCreature<Animal>(0, 0);
-                int cont = 0;
-                do
-                {
-                    validPosition = true;
-                    x = RandomGenerator.Next(0, UserInfo.Size);
-                    y = RandomGenerator.Next(0, UserInfo.Size);
-                    if (world.map[x, y].isWater)
-                    {
-                        validPosition = false;
-                        continue;
-                    }
-                    if (!a.CheckTemperature(x, y) && cont < UserInfo.Size)
-                    {
-                        validPosition = false;
-                        cont++;
-                        continue;
-                    }
-                }
-                while (!validPosition);
-
-                a.Place(x, y);
-                //The specified amount of individuals of each species is created.
-                for (int j = 1; j < UserInfo.Individuals; j++)
-                {
-                    world.CreateCreature<Animal>(x, y, a.chromosome, a.speciesName);
-                }
-
-                //The new position is added to the list of used.
-                spawnPositions.Add(new Tuple<int, int>(x, y));
-            }
-            SetUpInitialPopulation();
+            SetUpInitialPopulationNoChromosome();
         }
 
         /// <summary>
@@ -354,6 +331,27 @@ namespace EvolutionSimulation
                 else
                 {
                     c.chromosome.ModifyGender(Genetics.Gender.Female);
+                    c.stats.Gender = Genetics.Gender.Female;
+                }
+                i++;
+            }
+        }
+
+        /// <summary>
+        /// The initial population start being adult and the half is male and the other is female
+        /// </summary>
+        virtual protected void SetUpInitialPopulationNoChromosome()
+        {
+            int i = 0;
+            foreach (Creature c in world.Creatures.Values)
+            {
+                c.stats.CurrAge = (int)(UniverseParametersManager.parameters.adulthoodThreshold * c.stats.LifeSpan);
+                if (i % 2 == 0)
+                {
+                    c.stats.Gender = Genetics.Gender.Male;
+                }
+                else
+                {
                     c.stats.Gender = Genetics.Gender.Female;
                 }
                 i++;

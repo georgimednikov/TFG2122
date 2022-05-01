@@ -16,18 +16,18 @@ namespace VisualizadorConsola
     /// </summary>
     public class ConsoleSimulation : Simulation
     {
-        override public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig config)
+        override public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig config, string chromosomePath = "")
         {
             
-            base.Init(years, species, individuals, dataDir, exportDir, config);
+            base.Init(years, species, individuals, dataDir, exportDir, config, chromosomePath);
             //WorldToBmp();
             Console.WriteLine("Simulation Init done");
         }
 
-        override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
+        override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null, string chromosomePath = "")
         {
             
-            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, regionMap, exportDir);
+            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, regionMap, exportDir, chromosomePath);
             Console.WriteLine("Simulation Init done");
         }
 

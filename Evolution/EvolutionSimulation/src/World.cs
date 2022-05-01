@@ -528,8 +528,8 @@ namespace EvolutionSimulation
 
             ent.Init(entitiesID, this, x, y, stats, name, fatherID, motherID);
 
-            taxonomy.AddCreatureToSpecies(ent);
-            ent.BirthEventTrack();
+            //taxonomy.AddCreatureToSpecies(ent);
+            //ent.BirthEventTrack();
 
             entityMap[x, y].Add(ent);
 
@@ -626,7 +626,7 @@ namespace EvolutionSimulation
             {
                 if (Creatures.ContainsKey(id))
                 {
-                    taxonomy.RemoveCreatureToSpecies(Creatures[id]);
+                    if(Creatures[id].chromosome != null)taxonomy.RemoveCreatureToSpecies(Creatures[id]);
                     Creatures.Remove(id);
                 }
                 else

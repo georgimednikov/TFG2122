@@ -133,7 +133,7 @@ namespace EvolutionSimulation.Entities
             ticksElapsed = 0;
             maxExperienceTicks = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
             dangerRadius = (int)(thisCreature.stats.Aggressiveness * UniverseParametersManager.parameters.aggressivenessToRadiusMultiplier);
-            danger = thisCreature.chromosome.GetFeature(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier;
+            danger = thisCreature.stats.Aggressiveness * UniverseParametersManager.parameters.experienceMaxAggresivenessMultiplier;
             CalculatePerceptionRadius();
         }
 
@@ -230,7 +230,7 @@ namespace EvolutionSimulation.Entities
                 if (entity is Corpse && !thisCreature.IsHerbivorous())
                 {
                     Corpse newCorpse = entity as Corpse;
-                    if (thisCreature.chromosome.HasAbility(Genetics.CreatureFeature.Scavenger, Genetics.CreatureChromosome.AbilityUnlock[Genetics.CreatureFeature.Scavenger])
+                    if (thisCreature.stats.Scavenger > 0
                         || newCorpse.Edible)
                         UpdateList(FreshCorpses, resource, maxExperienceTicks);
                     else

@@ -345,7 +345,8 @@ MonoBehaviour:
   AbilityUnlocks: {fileID: 4900000, guid: a72b0c7193b661a44a1826bf36cbbb1f, type: 3}
   GeneSimilarity: {fileID: 4900000, guid: 720e5147ea417944ea92c6537381b5f7, type: 3}
   WorldMap: {fileID: 4900000, guid: 8da52ab9936a2c64fa9ce818dec94ca7, type: 3}
-  RegionMap: {fileID: 4900000, guid: 5ffbdee8624b2f246824122cf4b36ce5, type: 3}
+  RegionMap: {fileID: 4900000, guid: 726fc98b1a56f0c47a6143ebdb26445e, type: 3}
+  SpeciesDir: /ProgramData/InitialSpecies/
   worldCreatureManager: {fileID: 848237403}
   worldCorpseManager: {fileID: 848237409}
   worldGenerator: {fileID: 848237407}

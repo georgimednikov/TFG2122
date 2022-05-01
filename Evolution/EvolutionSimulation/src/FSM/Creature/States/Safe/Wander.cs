@@ -12,8 +12,8 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override int GetCost()
         {
             return (int)(UniverseParametersManager.parameters.baseActionCost * 
-                ((creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) - creature.stats.GroundSpeed) / 
-                (creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Mobility) / 2f)));
+                (200 - creature.stats.GroundSpeed) / 
+                (200 / 2f));
         }
 
         public override void Action()

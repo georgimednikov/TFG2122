@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using Telemetry;
 using Telemetry.Events;
-
 namespace UnitySimulation
 {
     public class SimulationManager : MonoBehaviour
@@ -23,6 +22,8 @@ namespace UnitySimulation
         public TextAsset GeneSimilarity;
         public TextAsset WorldMap;
         public TextAsset RegionMap;
+        [SerializeField]
+        string SpeciesDir = "/ProgramData/InitialSpecies/";
 
         public static float TimeBetweenSteps = 1f;
 
@@ -65,7 +66,7 @@ namespace UnitySimulation
                 geneFileRaw,
                 worldFileRaw, regionFileRaw,
                 Application.dataPath + "/Export/"
-                );
+                , Application.dataPath + SpeciesDir);
 
             System.Timers.Timer timer = new System.Timers.Timer(5000);
             // TODO: Se puede hacer que sea el propio tracker el que haga el flush automatico cada x tiempo

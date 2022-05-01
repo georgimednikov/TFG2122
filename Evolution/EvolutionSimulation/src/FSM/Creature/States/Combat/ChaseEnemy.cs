@@ -19,7 +19,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         { 
             creature = c;
             modifier = 1.1f - // TODO: Modificador que dependa bien, ahora mismo a mas agresividad mejor persigue
-                (c.stats.Aggressiveness / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * 0.4f);  // TODO: PASAR A UNIVERSAL
+                (c.stats.Aggressiveness / 20 * 0.4f);  // TODO: PASAR A UNIVERSAL
         }
 
         public override int GetCost()

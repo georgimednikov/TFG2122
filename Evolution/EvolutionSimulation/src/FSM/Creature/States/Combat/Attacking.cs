@@ -16,7 +16,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override int GetCost()
         {
             attackMod = 0;
-            if (poison = creature.chromosome.HasAbility(Genetics.CreatureFeature.Venomous, Genetics.CreatureChromosome.AbilityUnlock[Genetics.CreatureFeature.Venomous]))  
+            if (poison = creature.stats.Venom > 0)  
                 attackMod += UniverseParametersManager.parameters.venomCostMultiplier * creature.stats.Venom;    // Costs 100 more per point in Venom                                                      
             return (int)(UniverseParametersManager.parameters.baseActionCost + attackMod);
         }
@@ -27,10 +27,13 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (!creature.Enemy(out enemyID, out _)) { speciesName = ""; return; }
             // TODO: Handlear la perdida posible de enmigo de la misma manera que chase? De momento no peta \[T]/
             Entities.Creature objCreature = creature.world.GetCreature(enemyID);
-            speciesName = objCreature.speciesName;
-            if (poison)
-                objCreature.ReceiveInteraction(creature, Entities.Interactions.poison);
-            objCreature.ReceiveInteraction(creature, Entities.Interactions.attack);
+            if (objCreature != null)
+            {
+                speciesName = objCreature.speciesName;
+                if (poison)
+                    objCreature.ReceiveInteraction(creature, Entities.Interactions.poison);
+                objCreature.ReceiveInteraction(creature, Entities.Interactions.attack);
+            }
         }
 
         // No longer cornered, as combat is done
