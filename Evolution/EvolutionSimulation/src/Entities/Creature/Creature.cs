@@ -18,6 +18,7 @@ namespace EvolutionSimulation.Entities
         Dehydration,
         Exhaustion,
         Poison,
+        Longevity,
         NONE
     }
 
@@ -229,6 +230,8 @@ namespace EvolutionSimulation.Entities
             stats.CurrRest = Math.Max(stats.CurrRest - stats.RestExpense, 0);
             stats.CurrEnergy = Math.Max(stats.CurrEnergy - stats.EnergyExpense, 0);
             stats.CurrAge++;
+            if (stats.CurrAge >= stats.LifeSpan)
+                causeOfDeath = CauseOfDeath.Longevity;
         }
 
         /// <summary>
