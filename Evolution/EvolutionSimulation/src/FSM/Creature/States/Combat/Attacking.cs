@@ -27,10 +27,13 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (!creature.Enemy(out enemyID, out _)) { speciesName = ""; return; }
             // TODO: Handlear la perdida posible de enmigo de la misma manera que chase? De momento no peta \[T]/
             Entities.Creature objCreature = creature.world.GetCreature(enemyID);
-            speciesName = objCreature.speciesName;
-            if (poison)
-                objCreature.ReceiveInteraction(creature, Entities.Interactions.poison);
-            objCreature.ReceiveInteraction(creature, Entities.Interactions.attack);
+            if (objCreature != null)
+            {
+                speciesName = objCreature.speciesName;
+                if (poison)
+                    objCreature.ReceiveInteraction(creature, Entities.Interactions.poison);
+                objCreature.ReceiveInteraction(creature, Entities.Interactions.attack);
+            }
         }
 
         // No longer cornered, as combat is done

@@ -171,7 +171,7 @@ namespace EvolutionSimulation.Entities
         }
         public int Perception
         {
-            get { return (int)(baseStats.Perception * CurrentVision * ActionPerceptionPercentage); }
+            get { return Math.Max(1,(int)(baseStats.Perception * CurrentVision * ActionPerceptionPercentage)); }
             set { baseStats.Perception = value; }
         }
         /// <summary>

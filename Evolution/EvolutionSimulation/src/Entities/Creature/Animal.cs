@@ -121,10 +121,7 @@ namespace EvolutionSimulation.Entities
             //Environment related stats
             stats.Camouflage = chromosome.GetFeature(CreatureFeature.Camouflage);
             stats.Aggressiveness = chromosome.GetFeature(CreatureFeature.Aggressiveness);
-            int maxPerceptionGene = chromosome.GetFeatureMax(CreatureFeature.Perception);
-            float range = (float)chromosome.GetFeature(CreatureFeature.Perception) / maxPerceptionGene;
-            stats.Perception = (int)(minPerception + (maxPerception - minPerception) * range);
-            stats.MaxPerception = minPerception + (maxPerception - minPerception) * 1;
+           
             //If the creature does not have the feature night vision then its perception will be the lowest posible,
             //So instead of Perception * 1 it will be Perception * minNightVision
             if (!chromosome.HasAbility(CreatureFeature.NightVision, CreatureChromosome.AbilityUnlock[CreatureFeature.NightVision]))
@@ -143,6 +140,12 @@ namespace EvolutionSimulation.Entities
             //Value that multiplies perception when it is being gotten
             stats.CurrentVision = world.day ? 1 : stats.NightPerceptionPercentage;
             stats.ActionPerceptionPercentage = 1;
+
+            int maxPerceptionGene = chromosome.GetFeatureMax(CreatureFeature.Perception);
+            float range = Math.Max(1.0f / maxPerceptionGene, (float)chromosome.GetFeature(CreatureFeature.Perception) / maxPerceptionGene);
+
+            stats.Perception = (int)(minPerception + (maxPerception - minPerception) * range);
+            stats.MaxPerception = minPerception + (maxPerception - minPerception) * 1;
 
             //If the creature can see in the dark, that penalty is reduced the better sight it has
             if (chromosome.HasAbility(CreatureFeature.NightVision, CreatureChromosome.AbilityUnlock[CreatureFeature.NightVision]))
