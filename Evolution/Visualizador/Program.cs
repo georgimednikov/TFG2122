@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Forms;
 using EvolutionSimulation;
+using Newtonsoft.Json;
 
 namespace Visualizador
 {
@@ -15,14 +16,14 @@ namespace Visualizador
         {
             Simulation s = new Simulation();
 #if DEBUG
-            s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/");
-#else
+            //s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/");
             if (!AskInfoUsingWindows(s))
                 return;
+#else
 #endif
             s.Run();
+            s.Export();
         }
-
 
         /// <summary>
         /// Asks the user where to look for the files containing the different values for the calculation of the chromosme, genes and stats,
@@ -67,12 +68,19 @@ namespace Visualizador
             WorldGenConfig config = null;
 
             // If a simulation world is not given, a new one has to be created.
-            if (!File.Exists(dataDir + UserInfo.WorldName) || !File.Exists(dataDir + UserInfo.HeightMapName))
+            if (!File.Exists(dataDir + UserInfo.WorldName) || !File.Exists(dataDir + UserInfo.RegionMapName))
             {
                 // If a height map is provided, it is not created from scratch.
                 if (File.Exists(dataDir + UserInfo.HeightMapName))
                 {
-                    config = new WorldGenConfig(dataDir + UserInfo.HeightMapName);
+                    string map = File.ReadAllText(dataDir + UserInfo.HeightMapName);
+                    float[,] heights = JsonConvert.DeserializeObject<float[,]>(map);
+                    config = new WorldGenConfig(World.MapType.Custom)
+                    {
+                        heightMap = heights,
+                        mapSize = heights.GetLength(0)
+                    };
+                    UserInfo.Size = config.mapSize;
                 }
                 else // if nothing is given, a size has to be asked of the user. 
                 {
@@ -83,7 +91,7 @@ namespace Visualizador
                     } while (userEntry < UserInfo.MinWorldSize());
                     UserInfo.Size = userEntry;
                 }
-            } 
+            }
 
             do
             {
@@ -98,8 +106,6 @@ namespace Visualizador
                     return false;
             } while (userEntry < UserInfo.MinIndividualsAmount());
             individuals = userEntry;
-
-        
 
             s.Init(years, species, individuals, dataDir, exportDir, config);
 
@@ -129,7 +135,7 @@ namespace Visualizador
 
             if (result == DialogResult.OK && textBox.Text != "")
             {
-                value = Int32.Parse(textBox.Text);
+                value = int.Parse(textBox.Text);
                 return true;
             }
             else

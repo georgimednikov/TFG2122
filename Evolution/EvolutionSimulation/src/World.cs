@@ -74,17 +74,13 @@ namespace EvolutionSimulation
         /// </summary>
         public World.MapType type;
         /// <summary>
-        /// Number of wholly isolated landmasses per chunk (32x32). Increase if you are getting
+        /// Number of wholly isolated landmasses per chunk (32x32). Increase if you the generated region map does not manage to include all islands.
         /// </summary>
         public int numPasses = 2;
 
         public WorldGenConfig(World.MapType type)
         {
             this.type = type;
-        }
-        public WorldGenConfig(string file)
-        {
-            heightMap = JsonConvert.DeserializeObject<float[,]>(file);
         }
     }
 
@@ -147,8 +143,8 @@ namespace EvolutionSimulation
             }
             config.heightMap = heightMap;
             config.temperatureMap = temperatureMap;
-            highMap = JsonConvert.DeserializeObject<List<MapRegion>>(regionMap);
-            config.regionMap = highMap;
+            this.regionMap = JsonConvert.DeserializeObject<List<MapRegion>>(regionMap);
+            config.regionMap = this.regionMap;
             Validator.Validate(config);
             
 
@@ -269,7 +265,7 @@ namespace EvolutionSimulation
             StaticEntitiesToUpdate = new List<StaticEntity>();
 
             p = new Perlin();
-            if (config.heightMap != null) { heightMap = config.heightMap; mapSize = heightMap.GetLength(0); }
+            if (config.heightMap != null) { heightMap = config.heightMap; config.mapSize = mapSize = heightMap.GetLength(0); }
             else mapSize = config.mapSize;
 
             if (config.heightWaves != null) heightWaves = config.heightWaves;
@@ -301,7 +297,7 @@ namespace EvolutionSimulation
                 }
             }
 
-            if (config.humidityMap != null) { humidityMap = config.humidityMap; mapSize = humidityMap.GetLength(0); }
+            if (config.humidityMap != null) { humidityMap = config.humidityMap; config.mapSize = mapSize = humidityMap.GetLength(0); }
             else mapSize = config.mapSize;
 
             if (config.humidityWaves != null) humidityWaves = config.humidityWaves;
@@ -315,7 +311,7 @@ namespace EvolutionSimulation
             }
 
 
-            if (config.temperatureMap != null) { temperatureMap = config.temperatureMap; mapSize = temperatureMap.GetLength(0); }
+            if (config.temperatureMap != null) { temperatureMap = config.temperatureMap; config.mapSize = mapSize = temperatureMap.GetLength(0); }
             else mapSize = config.mapSize;
 
             if (config.temperatureWaves != null) temperatureWaves = config.temperatureWaves;
@@ -333,17 +329,16 @@ namespace EvolutionSimulation
             if (config.regionMap == null)
             {
                 chunkSize = 32;
-                int chunk = (int)Math.Floor(mapSize / (float)chunkSize) + ((mapSize % chunkSize == 0) ? 1 : 0);
-                highMap = new List<MapRegion>();
-                FillHighMap();
+                regionMap = new List<MapRegion>();
+                FillRegionMap();
             }
             else
             {
-                highMap = config.regionMap;
+                regionMap = config.regionMap;
             }
         }
 
-        private void FillHighMap()
+        private void FillRegionMap()
         {
             int numReg = 0;
             Queue<Vector2> regions = new Queue<Vector2>(); //TODO: Lista de nodos a encolar 
@@ -366,7 +361,7 @@ namespace EvolutionSimulation
                         MapRegion reg = new MapRegion();
                         reg.spawnPoint = new Vector2(x, y);
                         reg.links = new Dictionary<int, List<Vector2>>();
-                        highMap.Add(reg);
+                        regionMap.Add(reg);
                         regions.Enqueue(reg.spawnPoint);
                     }
                 }
@@ -387,10 +382,10 @@ namespace EvolutionSimulation
 
                             if (nId != -1) //If the new tile is already in another region
                             {
-                                if (!highMap[id].links.ContainsKey(nId)) highMap[id].links.Add(nId, new List<Vector2>());
-                                if (!highMap[nId].links.ContainsKey(id)) highMap[nId].links.Add(id, new List<Vector2>());
+                                if (!regionMap[id].links.ContainsKey(nId)) regionMap[id].links.Add(nId, new List<Vector2>());
+                                if (!regionMap[nId].links.ContainsKey(id)) regionMap[nId].links.Add(id, new List<Vector2>());
 
-                                List<Vector2> links2 = highMap[nId].links[id];
+                                List<Vector2> links2 = regionMap[nId].links[id];
                                 if (links2.Find((x) => { return x == newPos; }) == default(Vector2))
                                     links2.Add(newPos);
                             }
@@ -979,8 +974,8 @@ namespace EvolutionSimulation
             taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + UserInfo.TreeName);
             string word = JsonConvert.SerializeObject(map, Formatting.Indented);
             System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.WorldName, word);
-            string hMap = JsonConvert.SerializeObject(highMap, Formatting.Indented);
-            System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.HeightMapName, hMap);
+            string rMap = JsonConvert.SerializeObject(regionMap, Formatting.Indented);
+            System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.HeightMapName, rMap);
         }
 
         /// <summary>
@@ -997,7 +992,7 @@ namespace EvolutionSimulation
         public MapData[,] map { get; private set; }
 
         public List<IEntity>[,] entityMap;
-        public List<MapRegion> highMap { get; private set; }
+        public List<MapRegion> regionMap { get; private set; }
         int mapSize;
         public int chunkSize { get; private set; }
         public bool day;
