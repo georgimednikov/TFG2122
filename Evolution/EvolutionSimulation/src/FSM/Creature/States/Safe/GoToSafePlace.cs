@@ -19,6 +19,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
+            base.OnEntry();
             safePos = creature.SafePosition();
             hasSafePosAndNotInSamePos = safePos != null && (safePos.x != creature.x || safePos.y != creature.y || creature.creatureLayer != 0);
             if (hasSafePosAndNotInSamePos)

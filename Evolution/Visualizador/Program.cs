@@ -16,10 +16,10 @@ namespace Visualizador
         {
             Simulation s = new Simulation();
 #if DEBUG
-            //s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/");
+            s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
+#else
             if (!AskInfoUsingWindows(s))
                 return;
-#else
 #endif
             s.Run();
             s.Export();

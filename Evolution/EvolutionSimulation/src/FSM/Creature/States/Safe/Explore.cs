@@ -27,6 +27,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
+            base.OnEntry();
             regionID = creature.NewExploreRegion();
             posToDiscover = new Vector3(creature.world.regionMap[regionID].spawnPoint, 0); // Region spawn point is always at ground height
             creature.SetPath((int)posToDiscover.X, (int)posToDiscover.Y, Entities.Creature.HeightLayer.Ground);

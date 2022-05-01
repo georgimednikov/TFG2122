@@ -15,7 +15,7 @@ namespace EvolutionSimulation
         /// <summary>
         /// Size of the map. If a heightMap/humidityMap/temperatureMap is provided then this parameter will be ignored.
         /// </summary>
-        public int mapSize;
+        public int mapSize = UserInfo.Size;
         /// <summary>
         /// Array of waves used to generate the heightmap
         /// </summary>
@@ -90,6 +90,23 @@ namespace EvolutionSimulation
     public class World
     {
         public int[] deaths;
+        public List<Death> deathsPos;
+        public List<Vector2> pathPos;
+        public enum DeathCause
+        {
+            Temperature,
+            Others,
+            Retaliation,
+            Starvation,
+            Thirst,
+            Exhaustion
+        }
+        public struct Death
+        {
+            public Vector2 pos;
+            public DeathCause cause;
+        }
+
         public int tick { get; private set; }
         /// <summary>
         /// Properties of each map tile
@@ -169,6 +186,8 @@ namespace EvolutionSimulation
             StaticEntities = new Dictionary<int, StaticEntity>();
             entitiesToDelete = new List<int>();
             StaticEntitiesToUpdate = new List<StaticEntity>();
+            deathsPos = new List<Death>();
+            pathPos = new List<Vector2>();
             deaths = new int[7];
             MapData mapData;
             // Create plant entities from the file
@@ -205,6 +224,8 @@ namespace EvolutionSimulation
         /// </summary>
         public void Init(WorldGenConfig config)
         {
+            deathsPos = new List<Death>();
+            pathPos = new List<Vector2>();
             deaths = new int[7];
             ticksHour = UniverseParametersManager.parameters.ticksPerHour;
             hoursDay = UniverseParametersManager.parameters.hoursPerDay;
@@ -478,6 +499,8 @@ namespace EvolutionSimulation
             ent.Init(entitiesID, this, x, y, chromosome, name, fatherID, motherID);
             
             taxonomy.AddCreatureToSpecies(ent);
+            ent.BirthEventTrack();
+
             entityMap[x, y].Add(ent);
 
             Creatures.Add(entitiesID, ent);
@@ -746,6 +769,7 @@ namespace EvolutionSimulation
                             map[xIndex, yIndex].height = evaluateHeight(heightMap[xIndex, yIndex]);
                         else map[xIndex, yIndex].height = heightMap[xIndex, yIndex];
                     }
+                    if (map[xIndex, yIndex].height > 1) map[xIndex, yIndex].height = 1;
                     if (map[xIndex, yIndex].height >= 0.5) land++;
 
                     double evaluation = evaluateInfluence(map[xIndex, yIndex].height);

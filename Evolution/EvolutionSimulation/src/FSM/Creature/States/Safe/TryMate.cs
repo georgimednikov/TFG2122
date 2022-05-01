@@ -20,6 +20,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         // Increases current rest
         public override void OnEntry()
         {
+            base.OnEntry();
             if (creature.Mate(out mateID, out matePos) &&
                 creature.DistanceToObjective(matePos) <= UniverseParametersManager.parameters.adjacentLength)
                 creature.world.GetCreature(mateID).ReceiveInteraction(creature, Entities.Interactions.mate);

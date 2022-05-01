@@ -33,6 +33,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
+            base.OnEntry();
             Vector3Int objective;
             creature.Menace(out _, out objective);
             dngX = objective.x;

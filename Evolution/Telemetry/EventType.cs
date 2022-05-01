@@ -8,8 +8,12 @@ namespace Telemetry
         SessionStart,
         [EnumMember(Value = "SimulationSample")]
         SimulationSample,
-        [EnumMember(Value = "Die")]
-        Die,
+        [EnumMember(Value = "CreatureBirth")]
+        CreatureBirth,
+        [EnumMember(Value = "CreatureStateEntry")]
+        CreatureStateEntry,
+        [EnumMember(Value = "CreatureDeath")]
+        CreatureDeath,
         [EnumMember(Value = "SessionEnd")]
         SessionEnd
     }
