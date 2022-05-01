@@ -56,7 +56,7 @@ namespace EvolutionSimulation.Entities
             bool wings = chromosome.HasAbility(CreatureFeature.Wings, CreatureChromosome.AbilityUnlock[CreatureFeature.Wings]);
             bool arboreal = chromosome.HasAbility(CreatureFeature.Arboreal, CreatureChromosome.AbilityUnlock[CreatureFeature.Arboreal]);
             stats.Upright = chromosome.HasAbility(CreatureFeature.Upright, CreatureChromosome.AbilityUnlock[CreatureFeature.Upright]);
-            int speed = chromosome.GetFeature(CreatureFeature.Mobility);
+            int speed = Math.Max(10,chromosome.GetFeature(CreatureFeature.Mobility));
             stats.AirReach = wings;
             stats.TreeReach = wings || arboreal || stats.Upright;
 
