@@ -81,7 +81,6 @@ namespace EvolutionSimulation.Entities
 
             ConfigureStateMachine();
             SetUpInteractions();
-            BirthEventTrack();
             //Console.WriteLine(mfsm.ExportToDotGraph());
         }
 
@@ -1139,7 +1138,7 @@ namespace EvolutionSimulation.Entities
         #endregion
 
         #region Tracker
-        private void BirthEventTrack()
+        public void BirthEventTrack()
         {
             Telemetry.Events.CreatureBirth cbEvent = new Telemetry.Events.CreatureBirth(world.tick, ID, speciesName);
             cbEvent.MaxHealth = stats.MaxHealth;

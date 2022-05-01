@@ -504,6 +504,8 @@ namespace EvolutionSimulation
             ent.Init(entitiesID, this, x, y, chromosome, name, fatherID, motherID);
             
             taxonomy.AddCreatureToSpecies(ent);
+            ent.BirthEventTrack();
+
             entityMap[x, y].Add(ent);
 
             Creatures.Add(entitiesID, ent);
