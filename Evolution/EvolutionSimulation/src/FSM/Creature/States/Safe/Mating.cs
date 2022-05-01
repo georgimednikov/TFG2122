@@ -12,7 +12,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         int startTime;
         Vector2Int matePos;
         string mateSpecies;
-        public Mating(Entities.Creature c, int time) : base(c){ this.time = time; startTime = time; }
+        public Mating(Entities.Creature c, int time) : base(c) { this.time = time; startTime = time; }
 
         public override void OnEntry()
         {
@@ -38,30 +38,54 @@ namespace EvolutionSimulation.FSM.Creature.States
                 if (creature.stats.Gender == Genetics.Gender.Female)
                 {
                     // The creature whom it was mating has died or something
-                    if (creature.world.GetCreature(creature.matingCreature) == null) {
-                        StopMating(); 
-                        return; 
+                    if (creature.world.GetCreature(creature.matingCreature) == null)
+                    {
+                        StopMating();
+                        return;
                     }
                     // Create a random number of childs
                     int numberChilds = RandomGenerator.Next(1, 5);//TODO: que el numero de hijos dependa de algo del cromosoma?
-                    for (int i = 0; i < numberChilds; ++i)
+                    if (creature.chromosome == null)
                     {
-                        //TODO: cuidado con el problema del diamante
-                        // Crossover with male and female chromosomes
-                        Entities.Creature father = creature.world.GetCreature(creature.matingCreature);
-                        Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(father.chromosome, creature.chromosome);
-                        // Mutate the chromosome
-                        Genetics.GeneticFunctions.UniformMutation(ref childC, UniverseParametersManager.parameters.mutationChance);
-                        // The new creature's pos (near to the parents)
-                        int nx, ny;
-                        do{
-                            nx = creature.x + RandomGenerator.Next(-1, 2);
-                            ny = creature.y + RandomGenerator.Next(-1, 2);
-                        }while(!creature.world.CanMove(nx,ny));
-                        
-                        creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.world.GiveName(childC, father, creature), creature.matingCreature, creature.ID);
+                        for (int i = 0; i < numberChilds; ++i)
+                        {
+                            Entities.Creature father = creature.world.GetCreature(creature.matingCreature);
+                            Entities.CreatureBaseStats childC;// = Genetics.GeneticFunctions.UniformCrossover(father.chromosome, creature.chromosome);
+                            if (RandomGenerator.NextDouble() > 0.5)
+                                childC = father.stats.GetBaseStats();
+                            else
+                                childC = creature.stats.GetBaseStats();
+                            // The new creature's pos (near to the parents)
+                            int nx, ny;
+                            do
+                            {
+                                nx = creature.x + RandomGenerator.Next(-1, 2);
+                                ny = creature.y + RandomGenerator.Next(-1, 2);
+                            } while (!creature.world.CanMove(nx, ny));
 
+                            creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.speciesName, creature.matingCreature, creature.ID);
+                        }
                     }
+                    else
+                        for (int i = 0; i < numberChilds; ++i)
+                        {
+                            //TODO: cuidado con el problema del diamante
+                            // Crossover with male and female chromosomes
+                            Entities.Creature father = creature.world.GetCreature(creature.matingCreature);
+                            Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(father.chromosome, creature.chromosome);
+                            // Mutate the chromosome
+                            Genetics.GeneticFunctions.UniformMutation(ref childC, UniverseParametersManager.parameters.mutationChance);
+                            // The new creature's pos (near to the parents)
+                            int nx, ny;
+                            do
+                            {
+                                nx = creature.x + RandomGenerator.Next(-1, 2);
+                                ny = creature.y + RandomGenerator.Next(-1, 2);
+                            } while (!creature.world.CanMove(nx, ny));
+
+                            creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.world.GiveName(childC, father, creature), creature.matingCreature, creature.ID);
+
+                        }
                     creature.timeToBeInHeat = -1;
                     creature.mating = false;
                     creature.CreateDanger();
@@ -69,7 +93,8 @@ namespace EvolutionSimulation.FSM.Creature.States
                 else
                 {
                     // The creature whom it was mating has died or something
-                    if (creature.world.GetCreature(creature.matingCreature) == null) {
+                    if (creature.world.GetCreature(creature.matingCreature) == null)
+                    {
                         StopMating();
                     }
                 }
@@ -103,7 +128,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void OnExit()
         {
             time = startTime;
-            if(creature.world.GetCreature(creature.matingCreature) != null)
+            if (creature.world.GetCreature(creature.matingCreature) != null)
                 creature.world.GetCreature(creature.matingCreature).ReceiveInteraction(creature, Entities.Interactions.stopMate);
             creature.stats.ActionPerceptionPercentage = 1;
             creature.matingCreature = -1;
@@ -119,7 +144,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override string GetInfo()
         {
-            return creature.speciesName + " with ID: " + creature.ID + " MATES WITH " + mateSpecies + " with ID: " + creature.matingCreature + " AT (" + matePos.x + ", " + matePos.y + ")" ;
+            return creature.speciesName + " with ID: " + creature.ID + " MATES WITH " + mateSpecies + " with ID: " + creature.matingCreature + " AT (" + matePos.x + ", " + matePos.y + ")";
         }
     }
 }

@@ -85,6 +85,29 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
+        /// Initializes a creature in a world and position
+        /// </summary>
+        /// <param name="w">World in which it'll reside</param>
+        public void Init(int ID, World w, int x, int y, CreatureBaseStats stats, string name = "None", int fatherID = -1, int motherID = -1)
+        {
+            this.ID = ID;
+            world = w;
+            
+            speciesName = name;
+            this.stats = new CreatureStats();
+            SetStats(stats);
+            mind = new Mind(this, fatherID, motherID);
+            this.x = x;
+            this.y = y;
+            timeToBeInHeat = stats.TimeBetweenHeats;
+            halfMaxMobility = this.chromosome.GetFeatureMax(CreatureFeature.Mobility) / 2;//TODO???????????
+
+            ConfigureStateMachine();
+            SetUpInteractions();
+            //Console.WriteLine(mfsm.ExportToDotGraph());
+        }
+
+        /// <summary>
         /// Simulation step
         /// </summary>
         public bool Tick()
@@ -291,6 +314,11 @@ namespace EvolutionSimulation.Entities
         /// Sets the stats of the creature.
         /// </summary>
         abstract public void SetStats();
+
+        /// <summary>
+        /// Sets the stats of the creature.
+        /// </summary>
+        abstract public void SetStats(CreatureBaseStats baseStats);
         #endregion
 
         #region State Machine

@@ -4,6 +4,8 @@ using EvolutionSimulation.Entities;
 using System.IO;
 using Telemetry;
 using Telemetry.Events;
+using EvolutionSimulation.Genetics;
+
 namespace EvolutionSimulation
 {
     /// <summary>
@@ -216,6 +218,89 @@ namespace EvolutionSimulation
             int x, y;
 
             for (int i = 0; i < UserInfo.Species; i++)
+            {
+                bool validPosition;
+                Animal a = world.CreateCreature<Animal>(0, 0);
+                int cont = 0;
+                do
+                {
+                    validPosition = true;
+                    x = RandomGenerator.Next(0, UserInfo.Size);
+                    y = RandomGenerator.Next(0, UserInfo.Size);
+                    if (world.map[x, y].isWater)
+                    {
+                        validPosition = false;
+                        continue;
+                    }
+                    if (!a.CheckTemperature(x, y) && cont < UserInfo.Size)
+                    {
+                        validPosition = false;
+                        cont++;
+                        continue;
+                    }
+                }
+                while (!validPosition);
+
+                a.Place(x, y);
+                //The specified amount of individuals of each species is created.
+                for (int j = 1; j < UserInfo.Individuals; j++)
+                {
+                    world.CreateCreature<Animal>(x, y, a.chromosome, a.speciesName);
+                }
+
+                //The new position is added to the list of used.
+                spawnPositions.Add(new Tuple<int, int>(x, y));
+            }
+            SetUpInitialPopulation();
+        }
+
+        virtual protected void CreateCreaturesNoChromosome(SpeciesExport[] sExport)
+        {
+            //A minimum distance to leave in between species spawn points to give them some room.
+            //Calculated based on the world size and amount of species to spawn, and then reduced by
+            //a value to give room in the world and not fill it in a homogenous manner.
+            int minSpawnDist = UserInfo.Size / UserInfo.Species / 15;
+
+            //List with previous spawn positions, to know if a new spot is too close to another one used.
+            List<Tuple<int, int>> spawnPositions = new List<Tuple<int, int>>();
+            int x, y;
+            int i;
+            for ( i = 0; i < sExport.Length && i < UserInfo.Species; i++)
+            {
+                bool validPosition;
+                Animal a = world.CreateCreature<Animal>(0, 0, sExport[i].stats);
+                int cont = 0;
+                do
+                {
+                    validPosition = true;
+                    x = RandomGenerator.Next(0, UserInfo.Size);
+                    y = RandomGenerator.Next(0, UserInfo.Size);
+                    if (world.map[x, y].isWater)
+                    {
+                        validPosition = false;
+                        continue;
+                    }
+                    if (!a.CheckTemperature(x, y) && cont < UserInfo.Size)
+                    {
+                        validPosition = false;
+                        cont++;
+                        continue;
+                    }
+                }
+                while (!validPosition);
+
+                a.Place(x, y);
+                //The specified amount of individuals of each species is created.
+                for (int j = 1; j < UserInfo.Individuals; j++)
+                {
+                    world.CreateCreature<Animal>(x, y, a.chromosome, a.speciesName);
+                }
+
+                //The new position is added to the list of used.
+                spawnPositions.Add(new Tuple<int, int>(x, y));
+            }
+
+            for (; i < UserInfo.Species; i++)
             {
                 bool validPosition;
                 Animal a = world.CreateCreature<Animal>(0, 0);

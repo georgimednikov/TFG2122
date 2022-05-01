@@ -518,6 +518,31 @@ namespace EvolutionSimulation
         }
 
         /// <summary>
+        /// Creates a creature in the world.
+        /// Creatures are entities with abilities and 'complex' behaviours.
+        /// T: Any subclass of Creature i.e. Animal
+        /// </summary>
+        public T CreateCreature<T>(int x, int y, CreatureBaseStats stats, string name = "None", int fatherID = -1, int motherID = -1) where T : Creature, new()
+        {
+            T ent = new T();
+
+            ent.Init(entitiesID, this, x, y, stats, name, fatherID, motherID);
+
+            taxonomy.AddCreatureToSpecies(ent);
+            ent.BirthEventTrack();
+
+            entityMap[x, y].Add(ent);
+
+            Creatures.Add(entitiesID, ent);
+#if DEBUG
+            Console.WriteLine("CREATURE HAS BORN AT " + x + ", " + y + " WITH ID: " + entitiesID);
+#endif
+            entitiesID++;
+            // TODO: devolver el id, una copia o un wrap del objeto creado
+            return ent;
+        }
+
+        /// <summary>
         /// When a creature is born during the simulation it could happens that 
         /// the parents are not the same species, the father's species could be the mother's progenitor species
         /// or vice versa. If this is the case, we need to decide which one is the most similar to the child to set the species name
