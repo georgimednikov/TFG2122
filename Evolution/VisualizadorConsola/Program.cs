@@ -11,8 +11,9 @@ namespace VisualizadorConsola
 #if DEBUG
             s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
 #else
-            if (!s.AskInfoUsingConsole(s))
-                return;
+            s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
+            //if (!s.AskInfoUsingConsole(s))
+            //    return;
 #endif
             s.Run();
             s.Export();

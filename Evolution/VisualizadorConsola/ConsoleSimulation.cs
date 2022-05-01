@@ -54,13 +54,20 @@ namespace VisualizadorConsola
 
                 if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
                 lastNum = world.Creatures.Count;
-                Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
-                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
-                
-                //Render();
-                //Thread.Sleep(1000);
+                //Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
+                //Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
+
+                if (i % UniverseParametersManager.parameters.ticksPerHour == 0)
+                {
+                    Telemetry.Tracker.Instance.Flush();
+                    Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
+                    Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
+                }
                 if (i % YearTicks == 0)
+                {
+                    Telemetry.Tracker.Instance.Track(new Telemetry.Events.SimulationSample(ticks, world.Creatures.Count));
                     Console.WriteLine("A Year has passed");
+                }
             }
            
             DateTime time2 = DateTime.Now;

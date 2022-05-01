@@ -13,10 +13,10 @@ namespace Telemetry
         
         public void Send(TrackerEvent tEvent)
         {
-            lock (eventQueue)
-            {
+            //lock (eventQueue)
+            //{
                 eventQueue.Enqueue(tEvent);
-            }
+            //}
         }
 
         public void Flush()
@@ -24,11 +24,12 @@ namespace Telemetry
             string directoryPath = $"Output/{Tracker.Instance.SessionID}";
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
-
+            int numEvents = eventQueue.Count;
             using (StreamWriter writer = File.AppendText($"Output/{Tracker.Instance.SessionID}/sessionOutput.json"))
             {
-                lock (eventQueue)
-                {
+               
+                //lock (eventQueue)
+                //{
                     while (eventQueue.Count > 0)
                     {
                         TrackerEvent tEvent = eventQueue.Dequeue();
@@ -45,8 +46,9 @@ namespace Telemetry
                         else
                             writer.WriteLine(serializer.Serialize(tEvent));                      
                     }
-                }
+                //}
             }
+            System.Console.WriteLine($"{numEvents} Events flushed !");
         }
 
         ISerializer serializer;

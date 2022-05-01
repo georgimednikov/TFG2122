@@ -39,6 +39,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
+            base.OnEntry();
             creature.Enemy(out objectiveID, out objective);
             Entities.Creature tmp = creature.world.GetCreature(objectiveID);
             objSpecies = tmp == null ? " " : creature.world.GetCreature(objectiveID).speciesName;

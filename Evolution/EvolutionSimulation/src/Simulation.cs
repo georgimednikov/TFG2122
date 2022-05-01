@@ -62,7 +62,7 @@ namespace EvolutionSimulation
             UniverseParametersManager.WriteDefaultParameters();
             CreateCreatures();
 
-            StartFlusingTracker(5000);
+            //StartFlusingTracker(5000);
         }
 
         /// <summary>
@@ -103,7 +103,7 @@ namespace EvolutionSimulation
             }
             UserInfo.Size = world.map.GetLength(0);
             CreateCreatures();
-            StartFlusingTracker(5000);
+            //StartFlusingTracker(5000);
         }
         private void InitTracker()
         {
