@@ -121,9 +121,9 @@ namespace EvolutionSimulation.Genetics
         static public void SetChromosome(string chromosomeJson, string abilitiesJson = null)
         {
             if (chromosomeJson == null)
-                throw new Exception("Cannot find JSON with chromosome information");    
+                throw new Exception("Cannot find JSON with chromosome information");
 
-            List<Gene> genes = JsonConvert.DeserializeObject<List<Gene>>(chromosomeJson);
+            List<Gene> genes = JsonReader.Deserialize<List<Gene>>(chromosomeJson);
             Validator.Validate(genes);
             SetStructure(genes);
 
@@ -140,7 +140,7 @@ namespace EvolutionSimulation.Genetics
             // If it is provided, each ability is validated
             else
             {
-                Tuple<CreatureFeature, float>[] abUnlock = JsonConvert.DeserializeObject<Tuple<CreatureFeature, float>[]>(abilitiesJson);
+                Tuple<CreatureFeature, float>[] abUnlock = JsonReader.Deserialize<Tuple<CreatureFeature, float>[]> (abilitiesJson);
                 Validator.ValidateAbUnlock(abUnlock);
 
                 foreach (Tuple<CreatureFeature, float> ab in abUnlock)

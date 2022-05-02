@@ -25,9 +25,9 @@ namespace EvolutionSimulation.FSM.Creature.States
                 nY = creature.y + RandomGenerator.Next(-1, 2);
 
             } while (nX == creature.x && nY == creature.y);
-            if (creature.world.CanMove(nX, nY) && creature.CheckTemperature(nX,nY))
+            if (creature.world.CanMove(nX, nY, creature.creatureLayer) && creature.CheckTemperature(nX,nY))
             {
-                creature.Place(nX, nY);
+                creature.Place(nX, nY, creature.creatureLayer);
             }
         }
 

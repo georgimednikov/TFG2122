@@ -39,7 +39,9 @@ namespace Telemetry
         [EnumMember(Value = "Poisoned")]
         Poisoned,
         [EnumMember(Value = "Longevity")]
-        Longevity
+        Longevity,
+        [EnumMember(Value = "SimulationEnd")]
+        SimulationEnd
     }
 
     public enum DamageType

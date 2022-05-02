@@ -119,7 +119,7 @@ namespace EvolutionSimulation
         {
             if (uniParamsFile != null)
             {
-                parameters = JsonConvert.DeserializeObject<UniverseParameters>(uniParamsFile);
+                parameters = JsonReader.Deserialize<UniverseParameters>(uniParamsFile);
                 Validator.Validate(parameters);
             }
             else
