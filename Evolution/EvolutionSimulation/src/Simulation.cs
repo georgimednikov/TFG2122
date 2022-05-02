@@ -186,7 +186,7 @@ namespace EvolutionSimulation
 
         virtual public void Export()
         {
-            EndTracker();
+            //EndTracker();
             world.ExportContent();
             Console.Write("Simulation data has been exported");
         }
