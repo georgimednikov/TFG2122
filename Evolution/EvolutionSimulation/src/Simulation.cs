@@ -174,7 +174,7 @@ namespace EvolutionSimulation
             }
             // Para dejar los json bien cuando termine la simulacion
             foreach (Creature c in world.Creatures.Values)
-                Tracker.Instance.Track(new CreatureDeath(ticks, c.ID, c.speciesName, DeathType.SimulationEnd));
+                Tracker.Instance.Track(new CreatureDeath(ticks, c.ID, c.speciesName, DeathType.SimulationEnd, -1, 0));
 
             DateTime time2 = DateTime.Now;
             Console.Write("Estimated Time for " + UserInfo.Years + " years will be: " + TimeSpan.FromMilliseconds((time2 - time).TotalMilliseconds / (i - 1) * world.YearToTick(UserInfo.Years)) + "\n");

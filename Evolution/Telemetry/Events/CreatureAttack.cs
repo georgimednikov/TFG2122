@@ -10,10 +10,5 @@ namespace Telemetry.Events
         public int penetration { get; private set; }
         public CreatureAttack(int tick, int creatureID, string speciesName, int vID, int dmg, int pen) : base(EventType.CreatureAttack, tick, creatureID, speciesName) 
         { victimID = vID; damage = dmg; penetration = pen; }
-        public override string ToJSON()
-        {
-            string aux = base.ToJSON();
-            return $"{aux.Remove(aux.Length - 1)}\n]";
-        }
     }
 }
