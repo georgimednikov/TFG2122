@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Telemetry;
 using Telemetry.Events;
 
@@ -38,7 +39,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         {
             string template = creature.speciesName + " with ID " + creature.ID + " DIES; CAUSE OF DEATH: ";
 
-            Tracker.Instance.Track(new CreatureDeath(creature.world.tick, creature.ID, creature.speciesName, (DeathType)creature.causeOfDeath));
+            Tracker.Instance.Track(new CreatureDeath(creature.world.tick, creature.ID, creature.speciesName, (DeathType)creature.causeOfDeath, creature.killerID, creature.killingBlow));
             template += creature.causeOfDeath.ToString();
             creature.world.deaths[(int)creature.causeOfDeath]++;
 

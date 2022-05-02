@@ -12,11 +12,16 @@ namespace Telemetry
         CreatureBirth,
         [EnumMember(Value = "CreatureStateEntry")]
         CreatureStateEntry,
+        [EnumMember(Value = "CreatureAttack")]
+        CreatureAttack,
+        [EnumMember(Value = "CreatureReceiveDamage")]
+        CreatureReceiveDamage,
         [EnumMember(Value = "CreatureDeath")]
         CreatureDeath,
         [EnumMember(Value = "SessionEnd")]
         SessionEnd
     }
+
     public enum DeathType
     {
         [EnumMember(Value = "Temperature")]
@@ -35,5 +40,23 @@ namespace Telemetry
         Poisoned,
         [EnumMember(Value = "Longevity")]
         Longevity
+    }
+
+    public enum DamageType
+    {
+        [EnumMember(Value = "Temperature")]
+        Temperature,
+        [EnumMember(Value = "Attack")]
+        Attack,
+        [EnumMember(Value = "Retalliation")]
+        Retalliation,
+        [EnumMember(Value = "Starvation")]
+        Starvation,
+        [EnumMember(Value = "Dehydration")]
+        Dehydration,
+        [EnumMember(Value = "Exhaustion")]
+        Exhaustion,
+        [EnumMember(Value = "Poison")]
+        Poison
     }
 }
