@@ -32,6 +32,8 @@ namespace Telemetry
         [EnumMember(Value = "Exhaustion")]
         Exhaustion,
         [EnumMember(Value = "Poisoned")]
-        Poisoned
+        Poisoned,
+        [EnumMember(Value = "Longevity")]
+        Longevity
     }
 }

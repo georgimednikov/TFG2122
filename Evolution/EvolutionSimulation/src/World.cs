@@ -188,7 +188,7 @@ namespace EvolutionSimulation
             StaticEntitiesToUpdate = new List<StaticEntity>();
             deathsPos = new List<Death>();
             pathPos = new List<Vector2>();
-            deaths = new int[7];
+            deaths = new int[8];
             MapData mapData;
             // Create plant entities from the file
             for (int i = 0; i < mapSize; i++)
@@ -226,7 +226,7 @@ namespace EvolutionSimulation
         {
             deathsPos = new List<Death>();
             pathPos = new List<Vector2>();
-            deaths = new int[7];
+            deaths = new int[8];
             ticksHour = UniverseParametersManager.parameters.ticksPerHour;
             hoursDay = UniverseParametersManager.parameters.hoursPerDay;
             daysYear = UniverseParametersManager.parameters.daysPerYear;

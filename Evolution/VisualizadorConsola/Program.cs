@@ -13,6 +13,7 @@ namespace VisualizadorConsola
 #if DEBUG
             s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
 #else
+            //s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
             if (!AskInfoUsingConsole(s))
                 return;
 #endif

@@ -37,7 +37,6 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override string GetInfo()
         {
             string template = creature.speciesName + " with ID " + creature.ID + " DIES; CAUSE OF DEATH: ";
-            World.Death death = new World.Death();
 
             Tracker.Instance.Track(new CreatureDeath(creature.world.tick, creature.ID, creature.speciesName, (DeathType)creature.causeOfDeath));
             template += creature.causeOfDeath.ToString();
