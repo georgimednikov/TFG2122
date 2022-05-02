@@ -172,6 +172,10 @@ namespace EvolutionSimulation
                 if (i % YearTicks == 0)
                     Console.WriteLine("A Year has passed");
             }
+            // Para dejar los json bien cuando termine la simulacion
+            foreach (Creature c in world.Creatures.Values)
+                Tracker.Instance.Track(new CreatureDeath(ticks, c.ID, c.speciesName, DeathType.SimulationEnd));
+
             DateTime time2 = DateTime.Now;
             Console.Write("Estimated Time for " + UserInfo.Years + " years will be: " + TimeSpan.FromMilliseconds((time2 - time).TotalMilliseconds / (i - 1) * world.YearToTick(UserInfo.Years)) + "\n");
             Console.WriteLine("Deaths by: Temperature {0} Damage by others {1} Retaliation {2} Starvation {3} Thirst {4} Exhaustion {5} Poison {6}", world.deaths[0], world.deaths[1], world.deaths[2], world.deaths[3], world.deaths[4], world.deaths[5], world.deaths[6]);
