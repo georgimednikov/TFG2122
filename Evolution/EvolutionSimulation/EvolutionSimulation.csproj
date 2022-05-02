@@ -69,6 +69,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\LoadingBar.cs" />
     <Compile Include="src\JsonReader.cs" />
     <Compile Include="src\Entities\Creature\Animal.cs" />
     <Compile Include="src\Entities\Astar.cs" />
