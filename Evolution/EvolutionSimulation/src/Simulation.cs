@@ -161,10 +161,10 @@ namespace EvolutionSimulation
                 if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
                 lastNum = world.Creatures.Count;
                 Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
-                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);                    
+                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
                 //Render();
                 //Thread.Sleep(1000);
-                if(i % UniverseParametersManager.parameters.ticksPerHour == 0)
+                if (i % UniverseParametersManager.parameters.ticksPerHour == 0)
                 {
                     Tracker.Instance.Track(new SimulationSample(i, world.Creatures.Count));
                     Tracker.Instance.Flush();
@@ -253,31 +253,53 @@ namespace EvolutionSimulation
             //A minimum distance to leave in between species spawn points to give them some room.
             //Calculated based on the world size and amount of species to spawn, and then reduced by
             //a value to give room in the world and not fill it in a homogenous manner.
-            int minSpawnDist = UserInfo.Size / UserInfo.Species / 15;
+            int minSpawnDist = UserInfo.Size / UserInfo.Species;
 
             //List with previous spawn positions, to know if a new spot is too close to another one used.
             List<Tuple<int, int>> spawnPositions = new List<Tuple<int, int>>();
             int x, y;
-
+            bool validPosition;
+            bool valid;
+            Animal a;
+            int temperatureCont;
+            int minDistanceCont;
             for (int i = 0; i < UserInfo.Species; i++)
             {
-                bool validPosition;
-                Animal a = world.CreateCreature<Animal>(0, 0);
-                int cont = 0;
+                a = world.CreateCreature<Animal>(0, 0);
+                temperatureCont = 0;//a cont to create the creatures in a position that is not receiving damage by temperature
+                minDistanceCont = 0;//a cont to create the creatures separated if possible
+                //Find a good position to start for the creature. That means with a minimun distance with other creatures,
+                //not in a water tile and in a position that is with a confortable temperature to the creature
                 do
                 {
                     validPosition = true;
-                    x = RandomGenerator.Next(0, UserInfo.Size);
-                    y = RandomGenerator.Next(0, UserInfo.Size);
+                    valid = true;
+                    //Try to separate the creatures to avoid them starting attacking and dying in the beginning
+                    do
+                    {
+                        x = RandomGenerator.Next(0, UserInfo.Size);
+                        y = RandomGenerator.Next(0, UserInfo.Size);
+                        foreach (Tuple<int, int> pos in spawnPositions)
+                        {
+                            if (Math.Abs(pos.Item1 - x) < minSpawnDist && Math.Abs(pos.Item2 - y) < minSpawnDist)
+                            {
+                                valid = false;
+                                break;
+                            }
+                        }
+                        minDistanceCont++;
+                    } while (!valid && minDistanceCont < UserInfo.Size);
+                    //The creatures cant start in a water position
                     if (world.map[x, y].isWater)
                     {
                         validPosition = false;
                         continue;
                     }
-                    if (!a.CheckTemperature(x, y) && cont < UserInfo.Size)
+                    //Try to be in a safe temperature position
+                    if (!a.CheckTemperature(x, y) && temperatureCont < UserInfo.Size)
                     {
                         validPosition = false;
-                        cont++;
+                        temperatureCont++;
                         continue;
                     }
                 }
