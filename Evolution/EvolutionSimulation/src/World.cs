@@ -146,7 +146,7 @@ namespace EvolutionSimulation
         public void Init(string rawWorldData, string regionMap)
         {
             WorldGenConfig config = new WorldGenConfig(MapType.Custom);
-            map = JsonConvert.DeserializeObject<MapData[,]>(rawWorldData);
+            map = JsonReader.Deserialize<MapData[,]>(rawWorldData);
             int n = map.GetLength(0);
             float[,] heightMap = new float[n, n];
             float[,] temperatureMap = new float[n, n];
@@ -160,7 +160,7 @@ namespace EvolutionSimulation
             }
             config.heightMap = heightMap;
             config.temperatureMap = temperatureMap;
-            this.regionMap = JsonConvert.DeserializeObject<List<MapRegion>>(regionMap);
+            this.regionMap = JsonReader.Deserialize<List<MapRegion>>(regionMap);
             config.regionMap = this.regionMap;
             Validator.Validate(config);
             
