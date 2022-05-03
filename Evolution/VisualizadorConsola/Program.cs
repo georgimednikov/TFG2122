@@ -11,10 +11,10 @@ namespace VisualizadorConsola
         {
             Simulation s = new Simulation();
 #if DEBUG
-            s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
-#else
             if (!AskInfoUsingConsole(s))
                 return;
+#else
+            s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
 #endif
             s.Run();
             s.Export();
