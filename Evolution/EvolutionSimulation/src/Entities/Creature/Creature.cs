@@ -522,6 +522,11 @@ namespace EvolutionSimulation.Entities
             AddInteraction(Interactions.stopMate, StopMating);
         }
 
+        internal void WitnessDeath()
+        {
+            ActionPoints = 1;
+        }
+
         // Methods to receive and respond to interactions
         /// <summary>
         /// Executes every response that this creature has to an interaction with other creature
@@ -618,7 +623,7 @@ namespace EvolutionSimulation.Entities
         private void ReceiveDamage(Creature interacter)
         {
             float damage = ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
-            stats.CurrHealth -= damage;
+            stats.CurrHealth = Math.Max(Math.Min(stats.CurrHealth - damage, stats.MaxHealth), 0);
 
             Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, interacter.ID, damage, DamageType.Attack, stats.CurrHealth));
 

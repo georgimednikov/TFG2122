@@ -11,6 +11,12 @@ namespace EvolutionSimulation.FSM.Creature.States
         public Dead(Entities.Creature c) : base(c) { creature = c; }
         Entities.Corpse corpse;
         string template;
+
+        public override void OnEntry()
+        {
+            base.OnEntry();
+            creature.WitnessDeath();  // the death action will be executed just once
+        }
         public override int GetCost()
         {
             return Math.Max(creature.ActionPoints, 1); // This allows for one death and prevents subsequent ones
@@ -22,7 +28,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         /// </summary>
         public override void Action()
         {
-            creature.world.Destroy(creature.ID);
+            creature.world.Destroy(creature.ID); // aqui ya null en el diccionario y no le pueden volver a hacer daño
             Tracker.Instance.Track(new CreatureDeath(creature.world.tick, creature.ID, creature.speciesName, (DeathType)creature.causeOfDeath, creature.killerID, creature.killingBlow));
             
             // Set cause of death
