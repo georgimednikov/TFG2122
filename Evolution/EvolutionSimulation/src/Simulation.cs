@@ -3,7 +3,6 @@ using System.Drawing;
 using System.Collections.Generic;
 using EvolutionSimulation.Entities;
 using System.Numerics;
-using System.IO;
 using Telemetry;
 using Telemetry.Events;
 
@@ -156,12 +155,13 @@ namespace EvolutionSimulation
                     CreateCreatures();
                     birthCur = 0;
                     lastNum = world.Creatures.Count;
+                    LoadingBar.Instance.NewAttempt();
                 };
 
                 if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
                 lastNum = world.Creatures.Count;
-                Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
-                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
+                //Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
+                //Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
                 //Render();
                 //Thread.Sleep(1000);
                 if (i % UniverseParametersManager.parameters.ticksPerHour == 0)
@@ -170,7 +170,10 @@ namespace EvolutionSimulation
                     Tracker.Instance.Flush();
                 }
                 if (i % YearTicks == 0)
+                {
                     Console.WriteLine("A Year has passed");
+                    LoadingBar.Instance.StepElapsed();
+                }
             }
             // Para dejar los json bien cuando termine la simulacion
             foreach (Creature c in world.Creatures.Values)
@@ -341,7 +344,7 @@ namespace EvolutionSimulation
             }
         }
 
-        #region BMP
+#region BMP
         public void WorldToBmp()
         {
             int scale = 4;
@@ -358,7 +361,7 @@ namespace EvolutionSimulation
             {
                 for (int j = 0; j < world.map.GetLength(1) * scale; j += scale)
                 {
-                    #region HeightMap
+#region HeightMap
                     val = world.map[j / scale, i / scale].height;
                     if (val < 0.3) SetPixel(j, i, Color.DarkBlue, heightMap, scale);
                     else if (val < 0.5) SetPixel(j, i, Color.Blue, heightMap, scale);
@@ -368,18 +371,18 @@ namespace EvolutionSimulation
                     else if (val < 0.8) SetPixel(j, i, Color.LightYellow, heightMap, scale);
                     else SetPixel(j, i, Color.White, heightMap, scale);
                     val = world.map[j / scale, i / scale].humidity;
-                    #endregion
+#endregion
 
-                    #region HumidityMap
+#region HumidityMap
                     if (val < 0.3) SetPixel(j, i, Color.DarkRed, hMap, scale);
                     else if (val < 0.4) SetPixel(j, i, Color.Red, hMap, scale);
                     else if (val < 0.5) SetPixel(j, i, Color.IndianRed, hMap, scale);
                     else if (val < 0.6) SetPixel(j, i, Color.MediumVioletRed, hMap, scale);
                     else if (val < 0.8) SetPixel(j, i, Color.Blue, hMap, scale);
                     else if (val < 1) SetPixel(j, i, Color.DarkBlue, hMap, scale);
-                    #endregion
+#endregion
 
-                    #region TemperatureMap
+#region TemperatureMap
                     val = world.map[j / scale, i / scale].temperature;
                     if (val < 0.2) SetPixel(j, i, Color.DarkBlue, tempMap, scale);
                     else if (val < 0.3) SetPixel(j, i, Color.Blue, tempMap, scale);
@@ -387,9 +390,9 @@ namespace EvolutionSimulation
                     else if (val < 0.6) SetPixel(j, i, Color.Orange, tempMap, scale);
                     else if (val < 0.8) SetPixel(j, i, Color.OrangeRed, tempMap, scale);
                     else SetPixel(j, i, Color.Red, tempMap, scale);
-                    #endregion
+#endregion
 
-                    #region FloraMap
+#region FloraMap
                     val = world.map[j / scale, i / scale].flora;
                     if (val == 0)
                         if (world.map[j / scale, i / scale].isWater)
@@ -406,9 +409,9 @@ namespace EvolutionSimulation
                     else if (val < 0.7) SetPixel(j, i, Color.YellowGreen, floraMap, scale);
                     else if (val < 1) SetPixel(j, i, Color.Green, floraMap, scale);
                     else SetPixel(j, i, Color.White, floraMap, scale);
-                    #endregion
+#endregion
 
-                    #region TerrainTexture
+#region TerrainTexture
 
                     float thres = 1.0f, thres2 = 0.7f;
                     double h = world.map[j / scale, i / scale].height;
@@ -422,9 +425,9 @@ namespace EvolutionSimulation
                         Color c = floraMapMask.GetPixel(j, i);
                         SetPixel(j, i, Color.FromArgb((int)(c.R + ((h - thres2) / (1 - thres2) * (1 - (c.R / 255f))) * 255), (int)(c.G + ((h - thres2) / (1 - thres2) * (1 - (c.G / 255f))) * 255), (int)(c.B + ((h - thres2) / (1 - thres2) * (1 - (c.B / 255f)))) * 255), floraMapMask, scale);
                     }
-                    #endregion
+#endregion
 
-                    #region PlantMap
+#region PlantMap
                     Plant plant = world.map[j / scale, i / scale].plant;
                     if (plant as Grass != null)
                         SetPixel(j, i, Color.DarkOliveGreen, treeMap, scale);
@@ -440,9 +443,9 @@ namespace EvolutionSimulation
                         SetPixel(j, i, Color.FromArgb(0, 0, 255), holdRidgeMap, scale);
 
                     }
-                    #endregion
+#endregion
 
-                    #region HoldridgeMap
+#region HoldridgeMap
                     val = world.map[j / scale, i / scale].temperature;
                     double val2 = world.map[j / scale, i / scale].humidity;
                     //Mapa usando Holdridge de 39 Biomas
@@ -513,9 +516,9 @@ namespace EvolutionSimulation
                         else if (val2 < 0.95) SetPixel(j, i, Color.FromArgb(60, 255, 144), holdRidgeMap, scale); //Tropical Wet Forest
                         else SetPixel(j, i, Color.FromArgb(32, 255, 160), holdRidgeMap, scale); //Tropical Rain Forest
                     }
-                    #endregion
+#endregion
 
-                    #region VoronoiDiagram
+#region VoronoiDiagram
                     val = world.map[j / scale, i / scale].regionId;
                     switch (val % 20)
                     {
@@ -580,7 +583,7 @@ namespace EvolutionSimulation
                             SetPixel(j, i, Color.LimeGreen, voronoiMap, scale);
                             break;
                     }
-                    #endregion
+#endregion
                     if ((j / scale) % 32 == 0 || (i / scale) % 32 == 0)
                     {
                         SetPixel(j, i, Color.White, voronoiMap, scale / 2);
@@ -614,7 +617,7 @@ namespace EvolutionSimulation
                 }
             }
         }
-        #endregion
+#endregion
 
         protected World world;
     }

@@ -2,7 +2,7 @@
 
 namespace EvolutionSimulation
 {
-    static public class NameGenerator
+    public class NameGenerator
     {
         static public string GenerateName(CreatureChromosome ch)
         {
