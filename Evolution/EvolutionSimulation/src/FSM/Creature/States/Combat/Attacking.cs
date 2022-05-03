@@ -1,5 +1,8 @@
 ﻿using System;
 
+using Telemetry;
+using Telemetry.Events;
+
 namespace EvolutionSimulation.FSM.Creature.States
 {
     class Attacking : CreatureState
@@ -31,8 +34,13 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 speciesName = objCreature.speciesName;
                 if (poison)
+                {
+                    // TODO: Poison Event
                     objCreature.ReceiveInteraction(creature, Entities.Interactions.poison);
+                }
                 objCreature.ReceiveInteraction(creature, Entities.Interactions.attack);
+
+                Tracker.Instance.Track(new CreatureAttack(creature.world.tick, creature.ID, creature.speciesName, objCreature.ID, creature.stats.Damage, creature.stats.Perforation));
             }
         }
 
