@@ -146,7 +146,6 @@ namespace EvolutionSimulation
             int i = 1;
             double prevN = 0;
             int apocalypsisCont = 0, lastNum = world.Creatures.Count, births = 0, birthCur = 0;
-            WorldToBmp();
             String s = "[";
             for (int j = 0; j < prevN; j++)
             {
@@ -226,6 +225,7 @@ namespace EvolutionSimulation
         {
             //EndTracker();
             world.ExportContent();
+            WorldToBmp();
             Console.Write("Simulation data has been exported");
         }
         virtual public void ApocalypseExport(int cont)

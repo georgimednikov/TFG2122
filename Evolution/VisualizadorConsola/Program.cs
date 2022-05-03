@@ -10,8 +10,8 @@ namespace VisualizadorConsola
         static void Main(string[] args)
         {
             Simulation s = new Simulation();
-#if DEBUG
-            s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
+#if TRUE
+            s.Init(20, 30, 20, "../../ProgramData/", "../../ResultingData/", null);
 #else
             if (!AskInfoUsingConsole(s))
                 return;
