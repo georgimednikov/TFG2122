@@ -213,9 +213,9 @@ namespace EvolutionSimulation.Entities
                 else
                     timeToBeInHeat--;
 
-                //if the female has to do something, she doesn't want to mate
+                //if the female has to do something, she doesn't want to mate or is not on the ground
                 if (IsExhausted() || IsVeryHungry() || IsVeryThirsty()
-                    || mating || !stats.InHeat)
+                    || mating || !stats.InHeat || creatureLayer != HeightLayer.Ground)
                 {
                     wantMate = false;
                 }
