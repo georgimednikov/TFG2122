@@ -549,7 +549,7 @@ namespace EvolutionSimulation
             if (Creatures.ContainsKey(entityID))
             {
                 ent = Creatures[entityID];
-                taxonomy.RemoveCreatureToSpecies(Creatures[entitiesID]);
+                taxonomy.RemoveCreatureToSpecies(Creatures[entityID]);
                 Creatures[entityID] = null;
             }
             else

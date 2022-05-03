@@ -39,13 +39,13 @@ namespace EvolutionSimulation.FSM.Creature.States
             //To avoid create corpses in a water tile
             if (!creature.world.map[creature.x, creature.y].isWater)
             {
-                template += "\nCORPSE CANNOT BE CREATED IN: POSITION: (" + creature.x + ", " + creature.y + ") CREATURE ID: " + creature.ID;  // TODO: Coordenada altura?
                 corpse = creature.world.CreateStaticEntity<Entities.Corpse>(creature.x, creature.y, 50);    // TODO: no poner el hp a pelo
                 corpse.SetTraits(creature);
                 corpse.AddToUpdateList();
+                template += "\nCORPSE CREATED WITH ID: " + corpse.ID + " IN POSITION: (" + creature.x + ", " + creature.y + ")";
             }
             else
-                template += "\nCORPSE CREATED WITH ID: " + corpse.ID + " IN POSITION: (" + creature.x + ", " + creature.y + ")";
+                template += "\nCORPSE CANNOT BE CREATED IN: POSITION: (" + creature.x + ", " + creature.y + ") CREATURE ID: " + creature.ID;  // TODO: Coordenada altura?
         }
 
         public override string ToString()
