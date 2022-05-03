@@ -140,7 +140,7 @@ namespace VisualizadorConsola
             }
             else if (File.Exists(dataDir + UserInfo.HeightMapName))
             {
-                config = new WorldGenConfig(dataDir + UserInfo.HeightMapName);
+                config = new WorldGenConfig(World.MapType.Custom);
             }
 
             int minSpecies = UserInfo.MinSpeciesAmount();
@@ -451,9 +451,9 @@ namespace VisualizadorConsola
                 }
             }
             
-            for (int t = 0; t < world.highMap.Count; t++)
+            for (int t = 0; t < world.regionMap.Count; t++)
             {
-                Vector2 vector = world.highMap[t].spawnPoint;
+                Vector2 vector = world.regionMap[t].spawnPoint;
                 SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Black, voronoiMap, scale);
             }
 
