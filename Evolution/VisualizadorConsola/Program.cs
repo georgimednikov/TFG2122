@@ -75,7 +75,7 @@ namespace VisualizadorConsola
                 {
                     do
                     {
-                        Console.WriteLine("Input how big in squares the world is going to be. Must be a number larger than: " + minSize + "\n");
+                        Console.WriteLine("Input how big in squares the world is going to be. Must be a number larger than or equal to: " + minSize + "\n");
                         string input = Console.ReadLine();
                         UserInfo.Size = -1;
                         if (input != "") UserInfo.Size = int.Parse(input);
@@ -87,7 +87,7 @@ namespace VisualizadorConsola
             int minSpecies = UserInfo.MinSpeciesAmount();
             do
             {
-                Console.WriteLine("Input how many species are going to be created initially. Must be a number larger than: " + minSpecies + "\n");
+                Console.WriteLine("Input how many species are going to be created initially. Must be a number larger than or equal to: " + minSpecies + "\n");
                 string input = Console.ReadLine();
                 species = -1;
                 if (input != "") species = int.Parse(input);
@@ -97,7 +97,7 @@ namespace VisualizadorConsola
             int minIndividuals = UserInfo.MinIndividualsAmount();
             do
             {
-                Console.WriteLine("Input how individuals per species are going to be created. Must be a number larger than: " + minIndividuals + "\n");
+                Console.WriteLine("Input how individuals per species are going to be created. Must be a number larger than or equal to: " + minIndividuals + "\n");
                 string input = Console.ReadLine();
                 individuals = -1;
                 if (input != "") individuals = int.Parse(input);
