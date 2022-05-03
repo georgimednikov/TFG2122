@@ -160,8 +160,8 @@ namespace EvolutionSimulation
 
                 if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
                 lastNum = world.Creatures.Count;
-                Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
-                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
+                //Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
+                //Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
                 //Render();
                 //Thread.Sleep(1000);
                 if (i % UniverseParametersManager.parameters.ticksPerHour == 0)

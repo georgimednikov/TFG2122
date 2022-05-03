@@ -87,7 +87,7 @@ namespace Visualizador
                 {
                     do
                     {
-                        if (!InstantiatePrompt("Input how big in squares the world is going to be.\nMust be a number larger than: " + UserInfo.MinWorldSize(), out userEntry))
+                        if (!InstantiatePrompt("Input how big in squares the world is going to be.\nMust be a number larger than or equal to: " + UserInfo.MinWorldSize(), out userEntry))
                             return false;
                     } while (userEntry < UserInfo.MinWorldSize());
                     UserInfo.Size = userEntry;
@@ -96,14 +96,14 @@ namespace Visualizador
 
             do
             {
-                if (!InstantiatePrompt("Input how many species are going to be created\ninitially. Must be a number larger than: " + UserInfo.MinSpeciesAmount(), out userEntry))
+                if (!InstantiatePrompt("Input how many species are going to be created\ninitially. Must be a number larger than or equal to: " + UserInfo.MinSpeciesAmount(), out userEntry))
                     return false;
             } while (userEntry < UserInfo.MinSpeciesAmount());
             species = userEntry;
 
             do
             {
-                if (!InstantiatePrompt("Input how individuals per species are going to be\ncreated. Must be a number larger than: " + UserInfo.MinIndividualsAmount(), out userEntry))
+                if (!InstantiatePrompt("Input how individuals per species are going to be\ncreated. Must be a number larger than or equal to: " + UserInfo.MinIndividualsAmount(), out userEntry))
                     return false;
             } while (userEntry < UserInfo.MinIndividualsAmount());
             individuals = userEntry;

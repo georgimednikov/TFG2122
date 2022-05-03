@@ -64,7 +64,7 @@ namespace EvolutionSimulation
         static void MinimumWorldSize(WorldGenConfig config)
         {
             if (config.humidityMap != null || config.temperatureMap != null || config.heightMap != null) return;
-            if (config.mapSize <= UserInfo.MinWorldSize()) throw new MinimumWorldSizeException("The provided size is equal or less than the minimum required size: " + UserInfo.MinWorldSize());
+            if (config.mapSize < UserInfo.MinWorldSize()) throw new MinimumWorldSizeException("The provided size is equal or less than the minimum required size: " + UserInfo.MinWorldSize());
 
             return;
         }
