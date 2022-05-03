@@ -45,11 +45,11 @@ namespace EvolutionSimulation.FSM.Creature.States
                     }
                     // Create a random number of childs
                     int numberChilds = RandomGenerator.Next(1, 5);//TODO: que el numero de hijos dependa de algo del cromosoma?
+                    Entities.Creature father = creature.world.GetCreature(creature.matingCreature);
                     for (int i = 0; i < numberChilds; ++i)
                     {
                         //TODO: cuidado con el problema del diamante
-                        // Crossover with male and female chromosomes
-                        Entities.Creature father = creature.world.GetCreature(creature.matingCreature);
+                        // Crossover with male and female chromosomes          
                         Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(father.chromosome, creature.chromosome);
                         // Mutate the chromosome
                         Genetics.GeneticFunctions.UniformMutation(ref childC, UniverseParametersManager.parameters.mutationChance);
@@ -63,6 +63,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                         creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.world.GiveName(childC, father, creature), creature.matingCreature, creature.ID);
 
                     }
+                    Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureMating(creature.world.tick, creature.ID, creature.speciesName, father.ID, father.speciesName, numberChilds));
                     creature.timeToBeInHeat = -1;
                     creature.mating = false;
                     creature.CreateDanger();
