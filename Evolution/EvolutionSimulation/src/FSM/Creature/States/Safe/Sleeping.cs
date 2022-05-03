@@ -16,6 +16,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         float originalEnergyExpense, originalHydrationExpense, originalRestExpense;
         public override void OnEntry()
         {
+            base.OnEntry();
             creature.stats.ActionPerceptionPercentage = UniverseParametersManager.parameters.actionPerceptionPercentage;
             
             // Sleeping reduces the expense of being active

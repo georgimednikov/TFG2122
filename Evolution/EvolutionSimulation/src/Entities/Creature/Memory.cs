@@ -345,7 +345,7 @@ namespace EvolutionSimulation.Entities
         {
             int unexploredRegion = -1;
             Queue<int> regionsQueue = new Queue<int>();
-            bool[] visited = new bool[world.highMap.Count];
+            bool[] visited = new bool[world.regionMap.Count];
             int currentRegion = world.map[thisCreature.x, thisCreature.y].regionId;
 
             // If the creature is over the water, it searches for the nearest land position
@@ -355,7 +355,7 @@ namespace EvolutionSimulation.Entities
 
                 // If no land position is found, it returns a random region
                 if (!SearchForLand(out landPos))
-                    return RandomGenerator.Next(0, world.highMap.Count);
+                    return RandomGenerator.Next(0, world.regionMap.Count);
                 currentRegion = world.map[landPos.x, landPos.y].regionId;
 
                 // If the land found is unexplored, no further search is needed
@@ -368,7 +368,7 @@ namespace EvolutionSimulation.Entities
             while (regionsQueue.Count > 0 && unexploredRegion == -1)
             {
                 int nextRegion = regionsQueue.Dequeue();
-                List<int> adyRegions = new List<int>(world.highMap[nextRegion].links.Keys);
+                List<int> adyRegions = new List<int>(world.regionMap[nextRegion].links.Keys);
                 Shuffle(adyRegions);    // Shuffle to add randomness
                 for (int i = 0; unexploredRegion == -1 && i < adyRegions.Count; i++)
                 {
@@ -385,7 +385,7 @@ namespace EvolutionSimulation.Entities
                 }
             }
             if (unexploredRegion == -1)
-                unexploredRegion = RandomGenerator.Next(0, world.highMap.Count);
+                unexploredRegion = RandomGenerator.Next(0, world.regionMap.Count);
             return unexploredRegion;
         }
         /// <summary>

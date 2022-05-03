@@ -121,9 +121,9 @@ namespace EvolutionSimulation.Genetics
         static public void SetChromosome(string chromosomeJson, string abilitiesJson = null)
         {
             if (chromosomeJson == null)
-                throw new Exception("Cannot find JSON with chromosome information");    
+                throw new Exception("Cannot find JSON with chromosome information");
 
-            List<Gene> genes = JsonConvert.DeserializeObject<List<Gene>>(chromosomeJson);
+            List<Gene> genes = JsonReader.Deserialize<List<Gene>>(chromosomeJson);
             Validator.Validate(genes);
             SetStructure(genes);
 
@@ -140,7 +140,7 @@ namespace EvolutionSimulation.Genetics
             // If it is provided, each ability is validated
             else
             {
-                Tuple<CreatureFeature, float>[] abUnlock = JsonConvert.DeserializeObject<Tuple<CreatureFeature, float>[]>(abilitiesJson);
+                Tuple<CreatureFeature, float>[] abUnlock = JsonReader.Deserialize<Tuple<CreatureFeature, float>[]> (abilitiesJson);
                 Validator.ValidateAbUnlock(abUnlock);
 
                 foreach (Tuple<CreatureFeature, float> ab in abUnlock)
@@ -180,7 +180,7 @@ namespace EvolutionSimulation.Genetics
                     //In other words, a negative relation may not modify the value, but if it is accounted for it would add extra bits surpassing the max value.
                     if (relation.percentage > 0)
                         //The highest possible value of the features related is calculated (percentaje * maxValue)
-                        relationsMaxValue += (int)Math.Ceiling(relation.percentage * geneMaxValues[(int)relation.feature]); //The percetaje gets truncated!!!
+                        relationsMaxValue += (int)Math.Ceiling(relation.percentage * geneMaxValues[(int)gene.feature]); //The percetaje gets truncated!!!
                     
                 }
                 int leftover = geneMaxValues[featureIndex] - relationsMaxValue;
@@ -212,7 +212,8 @@ namespace EvolutionSimulation.Genetics
                 //shuffle the bits to not have all the 1s at the initial positions of the gene and the 0s afterwards
                 for (int j = 0; j < genePos[i].Item2 && j + genePos[i].Item2 < chromosomeSize; ++j)
                 {
-                    int randomPos = RandomGenerator.Next(0, genePos[i].Item2 + 1);
+                    int randomPos = RandomGenerator.Next(ini, ini + genePos[i].Item2);
+                    randomPos = chromosomeSize >= randomPos ? randomPos : chromosomeSize - 1 ;
                     bool tmp = chromosome[ini + j];
                     chromosome[ini + j] = chromosome[randomPos];
                     chromosome[randomPos] = tmp;
@@ -264,7 +265,7 @@ namespace EvolutionSimulation.Genetics
                 int startPoint = genePos[feature].Item1;
                 int total = 0;
                 //The amount of its exclusive bits gets counted
-                for (int j = startPoint; j < startPoint + genePos[feature].Item2; ++j)
+                for (int j = startPoint; j < startPoint + genePos[feature].Item2 && j < chromosomeSize; ++j)
                 {
                     if (chromosome[j]) ++total; //If the bit is 1 then the total count is aumented
                 }

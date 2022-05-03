@@ -56,7 +56,7 @@ namespace EvolutionSimulation.Entities
             bool wings = chromosome.HasAbility(CreatureFeature.Wings, CreatureChromosome.AbilityUnlock[CreatureFeature.Wings]);
             bool arboreal = chromosome.HasAbility(CreatureFeature.Arboreal, CreatureChromosome.AbilityUnlock[CreatureFeature.Arboreal]);
             stats.Upright = chromosome.HasAbility(CreatureFeature.Upright, CreatureChromosome.AbilityUnlock[CreatureFeature.Upright]);
-            int speed = chromosome.GetFeature(CreatureFeature.Mobility);
+            int speed = Math.Max(10,chromosome.GetFeature(CreatureFeature.Mobility));
             stats.AirReach = wings;
             stats.TreeReach = wings || arboreal || stats.Upright;
 
@@ -90,16 +90,13 @@ namespace EvolutionSimulation.Entities
             stats.Members = SetStatInRange(CreatureFeature.Members, maxLimbs + 1);//its not inclusive [0-11)
 
             stats.Metabolism = chromosome.GetFeature(CreatureFeature.Metabolism);
-            //Save the temperature in range [0,1] because of the map extreme values are these
-            double temperatureMax = chromosome.GetFeatureMax(CreatureFeature.IdealTemperature) + chromosome.GetFeatureMax(CreatureFeature.TemperatureRange);
-            double temperatureMin = 0 - chromosome.GetFeatureMax(CreatureFeature.TemperatureRange);
-            double maxRangeTemperature = Math.Abs(temperatureMax) + Math.Abs(temperatureMin);
-
-            stats.IdealTemperature = (chromosome.GetFeature(CreatureFeature.IdealTemperature) + Math.Abs(temperatureMin)) / maxRangeTemperature; 
-            double tempInRange = chromosome.GetFeature(CreatureFeature.TemperatureRange) / maxRangeTemperature;
+            
+            stats.IdealTemperature = (chromosome.GetFeature(CreatureFeature.IdealTemperature) 
+                / (double)chromosome.GetFeatureMax(CreatureFeature.IdealTemperature));
+            double tempInRange = (chromosome.GetFeature(CreatureFeature.TemperatureRange) 
+                / (double)chromosome.GetFeatureMax(CreatureFeature.TemperatureRange)) * 0.5f; // TODO: Numero magico
             stats.MinTemperature = stats.IdealTemperature - tempInRange;
             stats.MaxTemperature = stats.IdealTemperature + tempInRange;
-
 
             stats.MaxEnergy = resourceAmount; // minEnergy + stats.Size / sizeToEnergyRatio; TODO: en teoria es el mismo valor todos los recursos, cambia el gasto
             stats.CurrEnergy = stats.MaxEnergy;
@@ -124,10 +121,7 @@ namespace EvolutionSimulation.Entities
             //Environment related stats
             stats.Camouflage = chromosome.GetFeature(CreatureFeature.Camouflage);
             stats.Aggressiveness = chromosome.GetFeature(CreatureFeature.Aggressiveness);
-            int maxPerceptionGene = chromosome.GetFeatureMax(CreatureFeature.Perception);
-            float range = (float)chromosome.GetFeature(CreatureFeature.Perception) / maxPerceptionGene;
-            stats.Perception = (int)(minPerception + (maxPerception - minPerception) * range);
-            stats.MaxPerception = minPerception + (maxPerception - minPerception) * 1;
+           
             //If the creature does not have the feature night vision then its perception will be the lowest posible,
             //So instead of Perception * 1 it will be Perception * minNightVision
             if (!chromosome.HasAbility(CreatureFeature.NightVision, CreatureChromosome.AbilityUnlock[CreatureFeature.NightVision]))
@@ -146,6 +140,12 @@ namespace EvolutionSimulation.Entities
             //Value that multiplies perception when it is being gotten
             stats.CurrentVision = world.day ? 1 : stats.NightPerceptionPercentage;
             stats.ActionPerceptionPercentage = 1;
+
+            int maxPerceptionGene = chromosome.GetFeatureMax(CreatureFeature.Perception);
+            float range = Math.Max(1.0f / maxPerceptionGene, (float)chromosome.GetFeature(CreatureFeature.Perception) / maxPerceptionGene);
+
+            stats.Perception = (int)(minPerception + (maxPerception - minPerception) * range);
+            stats.MaxPerception = minPerception + (maxPerception - minPerception) * 1;
 
             //If the creature can see in the dark, that penalty is reduced the better sight it has
             if (chromosome.HasAbility(CreatureFeature.NightVision, CreatureChromosome.AbilityUnlock[CreatureFeature.NightVision]))

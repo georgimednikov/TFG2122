@@ -18,6 +18,7 @@ namespace EvolutionSimulation.Entities
         Dehydration,
         Exhaustion,
         Poison,
+        Longevity,
         NONE
     }
 
@@ -229,6 +230,8 @@ namespace EvolutionSimulation.Entities
             stats.CurrRest = Math.Max(stats.CurrRest - stats.RestExpense, 0);
             stats.CurrEnergy = Math.Max(stats.CurrEnergy - stats.EnergyExpense, 0);
             stats.CurrAge++;
+            if (stats.CurrAge >= stats.LifeSpan)
+                causeOfDeath = CauseOfDeath.Longevity;
         }
 
         /// <summary>
@@ -1134,6 +1137,50 @@ namespace EvolutionSimulation.Entities
                 if (expired) stat.OnExpire();
                 else stat.OnRemove();
             }
+        }
+        #endregion
+
+        #region Tracker
+        public void BirthEventTrack()
+        {
+            Telemetry.Events.CreatureBirth cbEvent = new Telemetry.Events.CreatureBirth(world.tick, ID, speciesName);
+            cbEvent.MaxHealth = stats.MaxHealth;
+            cbEvent.HealthRegen = stats.HealthRegeneration;
+            cbEvent.MaxEnergy = stats.MaxEnergy;
+            cbEvent.EnergyExpense = stats.EnergyExpense;
+            cbEvent.MaxHydration = stats.MaxHydration;
+            cbEvent.HydrationExpense = stats.HydrationExpense;
+            cbEvent.MaxRest = stats.MaxRest;
+            cbEvent.RestExpense = stats.RestExpense;
+            cbEvent.RestRecovery = stats.RestRecovery;
+            cbEvent.MaxPerception = stats.MaxPerception;
+            cbEvent.MinTemperature = stats.MinTemperature;
+            cbEvent.MaxTemperature = stats.MaxTemperature;
+            cbEvent.Gender = stats.Gender.ToString();
+            cbEvent.Diet = stats.Diet.ToString();
+            cbEvent.Damage = stats.Damage;
+            cbEvent.Armor = stats.Armor;
+            cbEvent.Perforation = stats.Perforation;
+            cbEvent.Venom = stats.Venom;
+            cbEvent.Counter = stats.Counter;
+            cbEvent.GroundSpeed = stats.GroundSpeed;
+            cbEvent.AerialSpeed = stats.AerialSpeed;
+            cbEvent.AirReach = stats.AirReach;
+            cbEvent.ArborealSpeed = stats.ArborealSpeed;
+            cbEvent.TreeReach = stats.TreeReach;
+            cbEvent.Camouflage = stats.Camouflage;
+            cbEvent.Aggressiveness = stats.Aggressiveness;
+            cbEvent.Intimidation = stats.Intimidation;
+            cbEvent.Size = stats.Size;
+            cbEvent.LifeSpan = stats.LifeSpan;
+            cbEvent.Limbs = stats.Members;
+            cbEvent.Metabolism = stats.Metabolism;
+            cbEvent.Hair = stats.Hair;
+            cbEvent.Knowledge = stats.Knowledge;
+            cbEvent.Paternity = stats.Paternity;
+            cbEvent.Upright = stats.Upright;
+
+            Telemetry.Tracker.Instance.Track(cbEvent);
         }
         #endregion
     }

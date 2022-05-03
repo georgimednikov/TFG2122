@@ -19,6 +19,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
+            base.OnEntry();
             safeTempPos = creature.SafeTemperaturePosition();
            
             hasSafeTempPosAndNotInSamePos = safeTempPos != null && (safeTempPos.x != creature.x || safeTempPos.y != creature.y || creature.creatureLayer != 0);

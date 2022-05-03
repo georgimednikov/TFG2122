@@ -17,8 +17,8 @@ namespace EvolutionSimulation
             public MinimumWorldSizeException(string message) : base(message) { }
             public MinimumWorldSizeException(string message, Exception inner) : base(message, inner) { }
             protected MinimumWorldSizeException(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
         public class NotSameSizeMapsException : Exception
         {
@@ -26,8 +26,8 @@ namespace EvolutionSimulation
             public NotSameSizeMapsException(string message) : base(message) { }
             public NotSameSizeMapsException(string message, Exception inner) : base(message, inner) { }
             protected NotSameSizeMapsException(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
         public class FunctionNotWhollyDefinedException : Exception
         {
@@ -35,8 +35,8 @@ namespace EvolutionSimulation
             public FunctionNotWhollyDefinedException(string message) : base(message) { }
             public FunctionNotWhollyDefinedException(string message, Exception inner) : base(message, inner) { }
             protected FunctionNotWhollyDefinedException(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
         public class FunctionIncorrectOutputRangeException : Exception
         {
@@ -44,8 +44,8 @@ namespace EvolutionSimulation
             public FunctionIncorrectOutputRangeException(string message) : base(message) { }
             public FunctionIncorrectOutputRangeException(string message, Exception inner) : base(message, inner) { }
             protected FunctionIncorrectOutputRangeException(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
 
         static double funcValidationAccuracy = 0.1;
@@ -210,8 +210,8 @@ namespace EvolutionSimulation
             public NotAllGenesDefinedException(string message) : base(message) { }
             public NotAllGenesDefinedException(string message, Exception inner) : base(message, inner) { }
             protected NotAllGenesDefinedException(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
         public class NotAllValuesArePositiveException : Exception
         {
@@ -219,8 +219,8 @@ namespace EvolutionSimulation
             public NotAllValuesArePositiveException(string message) : base(message) { }
             public NotAllValuesArePositiveException(string message, Exception inner) : base(message, inner) { }
             protected NotAllValuesArePositiveException(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
         public class GeneHasRelationWithItself : Exception
         {
@@ -228,8 +228,8 @@ namespace EvolutionSimulation
             public GeneHasRelationWithItself(string message) : base(message) { }
             public GeneHasRelationWithItself(string message, Exception inner) : base(message, inner) { }
             protected GeneHasRelationWithItself(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
         public class GeneDependsCompletelyOnOthers : Exception
         {
@@ -237,8 +237,8 @@ namespace EvolutionSimulation
             public GeneDependsCompletelyOnOthers(string message) : base(message) { }
             public GeneDependsCompletelyOnOthers(string message, Exception inner) : base(message, inner) { }
             protected GeneDependsCompletelyOnOthers(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
         public class GeneDependsOnUnprocessed : Exception
         {
@@ -246,8 +246,8 @@ namespace EvolutionSimulation
             public GeneDependsOnUnprocessed(string message) : base(message) { }
             public GeneDependsOnUnprocessed(string message, Exception inner) : base(message, inner) { }
             protected GeneDependsOnUnprocessed(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
 
         static public void Validate(List<Gene> genes)
@@ -326,8 +326,8 @@ namespace EvolutionSimulation
             public NotAllFeaturesWeightsDefinedException(string message) : base(message) { }
             public NotAllFeaturesWeightsDefinedException(string message, Exception inner) : base(message, inner) { }
             protected NotAllFeaturesWeightsDefinedException(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
         public class SimilarityValuesDoNotAddUp : Exception
         {
@@ -335,8 +335,8 @@ namespace EvolutionSimulation
             public SimilarityValuesDoNotAddUp(string message) : base(message) { }
             public SimilarityValuesDoNotAddUp(string message, Exception inner) : base(message, inner) { }
             protected SimilarityValuesDoNotAddUp(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
 
         static float weightsTotalValueWiggleRoom = 0.02f;
@@ -377,8 +377,8 @@ namespace EvolutionSimulation
             public SimilarityThesholdNotValid(string message) : base(message) { }
             public SimilarityThesholdNotValid(string message, Exception inner) : base(message, inner) { }
             protected SimilarityThesholdNotValid(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
 
        
@@ -391,8 +391,8 @@ namespace EvolutionSimulation
             public NotAllAbilitiesUnlockDefinedException(string message) : base(message) { }
             public NotAllAbilitiesUnlockDefinedException(string message, Exception inner) : base(message, inner) { }
             protected NotAllAbilitiesUnlockDefinedException(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
         public class AbilitiesUnlockNotNotInRange : Exception
         {
@@ -400,8 +400,8 @@ namespace EvolutionSimulation
             public AbilitiesUnlockNotNotInRange(string message) : base(message) { }
             public AbilitiesUnlockNotNotInRange(string message, Exception inner) : base(message, inner) { }
             protected AbilitiesUnlockNotNotInRange(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
 
         static public void ValidateAbUnlock(Tuple<CreatureFeature, float>[] abUnlock)
@@ -440,8 +440,8 @@ namespace EvolutionSimulation
             public UniverseParameterIsZeroException(string message) : base(message) { }
             public UniverseParameterIsZeroException(string message, Exception inner) : base(message, inner) { }
             protected UniverseParameterIsZeroException(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
 
         public class UniverseParameterBeyondMaxException : Exception
@@ -450,8 +450,8 @@ namespace EvolutionSimulation
             public UniverseParameterBeyondMaxException(string message) : base(message) { }
             public UniverseParameterBeyondMaxException(string message, Exception inner) : base(message, inner) { }
             protected UniverseParameterBeyondMaxException(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
 
         public class MinMaxValueSwappedException : Exception
@@ -460,8 +460,8 @@ namespace EvolutionSimulation
             public MinMaxValueSwappedException(string message) : base(message) { }
             public MinMaxValueSwappedException(string message, Exception inner) : base(message, inner) { }
             protected MinMaxValueSwappedException(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
 
         public class PercentageOverOneException : Exception
@@ -470,28 +470,20 @@ namespace EvolutionSimulation
             public PercentageOverOneException(string message) : base(message) { }
             public PercentageOverOneException(string message, Exception inner) : base(message, inner) { }
             protected PercentageOverOneException(
-              System.Runtime.Serialization.SerializationInfo info,
-              System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+              SerializationInfo info,
+              StreamingContext context) : base(info, context) { }
         }
 
         public static void Validate(UniverseParameters parameters)
         {
             ValidateWorld(parameters);
-
             ValidateCreature(parameters);
-
             ValidateCreatureStats(parameters);
-
             ValidatePlants(parameters);
-
             ValidateMemory(parameters);
-
             ValidateCreatureStates(parameters);
-
             ValidateCreatureTransitions(parameters);
-
             ValidateCorpse(parameters);
-
             ValidateTaxonomy(parameters);
         }
 

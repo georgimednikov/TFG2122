@@ -22,7 +22,7 @@ namespace VisualizadorConsola
             Tracker.Instance.Init();
             Tracker.Instance.Track(new SessionStart());
             base.Init(years, species, individuals, dataDir, exportDir, config);
-            WorldToBmp();
+            //WorldToBmp();
             Console.WriteLine("Simulation Init done");
         }
 
@@ -38,77 +38,45 @@ namespace VisualizadorConsola
         {
             int YearTicks = world.YearToTick(1.0f);
             DateTime time = DateTime.Now;
-            int ticks = world.YearToTick(2/*UserInfo.Years*/);
+            int ticks = world.YearToTick(UserInfo.Years);
             int i = 1;
-            double prevN = 0;
+
             System.Timers.Timer timer = new System.Timers.Timer(5000);
             // TODO: Se puede hacer que sea el propio tracker el que haga el flush automatico cada x tiempo
             timer.Elapsed += (o, args) => { Tracker.Instance.Flush(); };
             timer.AutoReset = true;
             timer.Start();
-            int apocalypsisCont = 0, lastNum = world.Creatures.Count, births = 0;
-
-            String s = "[";
-            for (int j = 0; j < prevN; j++)
-            {
-                s += ".";
-            }
-            for (int j = (int)prevN; j < 100; j++)
-            {
-                s += " ";
-            }
-
-            Console.Clear();
-            Console.WriteLine(s + "] " + prevN + "%");
-
+            int apocalypsisCont = 0, lastNum = world.Creatures.Count, births = 0, birthCur = 0;
             for (; i <= ticks; i++)
             {
                 if (!world.Tick(i))
                 {
+                    break; //TODO: NO DEJAR ESTO
                     ApocalypseExport(apocalypsisCont++);
                     Console.WriteLine("APOCALYPSIS: Generating new set of creatures");
                     CreateCreatures();
+                    birthCur = 0;
                     lastNum = world.Creatures.Count;
-                    i = 0;
                 };
 
-                //if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum;}
-                //lastNum = world.Creatures.Count;
-                //Console.WriteLine("Ticks: {0}/{2} Num Creatures: {1} Births: {3} Entities to Update: {4}", i, world.Creatures.Count, ticks, births, world.StaticEntitiesToUpdate.Count);
-                //Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
+                if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
+                lastNum = world.Creatures.Count;
+                Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
+                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
                 if (i % 10 == 0)
                     Tracker.Instance.Track(new SimulationSample(i, world.Creatures.Count));
-                double newN = Math.Round((double)i / (double)ticks * 100);
-                if (newN > prevN)
-                {
-                    prevN = newN;
-                    String tempS = "[";
-                    for (int j = 0; j < prevN; j++)
-                    {
-                        tempS += ".";
-                    }
-                    for (int j = (int)prevN; j < 100; j++)
-                    {
-                        tempS += " ";
-                    }
-
-                    Console.Clear();
-                    Console.WriteLine(tempS + "] " + prevN + "%");
-                    if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; }
-                    lastNum = world.Creatures.Count;
-                    Console.WriteLine("Ticks: {0}/{2} Num Creatures: {1} Births: {3} Entities to Update: {4}", i, world.Creatures.Count, ticks, births, world.StaticEntitiesToUpdate.Count);
-                }
-
                 //Render();
                 //Thread.Sleep(1000);
+                if (i % YearTicks == 0)
+                    Console.WriteLine("A Year has passed");
             }
             timer.Stop();
             timer.Dispose();
-            WorldToBmp();
             DateTime time2 = DateTime.Now;
-            //Console.Write("Estimated Time for " + UserInfo.Years + " years will be: " + TimeSpan.FromMilliseconds((time2 - time).TotalMilliseconds / (i - 1) * world.YearToTick(UserInfo.Years)) + "\n");
+            Console.Write("Estimated Time for " + UserInfo.Years + " years will be: " + TimeSpan.FromMilliseconds((time2 - time).TotalMilliseconds / (i - 1) * world.YearToTick(UserInfo.Years)) + "\n");
             Console.WriteLine("Deaths by: Temperature {0} Damage by others {1} Retaliation {2} Starvation {3} Thirst {4} Exhaustion {5} Poison {6}", world.deaths[0], world.deaths[1], world.deaths[2], world.deaths[3], world.deaths[4], world.deaths[5], world.deaths[6]);
             Console.Write("Simulation ended, ticks elapsed: " + i + "\n");
+            WorldToBmp();
             Tracker.Instance.Track(new SessionEnd());
             Tracker.Instance.Flush();
         }
@@ -445,16 +413,16 @@ namespace VisualizadorConsola
                         SetPixel(j, i, Color.White, voronoiMap, scale / 2);
                     }
 
-                    if (world.map[j / scale, i / scale].isWater) SetPixel(j, i, Color.DarkBlue, debugMap, scale);
+                    if(world.map[j / scale, i / scale].isWater) SetPixel(j, i, Color.DarkBlue, debugMap, scale);
                     else SetPixel(j, i, Color.DarkGreen, debugMap, scale);
                 }
             }
             for (int i = 0; i < world.pathPos.Count; i++)
             {
                 Vector2 vector = world.pathPos[i];
-                SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.FromKnownColor(KnownColor.White), debugMap, scale / 2);
+                SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.FromKnownColor(KnownColor.White), debugMap, scale/2);
             }
-
+            
             for (int i = 0; i < world.deathsPos.Count; i++)
             {
                 Vector2 vector = world.deathsPos[i].pos;
@@ -482,7 +450,7 @@ namespace VisualizadorConsola
                         break;
                 }
             }
-
+            
             for (int t = 0; t < world.highMap.Count; t++)
             {
                 Vector2 vector = world.highMap[t].spawnPoint;
