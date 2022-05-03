@@ -7,8 +7,8 @@
         public EdibleTree()
         {
             type = PlantType.EdibleTree;
-            regrowthTime = RandomGenerator.Next(50, 101);
-            nutritionalValue = RandomGenerator.Next(5, 11);
+            regrowthTime = RandomGenerator.Next(70, 151); // TODO: Numeros magicos
+            nutritionalValue = RandomGenerator.Next(11, 22); // TODO: Numeros magicos
         }
 
         public EdibleTree(int regrowhtTime, float nutritionalValue)
