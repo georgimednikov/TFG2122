@@ -35,7 +35,6 @@ namespace EvolutionSimulation.FSM.Creature.States
                 speciesName = objCreature.speciesName;
                 if (poison)
                 {
-                    // TODO: Poison Event
                     Tracker.Instance.Track(new CreatureApplyPoison(creature.world.tick, creature.ID, creature.speciesName, 
                         objCreature.ID, objCreature.speciesName, creature.stats.Venom * 0.25f, (int)(creature.stats.Venom)));
                     objCreature.ReceiveInteraction(creature, Entities.Interactions.poison);
