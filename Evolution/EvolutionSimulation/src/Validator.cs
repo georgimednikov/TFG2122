@@ -71,7 +71,6 @@ namespace EvolutionSimulation
 
         static void SameSizeMaps(WorldGenConfig config)
         {
-
             int defined = 0;
             bool defHeight = (config.heightMap != null), defHumidity = (config.humidityMap != null), defTemp = (config.temperatureMap != null);
             if (defHeight) defined++;

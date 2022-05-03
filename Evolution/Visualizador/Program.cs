@@ -25,12 +25,13 @@ namespace Visualizador
             s.Export();
         }
 
+        #region AskInfo
         /// <summary>
         /// Asks the user where to look for the files containing the different values for the calculation of the chromosme, genes and stats,
         /// as well as the folder in which to save the resulting species. This method uses a Windows window to do so.
         /// </summary>
         /// <returns></returns>
-        static public bool AskInfoUsingWindows(Simulation s)
+        static bool AskInfoUsingWindows(Simulation s)
         {
             string dataDir, exportDir;
             int years, species, individuals;
@@ -108,6 +109,7 @@ namespace Visualizador
             individuals = userEntry;
 
             s.Init(years, species, individuals, dataDir, exportDir, config);
+            LoadingBar.Instance.Init(years, false);
 
             return true;
         }
@@ -144,5 +146,6 @@ namespace Visualizador
                 return false;
             }
         }
+        #endregion
     }
 }
