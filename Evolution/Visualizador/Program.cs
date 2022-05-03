@@ -15,8 +15,8 @@ namespace Visualizador
         static void Main()
         {
             Simulation s = new Simulation();
-#if DEBUG
-            s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
+#if true
+            s.Init(100, 30, 20, "../../ProgramData/", "../../ResultingData/", null);
 #else
             if (!AskInfoUsingWindows(s))
                 return;
