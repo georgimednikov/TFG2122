@@ -113,8 +113,6 @@ namespace EvolutionSimulation.Entities
                 ActionPoints -= cost;
 #if DEBUG
                 Console.WriteLine(GetStateInfo());
-#else 
-                GetStateInfo();
 #endif
             }
 
