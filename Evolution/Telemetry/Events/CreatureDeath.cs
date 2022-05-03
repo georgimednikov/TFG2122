@@ -11,5 +11,10 @@ namespace Telemetry.Events
         public double killerDmg { get; private set; }
         public CreatureDeath(int tick, int creatureID, string speciesName, DeathType deathType, int kID, double kDmg) : base(EventType.CreatureDeath, tick, creatureID, speciesName) 
         { DeathType = deathType; killerID = kID; killerDmg = kDmg; }
+        public override string ToJSON()
+        {
+            string aux = base.ToJSON();
+            return $"{aux.Remove(aux.Length - 1)}\n]";
+        }
     }
 }
