@@ -674,7 +674,7 @@ namespace EvolutionSimulation.Entities
         private void Poison(Creature interacter)
         {
             if (interacter.stats.Perforation >= stats.Armor)    // Venoms stack, no refreshing
-                AddStatus(new Poison((int)(interacter.stats.Venom), interacter.stats.Venom * 0.25f, interacter.ID));
+                AddStatus(new Poison((int)(interacter.stats.Venom), interacter.stats.Venom * 0.25f, interacter.ID)); // TODO: Numero magico
         }
 
         /// <summary>
