@@ -999,7 +999,7 @@ namespace EvolutionSimulation
             string word = JsonConvert.SerializeObject(map, Formatting.Indented);
             System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.WorldName, word);
             string rMap = JsonConvert.SerializeObject(regionMap, Formatting.Indented);
-            System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.HeightMapName, rMap);
+            System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.RegionMapName, rMap);
         }
 
         /// <summary>
