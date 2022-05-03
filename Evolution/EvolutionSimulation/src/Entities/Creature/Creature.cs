@@ -113,8 +113,6 @@ namespace EvolutionSimulation.Entities
                 ActionPoints -= cost;
 #if DEBUG
                 Console.WriteLine(GetStateInfo());
-#else 
-                GetStateInfo();
 #endif
             }
 
@@ -215,9 +213,9 @@ namespace EvolutionSimulation.Entities
                 else
                     timeToBeInHeat--;
 
-                //if the female has to do something, she doesn't want to mate
+                //if the female has to do something, she doesn't want to mate or is not on the ground
                 if (IsExhausted() || IsVeryHungry() || IsVeryThirsty()
-                    || mating || !stats.InHeat)
+                    || mating || !stats.InHeat || creatureLayer != HeightLayer.Ground)
                 {
                     wantMate = false;
                 }
@@ -524,6 +522,11 @@ namespace EvolutionSimulation.Entities
             AddInteraction(Interactions.stopMate, StopMating);
         }
 
+        internal void WitnessDeath()
+        {
+            ActionPoints = 1;
+        }
+
         // Methods to receive and respond to interactions
         /// <summary>
         /// Executes every response that this creature has to an interaction with other creature
@@ -620,7 +623,7 @@ namespace EvolutionSimulation.Entities
         private void ReceiveDamage(Creature interacter)
         {
             float damage = ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
-            stats.CurrHealth -= damage;
+            stats.CurrHealth = Math.Max(Math.Min(stats.CurrHealth - damage, stats.MaxHealth), 0);
 
             Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, interacter.ID, damage, DamageType.Attack, stats.CurrHealth));
 
@@ -671,7 +674,7 @@ namespace EvolutionSimulation.Entities
         private void Poison(Creature interacter)
         {
             if (interacter.stats.Perforation >= stats.Armor)    // Venoms stack, no refreshing
-                AddStatus(new Poison((int)(interacter.stats.Venom), interacter.stats.Venom * 0.25f, interacter.ID));
+                AddStatus(new Poison((int)(interacter.stats.Venom), interacter.stats.Venom * 0.25f, interacter.ID)); // TODO: Numero magico
         }
 
         /// <summary>

@@ -14,8 +14,12 @@ namespace Telemetry
         CreatureStateEntry,
         [EnumMember(Value = "CreatureAttack")]
         CreatureAttack,
+        [EnumMember(Value = "CreatureApplyPoison")]
+        CreatureApplyPoison,
         [EnumMember(Value = "CreatureReceiveDamage")]
         CreatureReceiveDamage,
+        [EnumMember(Value = "CreatureMating")]
+        CreatureMating,
         [EnumMember(Value = "CreatureDeath")]
         CreatureDeath,
         [EnumMember(Value = "SessionEnd")]

@@ -17,6 +17,7 @@ namespace EvolutionSimulation
         public int grassHp = 10;
         public int bushHp = 20;
         public int eTreeHp = 50;
+        public float plantNutritionMultiplier = 0.8f;
 
         // Creature
         public float abilityUnlockPercentage = 0.4f; //The percentage of an ability that has to be had in order to unlock it

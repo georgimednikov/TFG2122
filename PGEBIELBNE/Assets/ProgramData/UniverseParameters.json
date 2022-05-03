@@ -7,6 +7,7 @@
   "grassHp": 10,
   "bushHp": 20,
   "eTreeHp": 50,
+  "plantNutritionMultiplier": 0.8,
   "abilityUnlockPercentage": 0.4,
   "minHealth": 10,
   "healthGainMultiplier": 2,

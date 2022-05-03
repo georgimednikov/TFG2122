@@ -547,9 +547,16 @@ namespace EvolutionSimulation
         {
             IEntity ent;
             if (Creatures.ContainsKey(entityID))
+            {
                 ent = Creatures[entityID];
+                taxonomy.RemoveCreatureToSpecies(Creatures[entityID]);
+                Creatures[entityID] = null;
+            }
             else
+            {
                 ent = StaticEntities[entityID];
+                StaticEntities[entityID] = null;
+            }
 
             entityMap[ent.x, ent.y].Remove(ent);
             entitiesToDelete.Add(entityID);
@@ -595,10 +602,7 @@ namespace EvolutionSimulation
             entitiesToDelete.ForEach(delegate (int id)
             {
                 if (Creatures.ContainsKey(id))
-                {
-                    taxonomy.RemoveCreatureToSpecies(Creatures[id]);
                     Creatures.Remove(id);
-                }
                 else
                     StaticEntities.Remove(id);
             }

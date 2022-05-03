@@ -1,164 +1,52 @@
-﻿using System;
-using System.Drawing;
+using System;
 using System.Collections.Generic;
-using EvolutionSimulation.Entities;
+using System.Drawing;
+using System.IO;
 using System.Numerics;
+using System.Threading;
+using EvolutionSimulation;
+using EvolutionSimulation.Entities;
+using EvolutionSimulation.Genetics;
 using Telemetry;
 using Telemetry.Events;
 
-namespace EvolutionSimulation
+namespace VisualizadorConsola
 {
     /// <summary>
-    /// Simulation of evolution
+    /// Implementation of a simulation with console output
     /// </summary>
-    public class Simulation : ISimulation
+    public class ConsoleSimulation : Simulation
     {
-        System.Timers.Timer timer;
-
-        /// <summary>
-        /// Initializes the program with information provided by the user
-        /// If no directories are provided, data will be looked for in the directory where the .exe is located
-        /// </summary>
-        /// <param name="years"> Years to simulate </param>
-        /// <param name="species"> Initial number of original species </param>
-        /// <param name="individuals"> Initial number of creatures per original specie </param>
-        /// <param name="dataDir"> Directory where all the files with the simulation info are stored </param>
-        /// <param name="exportDir"> Directory where the files will be stored when de simulation ends </param>
-        /// <param name="worldConfig"> World configuration to generate the world map. If it is provided, no other world files are considered </param>
-        virtual public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig worldConfig)
-        {
-            InitTracker();
-
-            UserInfo.SetUp(years, species, individuals, dataDir, exportDir);
-            // Universe Parameters
-            UniverseParametersManager.ReadJSON();
-            // Chromosome and ability unlocks
-            Genetics.CreatureChromosome.SetChromosome();
-            // Similarity Gene Weight
-            Genetics.GeneticTaxonomy.SetTaxonomy();
-            // World
-            world = new World();
-
-            // If the is no custom world configuration
-            if (worldConfig == null)
-            {
-                string worldData = UserInfo.WorldFile();
-                string regionData = UserInfo.RegionFile();
-                // If a simulation world is provided, that one is used.
-                if (worldData != null && regionData != null)
-                {
-                    world.Init(worldData, regionData);
-                }
-                else // Else a new one has to be created from scratch with the given parameters, in this case only size.
-                {
-                    WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
-                    {
-                        mapSize = UserInfo.Size
-                    };
-
-                    world.Init(config);
-                }
-            }
-            else // There is a custom world configuration, which in this case means that a height map is provided.
-                world.Init(worldConfig);
-
-            //WorldToBmp();
-            CreateCreatures();
-
-            //StartFlusingTracker(5000);
-        }
-
-        /// <summary>
-        /// Sets up the program with the information provided by the user
-        /// </summary>
-        /// <param name="years"> Years to simulate </param>
-        /// <param name="species"> Initial number of original species </param>
-        /// <param name="individuals"> Initial number of creatures per original specie </param>
-        /// <param name="uniParamsFile"> Raw file with the parameters of the simulation universe. If not provided, default information is setted </param>
-        /// <param name="chromosomeFile"> Raw File with the chromosome information </param>
-        /// <param name="sGeneWeightFile"> Raw file with each genes' weight for the chromosome </param>
-        /// <param name="abilitiesFile"> Raw file with each ability unlock percentage. If not provided, default information is setted</param>
-        /// <param name="exportDir"> Directory where the files will be stored when de simulation ends. If not provided, default export directory is setted</param>
-        virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
-        {
-            InitTracker();
-
-            UserInfo.SetUp(years, species, individuals, _exportDir: exportDir);
-            // Universe Parameters
-            UniverseParametersManager.ReadJSON(uniParamsFile);
-            // Chromosome and ability unlocks
-            Genetics.CreatureChromosome.SetChromosome(chromosomeFile, abilitiesFile);
-            // Similarity Gene Weight
-            Genetics.GeneticTaxonomy.SetTaxonomy(sGeneWeightFile);
-            // World
-            world = new World();
-            if (worldFile != null && regionMap != null)
-            {
-                world.Init(worldFile, regionMap);
-            }
-            else
-            {
-                WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
-                {
-                    mapSize = UserInfo.Size
-                };
-
-                world.Init(config);
-            }
-            UserInfo.Size = world.map.GetLength(0);
-            //WorldToBmp();
-            CreateCreatures();
-            //StartFlusingTracker(5000);
-        }
-        private void InitTracker()
+        override public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig config)
         {
             Tracker.Instance.Init();
             Tracker.Instance.Track(new SessionStart());
+            base.Init(years, species, individuals, dataDir, exportDir, config);
+            //WorldToBmp();
+            Console.WriteLine("Simulation Init done");
         }
 
-        /// <summary>
-        /// Seconds between each flush
-        /// </summary>
-        /// <param name="miliseconds"></param>
-        private void StartFlusingTracker(int miliseconds)
+        override public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
         {
-            timer = new System.Timers.Timer(5000);
+            Tracker.Instance.Init();
+            Tracker.Instance.Track(new SessionStart());
+            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, regionMap, exportDir);
+            Console.WriteLine("Simulation Init done");
+        }
+
+        override public void Run()
+        {
+            int YearTicks = world.YearToTick(1.0f);
+            DateTime time = DateTime.Now;
+            int ticks = world.YearToTick(UserInfo.Years);
+            int i = 1;
+
+            System.Timers.Timer timer = new System.Timers.Timer(5000);
             // TODO: Se puede hacer que sea el propio tracker el que haga el flush automatico cada x tiempo
             timer.Elapsed += (o, args) => { Tracker.Instance.Flush(); };
             timer.AutoReset = true;
             timer.Start();
-        }
-
-        private void EndTracker()
-        {
-            timer.Stop();
-            timer.Dispose();
-            Tracker.Instance.Track(new SessionEnd());
-            Tracker.Instance.Flush();
-        }
-
-        virtual public void Run()
-        {
-            int YearTicks = world.YearToTick(1.0f);
-            DateTime prevT = DateTime.Now;
-            DateTime newT = DateTime.Now;
-            int ticks = world.YearToTick(UserInfo.Years);
-            int i = 1;
-            double prevN = 0;
             int apocalypsisCont = 0, lastNum = world.Creatures.Count, births = 0, birthCur = 0;
-            WorldToBmp();
-            String s = "[";
-            for (int j = 0; j < prevN; j++)
-            {
-                s += ".";
-            }
-            for (int j = (int)prevN; j < 100; j++)
-            {
-                s += " ";
-            }
-            Console.Clear();
-            Console.WriteLine(s + "] " + prevN + "%");
-
             for (; i <= ticks; i++)
             {
                 if (!world.Tick(i))
@@ -169,217 +57,117 @@ namespace EvolutionSimulation
                     CreateCreatures();
                     birthCur = 0;
                     lastNum = world.Creatures.Count;
-                    LoadingBar.Instance.NewAttempt();
                 };
 
-                //if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
-                //lastNum = world.Creatures.Count;
-                //Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
-                //Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
+                if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
+                lastNum = world.Creatures.Count;
+                Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
+                Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
+                if (i % 10 == 0)
+                    Tracker.Instance.Track(new SimulationSample(i, world.Creatures.Count));
                 //Render();
                 //Thread.Sleep(1000);
-                if (i % UniverseParametersManager.parameters.ticksPerHour == 0)
-                {
-                    Tracker.Instance.Track(new SimulationSample(i, world.Creatures.Count));
-                    Tracker.Instance.Flush();
-                }
                 if (i % YearTicks == 0)
-                {
                     Console.WriteLine("A Year has passed");
-                    //LoadingBar.Instance.StepElapsed();
-                }
-
-                double newN = Math.Round((double)i / (double)ticks * 100);
-                if (newN > prevN)
-                {
-                    newT = DateTime.Now;
-                    prevN = newN;
-                    String tempS = "[";
-                    for (int j = 0; j < prevN; j++)
-                    {
-                        tempS += ".";
-                    }
-                    for (int j = (int)prevN; j < 100; j++)
-                    {
-                        tempS += " ";
-                    }
-
-                    Console.Clear();
-                    Console.WriteLine(tempS + "] " + prevN + "%");
-                    if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; }
-                    lastNum = world.Creatures.Count;
-                    Console.WriteLine("Ticks: {0}/{2} | Num Creatures: {1} | Births: {3} | Entities to Update: {4} | {5}", i, world.Creatures.Count, ticks, births, world.StaticEntitiesToUpdate.Count, newT - prevT);
-                    prevT = newT;
-                }
             }
-            // Para dejar los json bien cuando termine la simulacion
-            foreach (Creature c in world.Creatures.Values)
-                Tracker.Instance.Track(new CreatureDeath(ticks, c.ID, c.speciesName, DeathType.SimulationEnd, -1, 0));
-
+            timer.Stop();
+            timer.Dispose();
+            DateTime time2 = DateTime.Now;
+            Console.Write("Estimated Time for " + UserInfo.Years + " years will be: " + TimeSpan.FromMilliseconds((time2 - time).TotalMilliseconds / (i - 1) * world.YearToTick(UserInfo.Years)) + "\n");
             Console.WriteLine("Deaths by: Temperature {0} Damage by others {1} Retaliation {2} Starvation {3} Thirst {4} Exhaustion {5} Poison {6}", world.deaths[0], world.deaths[1], world.deaths[2], world.deaths[3], world.deaths[4], world.deaths[5], world.deaths[6]);
             Console.Write("Simulation ended, ticks elapsed: " + i + "\n");
+            WorldToBmp();
             Tracker.Instance.Track(new SessionEnd());
             Tracker.Instance.Flush();
         }
 
-        virtual public void Export()
+        override public void Export()
         {
-            //EndTracker();
-            world.ExportContent();
+            base.Export();
             Console.Write("Simulation data has been exported");
         }
-        virtual public void ApocalypseExport(int cont)
+
+        override public void ApocalypseExport(int cont)
         {
-            world.ApocalypseExportContent(cont);
+            base.ApocalypseExport(cont);
             Console.Write("Simulation data has been exported because of Apocalysis");
         }
-
-
-        /*//Method to test
-        virtual protected void CreateCreaturesTest()
+        /// <summary>
+        /// Asks the user where to look for the files containing the different values for the calculation of the chromosme, genes and stats,
+        /// as well as the folder in which to save the resulting species. This method uses the program's console to do so.
+        /// </summary>
+        /// <returns></returns>
+        public bool AskInfoUsingConsole(Simulation s)
         {
-            Animal a = world.CreateCreature<Animal>(10, 10);
-            a.chromosome.ModifyGender(Genetics.Gender.Male);
-            Animal b = world.CreateCreature<Animal>(10, 10, a.chromosome, a.speciesName);
-            b.chromosome.ModifyGender(Genetics.Gender.Female);
+            string dataDir, exportDir;
+            int years, species, individuals;
 
-            Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(a.chromosome, b.chromosome);
-            // Mutate the chromosome
-            Genetics.GeneticFunctions.UniformMutation(ref childC, UniverseParametersManager.parameters.mutationChance);
-            // The new creature's pos (near to the parents)
-
-            childC.ModifyGender(Genetics.Gender.Female);
-            Animal c = b.world.CreateCreature<Animal>(10, 10, childC, b.speciesName, a.ID, b.ID);
-            Animal c2 = world.CreateCreature<Animal>(10, 10, a.chromosome, a.speciesName);
-            c2.chromosome.ModifyGender(Genetics.Gender.Male);
-
-            Genetics.CreatureChromosome childD = Genetics.GeneticFunctions.UniformCrossover(a.chromosome, b.chromosome);
-            // Mutate the chromosome
-            Genetics.GeneticFunctions.UniformMutation(ref childD, UniverseParametersManager.parameters.mutationChance);
-            // The new creature's pos (near to the parents)
-
-            Animal d = b.world.CreateCreature<Animal>(10, 10, childD, b.speciesName, a.ID, b.ID);
-            
-            //world.ApocalypseExportContent(0);
-
-            Genetics.CreatureChromosome childCC = Genetics.GeneticFunctions.UniformCrossover(c2.chromosome, c.chromosome);
-            // Mutate the chromosome
-            Genetics.GeneticFunctions.UniformMutation(ref childCC, UniverseParametersManager.parameters.mutationChance);
-            // The new creature's pos (near to the parents)
-
-            Animal ac2 = c.world.CreateCreature<Animal>(10, 10, childCC, c.speciesName, c2.ID, c.ID);
-
-            Genetics.CreatureChromosome childCC2 = Genetics.GeneticFunctions.UniformCrossover(c2.chromosome, c.chromosome);
-            // Mutate the chromosome
-            Genetics.GeneticFunctions.UniformMutation(ref childCC2, UniverseParametersManager.parameters.mutationChance);
-            // The new creature's pos (near to the parents)
-
-            Animal ac = c.world.CreateCreature<Animal>(10, 10, childCC2, c.speciesName, c2.ID, c.ID);
-
-            Genetics.CreatureChromosome childCC3 = Genetics.GeneticFunctions.UniformCrossover(c2.chromosome, c.chromosome);
-            // Mutate the chromosome
-            Genetics.GeneticFunctions.UniformMutation(ref childCC3, UniverseParametersManager.parameters.mutationChance);
-            // The new creature's pos (near to the parents)
-
-            Animal ac3 = c.world.CreateCreature<Animal>(10, 10, childCC3, c.speciesName, c2.ID, c.ID);
-
-            world.ApocalypseExportContent(0);
-        }*/
-
-        virtual protected void CreateCreatures()
-        {
-            //A minimum distance to leave in between species spawn points to give them some room.
-            //Calculated based on the world size and amount of species to spawn, and then reduced by
-            //a value to give room in the world and not fill it in a homogenous manner.
-            int minSpawnDist = UserInfo.Size / UserInfo.Species;
-
-            //List with previous spawn positions, to know if a new spot is too close to another one used.
-            List<Tuple<int, int>> spawnPositions = new List<Tuple<int, int>>();
-            int x, y;
-            bool validPosition;
-            bool valid;
-            Animal a;
-            int temperatureCont;
-            int minDistanceCont;
-            for (int i = 0; i < UserInfo.Species; i++)
+            do
             {
-                a = world.CreateCreature<Animal>(0, 0);
-                temperatureCont = 0;//a cont to create the creatures in a position that is not receiving damage by temperature
-                minDistanceCont = 0;//a cont to create the creatures separated if possible
-                //Find a good position to start for the creature. That means with a minimun distance with other creatures,
-                //not in a water tile and in a position that is with a confortable temperature to the creature
+                Console.WriteLine("Input a valid directory containing the necessary data files for the program (chromosome.json, etc.):\n");
+                dataDir = Console.ReadLine() + "\\";
+                Console.Clear();
+            } while (!Directory.Exists(dataDir));
+
+            Console.WriteLine("Input a valid directory in which the resulting data will be saved:\n");
+            exportDir = Console.ReadLine() + "\\";
+            Console.Clear();
+            if (!Directory.Exists(exportDir))
+                exportDir = Directory.CreateDirectory(exportDir).FullName;
+
+            do
+            {
+                Console.WriteLine("Input how many years of evolution are going to be simulated:");
+                string input = Console.ReadLine();
+                years = -1;
+                if (input != "") years = Int32.Parse(input);
+                Console.Clear();
+            } while (years < 0);
+
+            int minSize = UserInfo.MinWorldSize();
+
+            WorldGenConfig config = null;
+            if (!File.Exists(dataDir + UserInfo.WorldName) && !File.Exists(dataDir + UserInfo.HeightMapName))
+            {
                 do
                 {
-                    validPosition = true;
-                    valid = true;
-                    //Try to separate the creatures to avoid them starting attacking and dying in the beginning
-                    do
-                    {
-                        x = RandomGenerator.Next(0, UserInfo.Size);
-                        y = RandomGenerator.Next(0, UserInfo.Size);
-                        foreach (Tuple<int, int> pos in spawnPositions)
-                        {
-                            if (Math.Abs(pos.Item1 - x) < minSpawnDist && Math.Abs(pos.Item2 - y) < minSpawnDist)
-                            {
-                                valid = false;
-                                break;
-                            }
-                        }
-                        minDistanceCont++;
-                    } while (!valid && minDistanceCont < UserInfo.Size);
-                    //The creatures cant start in a water position
-                    if (world.map[x, y].isWater)
-                    {
-                        validPosition = false;
-                        continue;
-                    }
-                    //Try to be in a safe temperature position
-                    if (!a.CheckTemperature(x, y) && temperatureCont < UserInfo.Size)
-                    {
-                        validPosition = false;
-                        temperatureCont++;
-                        continue;
-                    }
-                }
-                while (!validPosition);
-
-                a.Place(x, y);
-                //The specified amount of individuals of each species is created.
-                for (int j = 1; j < UserInfo.Individuals; j++)
-                {
-                    world.CreateCreature<Animal>(x, y, a.chromosome, a.speciesName);
-                }
-
-                //The new position is added to the list of used.
-                spawnPositions.Add(new Tuple<int, int>(x, y));
+                    Console.WriteLine("Input how big in squares the world is going to be. Must be a number larger than: " + minSize + "\n");
+                    string input = Console.ReadLine();
+                    UserInfo.Size = -1;
+                    if (input != "") UserInfo.Size = Int32.Parse(input);
+                    Console.Clear();
+                } while (UserInfo.Size < minSize);
             }
-            SetUpInitialPopulation();
-        }
-
-        /// <summary>
-        /// The initial population start being adult and the half is male and the other is female
-        /// </summary>
-        virtual protected void SetUpInitialPopulation()
-        {
-            int i = 0;
-            foreach (Creature c in world.Creatures.Values)
+            else if (File.Exists(dataDir + UserInfo.HeightMapName))
             {
-                c.stats.CurrAge = (int)(UniverseParametersManager.parameters.adulthoodThreshold * c.stats.LifeSpan);
-                if (i % 2 == 0)
-                {
-                    c.chromosome.ModifyGender(Genetics.Gender.Male);
-                    c.stats.Gender = Genetics.Gender.Male;
-                }
-                else
-                {
-                    c.chromosome.ModifyGender(Genetics.Gender.Female);
-                    c.stats.Gender = Genetics.Gender.Female;
-                }
-                i++;
+                config = new WorldGenConfig(World.MapType.Custom);
             }
+
+            int minSpecies = UserInfo.MinSpeciesAmount();
+            do
+            {
+                Console.WriteLine("Input how many species are going to be created initially. Must be a number larger than: " + minSpecies + "\n");
+                string input = Console.ReadLine();
+                species = -1;
+                if (input != "") species = Int32.Parse(input);
+                Console.Clear();
+            } while (species < minSpecies);
+
+            int minIndividuals = UserInfo.MinIndividualsAmount();
+            do
+            {
+                Console.WriteLine("Input how individuals per species are going to be created. Must be a number larger than: " + minIndividuals + "\n");
+                string input = Console.ReadLine();
+                individuals = -1;
+                if (input != "") individuals = Int32.Parse(input);
+                Console.Clear();
+            } while (individuals < minIndividuals);
+
+            s.Init(years, species, individuals, dataDir, exportDir, config);
+
+            return true;
         }
 
-        #region BMP
         public void WorldToBmp()
         {
             int scale = 4;
@@ -625,16 +413,16 @@ namespace EvolutionSimulation
                         SetPixel(j, i, Color.White, voronoiMap, scale / 2);
                     }
 
-                    if (world.map[j / scale, i / scale].isWater) SetPixel(j, i, Color.DarkBlue, debugMap, scale);
+                    if(world.map[j / scale, i / scale].isWater) SetPixel(j, i, Color.DarkBlue, debugMap, scale);
                     else SetPixel(j, i, Color.DarkGreen, debugMap, scale);
                 }
             }
             for (int i = 0; i < world.pathPos.Count; i++)
             {
                 Vector2 vector = world.pathPos[i];
-                SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.FromKnownColor(KnownColor.White), debugMap, scale / 2);
+                SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.FromKnownColor(KnownColor.White), debugMap, scale/2);
             }
-
+            
             for (int i = 0; i < world.deathsPos.Count; i++)
             {
                 Vector2 vector = world.deathsPos[i].pos;
@@ -662,7 +450,7 @@ namespace EvolutionSimulation
                         break;
                 }
             }
-
+            
             for (int t = 0; t < world.regionMap.Count; t++)
             {
                 Vector2 vector = world.regionMap[t].spawnPoint;
@@ -690,8 +478,19 @@ namespace EvolutionSimulation
                 }
             }
         }
-#endregion
 
-        protected World world;
+        void BlendPixel(int x, int y, Color color, Bitmap bitmap, int scale = 2)
+        {
+            int c = bitmap.GetPixel(x, y).ToArgb(), nC = color.ToArgb();
+            color = Color.FromArgb((nC + c) / 2);
+
+            for (int i = 0; i < scale; i++)
+            {
+                for (int j = 0; j < scale; j++)
+                {
+                    bitmap.SetPixel(x + i, y + j, color);
+                }
+            }
+        }
     }
 }
