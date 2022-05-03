@@ -7,6 +7,9 @@ using EvolutionSimulation.Genetics;
 using EvolutionSimulation.Entities.Status;
 using System.Numerics;
 
+using Telemetry;
+using Telemetry.Events;
+
 namespace EvolutionSimulation.Entities
 {
     public enum CauseOfDeath
@@ -110,8 +113,6 @@ namespace EvolutionSimulation.Entities
                 ActionPoints -= cost;
 #if DEBUG
                 Console.WriteLine(GetStateInfo());
-#else 
-                GetStateInfo();
 #endif
             }
 
@@ -167,6 +168,8 @@ namespace EvolutionSimulation.Entities
                 ((range * (UniverseParametersManager.parameters.maxHealthTemperatureDamage - UniverseParametersManager.parameters.minHealthTemperatureDamage)) +
                 UniverseParametersManager.parameters.minHealthTemperatureDamage);
             stats.CurrHealth -= (float)damage;
+
+            Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, -1, (float)damage, DamageType.Temperature, stats.CurrHealth));
 
             if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
             {
@@ -248,6 +251,16 @@ namespace EvolutionSimulation.Entities
             {
                 stats.CurrHealth -= 1;  // TODO: Numero magico
 
+                DamageType dtype = DamageType.Starvation;
+                if (stats.CurrEnergy <= 0)
+                    dtype = DamageType.Starvation;
+                else if (stats.CurrHydration <= 0)
+                    dtype = DamageType.Dehydration;
+                else if (stats.CurrRest <= 0)
+                    dtype = DamageType.Exhaustion;
+
+                Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, -1, 1, dtype, stats.CurrHealth));
+
                 if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
                 {
                     if (stats.CurrEnergy <= 0)
@@ -258,7 +271,7 @@ namespace EvolutionSimulation.Entities
                         causeOfDeath = CauseOfDeath.Exhaustion;
 
                     killingBlow = 1;
-                    killerID = ID;  // TODO: -1 o esto?
+                    killerID = -1;
                 }
             }
             else if (stats.CurrEnergy >= (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold) &&
@@ -509,6 +522,11 @@ namespace EvolutionSimulation.Entities
             AddInteraction(Interactions.stopMate, StopMating);
         }
 
+        internal void WitnessDeath()
+        {
+            ActionPoints = 1;
+        }
+
         // Methods to receive and respond to interactions
         /// <summary>
         /// Executes every response that this creature has to an interaction with other creature
@@ -605,7 +623,9 @@ namespace EvolutionSimulation.Entities
         private void ReceiveDamage(Creature interacter)
         {
             float damage = ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
-            stats.CurrHealth -= damage;
+            stats.CurrHealth = Math.Max(Math.Min(stats.CurrHealth - damage, stats.MaxHealth), 0);
+
+            Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, interacter.ID, damage, DamageType.Attack, stats.CurrHealth));
 
             if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
             {
@@ -635,6 +655,8 @@ namespace EvolutionSimulation.Entities
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
 
+            Tracker.Instance.Track(new CreatureReceiveDamage(interacter.world.tick, interacter.ID, interacter.speciesName, ID, stats.Counter, DamageType.Retalliation, interacter.stats.CurrHealth));
+
             if (interacter.causeOfDeath == CauseOfDeath.NONE && interacter.stats.CurrHealth <= 0)
             {
                 interacter.causeOfDeath = CauseOfDeath.Retalliation;
@@ -652,7 +674,7 @@ namespace EvolutionSimulation.Entities
         private void Poison(Creature interacter)
         {
             if (interacter.stats.Perforation >= stats.Armor)    // Venoms stack, no refreshing
-                AddStatus(new Poison((int)(interacter.stats.Venom), interacter.stats.Venom * 0.25f));
+                AddStatus(new Poison((int)(interacter.stats.Venom), interacter.stats.Venom * 0.25f, interacter.ID)); // TODO: Numero magico
         }
 
         /// <summary>

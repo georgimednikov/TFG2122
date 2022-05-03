@@ -13,7 +13,6 @@ namespace VisualizadorConsola
 #if DEBUG
             s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
 #else
-            //s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
             if (!AskInfoUsingConsole(s))
                 return;
 #endif
@@ -49,7 +48,7 @@ namespace VisualizadorConsola
                 Console.WriteLine("Input how many years of evolution are going to be simulated:");
                 string input = Console.ReadLine();
                 years = -1;
-                if (input != "") years = Int32.Parse(input);
+                if (input != "") years = int.Parse(input);
                 Console.Clear();
             } while (years < 0);
 
@@ -76,10 +75,10 @@ namespace VisualizadorConsola
                 {
                     do
                     {
-                        Console.WriteLine("Input how big in squares the world is going to be. Must be a number larger than: " + minSize + "\n");
+                        Console.WriteLine("Input how big in squares the world is going to be. Must be a number larger than or equal to: " + minSize + "\n");
                         string input = Console.ReadLine();
                         UserInfo.Size = -1;
-                        if (input != "") UserInfo.Size = Int32.Parse(input);
+                        if (input != "") UserInfo.Size = int.Parse(input);
                         Console.Clear();
                     } while (UserInfo.Size < minSize);
                 }
@@ -88,24 +87,26 @@ namespace VisualizadorConsola
             int minSpecies = UserInfo.MinSpeciesAmount();
             do
             {
-                Console.WriteLine("Input how many species are going to be created initially. Must be a number larger than: " + minSpecies + "\n");
+                Console.WriteLine("Input how many species are going to be created initially. Must be a number larger than or equal to: " + minSpecies + "\n");
                 string input = Console.ReadLine();
                 species = -1;
-                if (input != "") species = Int32.Parse(input);
+                if (input != "") species = int.Parse(input);
                 Console.Clear();
             } while (species < minSpecies);
 
             int minIndividuals = UserInfo.MinIndividualsAmount();
             do
             {
-                Console.WriteLine("Input how individuals per species are going to be created. Must be a number larger than: " + minIndividuals + "\n");
+                Console.WriteLine("Input how individuals per species are going to be created. Must be a number larger than or equal to: " + minIndividuals + "\n");
                 string input = Console.ReadLine();
                 individuals = -1;
-                if (input != "") individuals = Int32.Parse(input);
+                if (input != "") individuals = int.Parse(input);
                 Console.Clear();
             } while (individuals < minIndividuals);
 
             s.Init(years, species, individuals, dataDir, exportDir, config);
+            
+            LoadingBar.Instance.Init(years, true);
 
             return true;
         }

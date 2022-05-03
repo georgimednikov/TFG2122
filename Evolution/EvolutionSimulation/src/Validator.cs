@@ -64,14 +64,13 @@ namespace EvolutionSimulation
         static void MinimumWorldSize(WorldGenConfig config)
         {
             if (config.humidityMap != null || config.temperatureMap != null || config.heightMap != null) return;
-            if (config.mapSize <= UserInfo.MinWorldSize()) throw new MinimumWorldSizeException("The provided size is equal or less than the minimum required size: " + UserInfo.MinWorldSize());
+            if (config.mapSize < UserInfo.MinWorldSize()) throw new MinimumWorldSizeException("The provided size is equal or less than the minimum required size: " + UserInfo.MinWorldSize());
 
             return;
         }
 
         static void SameSizeMaps(WorldGenConfig config)
         {
-
             int defined = 0;
             bool defHeight = (config.heightMap != null), defHumidity = (config.humidityMap != null), defTemp = (config.temperatureMap != null);
             if (defHeight) defined++;

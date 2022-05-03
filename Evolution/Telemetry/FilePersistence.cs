@@ -48,7 +48,9 @@ namespace Telemetry
                     }
                 //}
             }
+#if DEBUG
             System.Console.WriteLine($"{numEvents} Events flushed !");
+#endif
         }
 
         ISerializer serializer;
