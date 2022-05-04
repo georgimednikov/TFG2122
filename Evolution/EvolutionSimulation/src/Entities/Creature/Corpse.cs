@@ -92,7 +92,7 @@ namespace EvolutionSimulation.Entities
                 curHp -= dealt;
                 // The creature can be poisoned when eating the corpse
                 if (prob < actualPoisonProb && dealt > 0)   // In case another creature tried eating an empty corpse
-                    other.AddStatus(new Status.Poison(poisonDuration, poisonTickDamage));
+                    other.AddStatus(new Status.Poison(poisonDuration, poisonTickDamage, -1));   // TODO: Distinguir corpse?
             }                      
         }
 

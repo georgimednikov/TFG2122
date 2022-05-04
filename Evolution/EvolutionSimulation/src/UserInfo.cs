@@ -50,7 +50,7 @@ namespace EvolutionSimulation
         /// <summary>
         /// Returns the Astar region file, if the file does not exist, returns null
         /// </summary>
-        static public string RegionFile() { return LoadFile(HeightMapName); }
+        static public string RegionFile() { return LoadFile(RegionMapName); }
 
         /// <summary>
         /// Loads a file form the Data directory and returns its raw data.

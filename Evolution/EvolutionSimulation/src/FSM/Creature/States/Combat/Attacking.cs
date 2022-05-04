@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Telemetry;
+using Telemetry.Events;
 
 namespace EvolutionSimulation.FSM.Creature.States
 {
@@ -21,6 +22,15 @@ namespace EvolutionSimulation.FSM.Creature.States
             return (int)(UniverseParametersManager.parameters.baseActionCost + attackMod);
         }
 
+        public override void OnEntry()
+        {
+            //base.OnEntry();
+            creature.Enemy(out enemyID, out _);
+            Entities.Creature objCreature = creature.world.GetCreature(enemyID);
+
+            Tracker.Instance.Track(new CreatureStateEntryNotSafe(creature.world.tick, creature.ID, creature.speciesName, ToString(), enemyID, objCreature == null ? " " : objCreature.speciesName));
+        }
+
         // Increases current rest
         public override void Action()
         {
@@ -31,8 +41,15 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 speciesName = objCreature.speciesName;
                 if (poison)
+                {
+                    Tracker.Instance.Track(new CreatureApplyPoison(creature.world.tick, creature.ID, creature.speciesName, 
+                        objCreature.ID, objCreature.speciesName, creature.stats.Venom * 0.25f, (int)(creature.stats.Venom)));
                     objCreature.ReceiveInteraction(creature, Entities.Interactions.poison);
+                }
                 objCreature.ReceiveInteraction(creature, Entities.Interactions.attack);
+
+                Tracker.Instance.Track(new CreatureAttack(creature.world.tick, creature.ID, creature.speciesName, 
+                    objCreature.ID, objCreature.speciesName, creature.stats.Damage, creature.stats.Perforation));
             }
         }
 

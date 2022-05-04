@@ -13,7 +13,8 @@
 
         public override bool Evaluate()
         {
-            return creature.stats.CurrHydration >= creature.stats.MaxHydration;
+            return creature.stats.CurrHydration >= creature.stats.MaxHydration
+                || (!creature.IsThirsty() && (creature.IsHungry() || creature.IsExhausted()));
         }
 
         public override string ToString()

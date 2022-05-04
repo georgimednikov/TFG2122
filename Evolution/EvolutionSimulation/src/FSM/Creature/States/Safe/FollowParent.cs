@@ -19,6 +19,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
+            base.OnEntry();
             SetPos();
         }
 

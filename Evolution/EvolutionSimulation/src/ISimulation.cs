@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EvolutionSimulation
+﻿namespace EvolutionSimulation
 {
     /// <summary>
     /// Common interface for simulations
@@ -15,10 +9,5 @@ namespace EvolutionSimulation
         /// Starts the simualtion and keeps it running until the exit condition is met
         /// </summary>
         void Run();
-
-        ///<summary>
-        /// Exports the simulation content
-        /// </summary>
-        void Export();
     }
 }

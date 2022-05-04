@@ -65,7 +65,7 @@ namespace EvolutionSimulation.Entities
             info.start = start;
             info.end = end;
 
-            if ((end-start).LengthSquared() <= 2)
+            if ((end - start).LengthSquared() <= 2)
             {
                 Vector3[] path = new Vector3[1];
                 path[0] = end;
@@ -126,8 +126,13 @@ namespace EvolutionSimulation.Entities
                 {
                     info.regionPath[i] = (int)list[i].pos.X;
                 }
+                if (list.Count <= 1)
+                {
+                    endRegion = -1;
+                    return -Vector3.One;
+                }
 
-                List<Vector2> pos = w.highMap[(int)list[1].pos.X].links[(int)nStart.X];
+                List<Vector2> pos = w.regionMap[(int)list[1].pos.X].links[(int)nStart.X];
 
                 for (int i = 0; i < pos.Count; i++)
                 {
@@ -147,6 +152,13 @@ namespace EvolutionSimulation.Entities
 
         private static Vector3[] LowAstar(Creature c, World w, Vector3 start, Vector3 end, int endRegion, out double treeDensity, DebugPathInfo info)
         {
+            if (start.X == -1)
+            {
+                Vector3[] tmp = new Vector3[1];
+                tmp[0] = start;
+                treeDensity = 1;
+                return tmp;
+            }
             List<GraphNode> path = new List<GraphNode>();
             Utils.PriorityQueue<GraphNode> open = new Utils.PriorityQueue<GraphNode>();
             List<GraphNode> closed = new List<GraphNode>();
@@ -260,7 +272,7 @@ namespace EvolutionSimulation.Entities
         {
             List<GraphNode> neigh = new List<GraphNode>();
 
-            foreach (var item in w.highMap[(int)n.pos.X].links.Keys)
+            foreach (var item in w.regionMap[(int)n.pos.X].links.Keys)
                 neigh.Add(new GraphNode(new Vector3(item, 0, 0), n, n.costSoFar + 1));
 
             return neigh;
@@ -268,8 +280,8 @@ namespace EvolutionSimulation.Entities
 
         static float manhattanHeuristic(World w, Vector3 start, Vector3 end)
         {
-            Vector2 start2 = w.highMap[(int)start.X].spawnPoint,
-            end2 = w.highMap[(int)end.X].spawnPoint;
+            Vector2 start2 = w.regionMap[(int)start.X].spawnPoint,
+            end2 = w.regionMap[(int)end.X].spawnPoint;
             return (Math.Abs(end2.X - start2.X) + Math.Abs(end2.Y - start2.Y));
         }
 

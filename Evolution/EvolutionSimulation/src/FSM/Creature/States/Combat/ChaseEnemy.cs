@@ -39,7 +39,12 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
+            //base.OnEntry();
             creature.Enemy(out objectiveID, out objective);
+            Entities.Creature objCreature = creature.world.GetCreature(objectiveID);
+
+            Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureStateEntryNotSafe(creature.world.tick, creature.ID, creature.speciesName, ToString(), objectiveID, objCreature == null ? " " : objCreature.speciesName));
+
             Entities.Creature tmp = creature.world.GetCreature(objectiveID);
             objSpecies = tmp == null ? " " : creature.world.GetCreature(objectiveID).speciesName;
             if (objective.x != creature.x && objective.y != creature.y && creature.CanReach((Entities.Creature.HeightLayer)objective.z)) // TODO: considerar alturas

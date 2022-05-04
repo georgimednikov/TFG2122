@@ -1,6 +1,9 @@
 ﻿using EvolutionSimulation.Genetics;
 using System;
 
+using Telemetry;
+using Telemetry.Events;
+
 namespace EvolutionSimulation.Entities.Status
 {
     /// <summary>
@@ -11,9 +14,13 @@ namespace EvolutionSimulation.Entities.Status
         // Damage the poison will do per tick
         float damage;
 
-        public Poison(int duration, float dmg) : base(duration)
+        // ID of the creature that gave the poison
+        int giverID;    
+
+        public Poison(int duration, float dmg, int id) : base(duration)
         {
             damage = dmg;
+            giverID = id;
         } 
 
         public override bool OnTick()
@@ -22,6 +29,8 @@ namespace EvolutionSimulation.Entities.Status
 #if DEBUG
             Console.WriteLine("POSION DEALT " + damage.ToString() + " DMG TO " + owner.speciesName + " " + owner.ID + " (" + owner.stats.CurrHealth + " HP LEFT)");
 #endif
+            Tracker.Instance.Track(new CreatureReceiveDamage(owner.world.tick, owner.ID, owner.speciesName, giverID, damage, DamageType.Poison, owner.stats.CurrHealth));
+
             if (owner.causeOfDeath == CauseOfDeath.NONE && owner.stats.CurrHealth <= 0)
             {
                 owner.causeOfDeath = CauseOfDeath.Poison;

@@ -2,18 +2,23 @@
 using System.IO;
 using System.Windows.Forms;
 using EvolutionSimulation;
+using Newtonsoft.Json;
 
 namespace Visualizador
 {
     static class Program
     {
+        static WindowLoadingBar loadingBar;
+
         /// <summary>
-        /// Punto de entrada principal para la aplicación.
+        /// Application entry point
         /// </summary>
         [STAThread]
         static void Main()
         {
-            Simulation s = new Simulation();
+            EventSimulation s = new EventSimulation();
+            s.OnSimulationBegin += (e) => { loadingBar = new WindowLoadingBar(UserInfo.Years); };
+            s.OnSimulationStep += (e) => { if(e.CurrentTick % e.YearTicks == 0) loadingBar.StepElapsed(); };
 #if DEBUG
             s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
 #else
@@ -23,13 +28,13 @@ namespace Visualizador
             s.Run();
         }
 
-
+        #region AskInfo
         /// <summary>
         /// Asks the user where to look for the files containing the different values for the calculation of the chromosme, genes and stats,
         /// as well as the folder in which to save the resulting species. This method uses a Windows window to do so.
         /// </summary>
         /// <returns></returns>
-        static public bool AskInfoUsingWindows(Simulation s)
+        static bool AskInfoUsingWindows(Simulation s)
         {
             string dataDir, exportDir;
             int years, species, individuals;
@@ -67,42 +72,46 @@ namespace Visualizador
             WorldGenConfig config = null;
 
             // If a simulation world is not given, a new one has to be created.
-            if (!File.Exists(dataDir + UserInfo.WorldName) || !File.Exists(dataDir + UserInfo.HeightMapName))
+            if (!File.Exists(dataDir + UserInfo.WorldName) || !File.Exists(dataDir + UserInfo.RegionMapName))
             {
                 // If a height map is provided, it is not created from scratch.
                 if (File.Exists(dataDir + UserInfo.HeightMapName))
                 {
-                    config = new WorldGenConfig(dataDir + UserInfo.HeightMapName);
+                    string map = File.ReadAllText(dataDir + UserInfo.HeightMapName);
+                    float[,] heights = JsonConvert.DeserializeObject<float[,]>(map);
+                    config = new WorldGenConfig(World.MapType.Custom)
+                    {
+                        heightMap = heights,
+                        mapSize = heights.GetLength(0)
+                    };
+                    UserInfo.Size = config.mapSize;
                 }
                 else // if nothing is given, a size has to be asked of the user. 
                 {
                     do
                     {
-                        if (!InstantiatePrompt("Input how big in squares the world is going to be.\nMust be a number larger than: " + UserInfo.MinWorldSize(), out userEntry))
+                        if (!InstantiatePrompt("Input how big in squares the world is going to be.\nMust be a number larger than or equal to: " + UserInfo.MinWorldSize(), out userEntry))
                             return false;
                     } while (userEntry < UserInfo.MinWorldSize());
                     UserInfo.Size = userEntry;
                 }
-            } 
+            }
 
             do
             {
-                if (!InstantiatePrompt("Input how many species are going to be created\ninitially. Must be a number larger than: " + UserInfo.MinSpeciesAmount(), out userEntry))
+                if (!InstantiatePrompt("Input how many species are going to be created\ninitially. Must be a number larger than or equal to: " + UserInfo.MinSpeciesAmount(), out userEntry))
                     return false;
             } while (userEntry < UserInfo.MinSpeciesAmount());
             species = userEntry;
 
             do
             {
-                if (!InstantiatePrompt("Input how individuals per species are going to be\ncreated. Must be a number larger than: " + UserInfo.MinIndividualsAmount(), out userEntry))
+                if (!InstantiatePrompt("Input how individuals per species are going to be\ncreated. Must be a number larger than or equal to: " + UserInfo.MinIndividualsAmount(), out userEntry))
                     return false;
             } while (userEntry < UserInfo.MinIndividualsAmount());
             individuals = userEntry;
 
-        
-
             s.Init(years, species, individuals, dataDir, exportDir, config);
-
             return true;
         }
 
@@ -129,7 +138,7 @@ namespace Visualizador
 
             if (result == DialogResult.OK && textBox.Text != "")
             {
-                value = Int32.Parse(textBox.Text);
+                value = int.Parse(textBox.Text);
                 return true;
             }
             else
@@ -138,5 +147,6 @@ namespace Visualizador
                 return false;
             }
         }
+        #endregion
     }
 }
