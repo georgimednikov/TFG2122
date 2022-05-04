@@ -14,6 +14,10 @@
 
         public override bool Evaluate()
         {
+            // If the creature does not know where is a water position (the creature is going to the water and suddenly forgot it)
+            if (creature.WaterPosition() == null)
+                return true;
+
             // Max priority to sleep
             if (creature.IsExhausted())
                 return true;
