@@ -142,7 +142,7 @@ namespace EvolutionSimulation
         virtual protected bool Step()
         {
             bool ret = world.Tick(currentTick); //TODO: NO DEJAR ESTO
-            HourTrack();
+            //HourTrack();
             return ret;
         }
 
@@ -166,7 +166,7 @@ namespace EvolutionSimulation
         /// </summary>
         virtual protected void End()
         {
-            EndTracker();
+            //EndTracker();
             Export();
         }
 
