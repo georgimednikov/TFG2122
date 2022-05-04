@@ -13,8 +13,6 @@ namespace EvolutionSimulation
     /// </summary>
     public class Simulation : ISimulation
     {
-        System.Timers.Timer timer;
-
         /// <summary>
         /// Initializes the program with information provided by the user
         /// If no directories are provided, data will be looked for in the directory where the .exe is located
@@ -62,10 +60,6 @@ namespace EvolutionSimulation
             else // There is a custom world configuration, which in this case means that a height map is provided.
                 world.Init(worldConfig);
 
-            //WorldToBmp();
-            CreateCreatures();
-
-            //StartFlusingTracker(5000);
         }
 
         /// <summary>
@@ -106,187 +100,78 @@ namespace EvolutionSimulation
                 world.Init(config);
             }
             UserInfo.Size = world.map.GetLength(0);
-            //WorldToBmp();
-            CreateCreatures();
-            //StartFlusingTracker(5000);
-        }
-        private void InitTracker()
-        {
-            Tracker.Instance.Init();
-            Tracker.Instance.Track(new SessionStart());
         }
 
         /// <summary>
-        /// Seconds between each flush
+        /// Performs the simulation for the established.
+        /// Init must be called before running the simulation, to set the years of simulation
+        /// and get the simulation information from the provided files.
         /// </summary>
-        /// <param name="miliseconds"></param>
-        private void StartFlusingTracker(int miliseconds)
-        {
-            timer = new System.Timers.Timer(5000);
-            // TODO: Se puede hacer que sea el propio tracker el que haga el flush automatico cada x tiempo
-            timer.Elapsed += (o, args) => { Tracker.Instance.Flush(); };
-            timer.AutoReset = true;
-            timer.Start();
-        }
-
-        private void EndTracker()
-        {
-            timer.Stop();
-            timer.Dispose();
-            Tracker.Instance.Track(new SessionEnd());
-            Tracker.Instance.Flush();
-        }
-
         virtual public void Run()
         {
-            int YearTicks = world.YearToTick(1.0f);
-            DateTime prevT = DateTime.Now;
-            DateTime newT = DateTime.Now;
-            int ticks = world.YearToTick(UserInfo.Years);
-            int i = 1;
-            double prevN = 0;
-            int apocalypsisCont = 0, lastNum = world.Creatures.Count, births = 0, birthCur = 0;
-            WorldToBmp();
-            String s = "[";
-            for (int j = 0; j < prevN; j++)
-            {
-                s += ".";
-            }
-            for (int j = (int)prevN; j < 100; j++)
-            {
-                s += " ";
-            }
-            Console.Clear();
-            Console.WriteLine(s + "] " + prevN + "%");
+            Begin();
+            Simulate();
+            End();
+        }
 
-            for (; i <= ticks; i++)
-            {
-                if (!world.Tick(i))
+        /// <summary>
+        /// The beginning of the simulation, where the original creatures
+        /// are created and the number of ticks to be simulated are calculated.
+        /// </summary>
+        virtual protected void Begin()
+        {
+            CreateCreatures();
+            totalTicks = world.YearToTick(UserInfo.Years);
+            currentTick = 1;
+            apocalypseCount = 0;
+        }
+
+        /// <summary>
+        /// Performs a step of the simulation
+        /// </summary>
+        /// <returns> False if no creatures remain, true otherwise </returns>
+        virtual protected bool Step()
+        {
+            bool ret = world.Tick(currentTick); //TODO: NO DEJAR ESTO
+            HourTrack();
+            return ret;
+        }
+
+        /// <summary>
+        /// Performs all the ticks of the simulation until no creatures remain
+        /// </summary>
+        protected void Simulate()
+        {
+            for (; currentTick <= totalTicks; currentTick++)
+            { 
+                if (!Step())
                 {
                     break; //TODO: NO DEJAR ESTO
-                    ApocalypseExport(apocalypsisCont++);
-                    Console.WriteLine("APOCALYPSIS: Generating new set of creatures");
-                    CreateCreatures();
-                    birthCur = 0;
-                    lastNum = world.Creatures.Count;
-                    LoadingBar.Instance.NewAttempt();
-                };
-
-                //if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; birthCur += world.Creatures.Count - lastNum; }
-                //lastNum = world.Creatures.Count;
-                //Console.WriteLine("Num Creatures: {1} Apocalypsis: {3} Births: {4} Births(Current Apocalypsis): {5} Ticks: {0}/{2}", i, world.Creatures.Count, ticks, apocalypsisCont, births, birthCur);
-                //Console.WriteLine("Num Creatures: {1} Ticks: {0}/{2} ", i, world.Creatures.Count, ticks);
-                //Render();
-                //Thread.Sleep(1000);
-                if (i % UniverseParametersManager.parameters.ticksPerHour == 0)
-                {
-                    Tracker.Instance.Track(new SimulationSample(i, world.Creatures.Count));
-                    Tracker.Instance.Flush();
-                }
-                if (i % YearTicks == 0)
-                {
-                    Console.WriteLine("A Year has passed");
-                    //LoadingBar.Instance.StepElapsed();
-                }
-
-                double newN = Math.Round((double)i / (double)ticks * 100);
-                if (newN > prevN)
-                {
-                    newT = DateTime.Now;
-                    prevN = newN;
-                    String tempS = "[";
-                    for (int j = 0; j < prevN; j++)
-                    {
-                        tempS += ".";
-                    }
-                    for (int j = (int)prevN; j < 100; j++)
-                    {
-                        tempS += " ";
-                    }
-
-                    Console.Clear();
-                    Console.WriteLine(tempS + "] " + prevN + "%");
-                    if (lastNum < world.Creatures.Count) { births += world.Creatures.Count - lastNum; }
-                    lastNum = world.Creatures.Count;
-                    Console.WriteLine("Ticks: {0}/{2} | Num Creatures: {1} | Births: {3} | Entities to Update: {4} | {5}", i, world.Creatures.Count, ticks, births, world.StaticEntitiesToUpdate.Count, newT - prevT);
-                    prevT = newT;
+                    Apocalypse();              
                 }
             }
-            // Para dejar los json bien cuando termine la simulacion
-            foreach (Creature c in world.Creatures.Values)
-                Tracker.Instance.Track(new CreatureDeath(ticks, c.ID, c.speciesName, DeathType.SimulationEnd, -1, 0));
-
-            Console.WriteLine("Deaths by: Temperature {0} Damage by others {1} Retaliation {2} Starvation {3} Thirst {4} Exhaustion {5} Poison {6}", world.deaths[0], world.deaths[1], world.deaths[2], world.deaths[3], world.deaths[4], world.deaths[5], world.deaths[6]);
-            Console.Write("Simulation ended, ticks elapsed: " + i + "\n");
-            Tracker.Instance.Track(new SessionEnd());
-            Tracker.Instance.Flush();
         }
 
-        virtual public void Export()
+        /// <summary>
+        /// The end of the simulation. The simulation results are exported at the end
+        /// </summary>
+        virtual protected void End()
         {
-            //EndTracker();
-            world.ExportContent();
-            WorldToBmp();
-            Console.Write("Simulation data has been exported");
-        }
-        virtual public void ApocalypseExport(int cont)
-        {
-            world.ApocalypseExportContent(cont);
-            Console.Write("Simulation data has been exported because of Apocalysis");
+            EndTracker();
+            Export();
         }
 
-
-        /*//Method to test
-        virtual protected void CreateCreaturesTest()
+        //TODO: apocalipsis y esas cosas
+        virtual protected void Apocalypse()
         {
-            Animal a = world.CreateCreature<Animal>(10, 10);
-            a.chromosome.ModifyGender(Genetics.Gender.Male);
-            Animal b = world.CreateCreature<Animal>(10, 10, a.chromosome, a.speciesName);
-            b.chromosome.ModifyGender(Genetics.Gender.Female);
+            ApocalypseExport(apocalypseCount++);
+            CreateCreatures();
+            // totalTicks = world.YearToTick(UserInfo.Years);
+            // currentTick = 1;
+        }
+        
 
-            Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(a.chromosome, b.chromosome);
-            // Mutate the chromosome
-            Genetics.GeneticFunctions.UniformMutation(ref childC, UniverseParametersManager.parameters.mutationChance);
-            // The new creature's pos (near to the parents)
-
-            childC.ModifyGender(Genetics.Gender.Female);
-            Animal c = b.world.CreateCreature<Animal>(10, 10, childC, b.speciesName, a.ID, b.ID);
-            Animal c2 = world.CreateCreature<Animal>(10, 10, a.chromosome, a.speciesName);
-            c2.chromosome.ModifyGender(Genetics.Gender.Male);
-
-            Genetics.CreatureChromosome childD = Genetics.GeneticFunctions.UniformCrossover(a.chromosome, b.chromosome);
-            // Mutate the chromosome
-            Genetics.GeneticFunctions.UniformMutation(ref childD, UniverseParametersManager.parameters.mutationChance);
-            // The new creature's pos (near to the parents)
-
-            Animal d = b.world.CreateCreature<Animal>(10, 10, childD, b.speciesName, a.ID, b.ID);
-            
-            //world.ApocalypseExportContent(0);
-
-            Genetics.CreatureChromosome childCC = Genetics.GeneticFunctions.UniformCrossover(c2.chromosome, c.chromosome);
-            // Mutate the chromosome
-            Genetics.GeneticFunctions.UniformMutation(ref childCC, UniverseParametersManager.parameters.mutationChance);
-            // The new creature's pos (near to the parents)
-
-            Animal ac2 = c.world.CreateCreature<Animal>(10, 10, childCC, c.speciesName, c2.ID, c.ID);
-
-            Genetics.CreatureChromosome childCC2 = Genetics.GeneticFunctions.UniformCrossover(c2.chromosome, c.chromosome);
-            // Mutate the chromosome
-            Genetics.GeneticFunctions.UniformMutation(ref childCC2, UniverseParametersManager.parameters.mutationChance);
-            // The new creature's pos (near to the parents)
-
-            Animal ac = c.world.CreateCreature<Animal>(10, 10, childCC2, c.speciesName, c2.ID, c.ID);
-
-            Genetics.CreatureChromosome childCC3 = Genetics.GeneticFunctions.UniformCrossover(c2.chromosome, c.chromosome);
-            // Mutate the chromosome
-            Genetics.GeneticFunctions.UniformMutation(ref childCC3, UniverseParametersManager.parameters.mutationChance);
-            // The new creature's pos (near to the parents)
-
-            Animal ac3 = c.world.CreateCreature<Animal>(10, 10, childCC3, c.speciesName, c2.ID, c.ID);
-
-            world.ApocalypseExportContent(0);
-        }*/
-
+        #region CreatureCreation
         virtual protected void CreateCreatures()
         {
             //A minimum distance to leave in between species spawn points to give them some room.
@@ -379,9 +264,20 @@ namespace EvolutionSimulation
                 i++;
             }
         }
+        #endregion
 
-        #region BMP
-        public void WorldToBmp()
+        #region Exportation
+        protected void Export()
+        {
+            world.ExportContent();
+            WorldToBmp();
+        }
+        protected void ApocalypseExport(int cont)
+        {
+            world.ApocalypseExportContent(cont);
+        }
+
+        protected void WorldToBmp()
         {
             int scale = 4;
             Bitmap treeMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
@@ -693,6 +589,87 @@ namespace EvolutionSimulation
         }
 #endregion
 
+        #region Tracker
+        protected void InitTracker()
+        {
+            Tracker.Instance.Init();
+            Tracker.Instance.Track(new SessionStart());
+        }
+
+        protected void HourTrack()
+        {
+            if (currentTick % UniverseParametersManager.parameters.ticksPerHour == 0)
+            {
+                Tracker.Instance.Track(new SimulationSample(currentTick, world.Creatures.Count));
+                Tracker.Instance.Flush();
+            }
+        }
+
+        protected void EndTracker()
+        {
+            // Para dejar los json bien cuando termine la simulacion
+            foreach (Creature c in world.Creatures.Values)
+                Tracker.Instance.Track(new CreatureDeath(world.tick, c.ID, c.speciesName, DeathType.SimulationEnd, -1, 0));
+            Tracker.Instance.Track(new SessionEnd());
+            Tracker.Instance.Flush();
+        }
+        #endregion
+
         protected World world;
+        protected int totalTicks;
+        protected int currentTick;
+        // TODO: quitar esto si no hacemos apocalipsis
+        protected int apocalypseCount;
+
+        /*//Method to test
+        virtual protected void CreateCreaturesTest()
+        {
+            Animal a = world.CreateCreature<Animal>(10, 10);
+            a.chromosome.ModifyGender(Genetics.Gender.Male);
+            Animal b = world.CreateCreature<Animal>(10, 10, a.chromosome, a.speciesName);
+            b.chromosome.ModifyGender(Genetics.Gender.Female);
+
+            Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(a.chromosome, b.chromosome);
+            // Mutate the chromosome
+            Genetics.GeneticFunctions.UniformMutation(ref childC, UniverseParametersManager.parameters.mutationChance);
+            // The new creature's pos (near to the parents)
+
+            childC.ModifyGender(Genetics.Gender.Female);
+            Animal c = b.world.CreateCreature<Animal>(10, 10, childC, b.speciesName, a.ID, b.ID);
+            Animal c2 = world.CreateCreature<Animal>(10, 10, a.chromosome, a.speciesName);
+            c2.chromosome.ModifyGender(Genetics.Gender.Male);
+
+            Genetics.CreatureChromosome childD = Genetics.GeneticFunctions.UniformCrossover(a.chromosome, b.chromosome);
+            // Mutate the chromosome
+            Genetics.GeneticFunctions.UniformMutation(ref childD, UniverseParametersManager.parameters.mutationChance);
+            // The new creature's pos (near to the parents)
+
+            Animal d = b.world.CreateCreature<Animal>(10, 10, childD, b.speciesName, a.ID, b.ID);
+            
+            //world.ApocalypseExportContent(0);
+
+            Genetics.CreatureChromosome childCC = Genetics.GeneticFunctions.UniformCrossover(c2.chromosome, c.chromosome);
+            // Mutate the chromosome
+            Genetics.GeneticFunctions.UniformMutation(ref childCC, UniverseParametersManager.parameters.mutationChance);
+            // The new creature's pos (near to the parents)
+
+            Animal ac2 = c.world.CreateCreature<Animal>(10, 10, childCC, c.speciesName, c2.ID, c.ID);
+
+            Genetics.CreatureChromosome childCC2 = Genetics.GeneticFunctions.UniformCrossover(c2.chromosome, c.chromosome);
+            // Mutate the chromosome
+            Genetics.GeneticFunctions.UniformMutation(ref childCC2, UniverseParametersManager.parameters.mutationChance);
+            // The new creature's pos (near to the parents)
+
+            Animal ac = c.world.CreateCreature<Animal>(10, 10, childCC2, c.speciesName, c2.ID, c.ID);
+
+            Genetics.CreatureChromosome childCC3 = Genetics.GeneticFunctions.UniformCrossover(c2.chromosome, c.chromosome);
+            // Mutate the chromosome
+            Genetics.GeneticFunctions.UniformMutation(ref childCC3, UniverseParametersManager.parameters.mutationChance);
+            // The new creature's pos (near to the parents)
+
+            Animal ac3 = c.world.CreateCreature<Animal>(10, 10, childCC3, c.speciesName, c2.ID, c.ID);
+
+            world.ApocalypseExportContent(0);
+        }*/
     }
 }

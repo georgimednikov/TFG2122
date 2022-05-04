@@ -7,17 +7,19 @@ namespace VisualizadorConsola
 {
     public static class Program
     {
+        static ConsoleLoadingBar loadingBar;
         static void Main(string[] args)
         {
-            Simulation s = new Simulation();
+            EventSimulation s = new EventSimulation();
+            s.OnSimulationBegin += (e) => { loadingBar = new ConsoleLoadingBar(); };
+            s.OnSimulationStep += (e) => { loadingBar.Update(e); };
 #if true
-            s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
+            s.Init(1, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
 #else
             if (!AskInfoUsingConsole(s))
                 return;
 #endif
             s.Run();
-            s.Export();
         }
 
         /// <summary>
@@ -105,9 +107,6 @@ namespace VisualizadorConsola
             } while (individuals < minIndividuals);
 
             s.Init(years, species, individuals, dataDir, exportDir, config);
-            
-            LoadingBar.Instance.Init(years, true);
-
             return true;
         }
     }

@@ -69,7 +69,6 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\LoadingBar.cs" />
     <Compile Include="src\JsonReader.cs" />
     <Compile Include="src\Entities\Creature\Animal.cs" />
     <Compile Include="src\Entities\Astar.cs" />
@@ -147,6 +146,7 @@
     <Compile Include="src\Genetics\GeneticTaxonomy.cs" />
     <Compile Include="src\Entities\Plants\Grass.cs" />
     <Compile Include="src\NameGenerator.cs" />
+    <Compile Include="src\EventSimulation.cs" />
     <Compile Include="src\Utils\ListenerPattern.cs" />
     <Compile Include="src\UniverseParameters.cs" />
     <Compile Include="src\Utils\PriorityQueue.cs" />
