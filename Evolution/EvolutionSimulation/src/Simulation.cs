@@ -376,6 +376,7 @@ namespace EvolutionSimulation
                     c.chromosome.ModifyGender(Genetics.Gender.Female);
                     c.stats.Gender = Genetics.Gender.Female;
                 }
+                c.BirthEventTrack();
                 i++;
             }
         }
