@@ -47,7 +47,7 @@ namespace VisualizadorConsola
 
                 Console.Clear();
                 Console.WriteLine(tempS + "] " + prevN + "%");
-                Console.WriteLine("Ticks: {0}/{2} | Num Creatures: {1} | Births: {3} | Entities to Update: {4} | {5}", e.CurrentTick, e.TotalTicks, e.World.Creatures.Count, e.Births, e.World.StaticEntitiesToUpdate.Count, newT - prevT);
+                Console.WriteLine("Ticks: {0}/{2} | Num Creatures: {1} | Births: {3} | Entities to Update: {4} | {5}", e.CurrentTick, e.World.Creatures.Count, e.TotalTicks, e.Births, e.World.StaticEntitiesToUpdate.Count, newT - prevT);
                 prevT = newT;
             }
         }

@@ -37,7 +37,7 @@ namespace EvolutionSimulation
             base.Begin();
             YearTicks = world.YearToTick(1.0f);
             prevCreatures = world.Creatures.Count;
-            Births = prevCreatures = 0;
+            Births = 0;
             OnSimulationStep += (s) =>
             {
                 if (prevCreatures < world.Creatures.Count)

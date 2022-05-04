@@ -576,6 +576,8 @@ namespace EvolutionSimulation
             holdRidgeMap.Save("biome.bmp");
             voronoiMap.Save("VoronoiDiagram.bmp");
             debugMap.Save("Debug.bmp");
+            debugMap.Save($"Output/{Tracker.Instance.SessionID}/Debug.bmp");
+
         }
 
         void SetPixel(int x, int y, Color color, Bitmap bitmap, int scale = 2)
