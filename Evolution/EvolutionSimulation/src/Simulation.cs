@@ -226,6 +226,7 @@ namespace EvolutionSimulation
         {
             //EndTracker();
             world.ExportContent();
+            WorldToBmp();
             Console.Write("Simulation data has been exported");
         }
         virtual public void ApocalypseExport(int cont)
