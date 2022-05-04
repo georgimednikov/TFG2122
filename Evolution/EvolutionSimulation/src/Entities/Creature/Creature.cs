@@ -716,6 +716,11 @@ namespace EvolutionSimulation.Entities
 
         #region Creature Information
 
+        /// <summary>
+        /// This is the resource that the creature needs while exploring
+        /// </summary>
+        public string ResourceNeeded ="";
+
         // Stats related information
         public bool IsCarnivorous() { return stats.Diet == Diet.Carnivore; }
         public bool IsHerbivorous() { return stats.Diet == Diet.Herbivore; }
