@@ -65,16 +65,9 @@ namespace UnitySimulation
                 chromosomeFileRaw, abilitiesFileRaw,
                 geneFileRaw,
                 worldFileRaw, regionFileRaw,
-                Application.dataPath + "/Export/"
-                , Application.dataPath + SpeciesDir);
+                Application.dataPath + "/Export/");
 
-            System.Timers.Timer timer = new System.Timers.Timer(5000);
-            // TODO: Se puede hacer que sea el propio tracker el que haga el flush automatico cada x tiempo
-            timer.Elapsed += (o, args) => { Tracker.Instance.Flush(); };
-            timer.AutoReset = true;
-            timer.Start();
-
-            simulation.Run();
+            simulation.Run("");
 
             simulation.Subscribe(worldCreatureManager);
             simulation.Subscribe(worldCorpseManager);

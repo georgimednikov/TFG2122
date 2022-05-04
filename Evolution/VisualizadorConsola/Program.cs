@@ -14,12 +14,12 @@ namespace VisualizadorConsola
             s.OnSimulationBegin += (e) => { loadingBar = new ConsoleLoadingBar(); };
             s.OnSimulationStep += (e) => { loadingBar.Update(e); };
 #if true
-            s.Init(1, 20, 20, "../../ProgramData/", "../../ResultingData/", null, "");
+            s.Init(1, 30, 20, "../../ProgramData/", "../../ResultingData/", null);
 #else
             if (!AskInfoUsingConsole(s))
                 return;
 #endif
-            s.Run();
+            s.Run("../../ResultingData/");
         }
 
         /// <summary>

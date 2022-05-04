@@ -10,16 +10,16 @@ namespace UnitySimulation
     public class UnitySimulation : Simulation, ISubject<World> 
     {
 
-        public override void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig config = null, string chromosomePath = "")
+        public override void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig config = null)
         {
-            base.Init(years, species, individuals, dataDir, exportDir, config, chromosomePath);
+            base.Init(years, species, individuals, dataDir, exportDir, config);
             generateWorld.SetWorld(world);
             generateWorld.MapGen();
         }
 
-        public override void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string highMap = null, string exportDir = null, string chromosomePath = "")
+        public override void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string highMap = null, string exportDir = null)
         {
-            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, highMap, exportDir, chromosomePath);
+            base.Init(years, species, individuals, uniParamsFile, chromosomeFile, abilitiesFile, sGeneWeightFile, worldFile, highMap, exportDir);
             generateWorld.SetWorld(world);
             generateWorld.MapGen();
         }

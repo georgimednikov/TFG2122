@@ -163,7 +163,7 @@ namespace EvolutionSimulation
             this.regionMap = JsonReader.Deserialize<List<MapRegion>>(regionMap);
             config.regionMap = this.regionMap;
             Validator.Validate(config);
-            
+
 
             ticksHour = UniverseParametersManager.parameters.ticksPerHour;
             hoursDay = UniverseParametersManager.parameters.hoursPerDay;
@@ -497,9 +497,9 @@ namespace EvolutionSimulation
             T ent = new T();
 
             ent.Init(entitiesID, this, x, y, chromosome, name, fatherID, motherID);
-            
+
             taxonomy.AddCreatureToSpecies(ent);
-            if(fatherID != -1)
+            if (fatherID != -1)
                 ent.BirthEventTrack();
 
             entityMap[x, y].Add(ent);
@@ -575,6 +575,7 @@ namespace EvolutionSimulation
             if (Creatures.ContainsKey(entityID))
             {
                 ent = Creatures[entityID];
+                if(Creatures[entityID].chromosome != null)
                 taxonomy.RemoveCreatureToSpecies(Creatures[entityID]);
                 Creatures[entityID] = null;
             }
@@ -627,11 +628,8 @@ namespace EvolutionSimulation
             // Entity deletion
             entitiesToDelete.ForEach(delegate (int id)
             {
-                if (Creatures.ContainsKey(id))
-                    if(Creatures[id].chromosome != null)
-                        taxonomy.RemoveCreatureToSpecies(Creatures[id]);
-                    else
-                        Creatures.Remove(id);
+                if (Creatures.ContainsKey(id))                    
+                    Creatures.Remove(id);
                 else
                     StaticEntities.Remove(id);
             }
@@ -1027,8 +1025,11 @@ namespace EvolutionSimulation
         /// </summary>
         public void ExportContent()
         {
-            taxonomy.ExportSpecies();
-            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + UserInfo.TreeName);
+            if (taxonomy.speciesRecord[0].original.chromosome != null)
+            {
+                taxonomy.ExportSpecies();
+                taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + UserInfo.TreeName);
+            }
             string word = JsonConvert.SerializeObject(map, Formatting.Indented);
             System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.WorldName, word);
             string rMap = JsonConvert.SerializeObject(regionMap, Formatting.Indented);

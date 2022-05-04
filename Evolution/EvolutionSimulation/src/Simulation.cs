@@ -25,7 +25,7 @@ namespace EvolutionSimulation
         /// <param name="dataDir"> Directory where all the files with the simulation info are stored </param>
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends </param>
         /// <param name="worldConfig"> World configuration to generate the world map. If it is provided, no other world files are considered </param>
-        virtual public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig worldConfig, string chromosomePath = "")
+        virtual public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig worldConfig)
         {
             InitTracker();
 
@@ -64,10 +64,7 @@ namespace EvolutionSimulation
                 world.Init(worldConfig);
 
             //UniverseParametersManager.WriteDefaultParameters();
-            if (chromosomePath == "")
-                CreateCreatures();
-            else
-                CreateCreaturesNoChromosome(chromosomePath);
+            
             //StartFlusingTracker(5000);
         }
 
@@ -82,7 +79,7 @@ namespace EvolutionSimulation
         /// <param name="sGeneWeightFile"> Raw file with each genes' weight for the chromosome </param>
         /// <param name="abilitiesFile"> Raw file with each ability unlock percentage. If not provided, default information is setted</param>
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends. If not provided, default export directory is setted</param>
-        virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null, string chromosomePath = "")
+        virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
         {
             InitTracker();
 
@@ -109,11 +106,6 @@ namespace EvolutionSimulation
                 world.Init(config);
             }
             UserInfo.Size = world.map.GetLength(0);
-            if (chromosomePath == "")
-                CreateCreatures();
-            else
-                CreateCreaturesNoChromosome(chromosomePath);
-            //StartFlusingTracker(5000);
         }
 
         /// <summary>
@@ -121,9 +113,9 @@ namespace EvolutionSimulation
         /// Init must be called before running the simulation, to set the years of simulation
         /// and get the simulation information from the provided files.
         /// </summary>
-        virtual public void Run()
+        virtual public void Run(string chromosomePath)
         {
-            Begin();
+            Begin(chromosomePath);
             Simulate();
             End();
         }
@@ -132,9 +124,12 @@ namespace EvolutionSimulation
         /// The beginning of the simulation, where the original creatures
         /// are created and the number of ticks to be simulated are calculated.
         /// </summary>
-        virtual protected void Begin()
+        virtual protected void Begin(string chromosomePath)
         {
-            CreateCreatures();
+            if (chromosomePath == "")
+                CreateCreatures();
+            else
+                CreateCreaturesNoChromosome(chromosomePath);
             totalTicks = world.YearToTick(UserInfo.Years);
             currentTick = 1;
             apocalypseCount = 0;
@@ -254,6 +249,103 @@ namespace EvolutionSimulation
                 spawnPositions.Add(new Tuple<int, int>(x, y));
             }
             SetUpInitialPopulation();
+        }
+
+        virtual protected void CreateCreaturesNoChromosome(string path)
+        {
+            List<SpeciesExport> s = new List<SpeciesExport>();
+            for (int j = 0; j < UserInfo.Species ; ++j)
+            {
+                if (File.Exists(path + "Species_" + j + ".json"))
+                    s.Add(SpeciesExport.GetExportFromJSON(File.ReadAllText(path + "Species_" + j + ".json")));
+            }
+            //A minimum distance to leave in between species spawn points to give them some room.
+            //Calculated based on the world size and amount of species to spawn, and then reduced by
+            //a value to give room in the world and not fill it in a homogenous manner.
+            int minSpawnDist = UserInfo.Size / UserInfo.Species / 15;
+
+            //List with previous spawn positions, to know if a new spot is too close to another one used.
+            List<Tuple<int, int>> spawnPositions = new List<Tuple<int, int>>();
+            int x, y;
+            bool validPosition;
+            bool valid;
+            Animal a;
+            int temperatureCont;
+            int minDistanceCont;
+            int i;
+            for (i = 0; i < s.Count && i < UserInfo.Species; i++)
+            {
+                a = world.CreateCreature<Animal>(0, 0, s[i].stats, s[i].name);
+                temperatureCont = 0;//a cont to create the creatures in a position that is not receiving damage by temperature
+                minDistanceCont = 0;//a cont to create the creatures separated if possible
+                //Find a good position to start for the creature. That means with a minimun distance with other creatures,
+                //not in a water tile and in a position that is with a confortable temperature to the creature
+                do
+                {
+                    validPosition = true;
+                    valid = true;
+                    do
+                    {
+                        x = RandomGenerator.Next(0, UserInfo.Size);
+                        y = RandomGenerator.Next(0, UserInfo.Size);
+                        foreach (Tuple<int, int> pos in spawnPositions)
+                        {
+                            if (Math.Abs(pos.Item1 - x) < minSpawnDist && Math.Abs(pos.Item2 - y) < minSpawnDist)
+                            {
+                                valid = false;
+                                break;
+                            }
+                        }
+                        minDistanceCont++;
+                    } while (!valid && minDistanceCont < UserInfo.Size* UserInfo.Size/2);
+                    //The creatures cant start in a water position
+                    if (world.map[x, y].isWater)
+                    {
+                        validPosition = false;
+                        continue;
+                    }
+                    //Try to be in a safe temperature position
+                    if (!a.CheckTemperature(x, y) && temperatureCont < UserInfo.Size* UserInfo.Size/2)
+                    {
+                        validPosition = false;
+                        temperatureCont++;
+                        continue;
+                    }
+                }
+                while (!validPosition);
+
+                a.Place(x, y);
+                //The specified amount of individuals of each species is created.
+                for (int j = 1; j < UserInfo.Individuals; j++)
+                {
+                    world.CreateCreature<Animal>(x, y, a.stats.GetBaseStats(), a.speciesName);
+                }
+
+                //The new position is added to the list of used.
+                spawnPositions.Add(new Tuple<int, int>(x, y));
+            }
+            SetUpInitialPopulationNoChromosome();
+        }
+
+        /// <summary>
+        /// The initial population start being adult and the half is male and the other is female
+        /// </summary>
+        virtual protected void SetUpInitialPopulationNoChromosome()
+        {
+            int i = 0;
+            foreach (Creature c in world.Creatures.Values)
+            {
+                c.stats.CurrAge = (int)(UniverseParametersManager.parameters.adulthoodThreshold * c.stats.LifeSpan);
+                if (i % 2 == 0)
+                {
+                    c.stats.Gender = Gender.Male;
+                }
+                else
+                {
+                    c.stats.Gender = Gender.Female;
+                }
+                i++;
+            }
         }
 
         /// <summary>
@@ -687,80 +779,7 @@ namespace EvolutionSimulation
             world.ApocalypseExportContent(0);
         }*/
 
-        virtual protected void CreateCreaturesNoChromosome(string path)
-        {
-            List<SpeciesExport> s = new List<SpeciesExport>();
-            for (int j = 0; j < UserInfo.Species ; ++j)
-            {
-                if (File.Exists(path + "Species_" + j + ".json"))
-                    s.Add(SpeciesExport.GetExportFromJSON(File.ReadAllText(path + "Species_" + j + ".json")));
-            }
-            //A minimum distance to leave in between species spawn points to give them some room.
-            //Calculated based on the world size and amount of species to spawn, and then reduced by
-            //a value to give room in the world and not fill it in a homogenous manner.
-            int minSpawnDist = UserInfo.Size / UserInfo.Species / 15;
-
-            //List with previous spawn positions, to know if a new spot is too close to another one used.
-            List<Tuple<int, int>> spawnPositions = new List<Tuple<int, int>>();
-            int x, y;
-            int i;
-            for (i = 0; i < s.Count && i < UserInfo.Species; i++)
-            {
-                bool validPosition;
-                Animal a = world.CreateCreature<Animal>(0, 0, s[i].stats, s[i].name);
-                int cont = 0;
-                do
-                {
-                    validPosition = true;
-                    x = RandomGenerator.Next(0, UserInfo.Size);
-                    y = RandomGenerator.Next(0, UserInfo.Size);
-                    if (world.map[x, y].isWater)
-                    {
-                        validPosition = false;
-                        continue;
-                    }
-                    if (!a.CheckTemperature(x, y) && cont < UserInfo.Size)
-                    {
-                        validPosition = false;
-                        cont++;
-                        continue;
-                    }
-                }
-                while (!validPosition);
-
-                a.Place(x, y);
-                //The specified amount of individuals of each species is created.
-                for (int j = 1; j < UserInfo.Individuals; j++)
-                {
-                    world.CreateCreature<Animal>(x, y, a.stats.GetBaseStats(), a.speciesName);
-                }
-
-                //The new position is added to the list of used.
-                spawnPositions.Add(new Tuple<int, int>(x, y));
-            }
-            SetUpInitialPopulationNoChromosome();
-        }
-
-        /// <summary>
-        /// The initial population start being adult and the half is male and the other is female
-        /// </summary>
-        virtual protected void SetUpInitialPopulationNoChromosome()
-        {
-            int i = 0;
-            foreach (Creature c in world.Creatures.Values)
-            {
-                c.stats.CurrAge = (int)(UniverseParametersManager.parameters.adulthoodThreshold * c.stats.LifeSpan);
-                if (i % 2 == 0)
-                {
-                    c.stats.Gender = Genetics.Gender.Male;
-                }
-                else
-                {
-                    c.stats.Gender = Genetics.Gender.Female;
-                }
-                i++;
-            }
-        }
+        
 
     }
 }

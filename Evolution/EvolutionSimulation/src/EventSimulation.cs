@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Collections.Generic;
-using EvolutionSimulation.Entities;
-using System.Numerics;
-using Telemetry;
-using Telemetry.Events;
-
 namespace EvolutionSimulation
 {
     /// <summary>
@@ -32,9 +25,9 @@ namespace EvolutionSimulation
         /// <summary>
         /// OnSimulationStart events are performed.
         /// </summary>
-        override protected void Begin()
+        override protected void Begin(string chromosomePath = "")
         {
-            base.Begin();
+            base.Begin(chromosomePath);
             YearTicks = world.YearToTick(1.0f);
             prevCreatures = world.Creatures.Count;
             Births = prevCreatures = 0;

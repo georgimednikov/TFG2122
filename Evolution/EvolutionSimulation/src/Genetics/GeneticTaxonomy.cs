@@ -60,7 +60,7 @@ namespace EvolutionSimulation.Genetics
         // List containing the information of every species that has spawned, dead AND alive, as well as the forming tree.
         // A new species is inserted right after its progenitor, so the order to create the tree is mantained.
         // See RenderSpeciesTree for details about the tree structure
-        List<Species> speciesRecord;
+        public List<Species> speciesRecord { get; private set; }
 
         TicksComparer ticksComparator;
 

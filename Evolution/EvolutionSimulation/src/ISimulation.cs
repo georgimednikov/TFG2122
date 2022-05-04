@@ -8,6 +8,6 @@
         /// <summary>
         /// Starts the simualtion and keeps it running until the exit condition is met
         /// </summary>
-        void Run();
+        void Run(string chromosomePath = "");
     }
 }
