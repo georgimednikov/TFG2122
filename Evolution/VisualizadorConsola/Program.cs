@@ -11,7 +11,7 @@ namespace VisualizadorConsola
         {
             Simulation s = new Simulation();
 #if true
-            s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
+            s.Init(20, 30, 20, "../../ProgramData/", "../../ResultingData/", null);
 #else
             if (!AskInfoUsingConsole(s))
                 return;

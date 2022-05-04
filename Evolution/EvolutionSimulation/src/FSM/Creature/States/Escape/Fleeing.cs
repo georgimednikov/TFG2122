@@ -33,9 +33,12 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            base.OnEntry();
             Vector3Int objective;
-            creature.Menace(out _, out objective);
+            int menaceId;
+            creature.Menace(out menaceId, out objective);
+            Entities.Creature objCreature = creature.world.GetCreature(menaceId);
+            
+            Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureStateEntryNotSafe(creature.world.tick, creature.ID, creature.speciesName, ToString(), menaceId, objCreature == null ? " " : objCreature.speciesName));
             dngX = objective.x;
             dngY = objective.y;
             pathX = 0;

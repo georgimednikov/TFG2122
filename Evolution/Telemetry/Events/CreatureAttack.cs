@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-
-namespace Telemetry.Events
+﻿namespace Telemetry.Events
 {
     public class CreatureAttack : CreatureEvent
     {

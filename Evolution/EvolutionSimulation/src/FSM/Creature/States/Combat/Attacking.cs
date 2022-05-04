@@ -1,6 +1,4 @@
-﻿using System;
-
-using Telemetry;
+﻿using Telemetry;
 using Telemetry.Events;
 
 namespace EvolutionSimulation.FSM.Creature.States
@@ -22,6 +20,15 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (poison = creature.chromosome.HasAbility(Genetics.CreatureFeature.Venomous, Genetics.CreatureChromosome.AbilityUnlock[Genetics.CreatureFeature.Venomous]))  
                 attackMod += UniverseParametersManager.parameters.venomCostMultiplier * creature.stats.Venom;    // Costs 100 more per point in Venom                                                      
             return (int)(UniverseParametersManager.parameters.baseActionCost + attackMod);
+        }
+
+        public override void OnEntry()
+        {
+            //base.OnEntry();
+            creature.Enemy(out enemyID, out _);
+            Entities.Creature objCreature = creature.world.GetCreature(enemyID);
+
+            Tracker.Instance.Track(new CreatureStateEntryNotSafe(creature.world.tick, creature.ID, creature.speciesName, ToString(), enemyID, objCreature == null ? " " : objCreature.speciesName));
         }
 
         // Increases current rest
