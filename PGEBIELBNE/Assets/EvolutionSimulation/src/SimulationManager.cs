@@ -67,7 +67,7 @@ namespace UnitySimulation
                 worldFileRaw, regionFileRaw,
                 Application.dataPath + "/Export/");
 
-            simulation.Run("");
+            simulation.Run(Application.dataPath + SpeciesDir);
 
             simulation.Subscribe(worldCreatureManager);
             simulation.Subscribe(worldCorpseManager);
