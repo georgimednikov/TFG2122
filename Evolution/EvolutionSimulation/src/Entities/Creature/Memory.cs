@@ -321,10 +321,10 @@ namespace EvolutionSimulation.Entities
                 {
                     Creature ally = world.GetCreature(Allies[i].ID);
                     if (ally == null || ally.stats.Gender == thisCreature.stats.Gender ||
-                        !thisCreature.CanReach(ally.creatureLayer))                     //This is done to ignore creatures of the same gender as this one. The gender is
+                        ally.creatureLayer != Creature.HeightLayer.Ground)                     //This is done to ignore creatures of the same gender as this one. The gender is
                         continue;                                                       //checked although the creature might not be in sight, but it is not modified
                                                                                         //and this way the gender is not saved (which would be inconvinient).
-                                                                                        //The creature has to be able to reach de ally to considere it as a mate
+                                                                                        //The creature has to be on ground
 
                     if (ally.wantMate) //If it wants to mate, it is a match.
                     {
