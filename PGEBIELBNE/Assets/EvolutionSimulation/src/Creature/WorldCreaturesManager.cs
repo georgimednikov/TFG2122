@@ -128,7 +128,7 @@ namespace UnitySimulation
             gO.GetComponent<CreatureLerpPosition>().LerpToPosition(nextPos);
 
             // State visualization
-            cM.SetStatusTexts(c.GetState(), c.GetStateInfo());            
+            cM.SetStatusTexts(""/*c.GetState()*/, ""/*c.GetStateInfo()*/);            
         }
 
     }

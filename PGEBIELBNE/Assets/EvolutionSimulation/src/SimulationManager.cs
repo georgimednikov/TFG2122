@@ -9,6 +9,7 @@ namespace UnitySimulation
         //TODO: Setear estos paramatros poniendo directamente los archivos en vez de el directorio
         [Tooltip("Evolution years to perform before simulation")]
         public int EvolutionYears;
+        public bool chromosome;
 
         [Tooltip("Number of initial species")]
         public int SpeciesNumber;
@@ -67,7 +68,8 @@ namespace UnitySimulation
                 worldFileRaw, regionFileRaw,
                 Application.dataPath + "/Export/");
 
-            simulation.Run(Application.dataPath + SpeciesDir);
+            if (chromosome) simulation.Run("");
+            else simulation.Run(Application.dataPath + SpeciesDir);
 
             simulation.Subscribe(worldCreatureManager);
             simulation.Subscribe(worldCorpseManager);
