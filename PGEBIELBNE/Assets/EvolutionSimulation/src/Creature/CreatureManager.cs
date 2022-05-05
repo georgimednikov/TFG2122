@@ -181,7 +181,7 @@ namespace UnitySimulation
             //_statusBar.transform.position = new Vector3(_statusBar.transform.position.x, _statusBar.transform.position.y, _statusBar.transform.position.z);
             _statusBar.SetName(creature.name);
             _statusBar.transform.localScale = Vector3.one * sizeScale;
-            _statusBar.transform.Translate(Vector3.up * 3 * (sizeScale + baseHeight));
+            _statusBar.transform.Translate(Vector3.up * 4 * (sizeScale + baseHeight));
         }
       
         public void SetStatusBar(float percentage)

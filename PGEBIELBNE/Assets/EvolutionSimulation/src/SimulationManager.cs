@@ -26,7 +26,7 @@ namespace UnitySimulation
         [SerializeField]
         string SpeciesDir = "/ProgramData/InitialSpecies/";
 
-        public static float TimeBetweenSteps = 1f;
+        public static float TimeBetweenSteps = 0.5f;
 
         //[Tooltip("Directory where genes, chromosome, world and simulation parameters files are stored")]
         //public string DataDirectory;

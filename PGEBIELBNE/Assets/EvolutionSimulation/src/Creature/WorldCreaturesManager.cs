@@ -79,13 +79,7 @@ namespace UnitySimulation
             gO.name = c.speciesName + " " + c.ID;
             // Subscribes to the event launched when a creature receives an interaction
             c.ReceiveInteractionEvent += ReceiveInteractionListener;
-            c.AddInteraction(Interactions.attack,
-                             (c) =>
-                             {
-                                 float percentage = c.stats.CurrHealth / c.stats.MaxHealth ;
-                                 cMG.SetStatusBar(percentage);
-                             }
-                         );
+            
             return gO;
         }
 
@@ -126,9 +120,10 @@ namespace UnitySimulation
                     break;
             }
             gO.GetComponent<CreatureLerpPosition>().LerpToPosition(nextPos);
-
+            float percentage = c.stats.CurrHealth / c.stats.MaxHealth;
+            cM.SetStatusBar(percentage);
             // State visualization
-            cM.SetStatusTexts(""/*c.GetState()*/, ""/*c.GetStateInfo()*/);            
+            cM.SetStatusTexts(c.GetState(), ""/*c.GetStateInfo()*/);            
         }
 
     }
