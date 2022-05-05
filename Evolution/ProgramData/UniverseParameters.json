@@ -1,5 +1,5 @@
 {
-  "ticksPerHour": 50,
+  "ticksPerHour": 1,
   "hoursPerDay": 24,
   "daysPerYear": 365,
   "morningStart": 6.5,
@@ -7,6 +7,7 @@
   "grassHp": 10,
   "bushHp": 20,
   "eTreeHp": 50,
+  "plantNutritionMultiplier": 1.0,
   "abilityUnlockPercentage": 0.4,
   "minHealth": 10,
   "healthGainMultiplier": 2,
@@ -53,7 +54,7 @@
   "aggressivenessToRadiusMultiplier": 0.33,
   "maxResourcesRemembered": 5,
   "maxPositionsRemembered": 10,
-  "baseActionCost": 1000,
+  "baseActionCost": 500,
   "venomCostMultiplier": 100,
   "chaseCostMultiplier": 0.4,
   "fleeingCostMultiplier": 0.75,

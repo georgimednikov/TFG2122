@@ -9,6 +9,7 @@ namespace UnitySimulation
         //TODO: Setear estos paramatros poniendo directamente los archivos en vez de el directorio
         [Tooltip("Evolution years to perform before simulation")]
         public int EvolutionYears;
+        public bool chromosome;
 
         [Tooltip("Number of initial species")]
         public int SpeciesNumber;
@@ -65,16 +66,10 @@ namespace UnitySimulation
                 chromosomeFileRaw, abilitiesFileRaw,
                 geneFileRaw,
                 worldFileRaw, regionFileRaw,
-                Application.dataPath + "/Export/"
-                , Application.dataPath + SpeciesDir);
+                Application.dataPath + "/Export/");
 
-            System.Timers.Timer timer = new System.Timers.Timer(5000);
-            // TODO: Se puede hacer que sea el propio tracker el que haga el flush automatico cada x tiempo
-            timer.Elapsed += (o, args) => { Tracker.Instance.Flush(); };
-            timer.AutoReset = true;
-            timer.Start();
-
-            simulation.Run();
+            if (chromosome) simulation.Run("");
+            else simulation.Run(Application.dataPath + SpeciesDir);
 
             simulation.Subscribe(worldCreatureManager);
             simulation.Subscribe(worldCorpseManager);
@@ -85,7 +80,7 @@ namespace UnitySimulation
         {
             while (true)
             {
-                simulation.Step();
+                simulation.SimulateStep();
                 yield return new WaitForSeconds(TimeBetweenSteps);
                 
                 //worldCreatureManager.AfterCorroutine();

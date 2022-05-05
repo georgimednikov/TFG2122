@@ -44,7 +44,7 @@ namespace EvolutionSimulation.Genetics
 
         public static SpeciesExport GetExportFromJSON(string json)
         {
-            return JsonConvert.DeserializeObject<SpeciesExport>(json);
+            return JsonReader.Deserialize<SpeciesExport>(json);
         }
     }
 
@@ -60,7 +60,7 @@ namespace EvolutionSimulation.Genetics
         // List containing the information of every species that has spawned, dead AND alive, as well as the forming tree.
         // A new species is inserted right after its progenitor, so the order to create the tree is mantained.
         // See RenderSpeciesTree for details about the tree structure
-        List<Species> speciesRecord;
+        public List<Species> speciesRecord { get; private set; }
 
         TicksComparer ticksComparator;
 
@@ -93,7 +93,7 @@ namespace EvolutionSimulation.Genetics
 
             //In tuples to facilitate the modification of the file
             //(the feature name is written instead of a number)
-            Tuple<CreatureFeature, float>[] weights = JsonConvert.DeserializeObject<Tuple<CreatureFeature, float>[]>(geneWeightsRaw);
+            Tuple<CreatureFeature, float>[] weights = JsonReader.Deserialize<Tuple<CreatureFeature, float>[]>(geneWeightsRaw);
             Validator.Validate(weights);
             speciesGeneWeights = new float[weights.Length];
             foreach (var t in weights)

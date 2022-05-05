@@ -21,6 +21,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
+            base.OnEntry();
             // If the mate is has not spontaneously died or the creature forgor, and it isn not already there; it can set the path to the mate
             hasMateAndNotInSamePos = creature.Mate(out mateid, out matePos) && (matePos.x != creature.x || matePos.y != creature.y ||
                 creature.creatureLayer != (Entities.Creature.HeightLayer)matePos.z);

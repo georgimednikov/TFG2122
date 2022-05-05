@@ -105,7 +105,7 @@ namespace UnitySimulation
             // Position
             //Vector3 nextPos = new Vector3(c.x, 0, c.y);
             Vector3 nextPos = new Vector3(c.x * terrain.terrainData.size.x / c.world.map.GetLength(0), 0, (c.world.map.GetLength(1) - c.y) * terrain.terrainData.size.z / c.world.map.GetLength(1));
-
+            CreatureManager cM = gO.GetComponent<CreatureManager>();
             //Debug.Log("NextPos: " + nextPos);
             //Debug.Log("Layer " + c.creatureLayer);
             //Debug.Log(c.GetStateInfo());
@@ -113,18 +113,22 @@ namespace UnitySimulation
             {
                 case Creature.HeightLayer.Air:
                     nextPos.y = terrain.SampleHeight(nextPos) + AirHeight;
+                    cM.ActivateLegAnimation(false);
+                    cM.ActivateWingsAnimation(true);
                     break;
                 case Creature.HeightLayer.Tree:
                     nextPos.y = terrain.SampleHeight(nextPos) + TreeHeight;
                     break;
                 case Creature.HeightLayer.Ground:
                     nextPos.y = terrain.SampleHeight(nextPos);
+                    cM.ActivateLegAnimation(true);
+                    cM.ActivateWingsAnimation(false);
                     break;
             }
             gO.GetComponent<CreatureLerpPosition>().LerpToPosition(nextPos);
 
             // State visualization
-            gO.GetComponent<CreatureManager>().SetStatusTexts(c.GetState(), c.GetStateInfo());            
+            cM.SetStatusTexts(""/*c.GetState()*/, ""/*c.GetStateInfo()*/);            
         }
 
     }

@@ -131,7 +131,7 @@
     },
     {
         "feature":"Longevity",
-        "maxValue":50,
+        "maxValue":10,
         "relations":
         [
             {
