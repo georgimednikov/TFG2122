@@ -25,9 +25,9 @@ namespace EvolutionSimulation
         /// <param name="worldConfig"> World configuration to generate the world map. If it is provided, no other world files are considered </param>
         virtual public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig worldConfig)
         {
-            InitTracker();
 
             UserInfo.SetUp(years, species, individuals, dataDir, exportDir);
+            InitTracker();
             // Universe Parameters
             UniverseParametersManager.ReadJSON();
             // Chromosome and ability unlocks
@@ -75,9 +75,9 @@ namespace EvolutionSimulation
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends. If not provided, default export directory is setted</param>
         virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
         {
-            InitTracker();
 
             UserInfo.SetUp(years, species, individuals, _exportDir: exportDir);
+            InitTracker();
             // Universe Parameters
             UniverseParametersManager.ReadJSON(uniParamsFile);
             // Chromosome and ability unlocks
@@ -576,7 +576,7 @@ namespace EvolutionSimulation
             holdRidgeMap.Save("biome.bmp");
             voronoiMap.Save("VoronoiDiagram.bmp");
             debugMap.Save("Debug.bmp");
-            debugMap.Save($"Output/{Tracker.Instance.SessionID}/Debug.bmp");
+            debugMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Debug.bmp");
 
         }
 
@@ -596,6 +596,7 @@ namespace EvolutionSimulation
         protected void InitTracker()
         {
             Tracker.Instance.Init();
+            Tracker.Instance.OutputDir = UserInfo.ExportDirectory;
             Tracker.Instance.Track(new SessionStart());
         }
 

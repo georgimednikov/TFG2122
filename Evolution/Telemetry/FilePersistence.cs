@@ -21,11 +21,11 @@ namespace Telemetry
 
         public void Flush()
         {
-            string directoryPath = $"Output/{Tracker.Instance.SessionID}";
+            string directoryPath = $"{Tracker.Instance.OutputDir}Output/{Tracker.Instance.SessionID}";
             if (!Directory.Exists(directoryPath))
                 Directory.CreateDirectory(directoryPath);
             int numEvents = eventQueue.Count;
-            using (StreamWriter writer = File.AppendText($"Output/{Tracker.Instance.SessionID}/sessionOutput.json"))
+            using (StreamWriter writer = File.AppendText($"{directoryPath}/sessionOutput.json"))
             {
                
                 //lock (eventQueue)

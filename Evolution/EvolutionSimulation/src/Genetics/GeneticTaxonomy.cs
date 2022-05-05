@@ -360,7 +360,7 @@ namespace EvolutionSimulation.Genetics
                 Species sp = existingSpecies[i];
                 SpeciesExport export = new SpeciesExport(sp.name, sp.original.stats);
                 string species = JsonConvert.SerializeObject(export, Formatting.Indented);
-                File.WriteAllText(UserInfo.ExportDirectory + "Species_" + i + ".json", species);
+                File.WriteAllText($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Species_{i}.json", species);
             }
         }
 
