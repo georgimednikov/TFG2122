@@ -143,11 +143,11 @@ namespace EvolutionSimulation
         protected void Simulate()
         {
             for (; currentTick <= totalTicks; currentTick++)
-            { 
+            {
                 if (!Step())
                 {
                     break; //TODO: NO DEJAR ESTO
-                    Apocalypse();              
+                    Apocalypse();
                 }
             }
         }
@@ -169,7 +169,7 @@ namespace EvolutionSimulation
             // totalTicks = world.YearToTick(UserInfo.Years);
             // currentTick = 1;
         }
-        
+
 
         #region CreatureCreation
         virtual protected void CreateCreatures()
@@ -523,14 +523,17 @@ namespace EvolutionSimulation
                         SetPixel(j, i, Color.White, voronoiMap, scale / 2);
                     }
 
-                    if (world.map[j / scale, i / scale].isWater) SetPixel(j, i, Color.DarkBlue, debugMap, scale);
+                    if (world.map[j / scale, i / scale].isWater) SetPixel(j, i, Color.Blue, debugMap, scale);
                     else SetPixel(j, i, Color.DarkGreen, debugMap, scale);
                 }
             }
-            for (int i = 0; i < world.pathPos.Count; i++)
+            double max;
+            var posNum = ComputePathPos(out max);
+            foreach (var item in posNum)
             {
-                Vector2 vector = world.pathPos[i];
-                SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.FromKnownColor(KnownColor.White), debugMap, scale / 2);
+                Vector2 vector = item.Key;
+                int color = (int)(item.Value / max * 255);
+                SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.FromArgb(255, color, color, color), debugMap, scale);
             }
 
             for (int i = 0; i < world.deathsPos.Count; i++)
@@ -566,7 +569,7 @@ namespace EvolutionSimulation
                 Vector2 vector = world.regionMap[t].spawnPoint;
                 SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Black, voronoiMap, scale);
             }
-
+            /////TODO GORDO: Hacer lo mismo de debug en el resto!!!
             treeMap.Save("treeTest.png");
             floraMap.Save("flora.bmp");
             floraMapMask.Save("floraMask.bmp");
@@ -580,6 +583,24 @@ namespace EvolutionSimulation
 
         }
 
+        Dictionary<Vector2, int> ComputePathPos(out double max)
+        {
+            Dictionary<Vector2, int> posNum = new Dictionary<Vector2, int>();
+            List<Vector2> v = world.pathPos;
+            max = 1;
+            foreach (var pos in v)
+            {
+                if (posNum.ContainsKey(pos))
+                {
+                    int tMax = ++posNum[pos];
+                    if (tMax > max)
+                        max = tMax;
+                }
+                else posNum.Add(pos, 1);
+            }
+            return posNum;
+        }
+
         void SetPixel(int x, int y, Color color, Bitmap bitmap, int scale = 2)
         {
             for (int i = 0; i < scale; i++)
@@ -590,7 +611,7 @@ namespace EvolutionSimulation
                 }
             }
         }
-#endregion
+        #endregion
 
         #region Tracker
         protected void InitTracker()
