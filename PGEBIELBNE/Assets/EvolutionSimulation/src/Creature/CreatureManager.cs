@@ -8,11 +8,20 @@ namespace UnitySimulation
     {
         public GameObject body;
         public GameObject[] legs;
+
         public GameObject[] mouths;
+        public Material mouthMat;
+
         public GameObject[] armours;
+
         public GameObject spikes;
+
         public GameObject hair;
+        public Material hairMat;
+
         public GameObject beard;
+        public Material beardMat;
+
         public GameObject[] wings;
         public GameObject statusBar;
 
@@ -80,6 +89,7 @@ namespace UnitySimulation
             go.transform.Translate(-Vector3.up * (bodyForward.transform.localPosition.z + bodyForward.transform.localScale.z / 2));
             go.transform.Rotate(Vector3.forward * 180);
             go.transform.localScale = Vector3.one * bodyForward.transform.localScale.z;
+            go.GetComponent<MeshRenderer>().material = mouthMat; 
         }
 
         private void InstantiateArmour(SpeciesExport creature)

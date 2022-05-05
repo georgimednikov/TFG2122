@@ -4915,10 +4915,14 @@ MonoBehaviour:
   - {fileID: 919132149155446097, guid: 9b741b14d19f8534ea81b31067a9ebce, type: 3}
   - {fileID: 919132149155446097, guid: 9e1164c7bd2eec440868c02e34a7cfe0, type: 3}
   - {fileID: 919132149155446097, guid: b3e36aec89c3c604098ba42f0d900571, type: 3}
+  mouthMat: {fileID: 2100000, guid: a33f4003d775f784cbe3a748746fd4c1, type: 2}
   armours: []
   spikes: {fileID: 8342748688082198565, guid: 55069544037c2c944b699154be3012f9, type: 3}
+  spikesMat: {fileID: 2100000, guid: 0af6b801ed11b2f40a00983e7efc31bb, type: 2}
   hair: {fileID: 919132149155446097, guid: a5f1b6e48477e7348b32e01e38d84d4c, type: 3}
+  hairMat: {fileID: 2100000, guid: 428617074e5d8c041b45865eb5a4ffe2, type: 2}
   beard: {fileID: 919132149155446097, guid: b9b0a53b8e728254086cd9a0a51642f8, type: 3}
+  beardMat: {fileID: 2100000, guid: 0da1f90862b3d7e4189c22652547272e, type: 2}
   wings:
   - {fileID: 694736283345526330, guid: 679172a433d30b64c87e48237621d9a3, type: 3}
   - {fileID: 7009738009452670297, guid: 70f3e9b92d0c4094c99497f1c0ea55b8, type: 3}
