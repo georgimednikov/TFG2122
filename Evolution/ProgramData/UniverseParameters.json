@@ -1,5 +1,5 @@
 {
-  "ticksPerHour": 10,
+  "ticksPerHour": 50,
   "hoursPerDay": 24,
   "daysPerYear": 365,
   "morningStart": 6.5,
@@ -54,7 +54,7 @@
   "aggressivenessToRadiusMultiplier": 0.33,
   "maxResourcesRemembered": 5,
   "maxPositionsRemembered": 10,
-  "baseActionCost": 500,
+  "baseActionCost": 1000,
   "venomCostMultiplier": 100,
   "chaseCostMultiplier": 0.4,
   "fleeingCostMultiplier": 0.75,
