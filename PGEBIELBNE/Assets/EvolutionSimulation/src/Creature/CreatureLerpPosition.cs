@@ -14,7 +14,7 @@ public class CreatureLerpPosition : MonoBehaviour
     {
         if (lerping)
         {
-            lerpPercentage += Time.deltaTime / UnitySimulation.SimulationManager.GetTimeBetweenSteps();
+            lerpPercentage += Time.deltaTime / UnitySimulation.SimulationManager.Instance.GetTimeBetweenSteps();
             if (lerpPercentage >= 1)
             {
                 lerping = false;

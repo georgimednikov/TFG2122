@@ -24,7 +24,7 @@ namespace UnitySimulation
         public TextAsset WorldMap;
         public TextAsset RegionMap;
 
-        public static float TimeBetweenSteps = 1f;
+        public float TimeBetweenSteps = 1f;
 
         //[Tooltip("Directory where genes, chromosome, world and simulation parameters files are stored")]
         //public string DataDirectory;
@@ -37,6 +37,35 @@ namespace UnitySimulation
         public GenerateWorld worldGenerator;
 
         UnitySimulation simulation;
+
+        static public SimulationManager Instance { get => _instance; }
+        static SimulationManager _instance;
+
+        private void Awake()
+        {
+            if (_instance == null)
+            {
+                _instance = this;
+                DontDestroyOnLoad(this);
+            }
+            else
+            {
+                _instance.EvolutionYears = EvolutionYears;
+                _instance.SpeciesNumber = SpeciesNumber;
+                _instance.IndividualsNumber = IndividualsNumber;
+                _instance.UniverseParameters = UniverseParameters;
+                _instance.Chromosome = Chromosome;
+                _instance.AbilityUnlocks = AbilityUnlocks;
+                _instance.GeneSimilarity = GeneSimilarity;
+                _instance.WorldMap = WorldMap;
+                _instance.RegionMap = RegionMap;
+                _instance.worldCorpseManager = worldCorpseManager;
+                _instance.worldCreatureManager = worldCreatureManager;
+                _instance.worldGenerator = worldGenerator;
+
+                Destroy(gameObject);
+            }
+        }
         void Start()
         {
             if (worldGenerator == null)
@@ -57,7 +86,7 @@ namespace UnitySimulation
             string regionFileRaw = RegionMap == null ? null : RegionMap.text;
            
             simulation = new UnitySimulation();
-            simulation.generateWorld = worldGenerator;
+            simulation.GenerateWorld = worldGenerator;
             simulation.Init(
                 EvolutionYears, SpeciesNumber, IndividualsNumber,
                 universeFileRaw,
@@ -91,9 +120,17 @@ namespace UnitySimulation
             }
         }
 
-        public static float GetTimeBetweenSteps()
+        public float GetTimeBetweenSteps()
         {
             return TimeBetweenSteps;
+        }
+        public int GetCurrentTicks()
+        {
+            return simulation.GetCurrentTicks();
+        }
+        public int GetTicksInDay()
+        {
+            return simulation.GetTicksInDay();
         }
 
         void OnDestroy()
