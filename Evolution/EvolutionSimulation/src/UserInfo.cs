@@ -5,7 +5,7 @@ namespace EvolutionSimulation
 {
     static public class UserInfo
     {
-        static public int Size = 512;
+        static public int Size = 206;
         static public int Years = 10;
         static public int Species = 10;
         static public int Individuals = 10;
