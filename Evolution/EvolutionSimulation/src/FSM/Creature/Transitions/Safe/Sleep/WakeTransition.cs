@@ -13,7 +13,8 @@
 
         public override bool Evaluate()
         {
-            return creature.stats.CurrRest >= creature.stats.MaxRest;
+            return creature.stats.CurrRest >= creature.stats.MaxRest ||
+                (!creature.IsTired() && (creature.IsHungry() || creature.IsThirsty()));
         }
 
         public override string ToString()

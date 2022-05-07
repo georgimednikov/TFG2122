@@ -499,7 +499,8 @@ namespace EvolutionSimulation
             ent.Init(entitiesID, this, x, y, chromosome, name, fatherID, motherID);
             
             taxonomy.AddCreatureToSpecies(ent);
-            ent.BirthEventTrack();
+            if(fatherID != -1)
+                ent.BirthEventTrack();
 
             entityMap[x, y].Add(ent);
 
@@ -999,11 +1000,11 @@ namespace EvolutionSimulation
         public void ExportContent()
         {
             taxonomy.ExportSpecies();
-            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + UserInfo.TreeName);
+            taxonomy.RenderSpeciesTree($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/{UserInfo.TreeName}");
             string word = JsonConvert.SerializeObject(map, Formatting.Indented);
-            System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.WorldName, word);
+            System.IO.File.WriteAllText($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/{UserInfo.WorldName}", word);
             string rMap = JsonConvert.SerializeObject(regionMap, Formatting.Indented);
-            System.IO.File.WriteAllText(UserInfo.ExportDirectory + UserInfo.HeightMapName, rMap);
+            System.IO.File.WriteAllText($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/{UserInfo.RegionMapName}", rMap);
         }
 
         /// <summary>

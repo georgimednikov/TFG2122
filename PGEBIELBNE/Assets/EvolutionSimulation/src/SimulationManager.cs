@@ -84,7 +84,7 @@ namespace UnitySimulation
         {
             while (true)
             {
-                simulation.Step();
+                simulation.SimulateStep();
                 yield return new WaitForSeconds(TimeBetweenSteps);
                 
                 //worldCreatureManager.AfterCorroutine();

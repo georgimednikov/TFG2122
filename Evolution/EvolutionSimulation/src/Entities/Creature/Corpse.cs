@@ -89,7 +89,12 @@ namespace EvolutionSimulation.Entities
                 }
                 // Eating the corpse increases the energy of the creature 
                 float dealt = Math.Min(other.stats.Damage, curHp);
-                other.stats.CurrEnergy += (dealt / maxHp) * actualNutritionPoints;
+
+                // Food effectiveness is (normally) reduced for omnivores since they can consume all sources of nutritients, so they are worse at it.
+                float nutritionalEffectiveness = 1.0f;
+                if (other.stats.Diet == Genetics.Diet.Omnivore) nutritionalEffectiveness = UniverseParametersManager.parameters.omnivorousNutritionMultiplier;
+
+                other.stats.CurrEnergy += ((dealt / maxHp) * actualNutritionPoints) * nutritionalEffectiveness;
                 curHp -= dealt;
                 // The creature can be poisoned when eating the corpse
                 if (prob < actualPoisonProb && dealt > 0)   // In case another creature tried eating an empty corpse

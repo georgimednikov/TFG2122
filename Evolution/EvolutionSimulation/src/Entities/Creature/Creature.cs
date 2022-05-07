@@ -281,15 +281,16 @@ namespace EvolutionSimulation.Entities
             {
                 float pE = (stats.CurrEnergy - (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold)) /  // Percentage of surpassed thresholds
                     (stats.MaxEnergy - (stats.MaxEnergy * UniverseParametersManager.parameters.energyRegenerationThreshold));
-                float pR = (stats.CurrRest - (stats.MaxRest * UniverseParametersManager.parameters.energyRegenerationThreshold)) /
-                    (stats.MaxRest - (stats.MaxRest * UniverseParametersManager.parameters.energyRegenerationThreshold));
-                float pH = (stats.CurrHydration - (stats.MaxHydration * UniverseParametersManager.parameters.energyRegenerationThreshold)) /
-                    (stats.MaxHydration - (stats.MaxHydration * UniverseParametersManager.parameters.energyRegenerationThreshold));
+                float pR = (stats.CurrRest - (stats.MaxRest * UniverseParametersManager.parameters.restRegenerationThreshold)) /
+                    (stats.MaxRest - (stats.MaxRest * UniverseParametersManager.parameters.restRegenerationThreshold));
+                float pH = (stats.CurrHydration - (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold)) /
+                    (stats.MaxHydration - (stats.MaxHydration * UniverseParametersManager.parameters.hydrationRegenerationThreshold));
 
                 float medPercent = (pE + pR + pH) / 3.0f;   // Average percentage of suprassed thresholds
 
                 stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth * medPercent);  // TODO: Ver si esto esta bien, ingenieria de valores
                 stats.CurrHealth = Math.Min(stats.CurrHealth, stats.MaxHealth); // So it does not get over-healed
+                
             }
         }
 
@@ -383,6 +384,30 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(wander, goToSafeTempPlaceTransition, goToSafeTemperaturePlace);
             safeFSM.AddTransition(goToSafeTemperaturePlace, stopGoToSafeTempPlaceTransition, wander);
             safeFSM.AddTransition(wander, goToSafeTempPlaceExploreTransition, explore);
+            
+            // Drinking
+            ITransition thirstyTransition = new ThirstyTransition(this);
+            ITransition drinkingTransition = new DrinkingTransition(this);
+            ITransition drinkingExploreTransition = new DrinkingExploreTransition(this);
+            ITransition stopDrinkingTransition = new StopDrinkingTransition(this);
+            ITransition stopGoToDrinkTransition = new StopGoToDrinkTransition(this);
+            safeFSM.AddTransition(wander, drinkingExploreTransition, explore);
+            safeFSM.AddTransition(wander, thirstyTransition, goToDrink);
+            safeFSM.AddTransition(goToDrink, stopGoToDrinkTransition, wander);
+            safeFSM.AddTransition(goToDrink, drinkingTransition, drink);
+            safeFSM.AddTransition(drink, stopDrinkingTransition, wander);
+
+            // Eating
+            ITransition hungerTransition = new HungerTransition(this);
+            ITransition hungerExploreTransition = new HungerExploreTransition(this);
+            ITransition eatingTransition = new EatingTransition(this);
+            ITransition stopEatingTransition = new StopEatingTransition(this);
+            ITransition stopGoToEatTransition = new StopGoToEatTransition(this);
+            safeFSM.AddTransition(wander, hungerExploreTransition, explore);
+            safeFSM.AddTransition(wander, hungerTransition, goToEat);
+            safeFSM.AddTransition(goToEat, stopGoToEatTransition, wander);
+            safeFSM.AddTransition(goToEat, eatingTransition, eat);
+            safeFSM.AddTransition(eat, stopEatingTransition, wander);
 
             // Sleeping
             ITransition goToSafePlaceTransition = new GoToSafePlaceTransition(this);
@@ -399,33 +424,6 @@ namespace EvolutionSimulation.Entities
             safeFSM.AddTransition(explore, sleepyTransition, sleep);
             safeFSM.AddTransition(sleep, wakeTransition, wander);
 
-            // Drinking
-            ITransition thirstyTransition = new ThirstyTransition(this);
-            ITransition drinkingTransition = new DrinkingTransition(this);
-            ITransition drinkingExploreTransition = new DrinkingExploreTransition(this);
-            ITransition stopDrinkingTransition = new StopDrinkingTransition(this);
-            ITransition stopGoToDrinkTransition = new StopGoToDrinkTransition(this);
-            safeFSM.AddTransition(wander, drinkingExploreTransition, explore);
-            safeFSM.AddTransition(wander, thirstyTransition, goToDrink);
-            safeFSM.AddTransition(goToDrink, stopGoToDrinkTransition, wander);
-            safeFSM.AddTransition(goToDrink, drinkingTransition, drink);
-            safeFSM.AddTransition(drink, stopDrinkingTransition, wander);
-            safeFSM.AddTransition(sleep, drinkingExploreTransition, explore);
-            safeFSM.AddTransition(sleep, thirstyTransition, goToDrink);
-
-            // Eating
-            ITransition hungerTransition = new HungerTransition(this);
-            ITransition hungerExploreTransition = new HungerExploreTransition(this);
-            ITransition eatingTransition = new EatingTransition(this);
-            ITransition stopEatingTransition = new StopEatingTransition(this);
-            ITransition stopGoToEatTransition = new StopGoToEatTransition(this);
-            safeFSM.AddTransition(wander, hungerExploreTransition, explore);
-            safeFSM.AddTransition(wander, hungerTransition, goToEat);
-            safeFSM.AddTransition(goToEat, stopGoToEatTransition, wander);
-            safeFSM.AddTransition(goToEat, eatingTransition, eat);
-            safeFSM.AddTransition(eat, stopEatingTransition, wander);
-            safeFSM.AddTransition(sleep, hungerExploreTransition, explore);
-            safeFSM.AddTransition(sleep, hungerTransition, goToEat);
 
             // Mating
             ITransition mateTransition = new GoToMateTransition(this);
@@ -718,6 +716,11 @@ namespace EvolutionSimulation.Entities
         #endregion
 
         #region Creature Information
+
+        /// <summary>
+        /// This is the resource that the creature needs while exploring
+        /// </summary>
+        public string ResourceNeeded ="";
 
         // Stats related information
         public bool IsCarnivorous() { return stats.Diet == Diet.Carnivore; }

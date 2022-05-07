@@ -8,21 +8,24 @@ namespace Visualizador
 {
     static class Program
     {
+        static WindowLoadingBar loadingBar;
+
         /// <summary>
-        /// Punto de entrada principal para la aplicación.
+        /// Application entry point
         /// </summary>
         [STAThread]
         static void Main()
         {
-            Simulation s = new Simulation();
-#if true
-            s.Init(100, 30, 20, "../../ProgramData/", "../../ResultingData/", null);
+            EventSimulation s = new EventSimulation();
+            s.OnSimulationBegin += (e) => { loadingBar = new WindowLoadingBar(UserInfo.Years); };
+            s.OnSimulationStep += (e) => { if(e.CurrentTick % e.YearTicks == 0) loadingBar.StepElapsed(); };
+#if DEBUG
+            s.Init(10, 20, 20, "../../ProgramData/", "../../ResultingData/", null);
 #else
             if (!AskInfoUsingWindows(s))
                 return;
 #endif
             s.Run();
-            s.Export();
         }
 
         #region AskInfo
@@ -109,8 +112,6 @@ namespace Visualizador
             individuals = userEntry;
 
             s.Init(years, species, individuals, dataDir, exportDir, config);
-            LoadingBar.Instance.Init(years, false);
-
             return true;
         }
 

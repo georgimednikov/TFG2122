@@ -43,5 +43,7 @@ namespace Telemetry
         public string SessionID { get; private set; }
         private IPersistence persistence;
         private Stopwatch stopwatch;
+
+        public string OutputDir { get; set; }
     }
 }

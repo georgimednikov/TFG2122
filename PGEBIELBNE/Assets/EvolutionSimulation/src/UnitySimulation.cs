@@ -23,16 +23,23 @@ namespace UnitySimulation
             generateWorld.SetWorld(world);
             generateWorld.MapGen();
         }
+
         /// <summary>
         /// Performs a step of the simulation
         /// </summary>
-        public void Step()
+        public void SimulateStep()
         {
             world.Tick();
 
             // Notify every listener after a step is simulated
             foreach (IListener<World> listener in world_listeners)
                 listener.OnNotify(world);
+        }
+
+        // TODO: no exportar siempre?
+        protected override void End()
+        {
+            //EndTracker();
         }
 
         public bool Subscribe(IListener<World> listener)

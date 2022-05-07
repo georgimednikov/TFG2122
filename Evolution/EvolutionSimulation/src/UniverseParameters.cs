@@ -17,6 +17,7 @@ namespace EvolutionSimulation
         public int grassHp = 10;
         public int bushHp = 20;
         public int eTreeHp = 50;
+        public float plantNutritionMultiplier = 0.8f;
 
         // Creature
         public float abilityUnlockPercentage = 0.4f; //The percentage of an ability that has to be had in order to unlock it
@@ -52,6 +53,7 @@ namespace EvolutionSimulation
         public double minHealthTemperatureDamage = 0.01; //Minimum max health damage for being in extreme temperatures.
         public double maxHealthTemperatureDamage = 0.02; //Maximum max health damage for being in extreme temperatures.
         public float venomDamageMultiplier = 0.25f;
+        public float omnivorousNutritionMultiplier = 0.7f; // How effective food sources are for omnivores.
 
         // CreatureStats
         public float newbornStatMultiplier = 0.33f; //Starting multiplier of newborns

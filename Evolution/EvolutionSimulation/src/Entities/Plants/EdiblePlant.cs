@@ -29,7 +29,12 @@ namespace EvolutionSimulation.Entities
                 return;
             world.StaticEntitiesToUpdate.Add(this);
             float dealt = Math.Min(other.stats.Damage, curHp);
-            other.stats.CurrEnergy += (dealt / maxHp) * nutritionalValue;
+
+            // Food effectiveness is (normally) reduced for omnivores since they can consume all sources of nutritients, so they are worse at it.
+            float nutritionalEffectiveness = 1.0f;
+            if (other.stats.Diet == Genetics.Diet.Omnivore) nutritionalEffectiveness = UniverseParametersManager.parameters.omnivorousNutritionMultiplier;
+
+            other.stats.CurrEnergy += ((dealt / maxHp) * nutritionalValue) * nutritionalEffectiveness;
             curHp -= dealt;
 
             if(curHp <= 0) {

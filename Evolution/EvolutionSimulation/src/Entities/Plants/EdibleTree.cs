@@ -8,14 +8,7 @@
         {
             type = PlantType.EdibleTree;
             regrowthTime = RandomGenerator.Next(70, 151); // TODO: Numeros magicos
-            nutritionalValue = RandomGenerator.Next(11, 22); // TODO: Numeros magicos
-        }
-
-        public EdibleTree(int regrowhtTime, float nutritionalValue)
-        {
-            type = PlantType.EdibleTree;
-            this.regrowthTime = regrowhtTime;
-            this.nutritionalValue = nutritionalValue;
+            nutritionalValue = RandomGenerator.Next(11, 22) * UniverseParametersManager.parameters.plantNutritionMultiplier; // TODO: Numeros magicos
         }
     }
 }

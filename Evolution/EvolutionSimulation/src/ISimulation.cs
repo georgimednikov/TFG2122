@@ -9,10 +9,5 @@
         /// Starts the simualtion and keeps it running until the exit condition is met
         /// </summary>
         void Run();
-
-        ///<summary>
-        /// Exports the simulation content
-        /// </summary>
-        void Export();
     }
 }
