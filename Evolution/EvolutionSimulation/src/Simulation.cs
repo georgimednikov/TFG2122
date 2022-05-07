@@ -49,7 +49,7 @@ namespace EvolutionSimulation
                 }
                 else // Else a new one has to be created from scratch with the given parameters, in this case only size.
                 {
-                    WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
+                    WorldGenConfig config = new WorldGenConfig(World.MapType.Atoll)
                     {
                         mapSize = UserInfo.Size
                     };
@@ -59,6 +59,7 @@ namespace EvolutionSimulation
             }
             else // There is a custom world configuration, which in this case means that a height map is provided.
                 world.Init(worldConfig);
+
         }
 
         /// <summary>
@@ -532,7 +533,7 @@ namespace EvolutionSimulation
             {
                 Vector2 vector = item.Key;
                 int color = (int)(item.Value / max * 255);
-                SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.FromArgb(255, color, color, color), debugMap, scale);
+                SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.FromArgb(255, 255, 255 - color, 255 - color), debugMap, scale);
             }
 
             for (int i = 0; i < world.deathsPos.Count; i++)
