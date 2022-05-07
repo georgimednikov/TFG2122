@@ -55,7 +55,7 @@ namespace EvolutionSimulation
         override protected bool Step()
         {
             bool ret = base.Step();
-            OnSimulationStep.Invoke(this);  // no nullCheck because it has at least the birth check action
+            OnSimulationStep.Invoke(this);  // No nullCheck because it has at least the birth check action
             return ret;
         }
 

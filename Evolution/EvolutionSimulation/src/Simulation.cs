@@ -59,7 +59,6 @@ namespace EvolutionSimulation
             }
             else // There is a custom world configuration, which in this case means that a height map is provided.
                 world.Init(worldConfig);
-
         }
 
         /// <summary>

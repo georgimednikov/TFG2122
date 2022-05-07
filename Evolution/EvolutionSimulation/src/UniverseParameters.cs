@@ -53,6 +53,7 @@ namespace EvolutionSimulation
         public double minHealthTemperatureDamage = 0.01; //Minimum max health damage for being in extreme temperatures.
         public double maxHealthTemperatureDamage = 0.02; //Maximum max health damage for being in extreme temperatures.
         public float venomDamageMultiplier = 0.25f;
+        public float omnivorousNutritionMultiplier = 0.7f; // How effective food sources are for omnivores.
 
         // CreatureStats
         public float newbornStatMultiplier = 0.33f; //Starting multiplier of newborns
