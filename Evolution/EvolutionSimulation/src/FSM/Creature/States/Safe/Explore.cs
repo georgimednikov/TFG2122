@@ -34,7 +34,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (creature.IsTired() && creature.SafePosition() == null) creature.ResourceNeeded += " safe position";
             if (creature.wantMate && !creature.Mate()) creature.ResourceNeeded += " mating objective";
            
-            Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureStateEntryExplore(creature.world.tick, creature.ID, creature.speciesName, ToString(), creature.ResourceNeeded));
+            Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureStateEntryExplore(creature.world.tick, creature.ID, creature.speciesName, ToString(), creature.ResourceNeeded, creature.x, creature.y));
 
             regionID = creature.NewExploreRegion();
             posToDiscover = new Vector3(creature.world.regionMap[regionID].spawnPoint, 0); // Region spawn point is always at ground height

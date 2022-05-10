@@ -29,7 +29,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public override void Action()
         {
             creature.world.Destroy(creature.ID); // aqui ya null en el diccionario y no le pueden volver a hacer daño
-            Tracker.Instance.Track(new CreatureDeath(creature.world.tick, creature.ID, creature.speciesName, (DeathType)creature.causeOfDeath, creature.killerID, creature.killingBlow));
+            Tracker.Instance.Track(new CreatureDeath(creature.world.tick, creature.ID, creature.speciesName, (DeathType)creature.causeOfDeath, creature.killerID, creature.killingBlow, creature.x, creature.y));
             
             // Set cause of death
             template = creature.speciesName + " with ID " + creature.ID + " DIES; CAUSE OF DEATH: ";

@@ -177,10 +177,12 @@ namespace EvolutionSimulation.Entities
 
                 //If a creature is the same species as this creature or
                 //it belongs to a child species of this creature's or
-                //it belongs to a parent species of this creature's they're allies.
+                //it belongs to a parent species of this creature's they're allies
+                //the progenitor is the same.
                 if (creature.speciesName == thisCreature.speciesName ||
                     creature.progenitorSpeciesName == thisCreature.speciesName ||
-                    creature.speciesName == thisCreature.progenitorSpeciesName)
+                    creature.speciesName == thisCreature.progenitorSpeciesName ||
+                    creature.progenitorSpeciesName == thisCreature.progenitorSpeciesName)
                 {
                     UpdateList(Allies, resource, maxExperienceTicks);
                     if (creature.ID == father.ID)

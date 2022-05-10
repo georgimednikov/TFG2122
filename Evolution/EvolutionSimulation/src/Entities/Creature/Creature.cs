@@ -47,6 +47,10 @@ namespace EvolutionSimulation.Entities
         /// ID of the one who dealt the killing blow, if applicable.
         /// </summary>
         public int killerID;
+        /// <summary>
+        /// Boolean to send an event when the creature is adult the very first tick
+        /// </summary>
+        private bool adultEvent = false;
 
         /// <summary>
         /// Constructor for factories
@@ -97,6 +101,7 @@ namespace EvolutionSimulation.Entities
             ManageHealth();
             CheckTemperature();
             FemaleTick();
+
 
             mind.UpdatePriorities();
             foreach (Status.Status s in activeStatus)   // Activates each status effect
@@ -169,7 +174,7 @@ namespace EvolutionSimulation.Entities
                 UniverseParametersManager.parameters.minHealthTemperatureDamage);
             stats.CurrHealth -= (float)damage;
 
-            Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, -1, (float)damage, DamageType.Temperature, stats.CurrHealth));
+            Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, -1, (float)damage, DamageType.Temperature, stats.CurrHealth, x, y));
 
             if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
             {
@@ -235,6 +240,12 @@ namespace EvolutionSimulation.Entities
             stats.CurrAge++;
             if (stats.CurrAge >= stats.LifeSpan)
                 causeOfDeath = CauseOfDeath.Longevity;
+
+            if (!adultEvent && !stats.IsNewBorn())
+            {
+                adultEvent = true;
+                Tracker.Instance.Track(new CreatureAdult(world.tick, ID, speciesName, x, y));
+            }
         }
 
         /// <summary>
@@ -259,7 +270,7 @@ namespace EvolutionSimulation.Entities
                 else if (stats.CurrRest <= 0)
                     dtype = DamageType.Exhaustion;
 
-                Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, -1, 1, dtype, stats.CurrHealth));
+                Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, -1, 1, dtype, stats.CurrHealth, x, y));
 
                 if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
                 {
@@ -623,7 +634,7 @@ namespace EvolutionSimulation.Entities
             float damage = ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
             stats.CurrHealth = Math.Max(Math.Min(stats.CurrHealth - damage, stats.MaxHealth), 0);
 
-            Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, interacter.ID, damage, DamageType.Attack, stats.CurrHealth));
+            Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, interacter.ID, damage, DamageType.Attack, stats.CurrHealth, x, y));
 
             if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
             {
@@ -653,7 +664,7 @@ namespace EvolutionSimulation.Entities
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
 
-            Tracker.Instance.Track(new CreatureReceiveDamage(interacter.world.tick, interacter.ID, interacter.speciesName, ID, stats.Counter, DamageType.Retalliation, interacter.stats.CurrHealth));
+            Tracker.Instance.Track(new CreatureReceiveDamage(interacter.world.tick, interacter.ID, interacter.speciesName, ID, stats.Counter, DamageType.Retalliation, interacter.stats.CurrHealth, interacter.x, interacter.y));
 
             if (interacter.causeOfDeath == CauseOfDeath.NONE && interacter.stats.CurrHealth <= 0)
             {
@@ -1168,7 +1179,7 @@ namespace EvolutionSimulation.Entities
         #region Tracker
         public void BirthEventTrack()
         {
-            Telemetry.Events.CreatureBirth cbEvent = new Telemetry.Events.CreatureBirth(world.tick, ID, speciesName);
+            Telemetry.Events.CreatureBirth cbEvent = new CreatureBirth(world.tick, ID, speciesName, x, y);
             cbEvent.MaxHealth = stats.MaxHealth;
             cbEvent.HealthRegen = stats.HealthRegeneration;
             cbEvent.MaxEnergy = stats.MaxEnergy;

@@ -39,7 +39,7 @@
         public int Paternity;
         public bool Upright;
 
-        public CreatureBirth(int tick, int id, string species) : base(EventType.CreatureBirth, tick, id, species) { }
+        public CreatureBirth(int tick, int id, string species, int x, int y) : base(EventType.CreatureBirth, tick, id, species, x, y) { }
         public override string ToJSON() { return $"[\n{base.ToJSON()}"; }        
     }
 }
