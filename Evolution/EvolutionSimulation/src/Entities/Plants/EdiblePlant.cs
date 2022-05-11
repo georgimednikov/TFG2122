@@ -28,6 +28,7 @@ namespace EvolutionSimulation.Entities
             if (type != Interactions.eat || eaten) 
                 return;
             world.StaticEntitiesToUpdate.Add(this);
+
             float dealt = Math.Min(other.stats.Damage, curHp);
 
             // Food effectiveness is (normally) reduced for omnivores since they can consume all sources of nutritients, so they are worse at it.
@@ -39,6 +40,7 @@ namespace EvolutionSimulation.Entities
 
             if(curHp <= 0) {
                 eaten = true;
+                Telemetry.Tracker.Instance.Track(new Telemetry.Events.PlantEaten(world.tick, ID, x, y));
             }
         }
     }

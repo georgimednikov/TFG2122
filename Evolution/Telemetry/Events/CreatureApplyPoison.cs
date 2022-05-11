@@ -9,7 +9,7 @@ namespace Telemetry.Events
         public string victimSpecies { get; private set; }
         public float damage { get; private set; }
         public int duration { get; private set; }
-        public CreatureApplyPoison(int tick, int creatureID, string speciesName, int vID, string vSp, float dmg, int dur) : base(EventType.CreatureApplyPoison, tick, creatureID, speciesName) 
+        public CreatureApplyPoison(int tick, int creatureID, string speciesName, int vID, string vSp, float dmg, int dur, int x, int y) : base(EventType.CreatureApplyPoison, tick, creatureID, speciesName, x, y) 
         { victimID = vID; victimSpecies = vSp; damage = dmg; duration = dur; }
     }
 }

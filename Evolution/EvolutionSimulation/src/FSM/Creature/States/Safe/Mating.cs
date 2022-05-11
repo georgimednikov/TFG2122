@@ -63,7 +63,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                         creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.world.GiveName(childC, father, creature), creature.matingCreature, creature.ID);
 
                     }
-                    Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureMating(creature.world.tick, creature.ID, creature.speciesName, father.ID, father.speciesName, numberChilds));
+                    Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureMating(creature.world.tick, creature.ID, creature.speciesName, father.ID, father.speciesName, numberChilds, creature.x, creature.y));
                     creature.timeToBeInHeat = -1;
                     creature.mating = false;
                     creature.CreateDanger();

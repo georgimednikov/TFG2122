@@ -20,7 +20,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public virtual void Action() {}
 
         public virtual void OnEntry() { 
-            Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureStateEntry(creature.world.tick, creature.ID, creature.speciesName, ToString())); }
+            Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureStateEntry(creature.world.tick, creature.ID, creature.speciesName, ToString(), creature.x, creature.y)); }
 
         public virtual void OnExit() {}
 

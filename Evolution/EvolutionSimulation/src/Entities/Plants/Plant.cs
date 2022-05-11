@@ -17,7 +17,7 @@ namespace EvolutionSimulation.Entities
         }
 
         public PlantType type;
-        public new int x { get; private set; }
-        public new int y { get; private set; }
+        //public new int x { get; private set; }
+        //public new int y { get; private set; }
     }
 }

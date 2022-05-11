@@ -634,7 +634,7 @@ namespace EvolutionSimulation
         {
             // Para dejar los json bien cuando termine la simulacion
             foreach (Creature c in world.Creatures.Values)
-                Tracker.Instance.Track(new CreatureDeath(world.tick, c.ID, c.speciesName, DeathType.SimulationEnd, -1, 0));
+                Tracker.Instance.Track(new CreatureDeath(world.tick, c.ID, c.speciesName, DeathType.SimulationEnd, -1, 0, c.x, c.y));
             Tracker.Instance.Track(new SessionEnd());
             Tracker.Instance.Flush();
         }
