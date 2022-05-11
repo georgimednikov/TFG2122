@@ -1,6 +1,19 @@
 import glob
 from io import TextIOWrapper
 import json
+import plotly.express as px
+
+def PieChart():
+    fig = px.pie(names=['Dani', 'Georgi'], values=[89, 11], title='Contribución en Aprendizaje Automático')
+    fig.show()
+
+def BarChart():
+    fig = px.bar(x=['Dani', 'Georgi'], y=[89, 11], title='Contribución en Aprendizaje Automático')
+    fig.show()
+
+def LineChart():
+    fig = px.line(x=['Dani', 'Georgi'], y=[89, 11], title='Contribución en Aprendizaje Automático')
+    fig.show()
 
 def AppendFile_n_Print(data: str, file: TextIOWrapper):
     file.write(f'{data}\n')
@@ -40,7 +53,4 @@ def main():
         AppendFile_n_Print(f'\n{k} Total Creatures : {v[1]}', outputFile)
         ProcessResults(v[0], v[1], outputFile)
 
-main()
-
-
-
+LineChart()
