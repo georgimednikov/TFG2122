@@ -1,7 +1,9 @@
 import glob
 from io import TextIOWrapper
 import json
+import os
 import string
+from pathlib import Path
 import plotly.express as px
 import plotly.graph_objects as pgo
 from plotly.subplots import make_subplots
@@ -114,13 +116,13 @@ def ProcessDict(results: dict, numCreatures: float, file: TextIOWrapper):
 #   speciesDeathCauses: A dictionary where keys are the name of a species and the values are a tuple where
 #   the first value is the number of creatures of that species and the second value is a dictionary where each
 #   key represents the death type and each value the number of creatures of that species that died.
-def ProcessData():
+def ProcessData(path: str):
     # Get all the species folder in the Output Dir, and the sessionOutput file
-    speciesList = glob.glob("*/")
-    sessionOutput = json.load(open("sessionOutput.json"))
+    speciesList = glob.glob(f'{path}/*/')
+    sessionOutput = json.load(open(f'{path}\\\\sessionOutput.json'))
 
     # SimulationStart Event, we know it is the second event
-    sessionStartEvent = sessionOutput[0]   #TODO: cambiar a 1 cuando lo ponga Andres
+    simulationStartEvent = sessionOutput[1]
     # Get plants eaten event
     plantsEatenEvents = [x for x in sessionOutput if (x['Type'] == 'PlantEaten')]
     
@@ -160,7 +162,8 @@ def ProcessData():
 
     # Get the death events from every creature in every species folder and add it to the pertinent dictionary
     for i in range(len(speciesList)):
-        currSpecies = speciesList[i][:-1]   # remove dir\\
+        currSpecies = speciesList[i][len(path)+1:-1]   # remove dir\\
+        aux = f'{speciesList[i]}*.json'
         creature_list = glob.glob(f'{speciesList[i]}*.json')
         creaturesNum = len(creature_list)
         speciesDeathCauses[currSpecies] = (dict.fromkeys(['Temperature','Attack','Retalliation','Starved','Dehydration','Exhaustion','Poisoned','Longevity','SimulationEnd'], 0), len(creature_list))
@@ -247,7 +250,7 @@ def ProcessData():
     globalBirthInfo[1] = globalMatingCreatures / globalAdultCreatures
 
     returnDict = {
-        'SessionInfo': sessionStartEvent,
+        'SessionInfo': simulationStartEvent,
         'GlobalDeathCauses' : globalDeathCauses,
         'SpeciesDeathCauses' : speciesDeathCauses,
         'GlobalDamageReception' : globalDamageReception,
@@ -260,32 +263,21 @@ def ProcessData():
     }
     return returnDict
 
-def ProcessResults(results: dict):
-    # Open the analysis output file
-    # outputFile = open('analysis.txt', 'w')
-    # AppendFile_n_Print(f'Total Creatures : {totalCreatures}', outputFile)
-    # ProcessDict(globalDeathCauses, totalCreatures, outputFile)
-    #ShowGlobalInfo(globalDeathCauses[0], globalDamageReception[0])
-    #ShowDietInfo(dietInfo)
-    #damageType = 'Starvation'
-    #ShowSpeciesBarChart(f'Species {damageType} percentage', ['Species', 'Percentage of deaths'], speciesDamageReception, damageType) 
-    # deathCause = 'Starved'
-    # ShowSpeciesBarChart(f'Species {deathCause} percentage', ['Species', 'Percentage of damage'], speciesDeathCauses, deathCause)
-    # DictionaryPieChart('Global death causes', globalDeathCauses)
-    #ShowPlantsConsumedInfo(startEvent['YearTicks'], startEvent['TotalTicks'], plantsEaten, startEvent['TotalEdiblePlants'])
-    #ShowBirthsAndDeaths('Global', startEvent['YearTicks'], startEvent['TotalTicks'], globalBirthInfo[2], globalBirthInfo[3])
-    ShowAdulthood(results['GlobalBirthInfo'],  results['SpeciesBirthInfo'])
-    ShowOffspring(results['GlobalBirthInfo'],  results['SpeciesBirthInfo'])
-    #BarChart('Species Drink success', ['Species','Success Percentage'], list(speciesDrinkSucces.keys()), list(speciesDrinkSucces.values()))
-    # for k,v in speciesDeathCauses.items():
-    #     AppendFile_n_Print(f'\n{k} Total Creatures : {v[1]}', outputFile)
-    #     ProcessDict(v[0], v[1], outputFile)
-#endregion
-def mainloop():
-    input = input()
-    
-def main():
-    results = ProcessData()
-    ProcessResults(results)
+#def ProcessResults(results: dict):
+    # ShowDietInfo(dietInfo)
 
+    # ShowPlantsConsumedInfo(startEvent['YearTicks'], startEvent['TotalTicks'], plantsEaten, startEvent['TotalEdiblePlants'])
+    # ShowBirthsAndDeaths('Global', startEvent['YearTicks'], startEvent['TotalTicks'], globalBirthInfo[2], globalBirthInfo[3])
+    # BarChart('Species Drink success', ['Species','Success Percentage'], list(speciesDrinkSucces.keys()), list(speciesDrinkSucces.values()))
+#endregion
+
+# def mainloop():
+#     input = input()
+
+def main():
+    session = '02a208b605b349e2acc0104092547303'
+    resultsDir = f'{Path().absolute()}\\ResultingData\\{session}'
+    results = ProcessData(resultsDir)
+    ShowPlantsConsumedInfo(results['SessionInfo']['YearTicks'], results['SessionInfo']['TotalTicks'], results['PlantsEaten'], results['SessionInfo']['TotalEdiblePlants'])
+    
 main()
