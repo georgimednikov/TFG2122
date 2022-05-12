@@ -316,6 +316,11 @@ namespace EvolutionSimulation.Entities
             if (menace != null && 
                 menace.ticks != maxExperienceTicks && thisCreature.DistanceToObjective(menace.position) <= perceptionRadius)
                 menace = null;
+            CheckMate();
+        }
+        
+        private void CheckMate()
+        {
             if (thisCreature.stats.Gender == Genetics.Gender.Male)
             {
                 Mate = null; //By default there is no mate available.
@@ -323,10 +328,10 @@ namespace EvolutionSimulation.Entities
                 {
                     Creature ally = world.GetCreature(Allies[i].ID);
                     if (ally == null || ally.stats.Gender == thisCreature.stats.Gender ||
-                        ally.creatureLayer != Creature.HeightLayer.Ground)                     //This is done to ignore creatures of the same gender as this one. The gender is
-                        continue;                                                       //checked although the creature might not be in sight, but it is not modified
-                                                                                        //and this way the gender is not saved (which would be inconvinient).
-                                                                                        //The creature has to be on ground
+                        Allies[i].position.z != 0)                     //This is done to ignore creatures of the same gender as this one. The gender is
+                        continue;                                      //checked although the creature might not be in sight, but it is not modified
+                                                                       //and this way the gender is not saved (which would be inconvinient).
+                                                                       //The creature has to be on ground
 
                     if (ally.wantMate) //If it wants to mate, it is a match.
                     {
@@ -337,7 +342,6 @@ namespace EvolutionSimulation.Entities
                 }
             }
         }
-
         /// <summary>
         /// Returns a new unexplored region for the creature.
         /// In extreme cases (it has explored an it remebers all regions
