@@ -92,6 +92,11 @@ namespace UnitySimulation
             {
                 _creatures[receiver.ID].GetComponent<CreatureEffects>().Bite();
             }
+            // TODO: esto pero para plantas, no se puede ahora por las instances de trees
+            //else if (type == Interactions.eat)
+            //{
+            //    _creatures[sender.ID].GetComponent<CreatureEffects>().Eat();
+            //}
         }
 
         void UpdateCreature(Creature c, GameObject gO)
@@ -123,8 +128,16 @@ namespace UnitySimulation
             float percentage = c.stats.CurrHealth / c.stats.MaxHealth;
             cM.SetStatusBar(percentage);
             // State visualization
-            cM.SetStatusTexts(c.GetState(), ""/*c.GetStateInfo()*/);            
+            cM.SetStatusTexts(c.GetState(), c.GetStateInfo()); 
+            // TODO: bien
+            if(c.GetState() == "EatingState")
+            {
+                gO.GetComponent<CreatureEffects>().Eat();
+            }
+            else if(c.GetState() == "DrinkingState")
+            {
+                gO.GetComponent<CreatureEffects>().Drink();
+            }
         }
-
     }
 }

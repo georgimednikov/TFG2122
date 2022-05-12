@@ -338,7 +338,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   EvolutionYears: 0
-  chromosome: 0
+  chromosome: 1
   SpeciesNumber: 20
   IndividualsNumber: 10
   UniverseParameters: {fileID: 4900000, guid: 28081e8ef8487cd40804789ee795ba64, type: 3}

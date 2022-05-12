@@ -528,7 +528,7 @@ namespace EvolutionSimulation.Entities
 
         // Handler for interaction events
         public delegate void ReceiveInteractionHandler(Creature receiver, Creature sender, Interactions type);
-        public event ReceiveInteractionHandler ReceiveInteractionEvent; // TODO: asi?
+        public event ReceiveInteractionHandler ReceiveInteractionEvent;
 
         /// <summary>
         /// Set the interactions that the creature has
