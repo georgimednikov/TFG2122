@@ -262,22 +262,3 @@ def ProcessData(path: str):
         'SpeciesDrinkSuccess': speciesDrinkSucces
     }
     return returnDict
-
-#def ProcessResults(results: dict):
-    # ShowDietInfo(dietInfo)
-
-    # ShowPlantsConsumedInfo(startEvent['YearTicks'], startEvent['TotalTicks'], plantsEaten, startEvent['TotalEdiblePlants'])
-    # ShowBirthsAndDeaths('Global', startEvent['YearTicks'], startEvent['TotalTicks'], globalBirthInfo[2], globalBirthInfo[3])
-    # BarChart('Species Drink success', ['Species','Success Percentage'], list(speciesDrinkSucces.keys()), list(speciesDrinkSucces.values()))
-#endregion
-
-# def mainloop():
-#     input = input()
-
-def main():
-    session = '02a208b605b349e2acc0104092547303'
-    resultsDir = f'{Path().absolute()}\\ResultingData\\{session}'
-    results = ProcessData(resultsDir)
-    ShowPlantsConsumedInfo(results['SessionInfo']['YearTicks'], results['SessionInfo']['TotalTicks'], results['PlantsEaten'], results['SessionInfo']['TotalEdiblePlants'])
-    
-main()
