@@ -1,6 +1,7 @@
 import glob
 from io import TextIOWrapper
 import json
+import string
 import plotly.express as px
 import plotly.graph_objects as pgo
 from plotly.subplots import make_subplots
@@ -29,8 +30,7 @@ def ShowSpeciesCausesChart(title, axisNames, speciesDict: dict, deathCause):
         perc = speciesDict[species][0][deathCause] / speciesDict[species][1] * 100
         speciesDeathCausePerc.append(perc)
 
-    BarChart(title, axisNames, speciesNames, speciesDeathCausePerc)
-    
+    BarChart(title, axisNames, speciesNames, speciesDeathCausePerc)  
 
 def ShowGlobalInfo(globalDeathInfo: dict, globalDamageInfo: dict):
     fig = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"}, {"type": "pie"}]],subplot_titles=(
@@ -55,6 +55,44 @@ def ShowDietInfo(dietInfo: dict):
     fig.add_trace(pgo.Bar(x=['Deaths', 'Damage'], y=[values[2][0][0]/values[2][0][1]*100, values[2][1][0]/values[2][1][1]*100]), 1, 3)
     fig.update_yaxes(title='Percentage')
     fig.show()
+
+def ShowPlantsConsumedInfo(yearTicks, totalTicks, plantsEaten, totalPlants):
+    totalYears = int(totalTicks / yearTicks)
+    yearlyConsumption = [0]*totalYears
+    for i in range(len(plantsEaten)):
+        yearlyConsumption[int(plantsEaten[i]['Tick'] / yearTicks)] += 1
+    yearlyConsumption =  [x / totalPlants * 100 for x in yearlyConsumption]
+
+    LineChart('Percentage of plants consumed through the years', ['Years', 'Percentage of plants consumed'], list(range(totalYears)), yearlyConsumption)
+
+# Shows the birth and death line graphs throughout all the simulation years
+def ShowBirthsAndDeaths(name, yearTicks, totalTicks, birthList: list, deathList: list):
+    years = int(totalTicks / yearTicks)
+    births = [0]*years
+    deaths = [0]*years
+    for i in range(len(birthList)):
+        births[int(birthList[i][1] / yearTicks)] += birthList[i][0]
+    for i in range(len(deathList)):
+        deaths[int(deathList[i] / yearTicks)] += 1
+
+    fig = make_subplots(rows=1, cols=2, shared_yaxes=True, subplot_titles=(
+        f'{name} births through the years',
+        f'{name} deaths through the years'))
+
+    fig.add_trace(pgo.Line(x=list(range(1, years + 1)), y=births), 1, 1)
+    fig.add_trace(pgo.Line(x=list(range(1, years + 1)), y=deaths), 1, 2)
+    fig.update_xaxes(title='Years')
+    fig.update_yaxes(title='Number of creatures')
+    fig.show()
+
+# Shows the natality data depending on the provided index
+def ShowAdulthood(globalBirthInfo:list , speciesBirthInfo: dict):
+    aux = [x[0] * 100 for x in list(speciesBirthInfo.values())]
+    BarChart(f'Percentage of creatures that reach adulthood. Global: {globalBirthInfo[0] *100}', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
+
+def ShowOffspring(globalBirthInfo:list , speciesBirthInfo: dict):
+    aux = [x[1] for x in list(speciesBirthInfo.values())]
+    BarChart(f'Average offspring per adult. Global: {globalBirthInfo[1]}', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
 #endregion
 
 #region Data Processing
@@ -69,16 +107,7 @@ def ProcessDict(results: dict, numCreatures: float, file: TextIOWrapper):
     for cause,num in deathCauses.items():
         AppendFile_n_Print(f'\t{cause} : {num / numCreatures * 100}', file)
 
-def ShowPlantsConsumedInfo(yearTicks, totalTicks, plantsEaten, totalPlants):
-    totalYears = int(totalTicks / yearTicks)
-    yearlyConsumption = [0]*totalYears
-    for i in range(len(plantsEaten)):
-        yearlyConsumption[int(plantsEaten[i]['Tick'] / yearTicks)] += 1
-    yearlyConsumption =  [x / totalPlants * 100 for x in yearlyConsumption]
-
-    LineChart('Percentage of plants consumed through the years', ['Years', 'Percentage of plants consumed'], list(range(totalYears)), yearlyConsumption)
-
-# The processed data is returned in the following structures:
+# The session data is processed returning the following structures in a dictionary:
 #   globalDeathCauses: A tuple where the first value is a dictionary where each key represents the 
 #   death type and each value the number of creatures of that species that died, and the second value
 #   is the total number of creatures that existed.
@@ -118,13 +147,17 @@ def ProcessData():
     # [2] -> Births ticks + numChilds list
     # [3] -> Deaths ticks list
 
-    globalBirthInfo = [0, 0, [], []]   
+    globalBirthInfo = [0, 0, [], []]
     speciesBirthInfo = {}
+
+    globalAdultCreatures = 0
+    globalOriginalCreatures = 0
+    globalMatingCreatures = 0
 
     # Drink 
     # { 'species': (0.9) ...}
-
     speciesDrinkSucces = {}
+
     # Get the death events from every creature in every species folder and add it to the pertinent dictionary
     for i in range(len(speciesList)):
         currSpecies = speciesList[i][:-1]   # remove dir\\
@@ -138,9 +171,8 @@ def ProcessData():
         speciesDrinkEvents = 0
         
         speciesBirthInfo[currSpecies] = [0, 0, [], []]
-        globalAdultCreatures= 0
+        originalCreatures = 0
         adultCreatures = 0
-        globalMatingCreatures=0
         matingCreatures = 0
         for j in range(creaturesNum):
             creatureData = json.load(open(creature_list[j]))
@@ -185,51 +217,50 @@ def ProcessData():
 
             # Birth events
             filteredData = [x for x in creatureData if (x['Type'] == 'CreatureAdult')]
-            adultCreatures += len(filteredData) # will always be 1 or 0
-            globalAdultCreatures += adultCreatures
+            numAdultEvent = len(filteredData) # will always be 1 or 0
+            adultCreatures += numAdultEvent
+            if numAdultEvent > 0 and filteredData[0]['Original'] :
+                originalCreatures +=1
             filteredData = [x for x in creatureData if (x['Type'] == 'CreatureMating')]
             matingCreatures += len(filteredData)
-            globalMatingCreatures += matingCreatures
 
             for mEvent in filteredData:
                 birth = [mEvent['ChildNumber'], mEvent['Tick']]
                 speciesBirthInfo[currSpecies][2].append(birth)
                 globalBirthInfo[2].append(birth)
 
+
         # Max 1 to avoid division by 0 which happens when there are no goToDrink events, so in that case it is 0/1=0
         speciesDrinkSucces[currSpecies] = speciesDrinkEvents / max(1,speciesGoToDrinkEvents) * 100
 
         # Update Birth info
-        speciesBirthInfo[currSpecies][0] = adultCreatures / creaturesNum
+        speciesBirthInfo[currSpecies][0] = adultCreatures - originalCreatures / max(1, creaturesNum - originalCreatures)
         # Max 1 to avoid division by 0 which happens when there are no goToDrink events, so in that case it is 0/1=0
         speciesBirthInfo[currSpecies][1] = matingCreatures / max(1,adultCreatures)
+        
+        globalAdultCreatures += adultCreatures
+        globalOriginalCreatures += originalCreatures
+        globalMatingCreatures += matingCreatures
 
-    globalBirthInfo[0] = globalAdultCreatures / totalCreatures
-    globalBirthInfo[1] = globalMatingCreatures / globalAdultCreatures
     globalDeathCauses[1] = totalCreatures
+    globalBirthInfo[0] = globalAdultCreatures - globalOriginalCreatures / max(1,totalCreatures - globalOriginalCreatures)
+    globalBirthInfo[1] = globalMatingCreatures / globalAdultCreatures
 
-    return globalDeathCauses, speciesDeathCauses, globalDamageReception, speciesDamageReception, dietInfo, sessionStartEvent, plantsEatenEvents, speciesDrinkSucces, globalBirthInfo, speciesBirthInfo
+    returnDict = {
+        'SessionInfo': sessionStartEvent,
+        'GlobalDeathCauses' : globalDeathCauses,
+        'SpeciesDeathCauses' : speciesDeathCauses,
+        'GlobalDamageReception' : globalDamageReception,
+        'SpeciesDamageReception' : speciesDamageReception,
+        'GlobalBirthInfo' : globalBirthInfo,
+        'SpeciesBirthInfo': speciesBirthInfo,
+        'DietInfo' : dietInfo,
+        'PlantsEaten': plantsEatenEvents,
+        'SpeciesDrinkSuccess': speciesDrinkSucces
+    }
+    return returnDict
 
-def ShowBirthsAndDeaths(name, yearTicks, totalTicks, birthList: list, deathList: list):
-    years = int(totalTicks / yearTicks)
-    births = [0]*years
-    deaths = [0]*years
-    for i in range(len(birthList)):
-        births[int(birthList[i][1] / yearTicks)] += birthList[i][0]
-    for i in range(len(deathList)):
-        deaths[int(deathList[i] / yearTicks)] += 1
-
-    fig = make_subplots(rows=1, cols=2, shared_yaxes=True, subplot_titles=(
-        f'{name} births through the years',
-        f'{name} deaths through the years'))
-
-    fig.add_trace(pgo.Line(x=list(range(1, years + 1)), y=births), 1, 1)
-    fig.add_trace(pgo.Line(x=list(range(1, years + 1)), y=deaths), 1, 2)
-    fig.update_xaxes(title='Years')
-    fig.update_yaxes(title='Number of creatures')
-    fig.show()
-
-def ProcessResults(globalDeathCauses: dict, speciesDeathCauses: dict, globalDamageReception: dict, speciesDamageReception: dict, dietInfo: dict, startEvent, plantsEaten:list, speciesDrinkSucces:dict, globalBirthInfo, speciesBirthInfo):
+def ProcessResults(results: dict):
     # Open the analysis output file
     # outputFile = open('analysis.txt', 'w')
     # AppendFile_n_Print(f'Total Creatures : {totalCreatures}', outputFile)
@@ -242,15 +273,19 @@ def ProcessResults(globalDeathCauses: dict, speciesDeathCauses: dict, globalDama
     # ShowSpeciesBarChart(f'Species {deathCause} percentage', ['Species', 'Percentage of damage'], speciesDeathCauses, deathCause)
     # DictionaryPieChart('Global death causes', globalDeathCauses)
     #ShowPlantsConsumedInfo(startEvent['YearTicks'], startEvent['TotalTicks'], plantsEaten, startEvent['TotalEdiblePlants'])
-    ShowBirthsAndDeaths('Global', startEvent['YearTicks'], startEvent['TotalTicks'], globalBirthInfo[2], globalBirthInfo[3])
+    #ShowBirthsAndDeaths('Global', startEvent['YearTicks'], startEvent['TotalTicks'], globalBirthInfo[2], globalBirthInfo[3])
+    ShowAdulthood(results['GlobalBirthInfo'],  results['SpeciesBirthInfo'])
+    ShowOffspring(results['GlobalBirthInfo'],  results['SpeciesBirthInfo'])
     #BarChart('Species Drink success', ['Species','Success Percentage'], list(speciesDrinkSucces.keys()), list(speciesDrinkSucces.values()))
     # for k,v in speciesDeathCauses.items():
     #     AppendFile_n_Print(f'\n{k} Total Creatures : {v[1]}', outputFile)
     #     ProcessDict(v[0], v[1], outputFile)
 #endregion
-
+def mainloop():
+    input = input()
+    
 def main():
-    globalDeathCauses, speciesDeathCauses, globalDamageReception, speciesDamageReception, dietInfo, startEvent, plantsEaten, speciesDrinkSucces,globalBirthInfo, speciesBirthInfo = ProcessData()
-    ProcessResults(globalDeathCauses, speciesDeathCauses, globalDamageReception, speciesDamageReception, dietInfo, startEvent, plantsEaten, speciesDrinkSucces,globalBirthInfo, speciesBirthInfo)  
+    results = ProcessData()
+    ProcessResults(results)
 
 main()
