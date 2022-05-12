@@ -101,6 +101,8 @@ namespace EvolutionSimulation
             Thirst,
             Exhaustion
         }
+
+        public int EdiblePlants { get; private set; }
         public struct Death
         {
             public Vector2 pos;
@@ -206,12 +208,15 @@ namespace EvolutionSimulation
                             break;
                         case Plant.PlantType.EdibleTree:
                             plant = CreateStaticEntity<EdibleTree>(i, j, UniverseParametersManager.parameters.eTreeHp);
+                            EdiblePlants++;
                             break;
                         case Plant.PlantType.Bush:
                             plant = CreateStaticEntity<Bush>(i, j, UniverseParametersManager.parameters.bushHp);
+                            EdiblePlants++;
                             break;
                         case Plant.PlantType.Grass:
                             plant = CreateStaticEntity<Grass>(i, j, UniverseParametersManager.parameters.grassHp);
+                            EdiblePlants++;
                             break;
                     }
                     mapData.plant = plant;
@@ -862,9 +867,11 @@ namespace EvolutionSimulation
                         {
                             case 0:
                                 map[xIndex, yIndex].plant = CreateStaticEntity<Grass>(xIndex, yIndex, UniverseParametersManager.parameters.grassHp);
+                                EdiblePlants++;
                                 break;
                             case 1:
                                 map[xIndex, yIndex].plant = CreateStaticEntity<Bush>(xIndex, yIndex, UniverseParametersManager.parameters.bushHp);
+                                EdiblePlants++;
                                 break;
                             case 2:
                                 maxTrees++;
@@ -874,6 +881,7 @@ namespace EvolutionSimulation
                                 maxTrees++;
                                 trees++;
                                 map[xIndex, yIndex].plant = CreateStaticEntity<EdibleTree>(xIndex, yIndex, UniverseParametersManager.parameters.eTreeHp);
+                                EdiblePlants++;
                                 break;
                             default:
                                 break;
@@ -992,6 +1000,14 @@ namespace EvolutionSimulation
         public int YearToTick(float year)
         {
             return (int)(year * daysYear * hoursDay * ticksHour);
+        }
+
+        /// <summary>
+        /// Get the number of existing species 
+        /// </summary>
+        public int GetSpeciesNumber()
+        {
+            return taxonomy.GetSpeciesNumber();
         }
 
         /// <summary>

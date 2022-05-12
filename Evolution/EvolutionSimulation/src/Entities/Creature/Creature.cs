@@ -1179,7 +1179,7 @@ namespace EvolutionSimulation.Entities
         #region Tracker
         public void BirthEventTrack()
         {
-            Telemetry.Events.CreatureBirth cbEvent = new CreatureBirth(world.tick, ID, speciesName, x, y);
+            CreatureBirth cbEvent = new CreatureBirth(world.tick, ID, speciesName, x, y);
             cbEvent.MaxHealth = stats.MaxHealth;
             cbEvent.HealthRegen = stats.HealthRegeneration;
             cbEvent.MaxEnergy = stats.MaxEnergy;
@@ -1216,7 +1216,7 @@ namespace EvolutionSimulation.Entities
             cbEvent.Paternity = stats.Paternity;
             cbEvent.Upright = stats.Upright;
 
-            Telemetry.Tracker.Instance.Track(cbEvent);
+            Tracker.Instance.Track(cbEvent);
         }
         #endregion
     }

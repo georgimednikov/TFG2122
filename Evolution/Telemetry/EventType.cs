@@ -6,6 +6,8 @@ namespace Telemetry
     {
         [EnumMember(Value = "SessionStart")]
         SessionStart,
+        [EnumMember(Value = "SimulationStart")]
+        SimulationStart,
         [EnumMember(Value = "SimulationSample")]
         SimulationSample,
         [EnumMember(Value = "CreatureBirth")]
@@ -26,6 +28,8 @@ namespace Telemetry
         CreatureDeath,
         [EnumMember(Value = "PlantEaten")]
         PlantEaten,
+        [EnumMember(Value = "SimulationEnd")]
+        SimulationEnd,
         [EnumMember(Value = "SessionEnd")]
         SessionEnd
     }

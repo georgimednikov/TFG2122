@@ -75,8 +75,7 @@ namespace UnitySimulation
             if (worldCorpseManager == null)
                 Debug.LogError("WorldCorpseManager is not assigned");
             
-            Tracker.Instance.Init();
-            Tracker.Instance.Track(new SessionStart());
+           
 
             string universeFileRaw = UniverseParameters == null ? null : UniverseParameters.text;
             string chromosomeFileRaw = Chromosome == null ? null : Chromosome.text;
@@ -86,6 +85,7 @@ namespace UnitySimulation
             string regionFileRaw = RegionMap == null ? null : RegionMap.text;
            
             simulation = new UnitySimulation();
+            simulation.InitTracker();
             simulation.GenerateWorld = worldGenerator;
             simulation.Init(
                 EvolutionYears, SpeciesNumber, IndividualsNumber,
@@ -135,8 +135,7 @@ namespace UnitySimulation
 
         void OnDestroy()
         {
-            Tracker.Instance.Track(new SessionEnd());
-            Tracker.Instance.Flush();
+            simulation.EndTracker();
         }
     }
 }

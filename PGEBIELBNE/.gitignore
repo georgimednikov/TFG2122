@@ -64,3 +64,5 @@ crashlytics-build.properties
 /[Aa]ssets/Plugins/EvolutionSimulation.dll
 /[Aa]ssets/Plugins/EvolutionSimulation.dll.meta
 /Output
+[Aa]ssets/Export
+[Aa]ssets/Export.meta

@@ -27,7 +27,7 @@ namespace EvolutionSimulation
         {
 
             UserInfo.SetUp(years, species, individuals, dataDir, exportDir);
-            InitTracker();
+            SetTrackerExportDir();
             // Universe Parameters
             UniverseParametersManager.ReadJSON();
             // Chromosome and ability unlocks
@@ -77,7 +77,7 @@ namespace EvolutionSimulation
         {
 
             UserInfo.SetUp(years, species, individuals, _exportDir: exportDir);
-            InitTracker();
+            SetTrackerExportDir();
             // Universe Parameters
             UniverseParametersManager.ReadJSON(uniParamsFile);
             // Chromosome and ability unlocks
@@ -124,6 +124,7 @@ namespace EvolutionSimulation
             totalTicks = world.YearToTick(UserInfo.Years);
             currentTick = 1;
             apocalypseCount = 0;
+            StartSimulation();
         }
 
         /// <summary>
@@ -157,7 +158,7 @@ namespace EvolutionSimulation
         /// </summary>
         virtual protected void End()
         {
-            EndTracker();
+            EndSimulation();
             Export();
         }
 
@@ -614,11 +615,21 @@ namespace EvolutionSimulation
         #endregion
 
         #region Tracker
-        protected void InitTracker()
+        public void InitTracker()
         {
-            Tracker.Instance.Init();
-            Tracker.Instance.OutputDir = UserInfo.ExportDirectory;
+            Tracker.Instance.Init();            
             Tracker.Instance.Track(new SessionStart());
+        }
+
+        public void EndTracker()
+        {
+            Tracker.Instance.Track(new SessionEnd());
+            Tracker.Instance.Flush();
+        }
+
+        protected void SetTrackerExportDir()
+        {
+            Tracker.Instance.OutputDir = UserInfo.ExportDirectory;
         }
 
         protected void HourTrack()
@@ -630,12 +641,17 @@ namespace EvolutionSimulation
             }
         }
 
-        protected void EndTracker()
+        protected void StartSimulation()
+        {
+            Tracker.Instance.Track(new SimulationStart(world.YearToTick(1), totalTicks , world.EdiblePlants));           
+        }
+
+        protected void EndSimulation()
         {
             // Para dejar los json bien cuando termine la simulacion
             foreach (Creature c in world.Creatures.Values)
                 Tracker.Instance.Track(new CreatureDeath(world.tick, c.ID, c.speciesName, DeathType.SimulationEnd, -1, 0, c.x, c.y));
-            Tracker.Instance.Track(new SessionEnd());
+            Tracker.Instance.Track(new SimulationEnd(currentTick - 1, world.Creatures.Count, world.GetSpeciesNumber()));
             Tracker.Instance.Flush();
         }
         #endregion

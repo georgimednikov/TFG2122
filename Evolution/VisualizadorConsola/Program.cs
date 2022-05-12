@@ -11,15 +11,17 @@ namespace VisualizadorConsola
         static void Main(string[] args)
         {
             EventSimulation s = new EventSimulation();
+            s.InitTracker();
             s.OnSimulationBegin += (e) => { loadingBar = new ConsoleLoadingBar(); };
             s.OnSimulationStep += (e) => { loadingBar.Update(e); };
 #if true
-            s.Init(20, 30, 20, "../../ProgramData/", "../../ResultingData/", null);
+            s.Init(20, 1, 0, "../../ProgramData/", "../../ResultingData/", null);
 #else
             if (!AskInfoUsingConsole(s))
                 return;
 #endif
             s.Run();
+            s.EndTracker();
         }
 
         /// <summary>

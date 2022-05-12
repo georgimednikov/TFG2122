@@ -1,10 +1,4 @@
 ﻿using System;
-using System.Drawing;
-using System.Collections.Generic;
-using EvolutionSimulation.Entities;
-using System.Numerics;
-using Telemetry;
-using Telemetry.Events;
 
 namespace EvolutionSimulation
 {

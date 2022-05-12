@@ -387,6 +387,14 @@ namespace EvolutionSimulation.Genetics
         }
 
         /// <summary>
+        /// Get the number of existing species 
+        /// </summary>
+        public int GetSpeciesNumber()
+        {
+            return existingSpecies.Count;
+        }
+
+        /// <summary>
         /// Given a list of edible plants, these are ordered based on distance from it. The shortest goes first.
         /// </summary>
         private class TicksComparer : Comparer<Species>
