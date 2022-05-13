@@ -1,114 +1,10 @@
 import glob
-from io import TextIOWrapper
 import json
-import os
-import string
-from pathlib import Path
 import plotly.express as px
 import plotly.graph_objects as pgo
 from plotly.subplots import make_subplots
 
-#region Data Visualization
-def PieChart(title, names, values):
-    fig = px.pie(names=names, values=values, title=title)
-    fig.show()
-
-def BarChart(title, axisNames, xNames, yValues):
-    fig = px.bar(x=xNames, y=yValues, title=title)
-    fig.update_xaxes(title=axisNames[0])
-    fig.update_yaxes(title=axisNames[1])
-    fig.show()
-
-def LineChart(title, axisNames, xNames, yValues):
-    fig = px.line(x=xNames, y=yValues, title=title)
-    fig.update_xaxes(title=axisNames[0])
-    fig.update_yaxes(title=axisNames[1])
-    fig.show()
-
-def ShowSpeciesCausesChart(title, axisNames, speciesDict: dict, deathCause):
-    speciesNames = list(speciesDict.keys())
-    speciesDeathCausePerc = list()
-    for species in speciesNames:
-        perc = speciesDict[species][0][deathCause] / speciesDict[species][1] * 100
-        speciesDeathCausePerc.append(perc)
-
-    BarChart(title, axisNames, speciesNames, speciesDeathCausePerc)  
-
-def ShowGlobalInfo(globalDeathInfo: dict, globalDamageInfo: dict):
-    fig = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"}, {"type": "pie"}]],subplot_titles=(
-        'Global death causes',
-        'Global damage causes'))
-
-    fig.add_trace(pgo.Pie(labels=list(globalDeathInfo.keys()), values=list(globalDeathInfo.values())), 1, 1)
-    fig.add_trace(pgo.Pie(labels=list(globalDamageInfo.keys()), values=list(globalDamageInfo.values())), 1, 2)
-    fig.show()
-
-def ShowDietInfo(dietInfo: dict):
-    keys = list(dietInfo.keys())
-    values = list(dietInfo.values())
-
-    fig = make_subplots(rows=1, cols=3, shared_yaxes=True, subplot_titles=(
-        f'Starvation caused deaths and damage among {keys[0]}s',
-        f'Starvation caused deaths and damage among {keys[1]}s',
-        f'Starvation caused deaths and damage among {keys[2]}s'))
-
-    fig.add_trace(pgo.Bar(x=['Deaths', 'Damage'], y=[values[0][0][0]/values[0][0][1]*100, values[0][1][0]/values[0][1][1]*100]), 1, 1)
-    fig.add_trace(pgo.Bar(x=['Deaths', 'Damage'], y=[values[1][0][0]/values[1][0][1]*100, values[1][1][0]/values[1][1][1]*100]), 1, 2)
-    fig.add_trace(pgo.Bar(x=['Deaths', 'Damage'], y=[values[2][0][0]/values[2][0][1]*100, values[2][1][0]/values[2][1][1]*100]), 1, 3)
-    fig.update_yaxes(title='Percentage')
-    fig.show()
-
-def ShowPlantsConsumedInfo(yearTicks, totalTicks, plantsEaten, totalPlants):
-    totalYears = int(totalTicks / yearTicks)
-    yearlyConsumption = [0]*totalYears
-    for i in range(len(plantsEaten)):
-        yearlyConsumption[int(plantsEaten[i]['Tick'] / yearTicks)] += 1
-    yearlyConsumption =  [x / totalPlants * 100 for x in yearlyConsumption]
-
-    LineChart('Percentage of plants consumed through the years', ['Years', 'Percentage of plants consumed'], list(range(totalYears)), yearlyConsumption)
-
-# Shows the birth and death line graphs throughout all the simulation years
-def ShowBirthsAndDeaths(name, yearTicks, totalTicks, birthList: list, deathList: list):
-    years = int(totalTicks / yearTicks)
-    births = [0]*years
-    deaths = [0]*years
-    for i in range(len(birthList)):
-        births[int(birthList[i][1] / yearTicks)] += birthList[i][0]
-    for i in range(len(deathList)):
-        deaths[int(deathList[i] / yearTicks)] += 1
-
-    fig = make_subplots(rows=1, cols=2, shared_yaxes=True, subplot_titles=(
-        f'{name} births through the years',
-        f'{name} deaths through the years'))
-
-    fig.add_trace(pgo.Line(x=list(range(1, years + 1)), y=births), 1, 1)
-    fig.add_trace(pgo.Line(x=list(range(1, years + 1)), y=deaths), 1, 2)
-    fig.update_xaxes(title='Years')
-    fig.update_yaxes(title='Number of creatures')
-    fig.show()
-
-# Shows the natality data depending on the provided index
-def ShowAdulthood(globalBirthInfo:list , speciesBirthInfo: dict):
-    aux = [x[0] * 100 for x in list(speciesBirthInfo.values())]
-    BarChart(f'Percentage of creatures that reach adulthood. Global: {globalBirthInfo[0] *100}', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
-
-def ShowOffspring(globalBirthInfo:list , speciesBirthInfo: dict):
-    aux = [x[1] for x in list(speciesBirthInfo.values())]
-    BarChart(f'Average offspring per adult. Global: {globalBirthInfo[1]}', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
-#endregion
-
 #region Data Processing
-def AppendFile_n_Print(data: str, file: TextIOWrapper):
-    file.write(f'{data}\n')
-    print(data)
-
-def ProcessDict(results: dict, numCreatures: float, file: TextIOWrapper):
-    deathCauses = {k: results[k] for k in results.keys() - {'SimulationEnd'}}
-    aliveCreatures = {k: results[k] for k in results.keys() - deathCauses.keys()}
-    AppendFile_n_Print(f'Last Alive : {aliveCreatures["SimulationEnd"]}\nDeathCauses:', file)
-    for cause,num in deathCauses.items():
-        AppendFile_n_Print(f'\t{cause} : {num / numCreatures * 100}', file)
-
 # The session data is processed returning the following structures in a dictionary:
 #   globalDeathCauses: A tuple where the first value is a dictionary where each key represents the 
 #   death type and each value the number of creatures of that species that died, and the second value
@@ -262,3 +158,93 @@ def ProcessData(path: str):
         'SpeciesDrinkSuccess': speciesDrinkSucces
     }
     return returnDict
+#endregion
+
+#region Data Visualization
+def PieChart(title, names, values):
+    fig = px.pie(names=names, values=values, title=title)
+    fig.show()
+
+def BarChart(title, axisNames, xNames, yValues):
+    fig = px.bar(x=xNames, y=yValues, title=title)
+    fig.update_xaxes(title=axisNames[0])
+    fig.update_yaxes(title=axisNames[1])
+    fig.show()
+
+def LineChart(title, axisNames, xNames, yValues):
+    fig = px.line(x=xNames, y=yValues, title=title)
+    fig.update_xaxes(title=axisNames[0])
+    fig.update_yaxes(title=axisNames[1])
+    fig.show()
+
+def ShowSpeciesCausesChart(title, axisNames, speciesDict: dict, deathCause):
+    speciesNames = list(speciesDict.keys())
+    speciesDeathCausePerc = list()
+    for species in speciesNames:
+        perc = speciesDict[species][0][deathCause] / speciesDict[species][1] * 100
+        speciesDeathCausePerc.append(perc)
+
+    BarChart(title, axisNames, speciesNames, speciesDeathCausePerc)  
+
+def ShowGlobalInfo(globalDeathInfo: dict, globalDamageInfo: dict):
+    fig = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"}, {"type": "pie"}]],subplot_titles=(
+        'Global death causes',
+        'Global damage causes'))
+
+    fig.add_trace(pgo.Pie(labels=list(globalDeathInfo.keys()), values=list(globalDeathInfo.values())), 1, 1)
+    fig.add_trace(pgo.Pie(labels=list(globalDamageInfo.keys()), values=list(globalDamageInfo.values())), 1, 2)
+    fig.show()
+
+def ShowDietInfo(dietInfo: dict):
+    keys = list(dietInfo.keys())
+    values = list(dietInfo.values())
+
+    fig = make_subplots(rows=1, cols=3, shared_yaxes=True, subplot_titles=(
+        f'Starvation caused deaths and damage among {keys[0]}s',
+        f'Starvation caused deaths and damage among {keys[1]}s',
+        f'Starvation caused deaths and damage among {keys[2]}s'))
+
+    fig.add_trace(pgo.Bar(x=['Deaths', 'Damage'], y=[values[0][0][0]/values[0][0][1]*100, values[0][1][0]/values[0][1][1]*100]), 1, 1)
+    fig.add_trace(pgo.Bar(x=['Deaths', 'Damage'], y=[values[1][0][0]/values[1][0][1]*100, values[1][1][0]/values[1][1][1]*100]), 1, 2)
+    fig.add_trace(pgo.Bar(x=['Deaths', 'Damage'], y=[values[2][0][0]/values[2][0][1]*100, values[2][1][0]/values[2][1][1]*100]), 1, 3)
+    fig.update_yaxes(title='Percentage')
+    fig.show()
+
+def ShowPlantsConsumedInfo(yearTicks, totalTicks, plantsEaten, totalPlants):
+    totalYears = int(totalTicks / yearTicks)
+    yearlyConsumption = [0]*totalYears
+    for i in range(len(plantsEaten)):
+        yearlyConsumption[int(plantsEaten[i]['Tick'] / yearTicks)] += 1
+    yearlyConsumption =  [x / totalPlants * 100 for x in yearlyConsumption]
+
+    LineChart('Percentage of plants consumed through the years', ['Years', 'Percentage of plants consumed'], list(range(totalYears)), yearlyConsumption)
+
+# Shows the birth and death line graphs throughout all the simulation years
+def ShowBirthsAndDeaths(name, yearTicks, totalTicks, birthList: list, deathList: list):
+    years = int(totalTicks / yearTicks)
+    births = [0]*years
+    deaths = [0]*years
+    for i in range(len(birthList)):
+        births[int(birthList[i][1] / yearTicks)] += birthList[i][0]
+    for i in range(len(deathList)):
+        deaths[int(deathList[i] / yearTicks)] += 1
+
+    fig = make_subplots(rows=1, cols=2, shared_yaxes=True, subplot_titles=(
+        f'{name} births through the years',
+        f'{name} deaths through the years'))
+
+    fig.add_trace(pgo.Scatter(x=list(range(1, years + 1)), y=births), 1, 1)
+    fig.add_trace(pgo.Scatter(x=list(range(1, years + 1)), y=deaths), 1, 2)
+    fig.update_xaxes(title='Years')
+    fig.update_yaxes(title='Number of creatures')
+    fig.show()
+
+# Shows the natality data depending on the provided index
+def ShowAdulthood(globalBirthInfo:list , speciesBirthInfo: dict):
+    aux = [x[0] * 100 for x in list(speciesBirthInfo.values())]
+    BarChart(f'Percentage of creatures that reach adulthood. Global: {globalBirthInfo[0] *100}', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
+
+def ShowOffspring(globalBirthInfo:list , speciesBirthInfo: dict):
+    aux = [x[1] for x in list(speciesBirthInfo.values())]
+    BarChart(f'Average offspring per adult. Global: {globalBirthInfo[1]}', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
+#endregion
