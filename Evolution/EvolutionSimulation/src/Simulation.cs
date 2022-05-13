@@ -645,7 +645,7 @@ namespace EvolutionSimulation
 
         protected void StartSimulation()
         {
-            Tracker.Instance.Track(new SimulationStart(world.YearToTick(1), totalTicks , world.EdiblePlants));           
+            Tracker.Instance.Track(new SimulationStart(world.YearToTick(1), totalTicks , world.EdiblePlants, world.map.GetLength(0)));           
         }
 
         protected void EndSimulation()
