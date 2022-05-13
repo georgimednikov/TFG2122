@@ -1,8 +1,11 @@
 import glob
 import json
+from math import floor
 import plotly.express as px
 import plotly.graph_objects as pgo
 from plotly.subplots import make_subplots
+from pathlib import Path
+import numpy as np # We are using numpy because python matrix do not function 
 
 #region Data Processing
 
@@ -37,10 +40,16 @@ from plotly.subplots import make_subplots
 #       - The second value is tuple where the first value is the damage recived due to starvation and the second value is the total number of damage recieved with the corresponding diet.
 #   > 'PlantsEaten': A list with all the events that are fired when a creature eats a plant.
 #   > 'SpeciesDrinkSuccess': A dictionary where keys are the name of a species and values are the ratio of success that that species has gotten at drinking water
-#  
+#   > 'MapData': A list of 4 maps matrix, where each map is scaled as the 'mapScale' parameter and contais the following data:
+#           [0] -> Temperature damage tiles
+#           [1] -> Dehydration damage tiles
+#           [2] -> Starvation damage tiles
+#           [3] -> Plants eaten tiles
+#           [4] -> Creature path tiles
+#
 # The visualization methods require this data (or some of this data, depending on the method) to function properly
 #
-def ProcessData(path: str):
+def ProcessData(path: str, mapScale: int):
     # Get all the species folder in the Output Dir, and the sessionOutput file
     #path = os.getcwd()] /
     speciesList = glob.glob(f'{path}/*/')
@@ -48,9 +57,15 @@ def ProcessData(path: str):
 
     # SimulationStart Event, we know it is the second event
     simulationStartEvent = sessionOutput[1]
+    mapSize = simulationStartEvent['MapSize']
+    mapData = np.zeros((5, floor(mapSize/mapScale + 0.5), floor(mapSize/mapScale + 0.5)))
     # Get plants eaten event
     plantsEatenEvents = [x for x in sessionOutput if (x['Type'] == 'PlantEaten')]
-    
+    for i in range(len(plantsEatenEvents)):
+        mapData[3][floor((plantsEatenEvents[i]['X'])/mapScale)][floor(plantsEatenEvents[i]['Y']/mapScale)] += 1
+    #mapData = [[[0]*simulationStartEvent['MapSize']]*simulationStartEvent['MapSize']]*4
+    #[[[1,2,3,4], [1,2,3,4]]
+    #[[1,2,3,4], .. ]]
     totalCreatures = 0
     # Initialize the global death causes dictionary with each species death cause and the species deaths dictionary
     globalDeathCauses = [dict.fromkeys(['Temperature','Attack','Retalliation','Starved','Dehydration','Exhaustion','Poisoned','Longevity','SimulationEnd'], 0), 0]
@@ -126,8 +141,9 @@ def ProcessData(path: str):
             # Damage received data
             filteredData = [x for x in creatureData if (x['Type'] == 'CreatureReceiveDamage')]
             for k in range(len(filteredData)):
-                damageType = filteredData[k]['damageType']
-                damageDone = filteredData[k]['damage']
+                damageEvent = filteredData[k]
+                damageType = damageEvent['damageType']
+                damageDone = damageEvent['damage']
                 globalDamageReception[0][damageType] += damageDone                      # global local
                 globalDamageReception[1] += damageDone                                  # global total
                 speciesDamageReception[currSpecies][0][damageType] += damageDone     # local
@@ -137,6 +153,17 @@ def ProcessData(path: str):
                 if damageType == 'Starvation':
                     dietInfo[creatureDiet][1][0] += damageDone
                 dietInfo[creatureDiet][1][1] += damageDone
+
+                # Map data
+                mapData[4][floor((damageEvent['X'])/mapScale)][floor(damageEvent['Y']/mapScale)] += 1
+                if damageType == 'Temperature':         
+                    mapData[0][floor((damageEvent['X'])/mapScale)][floor(damageEvent['Y']/mapScale)] += damageDone
+                if damageType == 'Dehydration':         
+                    mapData[1][floor((damageEvent['X'])/mapScale)][floor(damageEvent['Y']/mapScale)] += damageDone
+                if damageType == 'Starvation':         
+                    mapData[2][floor((damageEvent['X'])/mapScale)][floor(damageEvent['Y']/mapScale)] += damageDone
+
+                
             
             # Drinking events
             filteredData = [x for x in creatureData if (x['Type'] == 'CreatureStateEntry')]
@@ -184,7 +211,8 @@ def ProcessData(path: str):
         'SpeciesBirthInfo': speciesBirthInfo,
         'DietInfo' : dietInfo,
         'PlantsEaten': plantsEatenEvents,
-        'SpeciesDrinkSuccess': speciesDrinkSucces
+        'SpeciesDrinkSuccess': speciesDrinkSucces,
+        'MapData': mapData
     }
     return returnDict
 #endregion
@@ -276,4 +304,20 @@ def ShowAdulthood(globalBirthInfo:list , speciesBirthInfo: dict):
 def ShowOffspring(globalBirthInfo:list , speciesBirthInfo: dict):
     aux = [x[1] for x in list(speciesBirthInfo.values())]
     BarChart(f'Average offspring per adult. Global: {globalBirthInfo[1]*100}%', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
+
+
+# HeatMap of temperature damage
+def ShowHeatMap(map, type):
+    fig = px.imshow(map[type])
+    fig.show()
 #endregion
+
+# def main():
+#     session = '9de64eb220064dd1b71f3084634246cd'
+#     mapScale = 1
+#     resultsDir = f'{Path().absolute()}\\ResultingData\\Output\\{session}'
+#     results = ProcessData(resultsDir, mapScale)
+#     ShowHeatMap(results['MapData'], 4)
+#     #ProcessData()
+
+# main()
