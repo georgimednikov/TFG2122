@@ -5,13 +5,41 @@ import plotly.graph_objects as pgo
 from plotly.subplots import make_subplots
 
 #region Data Processing
-# The session data is processed returning the following structures in a dictionary:
-#   globalDeathCauses: A tuple where the first value is a dictionary where each key represents the 
-#   death type and each value the number of creatures of that species that died, and the second value
-#   is the total number of creatures that existed.
-#   speciesDeathCauses: A dictionary where keys are the name of a species and the values are a tuple where
-#   the first value is the number of creatures of that species and the second value is a dictionary where each
-#   key represents the death type and each value the number of creatures of that species that died.
+
+# The session data is processed returning the following structures in a dictionary with the next entries:
+#   > 'SessionInfo': A dictionary with general information from the simulation (gathered from the SimulationStart event).
+#       It contains the next entries: 'Type', 'Timestamp', 'SessionID', 'YearTicks', 'TotalTicks', 'TotalEdiblePlants'
+#   > 'GlobalDeathCauses' A tuple where the first value is a dictionary where each key represents the 
+#       death type and each value the number of creatures of that species that died, and the second value
+#       is the total number of creatures that existed.
+#   > 'SpeciesDeathCauses': A dictionary where keys are the name of a species and the values are a tuple where
+#       the first value is a dictionary where each key represents the death type and each value the number of creatures of that species that died,
+#       and the second value is the number of creatures of that species.
+#   > 'GlobalDamageReception' A tuple where the first value is a dictionary where each key represents the 
+#       damage type and each value the total damage done to all creatures with that type of damage, and the second value
+#       is the total damage done to all creatures that existed.
+#   > 'SpeciesDamageReception': A dictionary where keys are the name of a species and the values are a tuple where
+#       the first value is a dictionary where each key represents the damage type and each value the total damage done to that species
+#       with that type of damage, and the second value is the toal damage done to that species.
+#       and the second value is the number of creatures of that species.
+#   > 'GlobalBirthInfo': A array of 4 values, where each value has the nex information:
+#           [0] -> Global Adulthood rate, the percentage of creatures that reach adulthood
+#           [1] -> Global reproduction ratio, the average of adults that get to offspring during its lifetime
+#           [2] -> The list of all births. A birth is a tuple where the first value is the number of childs and the second value is the tick when the birth happened
+#           [3] -> The list of all deaths. A death is represented with the tick when the death happened
+#   > 'SpeciesBirthInfo': A dictionary where keys are the name of a species and the values are an array of 4 values, where each value has the nex information:
+#           [0] -> Species Adulthood rate, the percentage of creatures from that species that reach adulthood
+#           [1] -> Species reproduction ratio, the average of adults from that species that get to offspring during its lifetime
+#           [2] -> The list of all births from that species. A birth is a tuple where the first value is the number of childs and the second value is the tick when the birth happened
+#           [3] -> The list of all deaths from that species. A death is represented with the tick when the death happened
+#   > 'DietInfo': A dictionary with an entry per diet type ('Omnivores', 'Hervibores', 'Carnivores') and each entry has two values:
+#       - The first value is tuple where the first value is the number of deaths due to starvation and the second value is the total number of deaths with the corresponding diet.
+#       - The second value is tuple where the first value is the damage recived due to starvation and the second value is the total number of damage recieved with the corresponding diet.
+#   > 'PlantsEaten': A list with all the events that are fired when a creature eats a plant.
+#   > 'SpeciesDrinkSuccess': A dictionary where keys are the name of a species and values are the ratio of success that that species has gotten at drinking water
+#  
+# The visualization methods require this data (or some of this data, depending on the method) to function properly
+#
 def ProcessData(path: str):
     # Get all the species folder in the Output Dir, and the sessionOutput file
     speciesList = glob.glob(f'{path}/*/')
@@ -39,12 +67,12 @@ def ProcessData(path: str):
         'Herbivore':  [[0]*2, [0]*2],
         'Carnivore':  [[0]*2, [0]*2]
     }
+
     # Births information 
     # [0] -> Adulthood rate ( adults / total creatures)
     # [1] -> Reproduction ratio (total mating / adults )
     # [2] -> Births ticks + numChilds list
     # [3] -> Deaths ticks list
-
     globalBirthInfo = [0, 0, [], []]
     speciesBirthInfo = {}
 
@@ -177,11 +205,11 @@ def LineChart(title, axisNames, xNames, yValues):
     fig.update_yaxes(title=axisNames[1])
     fig.show()
 
-def ShowSpeciesCausesChart(title, axisNames, speciesDict: dict, deathCause):
+def ShowSpeciesCausesChart(title, axisNames, speciesDict: dict, cause:str):
     speciesNames = list(speciesDict.keys())
     speciesDeathCausePerc = list()
     for species in speciesNames:
-        perc = speciesDict[species][0][deathCause] / speciesDict[species][1] * 100
+        perc = speciesDict[species][0][cause] / max(1,speciesDict[species][1] * 100)
         speciesDeathCausePerc.append(perc)
 
     BarChart(title, axisNames, speciesNames, speciesDeathCausePerc)  
