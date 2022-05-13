@@ -962,6 +962,7 @@ namespace EvolutionSimulation.Entities
             creatureLayer = z;
             if (!world.IsTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
+
         }
 
         /// <summary>
@@ -979,6 +980,7 @@ namespace EvolutionSimulation.Entities
             creatureLayer = z;
             if (!world.IsTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
+            Tracker.Instance.Track(new CreaturePositionSample(world.tick, ID, speciesName, x, y));
         }
 
         /// <summary>

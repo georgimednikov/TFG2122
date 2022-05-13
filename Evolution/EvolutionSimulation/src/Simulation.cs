@@ -632,6 +632,7 @@ namespace EvolutionSimulation
             Tracker.Instance.OutputDir = UserInfo.ExportDirectory;
         }
 
+//#if TRACKER_ENABLED
         protected void HourTrack()
         {
             if (currentTick % UniverseParametersManager.parameters.ticksPerHour == 0)
@@ -640,6 +641,7 @@ namespace EvolutionSimulation
                 Tracker.Instance.Flush();
             }
         }
+//#endif
 
         protected void StartSimulation()
         {
@@ -654,7 +656,7 @@ namespace EvolutionSimulation
             Tracker.Instance.Track(new SimulationEnd(currentTick - 1, world.Creatures.Count, world.GetSpeciesNumber()));
             Tracker.Instance.Flush();
         }
-        #endregion
+#endregion
 
         protected World world;
         protected int totalTicks;

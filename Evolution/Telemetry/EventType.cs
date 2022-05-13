@@ -10,6 +10,8 @@ namespace Telemetry
         SimulationStart,
         [EnumMember(Value = "SimulationSample")]
         SimulationSample,
+        [EnumMember(Value = "CreaturePositionSample")]
+        CreaturePositionSample,
         [EnumMember(Value = "CreatureBirth")]
         CreatureBirth,
         [EnumMember(Value = "CreatureStateEntry")]

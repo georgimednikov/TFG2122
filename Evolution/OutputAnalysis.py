@@ -42,8 +42,9 @@ from plotly.subplots import make_subplots
 #
 def ProcessData(path: str):
     # Get all the species folder in the Output Dir, and the sessionOutput file
+    #path = os.getcwd()] /
     speciesList = glob.glob(f'{path}/*/')
-    sessionOutput = json.load(open(f'{path}\\\\sessionOutput.json'))
+    sessionOutput = json.load(open(f'{path}\\sessionOutput.json'))
 
     # SimulationStart Event, we know it is the second event
     simulationStartEvent = sessionOutput[1]
@@ -161,7 +162,7 @@ def ProcessData(path: str):
         speciesDrinkSucces[currSpecies] = speciesDrinkEvents / max(1,speciesGoToDrinkEvents) * 100
 
         # Update Birth info
-        speciesBirthInfo[currSpecies][0] = adultCreatures - originalCreatures / max(1, creaturesNum - originalCreatures)
+        speciesBirthInfo[currSpecies][0] = (adultCreatures - originalCreatures) / max(1, creaturesNum - originalCreatures)
         # Max 1 to avoid division by 0 which happens when there are no goToDrink events, so in that case it is 0/1=0
         speciesBirthInfo[currSpecies][1] = matingCreatures / max(1,adultCreatures)
         
@@ -170,7 +171,7 @@ def ProcessData(path: str):
         globalMatingCreatures += matingCreatures
 
     globalDeathCauses[1] = totalCreatures
-    globalBirthInfo[0] = globalAdultCreatures - globalOriginalCreatures / max(1,totalCreatures - globalOriginalCreatures)
+    globalBirthInfo[0] = (globalAdultCreatures - globalOriginalCreatures) / max(1,totalCreatures - globalOriginalCreatures)
     globalBirthInfo[1] = globalMatingCreatures / globalAdultCreatures
 
     returnDict = {
@@ -209,7 +210,7 @@ def ShowSpeciesCausesChart(title, axisNames, speciesDict: dict, cause:str):
     speciesNames = list(speciesDict.keys())
     speciesDeathCausePerc = list()
     for species in speciesNames:
-        perc = speciesDict[species][0][cause] / max(1,speciesDict[species][1] * 100)
+        perc = speciesDict[species][0][cause] / max(1,speciesDict[species][1]) * 100
         speciesDeathCausePerc.append(perc)
 
     BarChart(title, axisNames, speciesNames, speciesDeathCausePerc)  
@@ -227,14 +228,14 @@ def ShowDietInfo(dietInfo: dict):
     keys = list(dietInfo.keys())
     values = list(dietInfo.values())
 
-    fig = make_subplots(rows=1, cols=3, shared_yaxes=True, subplot_titles=(
-        f'Starvation caused deaths and damage among {keys[0]}s',
-        f'Starvation caused deaths and damage among {keys[1]}s',
-        f'Starvation caused deaths and damage among {keys[2]}s'))
+    x = [f'{keys[0]}s', f'{keys[1]}s', f'{keys[2]}s']
+    deaths = [values[0][0][0]/values[0][0][1]*100, values[1][0][0]/values[1][0][1]*100, values[2][0][0]/values[2][0][1]*100]
+    damages = [values[0][1][0]/values[0][1][1]*100, values[1][1][0]/values[1][1][1]*100, values[2][1][0]/values[2][1][1]*100]
 
-    fig.add_trace(pgo.Bar(x=['Deaths', 'Damage'], y=[values[0][0][0]/values[0][0][1]*100, values[0][1][0]/values[0][1][1]*100]), 1, 1)
-    fig.add_trace(pgo.Bar(x=['Deaths', 'Damage'], y=[values[1][0][0]/values[1][0][1]*100, values[1][1][0]/values[1][1][1]*100]), 1, 2)
-    fig.add_trace(pgo.Bar(x=['Deaths', 'Damage'], y=[values[2][0][0]/values[2][0][1]*100, values[2][1][0]/values[2][1][1]*100]), 1, 3)
+    fig = pgo.Figure(data=[pgo.Bar(name='Deaths caused',x=x, y=deaths), 
+                           pgo.Bar(name='Damage dealt',x=x, y=damages)])
+    fig.update_layout(title_text='How starvation affects the survival of creatures depending on diet')
+    fig.update_xaxes(title='Diets')
     fig.update_yaxes(title='Percentage')
     fig.show()
 
@@ -270,9 +271,9 @@ def ShowBirthsAndDeaths(name, yearTicks, totalTicks, birthList: list, deathList:
 # Shows the natality data depending on the provided index
 def ShowAdulthood(globalBirthInfo:list , speciesBirthInfo: dict):
     aux = [x[0] * 100 for x in list(speciesBirthInfo.values())]
-    BarChart(f'Percentage of creatures that reach adulthood. Global: {globalBirthInfo[0] *100}', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
+    BarChart(f'Percentage of creatures that reach adulthood. Global: {globalBirthInfo[0] *100}%', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
 
 def ShowOffspring(globalBirthInfo:list , speciesBirthInfo: dict):
     aux = [x[1] for x in list(speciesBirthInfo.values())]
-    BarChart(f'Average offspring per adult. Global: {globalBirthInfo[1]}', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
+    BarChart(f'Average offspring per adult. Global: {globalBirthInfo[1]*100}%', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
 #endregion
