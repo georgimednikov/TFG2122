@@ -302,8 +302,8 @@ def ShowAdulthood(globalBirthInfo:list , speciesBirthInfo: dict):
     BarChart(f'Percentage of creatures that reach adulthood. Global: {globalBirthInfo[0] *100}%', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
 
 def ShowOffspring(globalBirthInfo:list , speciesBirthInfo: dict):
-    aux = [x[1] * 100 for x in list(speciesBirthInfo.values())]
-    BarChart(f'Average offspring per adult. Global: {globalBirthInfo[1]*100}%', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
+    aux = [x[1] for x in list(speciesBirthInfo.values())]
+    BarChart(f'Average offspring per adult. Global: {globalBirthInfo[1]}', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
 
 
 # HeatMap of temperature damage

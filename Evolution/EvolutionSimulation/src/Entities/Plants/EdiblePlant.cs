@@ -7,11 +7,16 @@ namespace EvolutionSimulation.Entities
         public bool eaten { get; protected set; } = false;
         protected int regrowthTime;
         protected float nutritionalValue;
+        
         override public bool Tick()
         {
 
-            if (eaten)  // If it is eaten, it remains so until it is fully grown back
+            if (eaten) {  // If it is eaten, it remains so until it is fully grown back
                 eaten = curHp < maxHp;
+#if TRACKER_ENABLED
+                if (!eaten) world.EatenPlants--;    // If it was eaten and now is not, remove itself from counter
+#endif
+            }
 
             // It regrows steadily even while not fully eaten
             curHp = Math.Min(curHp + (1 / (float)regrowthTime) * maxHp, maxHp);
@@ -42,6 +47,7 @@ namespace EvolutionSimulation.Entities
                 eaten = true;
 #if TRACKER_ENABLED
                 Telemetry.Tracker.Instance.Track(new Telemetry.Events.PlantEaten(world.tick, ID, x, y));
+                world.EatenPlants++;    // If it is eaten, add itself to the counter
 #endif
             }
         }
