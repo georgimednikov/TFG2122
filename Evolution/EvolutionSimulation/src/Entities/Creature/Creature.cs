@@ -174,7 +174,9 @@ namespace EvolutionSimulation.Entities
                 UniverseParametersManager.parameters.minHealthTemperatureDamage);
             stats.CurrHealth -= (float)damage;
 
+#if TRACKER_ENABLED
             Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, -1, (float)damage, DamageType.Temperature, stats.CurrHealth, x, y));
+#endif
 
             if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
             {
@@ -182,7 +184,7 @@ namespace EvolutionSimulation.Entities
                 killingBlow = damage;
                 killerID = ID;  // TODO: -1 o esto?
             }
-#if DEBUG            
+#if DEBUG
             Console.WriteLine("CreatureId: " + ID + "  " + "temperature difference: " + difference + ", which dealt " + damage + " damage");
 #endif
 
@@ -244,7 +246,9 @@ namespace EvolutionSimulation.Entities
             if (!adultEvent && !stats.IsNewBorn())
             {
                 adultEvent = true;
+#if TRACKER_ENABLED
                 Tracker.Instance.Track(new CreatureAdult(world.tick, ID, speciesName, x, y));
+#endif
             }
         }
 
@@ -262,6 +266,7 @@ namespace EvolutionSimulation.Entities
             {
                 stats.CurrHealth -= 1;  // TODO: Numero magico
 
+#if TRACKER_ENABLED
                 DamageType dtype = DamageType.Starvation;
                 if (stats.CurrEnergy <= 0)
                     dtype = DamageType.Starvation;
@@ -269,8 +274,8 @@ namespace EvolutionSimulation.Entities
                     dtype = DamageType.Dehydration;
                 else if (stats.CurrRest <= 0)
                     dtype = DamageType.Exhaustion;
-
                 Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, -1, 1, dtype, stats.CurrHealth, x, y));
+#endif
 
                 if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
                 {
@@ -305,7 +310,7 @@ namespace EvolutionSimulation.Entities
             }
         }
 
-        #region Genetics and Taxonomy
+#region Genetics and Taxonomy
 
         // Taxonomy
         public string speciesName;
@@ -319,9 +324,9 @@ namespace EvolutionSimulation.Entities
         /// Sets the stats of the creature.
         /// </summary>
         abstract public void SetStats();
-        #endregion
+#endregion
 
-        #region State Machine
+#region State Machine
         public int ActionPoints { get; private set; }
 
         // State machine
@@ -502,9 +507,9 @@ namespace EvolutionSimulation.Entities
             mfsm.AddTransition(alive, dieTransition, dead);
         }
 
-        #endregion
+#endregion
 
-        #region Interactions
+#region Interactions
         // Interactions that the creature can react to. Keys are the Interaction type
         // and values are the actions that the creature performs when something interacts with it.
         Dictionary<Interactions, List<Action<Creature>>> InteractionsDict;
@@ -634,8 +639,9 @@ namespace EvolutionSimulation.Entities
             float damage = ComputeDamage(interacter.stats.Damage, interacter.stats.Perforation);
             stats.CurrHealth = Math.Max(Math.Min(stats.CurrHealth - damage, stats.MaxHealth), 0);
 
+#if TRACKER_ENABLED
             Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, interacter.ID, damage, DamageType.Attack, stats.CurrHealth, x, y));
-
+#endif
             if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
             {
                 causeOfDeath = CauseOfDeath.Attack;
@@ -663,9 +669,9 @@ namespace EvolutionSimulation.Entities
         private void RetalliateDamage(Creature interacter)
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
-
+#if TRACKER_ENABLED
             Tracker.Instance.Track(new CreatureReceiveDamage(interacter.world.tick, interacter.ID, interacter.speciesName, ID, stats.Counter, DamageType.Retalliation, interacter.stats.CurrHealth, interacter.x, interacter.y));
-
+#endif
             if (interacter.causeOfDeath == CauseOfDeath.NONE && interacter.stats.CurrHealth <= 0)
             {
                 interacter.causeOfDeath = CauseOfDeath.Retalliation;
@@ -724,9 +730,9 @@ namespace EvolutionSimulation.Entities
         public bool mating { get; set; }
         public bool wantMate { get; set; }
         public int matingCreature { get; set; }
-        #endregion
+#endregion
 
-        #region Creature Information
+#region Creature Information
 
         /// <summary>
         /// This is the resource that the creature needs while exploring
@@ -790,9 +796,9 @@ namespace EvolutionSimulation.Entities
         {
             return stats.CurrRest <= stats.exhaustThreshold * stats.MaxRest;
         }
-        #endregion
+#endregion
 
-        #region Mind
+#region Mind
         // Memory related information
         public Mind mind { get; private set; }
 
@@ -926,9 +932,9 @@ namespace EvolutionSimulation.Entities
         /// 
         /// </summary>
         public int NewExploreRegion() { return mind.NewExplorePosition(); }
-        #endregion
+#endregion
 
-        #region World Info, Movement and Paths
+#region World Info, Movement and Paths
 
         // World tile position
         public int x { get; private set; }
@@ -980,7 +986,9 @@ namespace EvolutionSimulation.Entities
             creatureLayer = z;
             if (!world.IsTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
+#if TRACKER_ENABLED
             Tracker.Instance.Track(new CreaturePositionSample(world.tick, ID, speciesName, x, y));
+#endif
         }
 
         /// <summary>
@@ -1143,9 +1151,9 @@ namespace EvolutionSimulation.Entities
             if (stats.TreeReach) return HeightLayer.Tree;
             return HeightLayer.Ground;
         }
-        #endregion
+#endregion
 
-        #region Status Effects
+#region Status Effects
 
         // List of active status effects
         List<Status.Status> activeStatus;
@@ -1176,9 +1184,9 @@ namespace EvolutionSimulation.Entities
                 else stat.OnRemove();
             }
         }
-        #endregion
+#endregion
 
-        #region Tracker
+#if TRACKER_ENABLED
         public void BirthEventTrack()
         {
             CreatureBirth cbEvent = new CreatureBirth(world.tick, ID, speciesName, x, y);
@@ -1220,6 +1228,6 @@ namespace EvolutionSimulation.Entities
 
             Tracker.Instance.Track(cbEvent);
         }
-        #endregion
+#endif
     }
 }

@@ -257,8 +257,8 @@ def ShowDietInfo(dietInfo: dict):
     values = list(dietInfo.values())
 
     x = [f'{keys[0]}s', f'{keys[1]}s', f'{keys[2]}s']
-    deaths = [values[0][0][0]/values[0][0][1]*100, values[1][0][0]/values[1][0][1]*100, values[2][0][0]/values[2][0][1]*100]
-    damages = [values[0][1][0]/values[0][1][1]*100, values[1][1][0]/values[1][1][1]*100, values[2][1][0]/values[2][1][1]*100]
+    deaths = [values[0][0][0]/max(1, values[0][0][1])*100, values[1][0][0]/max(1,values[1][0][1])*100, values[2][0][0]/max(1,values[2][0][1])*100]
+    damages = [values[0][1][0]/max(1,values[0][1][1])*100, values[1][1][0]/max(1,values[1][1][1])*100, values[2][1][0]/max(1,values[2][1][1])*100]
 
     fig = pgo.Figure(data=[pgo.Bar(name='Deaths caused',x=x, y=deaths), 
                            pgo.Bar(name='Damage dealt',x=x, y=damages)])
@@ -274,7 +274,7 @@ def ShowPlantsConsumedInfo(yearTicks, totalTicks, plantsEaten, totalPlants):
         yearlyConsumption[int(plantsEaten[i]['Tick'] / yearTicks)] += 1
     yearlyConsumption =  [x / totalPlants * 100 for x in yearlyConsumption]
 
-    LineChart('Percentage of plants consumed through the years', ['Years', 'Percentage of plants consumed'], list(range(totalYears)), yearlyConsumption)
+    LineChart('Percentage of plants consumed through the years', ['Years', 'Percentage of plants consumed'], list(range(1,totalYears+1)), yearlyConsumption)
 
 # Shows the birth and death line graphs throughout all the simulation years
 def ShowBirthsAndDeaths(name, yearTicks, totalTicks, birthList: list, deathList: list):
@@ -302,7 +302,7 @@ def ShowAdulthood(globalBirthInfo:list , speciesBirthInfo: dict):
     BarChart(f'Percentage of creatures that reach adulthood. Global: {globalBirthInfo[0] *100}%', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
 
 def ShowOffspring(globalBirthInfo:list , speciesBirthInfo: dict):
-    aux = [x[1] for x in list(speciesBirthInfo.values())]
+    aux = [x[1] * 100 for x in list(speciesBirthInfo.values())]
     BarChart(f'Average offspring per adult. Global: {globalBirthInfo[1]*100}%', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
 
 

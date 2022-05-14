@@ -40,7 +40,9 @@ namespace EvolutionSimulation.Entities
 
             if(curHp <= 0) {
                 eaten = true;
+#if TRACKER_ENABLED
                 Telemetry.Tracker.Instance.Track(new Telemetry.Events.PlantEaten(world.tick, ID, x, y));
+#endif
             }
         }
     }

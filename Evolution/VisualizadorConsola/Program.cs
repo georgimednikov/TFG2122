@@ -11,7 +11,6 @@ namespace VisualizadorConsola
         static void Main(string[] args)
         {
             EventSimulation s = new EventSimulation();
-            s.InitTracker();
             s.OnSimulationBegin += (e) => { loadingBar = new ConsoleLoadingBar(); };
             s.OnSimulationStep += (e) => { loadingBar.Update(e); };
 #if true
@@ -21,7 +20,6 @@ namespace VisualizadorConsola
                 return;
 #endif
             s.Run();
-            s.EndTracker();
         }
 
         /// <summary>

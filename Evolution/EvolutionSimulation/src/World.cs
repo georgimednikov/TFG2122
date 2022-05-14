@@ -504,9 +504,11 @@ namespace EvolutionSimulation
             ent.Init(entitiesID, this, x, y, chromosome, name, fatherID, motherID);
             
             taxonomy.AddCreatureToSpecies(ent);
+
+#if TRACKER_ENABLED
             if(fatherID != -1)
                 ent.BirthEventTrack();
-
+#endif
             entityMap[x, y].Add(ent);
 
             Creatures.Add(entitiesID, ent);
@@ -686,9 +688,9 @@ namespace EvolutionSimulation
         public List<StaticEntity> StaticEntitiesToUpdate;
         List<int> entitiesToDelete;
 
-        #endregion
+#endregion
 
-        #region Procedural Generation
+#region Procedural Generation
 
         public Wave[] heightWaves;      // Passes performed by the Perlin noise and added to the height
         public Wave[] humidityWaves;    // Passes performed by the Perlin noise and added to the humidity
@@ -992,7 +994,7 @@ namespace EvolutionSimulation
                     return 3;
             }
         }
-        #endregion
+#endregion
 
         /// <summary>
         /// Given a year, returns the number of ticks it equals

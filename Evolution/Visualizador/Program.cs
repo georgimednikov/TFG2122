@@ -17,7 +17,6 @@ namespace Visualizador
         static void Main()
         {
             EventSimulation s = new EventSimulation();
-            s.InitTracker();
             s.OnSimulationBegin += (e) => { loadingBar = new WindowLoadingBar(UserInfo.Years); };
             s.OnSimulationStep += (e) => { if(e.CurrentTick % e.YearTicks == 0) loadingBar.StepElapsed(); };
 #if DEBUG
@@ -27,7 +26,6 @@ namespace Visualizador
                 return;
 #endif
             s.Run();
-            s.EndTracker();
         }
 
         #region AskInfo

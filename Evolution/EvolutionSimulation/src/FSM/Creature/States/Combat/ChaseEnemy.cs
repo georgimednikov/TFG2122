@@ -43,8 +43,9 @@ namespace EvolutionSimulation.FSM.Creature.States
             creature.Enemy(out objectiveID, out objective);
             Entities.Creature objCreature = creature.world.GetCreature(objectiveID);
 
+#if TRACKER_ENABLED
             Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureStateEntryNotSafe(creature.world.tick, creature.ID, creature.speciesName, ToString(), objectiveID, creature.x, creature.y, objCreature == null ? " " : objCreature.speciesName));
-
+#endif
             Entities.Creature tmp = creature.world.GetCreature(objectiveID);
             objSpecies = tmp == null ? " " : creature.world.GetCreature(objectiveID).speciesName;
             if (objective.x != creature.x && objective.y != creature.y && creature.CanReach((Entities.Creature.HeightLayer)objective.z)) // TODO: considerar alturas

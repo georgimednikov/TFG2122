@@ -25,9 +25,12 @@ namespace EvolutionSimulation
         /// <param name="worldConfig"> World configuration to generate the world map. If it is provided, no other world files are considered </param>
         virtual public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig worldConfig)
         {
-
             UserInfo.SetUp(years, species, individuals, dataDir, exportDir);
+
+#if TRACKER_ENABLED
+            InitTracker();
             SetTrackerExportDir();
+#endif
             // Universe Parameters
             UniverseParametersManager.ReadJSON();
             // Chromosome and ability unlocks
@@ -75,9 +78,12 @@ namespace EvolutionSimulation
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends. If not provided, default export directory is setted</param>
         virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
         {
-
             UserInfo.SetUp(years, species, individuals, _exportDir: exportDir);
+
+#if TRACKER_ENABLED
+            InitTracker();
             SetTrackerExportDir();
+#endif
             // Universe Parameters
             UniverseParametersManager.ReadJSON(uniParamsFile);
             // Chromosome and ability unlocks
@@ -124,7 +130,10 @@ namespace EvolutionSimulation
             totalTicks = world.YearToTick(UserInfo.Years);
             currentTick = 1;
             apocalypseCount = 0;
-            StartSimulation();
+
+#if TRACKER_ENABLED
+            SimulationStartTrack();
+#endif
         }
 
         /// <summary>
@@ -134,7 +143,9 @@ namespace EvolutionSimulation
         virtual protected bool Step()
         {
             bool ret = world.Tick(currentTick); //TODO: NO DEJAR ESTO
+#if TRACKER_ENABLED
             HourTrack();
+#endif
             return ret;
         }
 
@@ -158,8 +169,14 @@ namespace EvolutionSimulation
         /// </summary>
         virtual protected void End()
         {
-            EndSimulation();
+#if TRACKER_ENABLED
+            SimulationEndTrack();
+#endif
             Export();
+
+#if TRACKER_ENABLED
+            EndTracker();
+#endif
         }
 
         //TODO: apocalipsis y esas cosas
@@ -172,7 +189,7 @@ namespace EvolutionSimulation
         }
 
 
-        #region CreatureCreation
+#region CreatureCreation
         virtual protected void CreateCreatures()
         {
             //A minimum distance to leave in between species spawn points to give them some room.
@@ -230,17 +247,22 @@ namespace EvolutionSimulation
                 }
                 while (!validPosition);
 
+                int j = 0;
+                InitialSetUp(a, (Genetics.Gender)(j % 2));
+                j++;
+
                 a.Place(x, y);
                 //The specified amount of individuals of each species is created.
-                for (int j = 1; j < UserInfo.Individuals; j++)
+                for (; j < UserInfo.Individuals; j++)
                 {
-                    world.CreateCreature<Animal>(x, y, a.chromosome, a.speciesName);
+                    Animal na = world.CreateCreature<Animal>(x, y, a.chromosome, a.speciesName);
+                    InitialSetUp(na, (Genetics.Gender)(j % 2));
                 }
 
                 //The new position is added to the list of used.
                 spawnPositions.Add(new Tuple<int, int>(x, y));
             }
-            SetUpInitialPopulation();
+            //SetUpInitialPopulation();
         }
 
         /// <summary>
@@ -262,9 +284,22 @@ namespace EvolutionSimulation
                     c.chromosome.ModifyGender(Genetics.Gender.Female);
                     c.stats.Gender = Genetics.Gender.Female;
                 }
+#if TRACKER_ENABLED
                 c.BirthEventTrack();
+#endif
                 i++;
             }
+        }
+
+        virtual protected void InitialSetUp(Creature c, Genetics.Gender gender)
+        {
+            c.stats.CurrAge = (int)(UniverseParametersManager.parameters.adulthoodThreshold * c.stats.LifeSpan);
+            c.chromosome.ModifyGender(gender);
+            c.stats.Gender = gender;
+
+#if TRACKER_ENABLED
+            c.BirthEventTrack();
+#endif
         }
         #endregion
 
@@ -296,7 +331,7 @@ namespace EvolutionSimulation
             {
                 for (int j = 0; j < world.map.GetLength(1) * scale; j += scale)
                 {
-                    #region HeightMap
+#region HeightMap
                     val = world.map[j / scale, i / scale].height;
                     if (val < 0.3) SetPixel(j, i, Color.DarkBlue, heightMap, scale);
                     else if (val < 0.5) SetPixel(j, i, Color.Blue, heightMap, scale);
@@ -306,18 +341,18 @@ namespace EvolutionSimulation
                     else if (val < 0.8) SetPixel(j, i, Color.LightYellow, heightMap, scale);
                     else SetPixel(j, i, Color.White, heightMap, scale);
                     val = world.map[j / scale, i / scale].humidity;
-                    #endregion
+#endregion
 
-                    #region HumidityMap
+#region HumidityMap
                     if (val < 0.3) SetPixel(j, i, Color.DarkRed, hMap, scale);
                     else if (val < 0.4) SetPixel(j, i, Color.Red, hMap, scale);
                     else if (val < 0.5) SetPixel(j, i, Color.IndianRed, hMap, scale);
                     else if (val < 0.6) SetPixel(j, i, Color.MediumVioletRed, hMap, scale);
                     else if (val < 0.8) SetPixel(j, i, Color.Blue, hMap, scale);
                     else if (val < 1) SetPixel(j, i, Color.DarkBlue, hMap, scale);
-                    #endregion
+#endregion
 
-                    #region TemperatureMap
+#region TemperatureMap
                     val = world.map[j / scale, i / scale].temperature;
                     if (val < 0.2) SetPixel(j, i, Color.DarkBlue, tempMap, scale);
                     else if (val < 0.3) SetPixel(j, i, Color.Blue, tempMap, scale);
@@ -325,9 +360,9 @@ namespace EvolutionSimulation
                     else if (val < 0.6) SetPixel(j, i, Color.Orange, tempMap, scale);
                     else if (val < 0.8) SetPixel(j, i, Color.OrangeRed, tempMap, scale);
                     else SetPixel(j, i, Color.Red, tempMap, scale);
-                    #endregion
+#endregion
 
-                    #region FloraMap
+#region FloraMap
                     val = world.map[j / scale, i / scale].flora;
                     if (val == 0)
                         if (world.map[j / scale, i / scale].isWater)
@@ -344,9 +379,9 @@ namespace EvolutionSimulation
                     else if (val < 0.7) SetPixel(j, i, Color.YellowGreen, floraMap, scale);
                     else if (val < 1) SetPixel(j, i, Color.Green, floraMap, scale);
                     else SetPixel(j, i, Color.White, floraMap, scale);
-                    #endregion
+#endregion
 
-                    #region TerrainTexture
+#region TerrainTexture
 
                     float thres = 1.0f, thres2 = 0.7f;
                     double h = world.map[j / scale, i / scale].height;
@@ -360,9 +395,9 @@ namespace EvolutionSimulation
                         Color c = floraMapMask.GetPixel(j, i);
                         SetPixel(j, i, Color.FromArgb((int)(c.R + ((h - thres2) / (1 - thres2) * (1 - (c.R / 255f))) * 255), (int)(c.G + ((h - thres2) / (1 - thres2) * (1 - (c.G / 255f))) * 255), (int)(c.B + ((h - thres2) / (1 - thres2) * (1 - (c.B / 255f)))) * 255), floraMapMask, scale);
                     }
-                    #endregion
+#endregion
 
-                    #region PlantMap
+#region PlantMap
                     Plant plant = world.map[j / scale, i / scale].plant;
                     if (plant as Grass != null)
                         SetPixel(j, i, Color.DarkOliveGreen, treeMap, scale);
@@ -378,9 +413,9 @@ namespace EvolutionSimulation
                         SetPixel(j, i, Color.FromArgb(0, 0, 255), holdRidgeMap, scale);
 
                     }
-                    #endregion
+#endregion
 
-                    #region HoldridgeMap
+#region HoldridgeMap
                     val = world.map[j / scale, i / scale].temperature;
                     double val2 = world.map[j / scale, i / scale].humidity;
                     //Mapa usando Holdridge de 39 Biomas
@@ -451,9 +486,9 @@ namespace EvolutionSimulation
                         else if (val2 < 0.95) SetPixel(j, i, Color.FromArgb(60, 255, 144), holdRidgeMap, scale); //Tropical Wet Forest
                         else SetPixel(j, i, Color.FromArgb(32, 255, 160), holdRidgeMap, scale); //Tropical Rain Forest
                     }
-                    #endregion
+#endregion
 
-                    #region VoronoiDiagram
+#region VoronoiDiagram
                     val = world.map[j / scale, i / scale].regionId;
                     switch (val % 20)
                     {
@@ -518,7 +553,7 @@ namespace EvolutionSimulation
                             SetPixel(j, i, Color.LimeGreen, voronoiMap, scale);
                             break;
                     }
-                    #endregion
+#endregion
                     if ((j / scale) % 32 == 0 || (i / scale) % 32 == 0)
                     {
                         SetPixel(j, i, Color.White, voronoiMap, scale / 2);
@@ -612,9 +647,9 @@ namespace EvolutionSimulation
                 }
             }
         }
-        #endregion
+#endregion
 
-        #region Tracker
+#if TRACKER_ENABLED
         public void InitTracker()
         {
             Tracker.Instance.Init();            
@@ -632,7 +667,6 @@ namespace EvolutionSimulation
             Tracker.Instance.OutputDir = UserInfo.ExportDirectory;
         }
 
-//#if TRACKER_ENABLED
         protected void HourTrack()
         {
             if (currentTick % UniverseParametersManager.parameters.ticksPerHour == 0)
@@ -641,22 +675,21 @@ namespace EvolutionSimulation
                 Tracker.Instance.Flush();
             }
         }
-//#endif
 
-        protected void StartSimulation()
+
+        protected void SimulationStartTrack()
         {
-            Tracker.Instance.Track(new SimulationStart(world.YearToTick(1), totalTicks , world.EdiblePlants, world.map.GetLength(0)));           
+            Tracker.Instance.Track(new SimulationStart(world.YearToTick(1), totalTicks, world.EdiblePlants, world.map.GetLength(0)));
         }
 
-        protected void EndSimulation()
+        protected void SimulationEndTrack()
         {
-            // Para dejar los json bien cuando termine la simulacion
+            // To close creature json files
             foreach (Creature c in world.Creatures.Values)
                 Tracker.Instance.Track(new CreatureDeath(world.tick, c.ID, c.speciesName, DeathType.SimulationEnd, -1, 0, c.x, c.y));
             Tracker.Instance.Track(new SimulationEnd(currentTick - 1, world.Creatures.Count, world.GetSpeciesNumber()));
-            Tracker.Instance.Flush();
         }
-#endregion
+#endif
 
         protected World world;
         protected int totalTicks;
