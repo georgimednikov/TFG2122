@@ -114,24 +114,19 @@ namespace EvolutionSimulation.Genetics
         public void AddCreatureToSpecies(Creature creature)
         {
             //The most similar valid species is saved to add the creature to its members, if there is one.
-            Species mostSimilarYet = null;
-            float bestSimilarityYet = 0;
             foreach (Species sp in existingSpecies)
             {
-                float similarity = GeneticSimilarity(creature.chromosome, sp.original.chromosome);
-                if (similarity > minGeneticSimilarity && similarity > bestSimilarityYet)
+                if (sp.name == creature.speciesName)
                 {
-                    mostSimilarYet = sp;
-                    bestSimilarityYet = similarity;
-                }
-            }
-            //If the creature belongs to an existing species, it is added to its members
-            if (mostSimilarYet != null)
-            {
-                mostSimilarYet.members.Add(creature);
-                creature.speciesName = mostSimilarYet.name;
-                creature.progenitorSpeciesName = mostSimilarYet.progenitor;
-                return;
+                    float similarity = GeneticSimilarity(creature.chromosome, sp.original.chromosome);
+                    if (similarity > minGeneticSimilarity)
+                    {
+                        creature.progenitorSpeciesName = sp.progenitor;
+                        sp.members.Add(creature);
+                        return;
+                    }
+                    break;                    
+                }                
             }
 
             //Else a new species is created
