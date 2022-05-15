@@ -53,7 +53,7 @@ def ProcessData(path: str, mapScale: int):
     # Get all the species folder in the Output Dir, and the sessionOutput file
     #path = os.getcwd()] /
     speciesList = glob.glob(f'{path}/*/')
-    sessionOutput = json.load(open(f'{path}\\sessionOutput.json'))
+    sessionOutput = json.load(open(f'{path}/sessionOutput.json'))
 
     # SimulationStart Event, we know it is the second event
     simulationStartEvent = sessionOutput[1]
@@ -61,6 +61,8 @@ def ProcessData(path: str, mapScale: int):
     mapData = np.zeros((5, floor(mapSize/mapScale + 0.5), floor(mapSize/mapScale + 0.5)))
     # Get plants eaten event
     plantsEatenEvents = [x for x in sessionOutput if (x['Type'] == 'PlantEaten')]
+    simulationSamples = [x for x in sessionOutput if (x['Type'] == 'SimulationSample')]
+
     for i in range(len(plantsEatenEvents)):
         mapData[3][floor((plantsEatenEvents[i]['X'])/mapScale)][floor(plantsEatenEvents[i]['Y']/mapScale)] += 1
     #mapData = [[[0]*simulationStartEvent['MapSize']]*simulationStartEvent['MapSize']]*4
@@ -203,6 +205,7 @@ def ProcessData(path: str, mapScale: int):
 
     returnDict = {
         'SessionInfo': simulationStartEvent,
+        'SessionSamples': simulationSamples,
         'GlobalDeathCauses' : globalDeathCauses,
         'SpeciesDeathCauses' : speciesDeathCauses,
         'GlobalDamageReception' : globalDamageReception,
@@ -214,6 +217,7 @@ def ProcessData(path: str, mapScale: int):
         'SpeciesDrinkSuccess': speciesDrinkSucces,
         'MapData': mapData
     }
+
     return returnDict
 #endregion
 
@@ -267,14 +271,6 @@ def ShowDietInfo(dietInfo: dict):
     fig.update_yaxes(title='Percentage')
     fig.show()
 
-def ShowPlantsConsumedInfo(yearTicks, totalTicks, plantsEaten, totalPlants):
-    totalYears = int(totalTicks / yearTicks)
-    yearlyConsumption = [0]*totalYears
-    for i in range(len(plantsEaten)):
-        yearlyConsumption[int(plantsEaten[i]['Tick'] / yearTicks)] += 1
-    yearlyConsumption =  [x / totalPlants * 100 for x in yearlyConsumption]
-
-    LineChart('Percentage of plants consumed through the years', ['Years', 'Percentage of plants consumed'], list(range(1,totalYears+1)), yearlyConsumption)
 
 # Shows the birth and death line graphs throughout all the simulation years
 def ShowBirthsAndDeaths(name, yearTicks, totalTicks, birthList: list, deathList: list):
@@ -302,22 +298,24 @@ def ShowAdulthood(globalBirthInfo:list , speciesBirthInfo: dict):
     BarChart(f'Percentage of creatures that reach adulthood. Global: {globalBirthInfo[0] *100}%', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
 
 def ShowOffspring(globalBirthInfo:list , speciesBirthInfo: dict):
-    aux = [x[1] * 100 for x in list(speciesBirthInfo.values())]
-    BarChart(f'Average offspring per adult. Global: {globalBirthInfo[1]*100}%', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
+    aux = [x[1] for x in list(speciesBirthInfo.values())]
+    BarChart(f'Average offspring per adult. Global: {globalBirthInfo[1]}', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
 
 
 # HeatMap of temperature damage
 def ShowHeatMap(map, type):
     fig = px.imshow(map[type])
     fig.show()
+
+def ShowPlantConsumption(yearTicks, totalTicks, simulationSamples): 
+    totalYears = int(totalTicks / yearTicks)
+    yearlyConsumption = np.zeros((totalYears,2))
+    eatenPlantRatios = [(x['EatenPlantsRatio'], x['Tick']) for x in simulationSamples]
+    for i in range(len(eatenPlantRatios)):
+        year = int(eatenPlantRatios[i][1] / yearTicks)
+        yearlyConsumption[year][0] += eatenPlantRatios[i][0]
+        yearlyConsumption[year][1] += 1
+    yearlyConsumption = [x[0]/max(1,x[1]) * 100 for x in yearlyConsumption]
+    LineChart('Average percentage of plants consumed through the years', ['Years', 'Percentage of plants consumed'], list(range(1,totalYears+1)), yearlyConsumption)
+  
 #endregion
-
-# def main():
-#     session = '9de64eb220064dd1b71f3084634246cd'
-#     mapScale = 1
-#     resultsDir = f'{Path().absolute()}\\ResultingData\\Output\\{session}'
-#     results = ProcessData(resultsDir, mapScale)
-#     ShowHeatMap(results['MapData'], 4)
-#     #ProcessData()
-
-# main()

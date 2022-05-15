@@ -671,7 +671,7 @@ namespace EvolutionSimulation
         {
             if (currentTick % UniverseParametersManager.parameters.ticksPerHour == 0)
             {
-                Tracker.Instance.Track(new SimulationSample(currentTick, world.Creatures.Count));
+                Tracker.Instance.Track(new SimulationSample(currentTick, world.Creatures.Count, world.EatenPlants/(float)world.EdiblePlants));
                 Tracker.Instance.Flush();
             }
         }

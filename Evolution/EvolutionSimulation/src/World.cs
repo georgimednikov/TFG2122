@@ -92,6 +92,7 @@ namespace EvolutionSimulation
         public int[] deaths;
         public List<Death> deathsPos;
         public List<Vector2> pathPos;
+
         public enum DeathCause
         {
             Temperature,
@@ -103,6 +104,11 @@ namespace EvolutionSimulation
         }
 
         public int EdiblePlants { get; private set; }
+
+#if TRACKER_ENABLED
+        public int EatenPlants; // Number of plants fully eaten currently
+#endif
+
         public struct Death
         {
             public Vector2 pos;
