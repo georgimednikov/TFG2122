@@ -5,8 +5,8 @@
         public Bush()
         {
             type = PlantType.Bush;
-            regrowthTime = RandomGenerator.Next(20, 101); // TODO: Numeros magicos
-            nutritionalValue = RandomGenerator.Next(5, 11) * UniverseParametersManager.parameters.plantNutritionMultiplier; // TODO: Numeros magicos
+            regrowthTime = (int)(UniverseParametersManager.parameters.bushHoursTillGrowth * UniverseParametersManager.parameters.ticksPerHour);
+            nutritionalValue = UniverseParametersManager.parameters.bushNutritionValue;
         }
     }
 }
