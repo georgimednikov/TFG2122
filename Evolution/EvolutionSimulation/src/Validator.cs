@@ -530,8 +530,8 @@ namespace EvolutionSimulation
             if (parameters.maxTemperatureDifference <= 0) throw new UniverseParameterIsZeroException("The provided maxTemperatureDifference must be positive");
             if (parameters.minHealthTemperatureDamage <= 0) throw new UniverseParameterIsZeroException("The provided minHealthTemperatureDamage must be positive");
             if (parameters.maxHealthTemperatureDamage <= 0) throw new UniverseParameterIsZeroException("The provided maxHealthTemperatureDamage must be positive");
+            if (parameters.venomDamageMultiplier <= 0) throw new UniverseParameterIsZeroException("The provided venomDamageMultiplier must be positive");
             if (parameters.maxHealthTemperatureDamage < parameters.minHealthTemperatureDamage) throw new MinMaxValueSwappedException("The maximum amount of temperature damage is lower than the minimium");
-            if (parameters.venomDamageMultiplier <= 0) throw new PercentageOverOneException("The provided venomDamageMultiplier must be positive");
             if (parameters.abilityUnlockPercentage > 1) throw new PercentageOverOneException("The provided abilityUnlockPercentage is over one");
             if (parameters.perceptionWithoutNightVision > 1) throw new PercentageOverOneException("The provided perceptionWithoutNightVision is over one");
             if (parameters.minPerceptionWithNightVision > 1) throw new PercentageOverOneException("The provided minPerceptionWithNightVision is over one");
@@ -578,9 +578,17 @@ namespace EvolutionSimulation
             if (parameters.treeMovementPenalty <= 0) throw new UniverseParameterIsZeroException("The provided treeMovementPenalty must be positive");
             if (parameters.treeMovementPenalty > 1) throw new PercentageOverOneException("The provided treeMovementPenalty is over one");
 
-            if(parameters.bushHp <= 0) throw new PercentageOverOneException("The provided bushHp muts be positive");
-            if(parameters.grassHp <= 0) throw new PercentageOverOneException("The provided grassHp muts be positive");
-            if(parameters.eTreeHp <= 0) throw new PercentageOverOneException("The provided eTreeHp muts be positive");
+            if(parameters.grassHp <= 0) throw new UniverseParameterIsZeroException("The provided grassHp must be positive");
+            if(parameters.bushHp <= 0) throw new UniverseParameterIsZeroException("The provided bushHp must be positive");
+            if(parameters.eTreeHp <= 0) throw new UniverseParameterIsZeroException("The provided eTreeHp must be positive");
+
+            if(parameters.grassNutritionalValue <= 0) throw new UniverseParameterIsZeroException("The provided grassNutritionalValue must be positive");
+            if(parameters.bushNutritionValue <= 0) throw new UniverseParameterIsZeroException("The provided bushNutritionValue must be positive");
+            if(parameters.eTreeNutritionalValue <= 0) throw new UniverseParameterIsZeroException("The provided eTreeNutritionalValue must be positive");
+
+            if(parameters.grassHoursTillGrowth <= 0) throw new UniverseParameterIsZeroException("The provided grassHoursTillGrowth must be positive");
+            if(parameters.bushHoursTillGrowth <= 0) throw new UniverseParameterIsZeroException("The provided bushHoursTillGrowth must be positive");
+            if(parameters.eTreeHoursTillGrowth <= 0) throw new UniverseParameterIsZeroException("The provided eTreeHoursTillGrowth must be positive");
         }
 
         static void ValidateMemory(UniverseParameters parameters)
