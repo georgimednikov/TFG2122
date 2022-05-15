@@ -157,13 +157,13 @@ def ProcessData(path: str, mapScale: int):
                 dietInfo[creatureDiet][1][1] += damageDone
 
                 # Map data
-                mapData[4][floor((damageEvent['X'])/mapScale)][floor(damageEvent['Y']/mapScale)] += 1
+                mapData[4][floor((damageEvent['Y'])/mapScale)][floor(damageEvent['X']/mapScale)] += 1
                 if damageType == 'Temperature':         
-                    mapData[0][floor((damageEvent['X'])/mapScale)][floor(damageEvent['Y']/mapScale)] += damageDone
+                    mapData[0][floor((damageEvent['Y'])/mapScale)][floor(damageEvent['X']/mapScale)] += damageDone
                 if damageType == 'Dehydration':         
-                    mapData[1][floor((damageEvent['X'])/mapScale)][floor(damageEvent['Y']/mapScale)] += damageDone
+                    mapData[1][floor((damageEvent['Y'])/mapScale)][floor(damageEvent['X']/mapScale)] += damageDone
                 if damageType == 'Starvation':         
-                    mapData[2][floor((damageEvent['X'])/mapScale)][floor(damageEvent['Y']/mapScale)] += damageDone
+                    mapData[2][floor((damageEvent['Y'])/mapScale)][floor(damageEvent['X']/mapScale)] += damageDone
 
                 
             

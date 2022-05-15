@@ -49,6 +49,7 @@ namespace EvolutionSimulation
                 if (worldData != null && regionData != null)
                 {
                     world.Init(worldData, regionData);
+                    UserInfo.Size = world.map.GetLength(0);
                 }
                 else // Else a new one has to be created from scratch with the given parameters, in this case only size.
                 {
@@ -95,6 +96,7 @@ namespace EvolutionSimulation
             if (worldFile != null && regionMap != null)
             {
                 world.Init(worldFile, regionMap);
+                UserInfo.Size = world.map.GetLength(0);
             }
             else
             {
