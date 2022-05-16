@@ -64,7 +64,7 @@ def ProcessData(path: str, mapScale: int):
     simulationSamples = [x for x in sessionOutput if (x['Type'] == 'SimulationSample')]
 
     for i in range(len(plantsEatenEvents)):
-        mapData[3][floor((plantsEatenEvents[i]['X'])/mapScale)][floor(plantsEatenEvents[i]['Y']/mapScale)] += 1
+        mapData[3][floor((plantsEatenEvents[i]['Y'])/mapScale)][floor(plantsEatenEvents[i]['X']/mapScale)] += 1
     #mapData = [[[0]*simulationStartEvent['MapSize']]*simulationStartEvent['MapSize']]*4
     #[[[1,2,3,4], [1,2,3,4]]
     #[[1,2,3,4], .. ]]
@@ -311,7 +311,7 @@ def ShowPlantConsumption(yearTicks, totalTicks, simulationSamples):
     totalYears = int(totalTicks / yearTicks)
     yearlyConsumption = np.zeros((totalYears,2))
     eatenPlantRatios = [(x['EatenPlantsRatio'], x['Tick']) for x in simulationSamples]
-    for i in range(len(eatenPlantRatios)):
+    for i in range(len(eatenPlantRatios) - 1):
         year = int(eatenPlantRatios[i][1] / yearTicks)
         yearlyConsumption[year][0] += eatenPlantRatios[i][0]
         yearlyConsumption[year][1] += 1
