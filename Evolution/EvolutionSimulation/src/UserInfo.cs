@@ -61,7 +61,7 @@ namespace EvolutionSimulation
             string filePath = DataDirectory + fileName;
             if (!File.Exists(filePath)) return null;
             return File.ReadAllText(filePath);
-        }      
+        }
 
         /// <summary>
         /// Sets up the program with the file information provided by the user
@@ -77,8 +77,11 @@ namespace EvolutionSimulation
             Years = years;
             Species = species;
             Individuals = individuals;
-            if(_dataDir != null) DataDirectory = _dataDir;
-            if(_exportDir != null)ExportDirectory = _exportDir;
+            if (_dataDir != null) DataDirectory = _dataDir;
+            if (_exportDir != null) ExportDirectory = _exportDir;
+
+            Directory.CreateDirectory(ExportDirectory + "Output");
+
         }
 
         // TODO: Estos metodos en la simulacion
