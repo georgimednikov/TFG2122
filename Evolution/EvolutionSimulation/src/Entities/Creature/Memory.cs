@@ -127,8 +127,8 @@ namespace EvolutionSimulation.Entities
             valueComparer = new ResourceValueComparer();
             positionComparer = new PositionComparer(c);
 
-            maxResourcesRemembered = thisCreature.stats.Knowledge + UniverseParametersManager.parameters.maxResourcesRemembered; 
-            maxPositionsRemembered = thisCreature.stats.Knowledge + UniverseParametersManager.parameters.maxPositionsRemembered; 
+            maxResourcesRemembered = thisCreature.stats.Knowledge + UniverseParametersManager.parameters.maxResourcesRemembered;
+            maxPositionsRemembered = thisCreature.stats.Knowledge + UniverseParametersManager.parameters.maxPositionsRemembered;
             ticksToSavePosition = 10; //TODO: Esto bien en base a action points?
             ticksElapsed = 0;
             maxExperienceTicks = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
@@ -158,7 +158,7 @@ namespace EvolutionSimulation.Entities
                 if (enemyEntity == null || thisCreature.DistanceToObjective(enemyEntity) > perceptionRadius)
                     Enemy = null;
                 else
-                    Enemy.position = new Vector3Int(enemyEntity.x, enemyEntity.y,(int)enemyEntity.creatureLayer);
+                    Enemy.position = new Vector3Int(enemyEntity.x, enemyEntity.y, (int)enemyEntity.creatureLayer);
             }
 
             // If the tile has to be forgotten, it is removed from the creature's memory
@@ -170,30 +170,14 @@ namespace EvolutionSimulation.Entities
             //The list of creatures is also needed to calculate danger so it is done here too.
             //The danger in each tile seen by the creature caused by other creatures.
             float[,] intimidationFelt = new float[1 + perceptionRadius * 2, 1 + perceptionRadius * 2]; //* 2 to make it the diameter and +1 to account for the center.
-           
+
             foreach (Creature creature in perceivedCreatures)
             {
                 EntityResource resource = new EntityResource(creature.x, creature.y, (int)creature.creatureLayer, creature.ID, maxExperienceTicks);
 
-                //If a creature is the same species as this creature or
-                //it belongs to a child species of this creature's or
-                //it belongs to a parent species of this creature's they're allies
-                //the progenitor is the same.
-                if (creature.speciesName == thisCreature.speciesName ||
-                    creature.progenitorSpeciesName == thisCreature.speciesName ||
-                    creature.speciesName == thisCreature.progenitorSpeciesName ||
-                    creature.progenitorSpeciesName == thisCreature.progenitorSpeciesName)
+                // If the creature is not an ally, check if it a menace or a prey
+                if (!CheckAlly(creature, resource))
                 {
-                    UpdateList(Allies, resource, maxExperienceTicks);
-                    if (creature.ID == father.ID)
-                        RefreshMemory(father, maxExperienceTicks);
-                    else if (creature.ID == mother.ID)
-                        RefreshMemory(mother, maxExperienceTicks);
-                }
-                //Else they have no relation
-                else
-                {
-                    
                     int dist = thisCreature.DistanceToObjective(creature);
                     //The intimidation of the perceived creature increases based on how much health this one is missing, up to a value defined in UniverseParameters.
                     float intimidation = creature.stats.Intimidation *
@@ -313,12 +297,35 @@ namespace EvolutionSimulation.Entities
                 exploredRegions[currentRegion] = maxExperienceTicks;
 
             SortAndAdjustLists();
-            if (menace != null && 
-                menace.ticks != maxExperienceTicks && thisCreature.DistanceToObjective(menace.position) <= perceptionRadius)
+            if (menace != null && menace.ticks != maxExperienceTicks &&
+                thisCreature.DistanceToObjective(menace.position) <= perceptionRadius)
                 menace = null;
             CheckMate();
         }
-        
+
+        /// <summary>
+        /// If the given creature is related with thisCreature
+        /// </summary>
+        /// <param name="creature"> The creature that are checking if is an ally</param>
+        /// <param name="resource"> The creature as a EntityResource</param>
+        /// <returns> Return true if the creature is an ally</returns>
+        private bool CheckAlly(Creature creature, EntityResource resource)
+        {
+            if (world.AreRelated(creature.speciesName, thisCreature.speciesName))
+            {
+                UpdateList(Allies, resource, maxExperienceTicks);
+                if (creature.ID == father.ID)
+                    RefreshMemory(father, maxExperienceTicks);
+                else if (creature.ID == mother.ID)
+                    RefreshMemory(mother, maxExperienceTicks);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Set a Mate if is possible
+        /// </summary>
         private void CheckMate()
         {
             if (thisCreature.stats.Gender == Genetics.Gender.Male)
@@ -327,11 +334,16 @@ namespace EvolutionSimulation.Entities
                 for (int i = 0; i < Allies.Count; i++) //For every ally the creature remembers the following comprobations are done:
                 {
                     Creature ally = world.GetCreature(Allies[i].ID);
+                    //This is done to ignore creatures of the same gender as this one. The gender is
+                    //checked although the creature might not be in sight, but it is not modified
+                    //and this way the gender is not saved (which would be inconvinient).                    
                     if (ally == null || ally.stats.Gender == thisCreature.stats.Gender ||
-                        Allies[i].position.z != 0)                     //This is done to ignore creatures of the same gender as this one. The gender is
-                        continue;                                      //checked although the creature might not be in sight, but it is not modified
-                                                                       //and this way the gender is not saved (which would be inconvinient).
-                                                                       //The creature has to be on ground
+                        Allies[i].position.z != 0 || //The creature has to be on ground
+                        (ally.speciesName != thisCreature.speciesName &&            //Allies could be a different of 2 generations, but your mate
+                        ally.progenitorSpeciesName != thisCreature.speciesName &&   //just 1 (same species, same progenitor or a progenitor)
+                        ally.speciesName != thisCreature.progenitorSpeciesName &&
+                        ally.progenitorSpeciesName != thisCreature.progenitorSpeciesName))
+                        continue;
 
                     if (ally.wantMate) //If it wants to mate, it is a match.
                     {
@@ -991,7 +1003,7 @@ namespace EvolutionSimulation.Entities
             }
             if (index < l.Count)
             {
-                l[index].position = r.position; 
+                l[index].position = r.position;
                 RefreshMemory(l[index], maxTicks);
             }
             else

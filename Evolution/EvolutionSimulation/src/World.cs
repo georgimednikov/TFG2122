@@ -1019,6 +1019,17 @@ namespace EvolutionSimulation
         }
 
         /// <summary>
+        /// Check if 2 species are related
+        /// they are related only if they are the same species, they have the same progenitor
+        /// or one is the progenitor or grandprogenitor of the other
+        /// </summary>
+        /// <returns>return true if they are related</returns>
+        public bool AreRelated(string speciesName1, string speciesName2)
+        {
+            return taxonomy.AreRelated(speciesName1, speciesName2);
+        }
+
+        /// <summary>
         /// Export the content information when the simulation ends
         /// </summary>
         public void ExportContent()

@@ -9,7 +9,7 @@ namespace EvolutionSimulation.Genetics
 {
     public class Species
     {
-        
+
         public string name;
         public string progenitor;
         public Creature original;
@@ -28,7 +28,7 @@ namespace EvolutionSimulation.Genetics
             creature.speciesName = name;
             creature.progenitorSpeciesName = progenitor;
             members = new List<Creature>();
-            members.Add(creature);            
+            members.Add(creature);
         }
     }
 
@@ -69,7 +69,7 @@ namespace EvolutionSimulation.Genetics
         /// Create the GeneticTaxonomy. SetTaxonomy has to be called
         /// before calling any other taxonomy method
         /// </summary>
-        public GeneticTaxonomy() 
+        public GeneticTaxonomy()
         {
             existingSpecies = new List<Species>();
             speciesRecord = new List<Species>();
@@ -106,6 +106,17 @@ namespace EvolutionSimulation.Genetics
 
         }
 
+        /// <summary>
+        /// Search in the given list a species with the given name
+        /// </summary>
+        /// <returns> The species or null if the list doesn't contains a species with this name</returns>
+        private Species FindSpecies(string name, List<Species> list)
+        {
+            foreach (Species sp in list)
+                if (sp.name == name)
+                    return sp;
+            return null;
+        }
 
         /// <summary>
         /// This method is supposed to be called when a new creature is spawned.
@@ -113,21 +124,20 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         public void AddCreatureToSpecies(Creature creature)
         {
+            Species sp = FindSpecies(creature.speciesName, existingSpecies);
+
             //The most similar valid species is saved to add the creature to its members, if there is one.
-            foreach (Species sp in existingSpecies)
+            if (sp != null)
             {
-                if (sp.name == creature.speciesName)
+                float similarity = GeneticSimilarity(creature.chromosome, sp.original.chromosome);
+                if (similarity > minGeneticSimilarity)
                 {
-                    float similarity = GeneticSimilarity(creature.chromosome, sp.original.chromosome);
-                    if (similarity > minGeneticSimilarity)
-                    {
-                        creature.progenitorSpeciesName = sp.progenitor;
-                        sp.members.Add(creature);
-                        return;
-                    }
-                    break;                    
-                }                
+                    creature.progenitorSpeciesName = sp.progenitor;
+                    sp.members.Add(creature);
+                    return;
+                }
             }
+
 
             //Else a new species is created
             Species newSpecies = new Species(creature);
@@ -141,28 +151,20 @@ namespace EvolutionSimulation.Genetics
                 speciesRecord.Add(newSpecies);
                 return;
             }
-            //If not, it is added after its progenitor as the last of the derivated species
-            //of the progenitor to keep the chronological order, following the tree structure of speciesRecord
+            //If not, it is added after its progenitor, following the tree structure of speciesRecord
             int i = 0;
-            bool found = false;
             for (; i < speciesRecord.Count; ++i)
             {
-                if (!found && speciesRecord[i].name == newSpecies.progenitor)
+                if (speciesRecord[i].name == newSpecies.progenitor)
                 {
-                    found = true;
-                }
-                else if(found && speciesRecord[i].progenitor != newSpecies.progenitor)
-                {
-                    speciesRecord.Insert(i, newSpecies);
+                    speciesRecord.Insert(i + 1, newSpecies);
                     break;
                 }
+
             }
-            if (i == speciesRecord.Count)
+            if (i >= speciesRecord.Count)
             {
-                if(found)//in case the species was the last 
-                    speciesRecord.Insert(i, newSpecies);
-                else
-                    throw new Exception("There is a discrepancy between the new  species' progenitor name and the existing species' names");
+                throw new Exception("There is a discrepancy between the new  species' progenitor name and the existing species' names");
             }
         }
 
@@ -390,12 +392,45 @@ namespace EvolutionSimulation.Genetics
         }
 
         /// <summary>
+        /// Check if the name of 2 species are related
+        /// They are related if they are the same species, they have the same progenitor,
+        /// one is the progenitor or grandprogenitor of the other
+        /// </summary>
+        /// <param name="speciesName1"></param>
+        /// <param name="speciesName2"></param>
+        /// <returns></returns>
+        public bool AreRelated(string speciesName1, string speciesName2)
+        {
+            if (speciesName1 == speciesName2)
+                return true;
+            int index1 = speciesRecord.FindIndex(x => x.name == speciesName1);
+            int index2 = speciesRecord.FindIndex(x => x.name == speciesName2);
+
+            int indexP1 = speciesRecord.FindIndex(x => x.name == speciesRecord[index1].progenitor);
+            int indexP2 = speciesRecord.FindIndex(x => x.name == speciesRecord[index2].progenitor);
+            //it should not happend, but just in case
+            if (index1 == -1 || index2 == -1 )
+                return false;
+
+            if(speciesRecord[index1].name == speciesRecord[index2].progenitor ||    //parent-child
+                    speciesRecord[index2].name == speciesRecord[index1].progenitor ||   //parent-child
+                    (speciesRecord[index1].progenitor == speciesRecord[index2].progenitor && speciesRecord[index2].progenitor != "None"))  //siblins
+                    return true;
+
+            if (indexP1 != -1 && speciesRecord[index2].name == speciesRecord[indexP1].progenitor)//grandparent-grandchild
+                return true;
+            if (indexP2 != -1 && speciesRecord[index1].name == speciesRecord[indexP2].progenitor)//grandparent-grandchild
+                return true;
+            return false;
+        }
+
+        /// <summary>
         /// Given a list of edible plants, these are ordered based on distance from it. The shortest goes first.
         /// </summary>
         private class TicksComparer : Comparer<Species>
         {
-            
-            public TicksComparer() {}
+
+            public TicksComparer() { }
 
             public override int Compare(Species a, Species b)
             {
