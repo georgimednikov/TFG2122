@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 0.3
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.3364665, g: 0.45537615, b: 0.45914692, a: 0.3}
+  m_IndirectSpecularColor: {r: 0.32780838, g: 0.44660264, b: 0.4534635, a: 0.3}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -267,8 +267,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   creaturePrefab: {fileID: 7305408888903237956, guid: 8c52346983f7f4f4c9cb7d4e40addc84, type: 3}
-  AirHeight: 100
-  TreeHeight: 2
+  AirHeight: 14
+  TreeHeight: 7
 --- !u!154 &848237404
 TerrainCollider:
   m_ObjectHideFlags: 0

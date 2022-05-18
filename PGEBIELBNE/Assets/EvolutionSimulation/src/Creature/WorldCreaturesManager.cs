@@ -112,7 +112,7 @@ namespace UnitySimulation
             switch (c.creatureLayer)
             {
                 case Creature.HeightLayer.Air:
-                    nextPos.y = terrain.SampleHeight(nextPos) + AirHeight;
+                    nextPos.y = Mathf.Max(terrain.SampleHeight(nextPos), terrain.terrainData.size.y / 2 - 0.05f) + AirHeight;
                     cM.ActivateLegAnimation(false);
                     cM.ActivateWingsAnimation(true);
                     break;
