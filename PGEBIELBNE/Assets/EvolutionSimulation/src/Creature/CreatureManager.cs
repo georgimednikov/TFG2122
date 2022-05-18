@@ -8,11 +8,20 @@ namespace UnitySimulation
     {
         public GameObject body;
         public GameObject[] legs;
+
         public GameObject[] mouths;
+        public Material mouthMat;
+
         public GameObject[] armours;
+
         public GameObject spikes;
+
         public GameObject hair;
+        public Material hairMat;
+
         public GameObject beard;
+        public Material beardMat;
+
         public GameObject[] wings;
         public GameObject statusBar;
 
@@ -80,6 +89,7 @@ namespace UnitySimulation
             go.transform.Translate(-Vector3.up * (bodyForward.transform.localPosition.z + bodyForward.transform.localScale.z / 2));
             go.transform.Rotate(Vector3.forward * 180);
             go.transform.localScale = Vector3.one * bodyForward.transform.localScale.z;
+            go.GetComponent<MeshRenderer>().material = mouthMat; 
         }
 
         private void InstantiateArmour(SpeciesExport creature)
@@ -97,14 +107,17 @@ namespace UnitySimulation
         {
             bodyMid = Instantiate(body, bodyEmpty);
             bodyMid.transform.localScale = Vector3.one * sizeScale * ((creature.stats.MaxHealth / 55f * 0.75f) + 0.5f); // 55: median value of health
+            bodyMid.GetComponent<MeshRenderer>().material.color = new Color(1, 1 - creature.stats.MaxHealth / 110f, 1 - creature.stats.MaxHealth / 110f);
 
             bodyForward = Instantiate(body, bodyEmpty);
             bodyForward.transform.localScale = Vector3.one * sizeScale * ((creature.stats.Aggressiveness / 10f * 0.75f) + 0.5f);
             bodyForward.transform.Translate(Vector3.forward * ((bodyMid.transform.localScale.z + bodyForward.transform.localScale.z) / 2));
+            bodyForward.GetComponent<MeshRenderer>().material.color = new Color(1, 1, 1 - creature.stats.Aggressiveness / 10f);
 
             bodyBack = Instantiate(body, bodyEmpty);
             bodyBack.transform.localScale = Vector3.one * sizeScale * ((creature.stats.Armor / 12.5f * 0.75f) + 0.5f);
             bodyBack.transform.Translate(-Vector3.forward * ((bodyMid.transform.localScale.z + bodyBack.transform.localScale.z) / 2));
+            bodyBack.GetComponent<MeshRenderer>().material.color = new Color(1 - creature.stats.Armor / 25f, 1, 1 - creature.stats.Armor / 25f);
         }
 
         private void InstantiateLegs(SpeciesExport creature)
@@ -171,7 +184,7 @@ namespace UnitySimulation
             //_statusBar.transform.position = new Vector3(_statusBar.transform.position.x, _statusBar.transform.position.y, _statusBar.transform.position.z);
             _statusBar.SetName(creature.name);
             _statusBar.transform.localScale = Vector3.one * sizeScale;
-            _statusBar.transform.Translate(Vector3.up * 3 * (sizeScale + baseHeight));
+            _statusBar.transform.Translate(Vector3.up * 4 * (sizeScale + baseHeight));
         }
       
         public void SetStatusBar(float percentage)
