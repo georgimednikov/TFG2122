@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 0.3
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.25571278, g: 0.37394586, b: 0.40623868, a: 0.3}
+  m_IndirectSpecularColor: {r: 0.3364665, g: 0.45537615, b: 0.45914692, a: 0.3}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -266,7 +266,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f6ae8bdd53c7204e94799d1460279f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  creaturePrefab: {fileID: 7305408888903237956, guid: a715dea8e9efb7d4da42974b682f6dab, type: 3}
+  creaturePrefab: {fileID: 7305408888903237956, guid: 8c52346983f7f4f4c9cb7d4e40addc84, type: 3}
   AirHeight: 100
   TreeHeight: 2
 --- !u!154 &848237404
@@ -361,7 +361,7 @@ MonoBehaviour:
   AbilityUnlocks: {fileID: 4900000, guid: a72b0c7193b661a44a1826bf36cbbb1f, type: 3}
   GeneSimilarity: {fileID: 4900000, guid: 720e5147ea417944ea92c6537381b5f7, type: 3}
   WorldMap: {fileID: 4900000, guid: 8da52ab9936a2c64fa9ce818dec94ca7, type: 3}
-  RegionMap: {fileID: 4900000, guid: 5ffbdee8624b2f246824122cf4b36ce5, type: 3}
+  RegionMap: {fileID: 4900000, guid: a97ba288782c446448196c158f33e089, type: 3}
   TimeBetweenSteps: 1
   worldCreatureManager: {fileID: 848237403}
   worldCorpseManager: {fileID: 848237409}
@@ -378,7 +378,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0e50f63ac2009044bb8e44156ff40061, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  corpsePrefab: {fileID: 1103498597189704240, guid: ede4739bb31cd7541bfd43b14f135049, type: 3}
+  corpsePrefab: {fileID: 1103498597189704240, guid: cced31f8c6854fc4daf1e9c810e5363f, type: 3}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
