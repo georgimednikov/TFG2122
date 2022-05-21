@@ -98,12 +98,12 @@ namespace EvolutionSimulation.Entities
             stats.MinTemperature = stats.IdealTemperature - tempInRange;
             stats.MaxTemperature = stats.IdealTemperature + tempInRange;
 
-            stats.MaxEnergy = resourceAmount; // minEnergy + stats.Size / sizeToEnergyRatio; TODO: en teoria es el mismo valor todos los recursos, cambia el gasto
-            stats.CurrEnergy = stats.MaxEnergy;
-            stats.EnergyExpense = (stats.MaxEnergy / (UniverseParametersManager.parameters.hoursTilStarvation * World.ticksHour)) *
-            (stats.Metabolism / (float)chromosome.GetFeatureMax(CreatureFeature.Metabolism) * (stats.Members / 2f) +
-            (stats.Venom / 2f + stats.Counter / 2f) * 0.5f);
-            //(stats.MaxEnergy / (8 * World.ticksHour)) * ((float)Math.Pow(ratio, 2) / (float)Math.Pow(0.5, 2));
+            stats.MaxEnergy = resourceAmount;
+            stats.CurrEnergy = stats.MaxEnergy;                                                                                     // The base cost of the action is expected of an average creature.
+            stats.EnergyExpense = stats.MaxEnergy / (UniverseParametersManager.parameters.hoursTilStarvation * World.ticksHour) *   // An average creature is defined as one with half the maximum metabolism,
+            (chromosome.GetFeaturePercentage(CreatureFeature.Metabolism) * 2f) *                                                    // 4 members, and neither venom nor thorns. The base value of the expense
+            ((stats.Members / 4f) + // TODO: Numero magico                                                                          // is then multiplied to reflect the creature's lack or suprlus of features.
+            (stats.Venom / (float)(chromosome.GetFeatureMax(CreatureFeature.Venomous) / 2f)) + (stats.Counter / (float)(chromosome.GetFeatureMax(CreatureFeature.Thorns) / 2f)));
 
             stats.MaxHydration = resourceAmount;
             stats.CurrHydration = stats.MaxHydration;
@@ -112,10 +112,8 @@ namespace EvolutionSimulation.Entities
             stats.MaxRest = resourceAmount;
             stats.CurrRest = stats.MaxRest;
             float re = stats.MaxRest / (UniverseParametersManager.parameters.hoursTilExhaustion * UniverseParametersManager.parameters.ticksPerHour);
-            stats.RestExpense = re / 2f +   // TODO: Numeros arcanos
-                (re / 2f * (1 - chromosome.GetFeaturePercentage(CreatureFeature.Resistance)));
-            //    minRestExpense + (maxRestExpense - minRestExpense) * 
-            //    (1 - (float)chromosome.GetFeature(CreatureFeature.Resistance) / chromosome.GetFeatureMax(CreatureFeature.Resistance));
+            stats.RestExpense = re / 2f +   // TODO: Numeros arcanos                            // A creature with average resistance will have the base expense
+                (1 - chromosome.GetFeaturePercentage(CreatureFeature.Resistance)) * re;         // One with maximum or minimum will have either half or 1.5 times respectively
             stats.RestRecovery = stats.RestExpense * exhaustToSleepRatio;
 
             //Environment related stats
