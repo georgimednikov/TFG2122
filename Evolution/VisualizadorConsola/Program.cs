@@ -73,7 +73,7 @@ namespace VisualizadorConsola
                     };
                     UserInfo.Size = config.mapSize;
                 }
-                else // if nothing is given, a size has to be asked of the user. 
+                else // if nothing is given, a size and a map type has to be asked of the user. 
                 {
                     do
                     {
@@ -83,6 +83,33 @@ namespace VisualizadorConsola
                         if (input != "") UserInfo.Size = int.Parse(input);
                         Console.Clear();
                     } while (UserInfo.Size < minSize);
+
+                    World.MapType[] mapTypes = (World.MapType[])Enum.GetValues(typeof(World.MapType));
+                    int index = -1;
+                    do
+                    {
+                        Console.WriteLine($"Input the number of the type of map that should be generated:");
+                        for(int i = 0; i < mapTypes.Length; i++)
+                        {
+                            Console.Write($"<{i}> {mapTypes[i]} | ");
+                        }
+                        Console.WriteLine();
+
+                        string input = Console.ReadLine();
+                        try 
+                        {
+                            index = int.Parse(input);
+                            if(index < 0 || index >= mapTypes.Length)
+                                Console.WriteLine("Incorrect type number");
+                        }
+                        catch (FormatException e){ Console.WriteLine("Incorrect format"); }
+                    } while (index < 0 || index >= mapTypes.Length);
+                    Console.Clear();
+
+                    config = new WorldGenConfig(mapTypes[index])
+                    {
+                        mapSize = UserInfo.Size
+                    };
                 }
             }
 

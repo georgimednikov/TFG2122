@@ -53,7 +53,7 @@ namespace EvolutionSimulation
                 }
                 else // Else a new one has to be created from scratch with the given parameters, in this case only size.
                 {
-                    WorldGenConfig config = new WorldGenConfig(World.MapType.Atoll)
+                    WorldGenConfig config = new WorldGenConfig(World.MapType.Atoll) // TODO: cambiar por default
                     {
                         mapSize = UserInfo.Size
                     };
