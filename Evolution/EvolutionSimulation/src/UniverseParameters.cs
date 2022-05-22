@@ -7,58 +7,58 @@ namespace EvolutionSimulation
     public class UniverseParameters
     {
         // Time/World
-        public int ticksPerHour = 50;
-        public int hoursPerDay = 24;
-        public int daysPerYear = 365;
-        public float morningStart = 6.5f;
-        public float nightStart = 20;
+        public int ticksPerHour = 50; // Number of ticks per hour of simulation
+        public int hoursPerDay = 24; // Number of hours per day of simulation
+        public int daysPerYear = 365; // Number of days per year of simulation
+        public float morningStart = 6.5f; // Dawn hour
+        public float nightStart = 20; // Nigthfall hour
 
         //Plant
-        public int grassHp = 10;
-        public int bushHp = 20;
-        public int eTreeHp = 50;
-        public float grassNutritionalValue = 2.8f;
-        public float bushNutritionValue = 6.4f;
-        public float eTreeNutritionalValue = 13.2f;
-        public float grassHoursTillGrowth = 24f; // One day
-        public float bushHoursTillGrowth = 120f; // Five days
-        public float eTreeHoursTillGrowth = 360f; // Fifteen days
+        public int grassHp = 10; // Grass "health", it represents the amount of times it can be consumed before expiring
+        public int bushHp = 20; // Bush "health", it represents the amount of times it can be consumed before expiring
+        public int eTreeHp = 50; // EdibleTree "health", it represents the amount of times it can be consumed before expiring
+        public float grassNutritionalValue = 2.8f; // Amount of food the grass gives
+        public float bushNutritionValue = 6.4f;  // Amount of food bushes give
+        public float eTreeNutritionalValue = 13.2f;  // Amount of food edible trees give
+        public float grassHoursTillGrowth = 24f; // Hours needed for grass to be regenerated. Default: One day
+        public float bushHoursTillGrowth = 120f; // Hours needed for bushes to be regenerated. Default: Five days
+        public float eTreeHoursTillGrowth = 360f; // Hours needed for edible trees to be regenerated. Default: Fifteen days
 
         // Creature
         public float abilityUnlockPercentage = 0.4f; //The percentage of an ability that has to be had in order to unlock it
         public int minHealth = 10; //Minimum amount of health
         public int healthGainMultiplier = 2; //Health gained per point of constitution
         public float healthRegeneration = 0.1f; // How much health is regenerated each tick if the creature is healthy
-        public int maxLimbs = 10;
-        public int minRestExpense = 1; // How much does rest go down every tick
-        public int maxRestExpense = 5;
+        public int maxLimbs = 10; // Maximum amount of lims a creature can have
+        public int minRestExpense = 1; // The minimum amount of rest to go down every tick
+        public int maxRestExpense = 5; // The maximum amount of rest to go down every tick
         public int resourceAmount = 100; //Max amount of every resource
-        public int minPerception = 5;
-        public int maxPerception = 10;
-        public float minLifeSpan = 0.5f; // Minimum years alive
+        public int minPerception = 5; // The minimum radius of perception a creature can have
+        public int maxPerception = 10; // The maximum radius of perceptiona creature can have
+        public float minLifeSpan = 0.5f; // Minimum number of years a creature can live
         public float exhaustToSleepRatio = 3; //The creature has to spend sleepToExhaustRatio hours awake per hour asleep
         public float hoursTilExhaustion = 28; // Hours until the creature falls over exhausted
-        public float perceptionWithoutNightVision = 0.6f; //Percentage of the max Perception lost at night
-        public float minPerceptionWithNightVision = 0.7f; //Percentage of the max Perception lost at night
+        public float perceptionWithoutNightVision = 0.6f; //Percentage of the perception lost at night
+        public float minPerceptionWithNightVision = 0.7f; //Percentage of the perception lost at night
         public float minMobilityMedium = 0.6f; //When moving through a special medium the slowest speed possible is its mobility * (0.6 - 1.0) depending on proficiency
         public float mobilityPenalty = 0.7f; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
         public float yearsBetweenHeats = 0.1f;  // How many years between each heat period
         public int maxChildNumber = 5; // The maximum number of child that can be conceived in a sexual intercourse
         public int ticksToReproduce = 20; // How many ticks the creatures must be reproducing for to be able to bear offspring
-        public float maxSpeed = 1.5f;
-        public float hornIntimidationMultiplier = 1.5f;
-        public float hairTemperatureMultiplier = 0.2f;//The temperature multiplier is the creature has the hair ability
+        public float maxSpeed = 1.5f; // Speed multiplier that defines the maximum speed of the creature TODO: no se si es esto
+        public float hornIntimidationMultiplier = 1.5f; // Intimidation multiplier if the creature has horns
+        public float hairTemperatureMultiplier = 0.2f; // The temperature multiplier if the creature has the hair ability
         public float restRegenerationThreshold = 0.7f;  // Threshold at which rest must be for the creature to be able to regenerate health
         public float energyRegenerationThreshold = 0.85f;   // Threshold at which energy must be for the creature to be able to regenerate health
         public float hydrationRegenerationThreshold = 0.85f;    // Threshold at which hysration must be for the creature to be able to regenerate health
-        public float regenerationRate = 0.01f;  // Perceentage of maximum health whichthe creature regenerates each tick
+        public float regenerationRate = 0.01f;  // Percentage of maximum health whichthe creature regenerates each tick
         public float hoursTilStarvation = 124f;  // Maximum time until the creature reached 0 energy
         public float thirstToHungerRatio = 3f;  // Rate at wich thisrts increases in relation to hunger
         public float maxTemperatureAggressivenessPercentage = 0.5f; //Max percentage of the creature's aggressiveness that is used as danger in tiles with extreme temperature
         public float maxTemperatureDifference = 0.2f; //How many degrees over the limit influence the damage until it reaches the limit.
         public double minHealthTemperatureDamage = 0.01; //Minimum max health damage for being in extreme temperatures.
         public double maxHealthTemperatureDamage = 0.02; //Maximum max health damage for being in extreme temperatures.
-        public float venomDamageMultiplier = 0.25f;
+        public float venomDamageMultiplier = 0.25f; // Venom damage multiplier applied to every type of venom TODO: no se si es esto 
         public float omnivorousNutritionMultiplier = 0.7f; // How effective food sources are for omnivores.
 
         // CreatureStats
@@ -72,42 +72,41 @@ namespace EvolutionSimulation
         public float veryThirstyThreshold = 0.15f; //After which percentage of currHydration the creature should eat with high priority
 
         // Trees
-        public float treeMovementPenalty = 0.7f;
+        public float treeMovementPenalty = 0.7f; // Mobility penalty applied to non-arborean creatures that move through trees
 
         // Memory
-        public int knowledgeTickMultiplier = 500;
-        //public float perceptionToRadiusMultiplier = 0.15f;
-        public float aggressivenessToRadiusMultiplier = 0.33f;
-        public int maxResourcesRemembered = 5;
-        public int maxPositionsRemembered = 10;
+        public int knowledgeTickMultiplier = 500; // Amount of ticks that a creature can remember experiences. It depends also on its knoledge. TODO: no se si es esto
+        public float aggressivenessToRadiusMultiplier = 0.33f; // TODO: no se que es esto
+        public int maxResourcesRemembered = 5; // Maximum number of resources that a creature can remeber
+        public int maxPositionsRemembered = 10; // Maximum number of positions that a creature can remember
 
         // States
-        public int baseActionCost = 1000;
-        public int venomCostMultiplier = 100;
-        public float chaseCostMultiplier = 0.4f;
-        public float fleeingCostMultiplier = 0.75f;
-        public int drinkingCostMultiplier = 10;
-        public int drinkingMultiplier = 10;
-        public int eatingCostMultiplier = 10;
-        public int sleepingCostMultiplier = 10;
-        public float mutationChance = 0.1f;
-        public int adjacentLength = 1;
-        public float actionPerceptionPercentage = 0.75f;
-        public float sleepingExpenseReduction = 0.1f;
+        public int baseActionCost = 1000; // Base cost of any action
+        public int venomCostMultiplier = 100; // Aditional cost of a venomous attack TODO: no es un multiplicador
+        public float chaseCostMultiplier = 0.4f; // TODO: no se usa
+        public float fleeingCostMultiplier = 0.75f; // Modifier of the cost of moving when one creature flees from another TODO: hay un numero mágico en flee
+        public int drinkingCostMultiplier = 10; // Cost modifier of drinking
+        public int drinkingMultiplier = 10; // Modifier of the amount of hidratation that is recovered when drinking
+        public int eatingCostMultiplier = 10; // Cost modifier of eating
+        public int sleepingCostMultiplier = 10; // Cost modifier of sleeping
+        public float mutationChance = 0.1f; // Chance of a mutation in new creatures 
+        public int adjacentLength = 1; // TODO: no se que es esto
+        public float actionPerceptionPercentage = 0.75f; // Perception modification when a creature is performing an action
+        public float sleepingExpenseReduction = 0.1f; // The reduction of every expense (energy, hydration, rest) when a creature is sleeping
 
         // Transitions
-        public int fleeingTransitionMultiplier = 4;
-        public int hidingTransitionMultiplier = 4;
-        public float stopEatingTransitionEnergyMultiplier = 1;
-        public float combatTransitionHealthThresholdMultiplier = 50;
-        public float maxMenaceIntimidationMultiplierBasedOnMissingHealth = 2;
-        public float safeTransitionAggressivenessThreshold = 1;
+        public int fleeingTransitionMultiplier = 4; // TODO: no se que es esto
+        public int hidingTransitionMultiplier = 4; // TODO: no se que es esto
+        public float stopEatingTransitionEnergyMultiplier = 1; // TODO: no se que es esto
+        public float combatTransitionHealthThresholdMultiplier = 50; // TODO: no se que es esto
+        public float maxMenaceIntimidationMultiplierBasedOnMissingHealth = 2; // TODO: no se que es esto
+        public float safeTransitionAggressivenessThreshold = 1; // TODO: no se que es esto
         public float experienceMaxAggresivenessMultiplier = 0.2f; //Percentage of the max aggressiveness used to create experiences
         public float safePrefferedOverClosestResourceRatio = 1.25f; //Acceptable max distance of the closest safe resource compared to the closest
 
         // Corpse
-        public float rotStartMultiplier = 0.01f;
-        public float corpseNutritionPointsMultiplier = 80f;
+        public float rotStartMultiplier = 0.01f; // Time relative to a corpse "life time"when the corpse starts putrefying
+        public float corpseNutritionPointsMultiplier = 80f; // Base nutrition points modification to a corpse
 
         //Taxonomy
         public float percentageSimilaritySpecies = 0.9f;// If 2 creatures's chromose similarity are under this percentage, it means their are two species
