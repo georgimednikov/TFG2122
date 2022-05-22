@@ -67,7 +67,7 @@ namespace EvolutionSimulation.Entities
                 stats.ArborealSpeed = Math.Max((int)((stats.AerialSpeed * mobilityPenalty) - (chromosome.GetFeaturePercentage(CreatureFeature.Size) * stats.MaxSpeed) / 2f), 0);
                 stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
             }
-            if (stats.TreeReach)//TODO igual es arboreal, pero no estoy seguro
+            if (arboreal)
             {
                 stats.ArborealSpeed = Math.Max((int)((speed * (minMobilityMedium + (1 - minMobilityMedium) * chromosome.GetFeaturePercentage(CreatureFeature.Arboreal))) - (chromosome.GetFeaturePercentage(CreatureFeature.Size) * stats.MaxSpeed) / 2f), 0);
                 stats.GroundSpeed = (int)(stats.ArborealSpeed * mobilityPenalty);
@@ -189,7 +189,7 @@ namespace EvolutionSimulation.Entities
             }
 
             //Intimidation has to be calculed here because of modifyStatByAge
-            float intimidation = stats.Size / 2; 
+            float intimidation = stats.Size / 2; //TODO:Hacer que escale con fuerza
 
             //Horns. Increase damage and intimidation
             if (chromosome.HasAbility(CreatureFeature.Horns, CreatureChromosome.AbilityUnlock[CreatureFeature.Horns]))
