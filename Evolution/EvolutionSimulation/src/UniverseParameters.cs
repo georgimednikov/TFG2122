@@ -43,6 +43,7 @@ namespace EvolutionSimulation
         public float minMobilityMedium = 0.6f; //When moving through a special medium the slowest speed possible is its mobility * (0.6 - 1.0) depending on proficiency
         public float mobilityPenalty = 0.7f; //The more evolved the animal is to move on a medium different than the ground the worse it moves in relation to the ground
         public float yearsBetweenHeats = 0.1f;  // How many years between each heat period
+        public int maxChildNumber = 5; // The maximum number of child that can be conceived in a sexual intercourse
         public int ticksToReproduce = 20; // How many ticks the creatures must be reproducing for to be able to bear offspring
         public float maxSpeed = 1.5f;
         public float hornIntimidationMultiplier = 1.5f;

@@ -44,7 +44,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                         return; 
                     }
                     // Create a random number of childs
-                    int numberChilds = RandomGenerator.Next(1, 5);//TODO: que el numero de hijos dependa de algo del cromosoma?
+                    int numberChilds = RandomGenerator.Next(1, UniverseParametersManager.parameters.maxChildNumber + 1);//TODO: que el numero de hijos dependa de algo del cromosoma?
                     Entities.Creature father = creature.world.GetCreature(creature.matingCreature);
                     for (int i = 0; i < numberChilds; ++i)
                     {
