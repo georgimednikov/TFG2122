@@ -465,13 +465,7 @@ namespace EvolutionSimulation.Entities
             // Escape-state Configuration
             // States
             IState fleeing = new Fleeing(this);
-            //IState hide = new Hide(this);
             Fsm escapeFSM = new Fsm(fleeing);
-            // Transitions
-            ITransition fleeTransition = new FleeTransition(this);
-            //ITransition hideTranistion = new HideTransition(this);
-            //escapeFSM.AddTransition(fleeing, hideTranistion, hide);
-            //escapeFSM.AddTransition(hide, fleeTransition, fleeing);
             IState escape = new CompoundState("Escape", escapeFSM);
 
             // Combat-state Configuration

@@ -13,14 +13,12 @@
 
         public override bool Evaluate()
         {
-            bool t = creature.SafeTemperaturePosition() == null;
-
             return !creature.CheckTemperature(creature.x, creature.y) && creature.SafeTemperaturePosition() == null;
         }
 
         public override string ToString()
         {
-            return "GoToSafePlaceTransition";
+            return "GoToSafeTemperaturePlaceExploreTransition";
         }
 
     }
