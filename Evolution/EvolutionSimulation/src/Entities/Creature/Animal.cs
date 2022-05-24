@@ -100,11 +100,12 @@ namespace EvolutionSimulation.Entities
 
             stats.MaxEnergy = resourceAmount;
             stats.CurrEnergy = stats.MaxEnergy;                                                                                     // The base cost of the action is expected of an average creature.
-            stats.EnergyExpense = stats.MaxEnergy / (UniverseParametersManager.parameters.hoursTilStarvation * World.ticksHour) *   // An average creature is defined as one with half the maximum metabolism,
+            stats.EnergyExpense = Math.Max(stats.MaxEnergy / (UniverseParametersManager.parameters.hoursTilStarvation * World.ticksHour) *   // An average creature is defined as one with half the maximum metabolism,
             (chromosome.GetFeaturePercentage(CreatureFeature.Metabolism) * 2f) *                                                    // 4 members, and neither venom nor thorns. The base value of the expense
             ((stats.Members / 4f) + // TODO: Numero magico                                                                          // is then multiplied to reflect the creature's lack or suprlus of features.
-            (stats.Venom / (float)(chromosome.GetFeatureMax(CreatureFeature.Venomous) / 2f)) + (stats.Counter / (float)(chromosome.GetFeatureMax(CreatureFeature.Thorns) / 2f)));
-
+            (stats.Venom / (float)(chromosome.GetFeatureMax(CreatureFeature.Venomous) / 2f)) + (stats.Counter / (float)(chromosome.GetFeatureMax(CreatureFeature.Thorns) / 2f)))
+            ,0.01f);
+            Console.WriteLine(stats.EnergyExpense);
             stats.MaxHydration = resourceAmount;
             stats.CurrHydration = stats.MaxHydration;
             stats.HydrationExpense = (stats.EnergyExpense * UniverseParametersManager.parameters.thirstToHungerRatio);

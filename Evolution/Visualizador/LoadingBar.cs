@@ -30,9 +30,8 @@ namespace Visualizador
                 Value = 0,
                 Step = 1,
             };
-            attempts = 0;
 
-            text = new Label() { Left = 0, Top = 25, Text = "Simulating... Attempts: " + attempts };
+            text = new Label() { Left = 0, Top = 25, Text = "Simulating..." };
             text.AutoSize = true;
 
             prompt.Controls.Add(progressBar);
@@ -46,13 +45,5 @@ namespace Visualizador
             progressBar.Value++;
         }
 
-        public void NewAttempt()
-        {
-            attempts++;
-            progressBar.Value = progressBar.Minimum;
-            text.Text = "Simulating... Attempts: " + attempts;
-            prompt.Refresh();
-        }
-        private int attempts;
     }
 }
