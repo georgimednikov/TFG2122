@@ -18,9 +18,9 @@
         public override bool Evaluate()
         {
             Vector3Int parentPos;
-            //TODO que la distancia a dejar de seguir al padre dependa de algo (nivel de paternity, peligro...)
             if (!creature.stats.IsNewBorn() || !creature.Parent(out _, out parentPos) || parentPos == null
-                || creature.DistanceToObjective(parentPos) < 3 || !creature.CanReach((Entities.Creature.HeightLayer)parentPos.z))
+                || creature.DistanceToObjective(parentPos) < UniverseParametersManager.parameters.maxDistanceToStopFollowParent
+                || !creature.CanReach((Entities.Creature.HeightLayer)parentPos.z))
                 return true;
 
             return false;

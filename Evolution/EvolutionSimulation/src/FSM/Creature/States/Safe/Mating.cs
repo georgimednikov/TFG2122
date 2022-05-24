@@ -38,17 +38,16 @@ namespace EvolutionSimulation.FSM.Creature.States
             {
                 if (creature.stats.Gender == Genetics.Gender.Female)
                 {
+                    Entities.Creature father = creature.world.GetCreature(creature.matingCreature);
                     // The creature whom it was mating has died or something
-                    if (creature.world.GetCreature(creature.matingCreature) == null) {
+                    if (father == null) {
                         StopMating(); 
                         return; 
                     }
                     // Create a random number of childs
                     int numberChilds = RandomGenerator.Next(1, UniverseParametersManager.parameters.maxChildNumber + 1);//TODO: que el numero de hijos dependa de algo del cromosoma?
-                    Entities.Creature father = creature.world.GetCreature(creature.matingCreature);
                     for (int i = 0; i < numberChilds; ++i)
                     {
-                        //TODO: cuidado con el problema del diamante
                         // Crossover with male and female chromosomes          
                         Genetics.CreatureChromosome childC = Genetics.GeneticFunctions.UniformCrossover(father.chromosome, creature.chromosome);
                         // Mutate the chromosome
@@ -61,7 +60,6 @@ namespace EvolutionSimulation.FSM.Creature.States
                         }while(!creature.world.CanMove(nx,ny));
                         
                         creature.world.CreateCreature<Entities.Animal>(nx, ny, childC, creature.world.GiveName(childC, father, creature), creature.matingCreature, creature.ID);
-
                     }
 
 #if TRACKER_ENABLED

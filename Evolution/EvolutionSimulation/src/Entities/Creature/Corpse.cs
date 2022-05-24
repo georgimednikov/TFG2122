@@ -54,7 +54,6 @@ namespace EvolutionSimulation.Entities
             poisonDuration = (int)creature.stats.Venom;
             poisonTickDamage = creature.stats.Venom * UniverseParametersManager.parameters.venomDamageMultiplier; 
 
-            // TODO: testiar
             maxNutritionPoints = UniverseParametersManager.parameters.corpseNutritionPointsMultiplier 
                                 * creature.stats.Size / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size);  
         }
@@ -98,7 +97,7 @@ namespace EvolutionSimulation.Entities
                 curHp -= dealt;
                 // The creature can be poisoned when eating the corpse
                 if (prob < actualPoisonProb && dealt > 0)   // In case another creature tried eating an empty corpse
-                    other.AddStatus(new Status.Poison(poisonDuration, poisonTickDamage, -1));   // TODO: Distinguir corpse?
+                    other.AddStatus(new Status.Poison(poisonDuration, poisonTickDamage, -1));   
             }                      
         }
 

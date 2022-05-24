@@ -19,10 +19,6 @@ namespace EvolutionSimulation
         public event Action<EventSimulation> OnSimulationStep;
         public event Action<EventSimulation> OnSimulationEnd;
 
-        // TODO: quitar esto si no hacemos apocalipsis
-        public int ApocalypseCount { get => apocalypseCount; }
-        public Action<EventSimulation> OnApocalypse;
-
         /// <summary>
         /// OnSimulationStart events are performed.
         /// </summary>
@@ -60,13 +56,6 @@ namespace EvolutionSimulation
         {
             OnSimulationEnd?.Invoke(this);
             base.End();
-        }
-
-        //TODO: apocalipsis y esas cosas
-        override protected void Apocalypse()
-        {
-            OnApocalypse?.Invoke(this);
-            base.Apocalypse();
         }
     }
 }

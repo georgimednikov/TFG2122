@@ -182,7 +182,7 @@ namespace EvolutionSimulation.Entities
             {
                 causeOfDeath = CauseOfDeath.Temperature;
                 killingBlow = damage;
-                killerID = ID;  // TODO: -1 o esto?
+                killerID = ID; 
             }
 #if DEBUG
             Console.WriteLine("CreatureId: " + ID + "  " + "temperature difference: " + difference + ", which dealt " + damage + " damage");
@@ -304,7 +304,7 @@ namespace EvolutionSimulation.Entities
 
                 float medPercent = (pE + pR + pH) / 3.0f;   // Average percentage of suprassed thresholds
 
-                stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth * medPercent);  // TODO: Ver si esto esta bien, ingenieria de valores
+                stats.CurrHealth += (UniverseParametersManager.parameters.regenerationRate * stats.MaxHealth * medPercent);  
                 stats.CurrHealth = Math.Min(stats.CurrHealth, stats.MaxHealth); // So it does not get over-healed
                 
             }
@@ -383,7 +383,6 @@ namespace EvolutionSimulation.Entities
             ITransition doneExploringTransition = new DoneExploringTransition(this);
             safeFSM.AddTransition(explore, doneExploringTransition, wander);
 
-            // TODO queremos esto? si lo dejamos, quitar comprobaciones en las transiciones de si tiene la habilidad o no
             //Follow Parent
             if (stats.Paternity > 0)
             {
@@ -510,7 +509,7 @@ namespace EvolutionSimulation.Entities
 
         // Handler for interaction events
         public delegate void ReceiveInteractionHandler(Creature receiver, Creature sender, Interactions type);
-        public event ReceiveInteractionHandler ReceiveInteractionEvent; // TODO: asi?
+        public event ReceiveInteractionHandler ReceiveInteractionEvent; 
 
         /// <summary>
         /// Set the interactions that the creature has
@@ -640,7 +639,7 @@ namespace EvolutionSimulation.Entities
             {
                 causeOfDeath = CauseOfDeath.Attack;
                 killingBlow = damage;
-                killerID = interacter.ID;  // TODO: -1 o esto?
+                killerID = interacter.ID;  
             }
 
 #if DEBUG
@@ -719,10 +718,13 @@ namespace EvolutionSimulation.Entities
             mating = false;
         }
 
-        // TODO: For the love of god please comment
+        // Time that has to pass between having offspring and being on heat again
         public int timeToBeInHeat { get; set; }
+        // If the creature is in the state Mating
         public bool mating { get; set; }
+        // It he creature wants to mate (a female have all the need suplied and is on heat)
         public bool wantMate { get; set; }
+        // The ID of the creature which this creature is mating
         public int matingCreature { get; set; }
 #endregion
 
@@ -1078,8 +1080,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         public int GetNextCostOnPath()
         {
-            // TODO Hay que tener en cuenta el path sea de longuitud 0
-            if (path == null || path.Length == 0 || pathIterator == path.Length) // TODO: que los estados tengan cuidado de cuando el coste que les dan es -1
+            if (path == null || path.Length == 0 || pathIterator == path.Length)
                 return -1;
             int speed;
             int layer = (int)path[pathIterator].Z;

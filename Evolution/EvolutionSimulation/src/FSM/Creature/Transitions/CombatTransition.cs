@@ -28,12 +28,7 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             // If a dangerous creature is nearby and it cannot run away, it engages in combat,
             if (creature.Menace(out advID, out advPos) && creature.cornered)
             {
-                //TODO quitar esta comprobacion, no debería hacerse, está solo para debugear algun fallo.
-                //if (creature.world.GetCreature(advID) == null)
-                //{
-                //    creature.mind.mem.Update();
-                //    return false;
-                //}
+                
                 creature.TargetEnemy(advID, advPos);
                 if (advPos.z == 2)
                     return true;
