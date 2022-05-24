@@ -29,7 +29,7 @@ namespace EvolutionSimulation
         public int minHealth = 10; //Minimum amount of health
         public int healthGainMultiplier = 2; //Health gained per point of constitution
         public float healthRegeneration = 0.1f; // How much health is regenerated each tick if the creature is healthy
-        public int maxLimbs = 10; // Maximum amount of lims a creature can have
+        public int maxLimbs = 10; // Maximum amount of limbs a creature can have
         public int minRestExpense = 1; // The minimum amount of rest to go down every tick
         public int maxRestExpense = 5; // The maximum amount of rest to go down every tick
         public int resourceAmount = 100; //Max amount of every resource
@@ -54,7 +54,7 @@ namespace EvolutionSimulation
         public float regenerationRate = 0.01f;  // Percentage of maximum health whichthe creature regenerates each tick
         public float hoursTilStarvation = 124f;  // Maximum time until the creature reached 0 energy
         public float thirstToHungerRatio = 3f;  // Rate at wich thisrts increases in relation to hunger
-        public float maxTemperatureAggressivenessPercentage = 0.5f; //Max percentage of the creature's aggressiveness that is used as danger in tiles with extreme temperature
+        public float maxTemperatureAggressivenessPercentage = 0.5f; //Max percentage of the creature's aggressiveness that is used as danger in tiles with extreme temperature // TODO no se usa
         public float maxTemperatureDifference = 0.2f; //How many degrees over the limit influence the damage until it reaches the limit.
         public double minHealthTemperatureDamage = 0.01; //Minimum max health damage for being in extreme temperatures.
         public double maxHealthTemperatureDamage = 0.02; //Maximum max health damage for being in extreme temperatures.
@@ -75,7 +75,7 @@ namespace EvolutionSimulation
         public float treeMovementPenalty = 0.7f; // Mobility penalty applied to non-arborean creatures that move through trees
 
         // Memory
-        public int knowledgeTickMultiplier = 500; // Amount of ticks that a creature can remember experiences. It depends also on its knoledge. TODO: no se si es esto
+        public int knowledgeTickMultiplier = 500; // Amount of ticks that a creature can remember things like water positions. It depends also on its knowledge.
         public float aggressivenessToRadiusMultiplier = 0.33f; // TODO: no se que es esto
         public int maxResourcesRemembered = 5; // Maximum number of resources that a creature can remeber
         public int maxPositionsRemembered = 10; // Maximum number of positions that a creature can remember
@@ -83,7 +83,7 @@ namespace EvolutionSimulation
         // States
         public int baseActionCost = 1000; // Base cost of any action
         public int venomCostMultiplier = 100; // Aditional cost of a venomous attack TODO: no es un multiplicador
-        public float chaseCostMultiplier = 0.4f; // TODO: no se usa
+        public float chaseCostMultiplier = 0.4f;
         public float fleeingCostMultiplier = 0.75f; // Modifier of the cost of moving when one creature flees from another TODO: hay un numero mágico en flee
         public int drinkingCostMultiplier = 10; // Cost modifier of drinking
         public int drinkingMultiplier = 10; // Modifier of the amount of hidratation that is recovered when drinking
@@ -96,23 +96,22 @@ namespace EvolutionSimulation
 
         // Transitions
         public int fleeingTransitionMultiplier = 4; // TODO: no se que es esto
-        public int hidingTransitionMultiplier = 4; // TODO: no se que es esto
         public float stopEatingTransitionEnergyMultiplier = 1; // TODO: no se que es esto
         public float combatTransitionHealthThresholdMultiplier = 50; // TODO: no se que es esto
         public float maxMenaceIntimidationMultiplierBasedOnMissingHealth = 2; // TODO: no se que es esto
         public float safeTransitionAggressivenessThreshold = 1; // TODO: no se que es esto
-        public float experienceMaxAggresivenessMultiplier = 0.2f; //Percentage of the max aggressiveness used to create experiences
-        public float safePrefferedOverClosestResourceRatio = 1.25f; //Acceptable max distance of the closest safe resource compared to the closest
-
+        public float experienceMaxAggresivenessMultiplier = 0.2f; // Percentage of the max aggressiveness used to create experiences
+        public float safePrefferedOverClosestResourceRatio = 1.25f; // Acceptable max distance of the closest safe resource compared to the closest
+        public int maxDistanceToStartFollowParent = 10; // Distance to start following the parent
+        public int maxDistanceToStopFollowParent = 3; // Distance to stop following the parent
+        
         // Corpse
         public float rotStartMultiplier = 0.01f; // Time relative to a corpse "life time"when the corpse starts putrefying
         public float corpseNutritionPointsMultiplier = 80f; // Base nutrition points modification to a corpse
 
         //Taxonomy
         public float percentageSimilaritySpecies = 0.9f;// If 2 creatures's chromose similarity are under this percentage, it means their are two species
-        // it is use just when an apocalypse occurs. Of all the species that has been among the simulation
-        // export this percentage of the species.
-        public float percentageOfSpeciesToExport = 0.35f;
+
     }
 
     public static class UniverseParametersManager

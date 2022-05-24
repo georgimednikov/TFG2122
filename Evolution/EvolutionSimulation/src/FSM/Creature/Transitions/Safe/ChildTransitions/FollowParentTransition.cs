@@ -24,8 +24,8 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
             if (!creature.stats.IsNewBorn() || !creature.Parent(out _, out parentPos) || parentPos == null)
                 return false;
 
-            //TODO que la distancia a empezar a seguir al padre dependa de algo (nivel de paternity, peligro...)
-            if (creature.DistanceToObjective(parentPos) > 10 && creature.CanReach((Entities.Creature.HeightLayer)parentPos.z))   // TODO: Numerosdalf el Gris
+            if (creature.DistanceToObjective(parentPos) > UniverseParametersManager.parameters.maxDistanceToStartFollowParent
+                && creature.CanReach((Entities.Creature.HeightLayer)parentPos.z))
                 return true;
 
             return false;

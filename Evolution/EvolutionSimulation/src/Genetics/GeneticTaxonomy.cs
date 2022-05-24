@@ -350,6 +350,7 @@ namespace EvolutionSimulation.Genetics
         /// </summary>
         public void ExportSpecies()
         {
+            //Export all the existing species
             for (int i = 0; i < existingSpecies.Count; i++)
             {
                 existingSpecies[i].endTick = existingSpecies[i].members[0].world.tick;
@@ -359,28 +360,16 @@ namespace EvolutionSimulation.Genetics
                 string species = JsonConvert.SerializeObject(export, Formatting.Indented);
                 File.WriteAllText($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Species_{i}.json", species);
             }
-        }
-
-
-        /// <summary>
-        /// Exports the species that has live more time as JSONs in the folder "ResultingSpecies" named "SpeciesN"
-        /// being n the order of writing. This method is called when an apocalysis ocurs
-        /// </summary>
-        /// <param name="cont"> Number of apocalysis</param>
-        public void ExportSpecies(int cont)
-        {
-            speciesRecord.Sort(ticksComparator);
-            float numExport = speciesRecord.Count * UniverseParametersManager.parameters.percentageOfSpeciesToExport;
-            for (int i = 0; i < UserInfo.Species || i < numExport; i++)
+            speciesRecord.Sort(new TicksComparer());
+            //Export at least the same number of species as the number of species that the simulation has begun
+            int speciesToExport = UserInfo.Species - existingSpecies.Count;
+            for (int i = 0; i < speciesRecord.Count && i < speciesToExport; i++)
             {
                 Species sp = speciesRecord[i];
                 SpeciesExport export = new SpeciesExport(sp.name, sp.original.stats);
                 string species = JsonConvert.SerializeObject(export, Formatting.Indented);
-                File.WriteAllText(UserInfo.ExportDirectory + "/Apocalypse" + cont + "Species_" + i + ".json", species);
+                File.WriteAllText($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Species_{i + existingSpecies.Count}.json", species);
             }
-
-            speciesRecord.Clear();
-            existingSpecies.Clear();
         }
 
         /// <summary>

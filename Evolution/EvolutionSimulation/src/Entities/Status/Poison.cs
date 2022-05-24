@@ -36,7 +36,7 @@ namespace EvolutionSimulation.Entities.Status
             {
                 owner.causeOfDeath = CauseOfDeath.Poison;
                 owner.killingBlow = damage;
-                owner.killerID = owner.ID;  // TODO:-1 o esto?
+                owner.killerID = owner.ID;
             }
 
             return base.OnTick();

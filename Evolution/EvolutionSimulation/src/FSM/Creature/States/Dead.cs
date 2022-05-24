@@ -47,7 +47,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 template += "\nCORPSE CREATED WITH ID: " + corpse.ID + " IN POSITION: (" + creature.x + ", " + creature.y + ")";
             }
             else
-                template += "\nCORPSE CANNOT BE CREATED IN: POSITION: (" + creature.x + ", " + creature.y + ") CREATURE ID: " + creature.ID;  // TODO: Coordenada altura?
+                template += "\nCORPSE CANNOT BE CREATED IN: POSITION: (" + creature.x + ", " + creature.y + ") CREATURE ID: " + creature.ID;  
         }
 
         public override string ToString()

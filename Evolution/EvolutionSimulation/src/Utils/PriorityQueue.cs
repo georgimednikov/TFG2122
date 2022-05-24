@@ -4,7 +4,6 @@ using System;
 
 namespace EvolutionSimulation.Utils
 {
-    // TODO: Adaptar esta para usar comparadores
     public class PriorityQueue<T> where T : IComparable<T>, IEquatable<T>
     {
         private List<T> items = new List<T>();

@@ -135,7 +135,6 @@ namespace EvolutionSimulation
             CreateCreatures();
             totalTicks = world.YearToTick(UserInfo.Years);
             currentTick = 1;
-            apocalypseCount = 0;
 
 #if TRACKER_ENABLED
             SimulationStartTrack();
@@ -160,14 +159,8 @@ namespace EvolutionSimulation
         /// </summary>
         protected void Simulate()
         {
-            for (; currentTick <= totalTicks; currentTick++)
-            {
-                if (!Step())
-                {
-                    break; //TODO: NO DEJAR ESTO
-                    Apocalypse();
-                }
-            }
+            while (Step() && currentTick <= totalTicks)
+                currentTick++;
         }
 
         /// <summary>
@@ -184,16 +177,6 @@ namespace EvolutionSimulation
             EndTracker();
 #endif
         }
-
-        //TODO: apocalipsis y esas cosas
-        virtual protected void Apocalypse()
-        {
-            ApocalypseExport(apocalypseCount++);
-            CreateCreatures();
-            // totalTicks = world.YearToTick(UserInfo.Years);
-            // currentTick = 1;
-        }
-
 
         #region CreatureCreation
         virtual protected void CreateCreatures()
@@ -314,10 +297,6 @@ namespace EvolutionSimulation
         {
             world.ExportContent();
             WorldToBmp();
-        }
-        protected void ApocalypseExport(int cont)
-        {
-            world.ApocalypseExportContent(cont);
         }
 
         protected void WorldToBmp()
@@ -716,8 +695,6 @@ namespace EvolutionSimulation
         protected World world;
         protected int totalTicks;
         protected int currentTick;
-        // TODO: quitar esto si no hacemos apocalipsis
-        protected int apocalypseCount;
 
         //Method to test
        /* virtual protected void CreateCreaturesTest()

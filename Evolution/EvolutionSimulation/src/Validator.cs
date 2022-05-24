@@ -512,10 +512,10 @@ namespace EvolutionSimulation
             if (parameters.hoursTilExhaustion <= 0) throw new UniverseParameterIsZeroException("The provided hoursTilExhaustion must be positive");
             if (parameters.perceptionWithoutNightVision <= 0) throw new UniverseParameterIsZeroException("The provided perceptionWithoutNightVision must be positive");
             if (parameters.minPerceptionWithNightVision <= 0) throw new UniverseParameterIsZeroException("The provided minPerceptionWithNightVision must be positive");
-            // TODO: "nightPerceptionPenalty": 0.4, hay que ver que era y por que estaba en el jason
             if (parameters.minMobilityMedium <= 0) throw new UniverseParameterIsZeroException("The provided minMobilityMedium must be positive");
             if (parameters.mobilityPenalty <= 0) throw new UniverseParameterIsZeroException("The provided mobilityPenalty must be positive");
             if (parameters.yearsBetweenHeats <= 0) throw new UniverseParameterIsZeroException("The provided yearsBetweenHeats must be positive");
+            if (parameters.maxChildNumber <= 0) throw new UniverseParameterIsZeroException("The provided maxChildNumber must be positive");
             if (parameters.ticksToReproduce <= 0) throw new UniverseParameterIsZeroException("The provided ticksToReproduce must be positive");
             if (parameters.maxSpeed <= 0) throw new UniverseParameterIsZeroException("The provided maxSpeed must be positive");
             if (parameters.hornIntimidationMultiplier <= 0) throw new UniverseParameterIsZeroException("The provided hornIntimidationMultiplier must be positive");
@@ -531,6 +531,7 @@ namespace EvolutionSimulation
             if (parameters.minHealthTemperatureDamage <= 0) throw new UniverseParameterIsZeroException("The provided minHealthTemperatureDamage must be positive");
             if (parameters.maxHealthTemperatureDamage <= 0) throw new UniverseParameterIsZeroException("The provided maxHealthTemperatureDamage must be positive");
             if (parameters.venomDamageMultiplier <= 0) throw new UniverseParameterIsZeroException("The provided venomDamageMultiplier must be positive");
+            if (parameters.omnivorousNutritionMultiplier <= 0) throw new UniverseParameterIsZeroException("The provided omnivorousNutritionMultiplier must be positive");
             if (parameters.maxHealthTemperatureDamage < parameters.minHealthTemperatureDamage) throw new MinMaxValueSwappedException("The maximum amount of temperature damage is lower than the minimium");
             if (parameters.abilityUnlockPercentage > 1) throw new PercentageOverOneException("The provided abilityUnlockPercentage is over one");
             if (parameters.perceptionWithoutNightVision > 1) throw new PercentageOverOneException("The provided perceptionWithoutNightVision is over one");
@@ -544,6 +545,7 @@ namespace EvolutionSimulation
             if (parameters.minHealthTemperatureDamage > 1) throw new PercentageOverOneException("The provided minHealthTemperatureDamage is over one");
             if (parameters.maxHealthTemperatureDamage > 1) throw new PercentageOverOneException("The provided maxHealthTemperatureDamage is over one");
             if (parameters.regenerationRate > 1) throw new PercentageOverOneException("The provided regenerationRate is over one");
+            if (parameters.omnivorousNutritionMultiplier > 1) throw new PercentageOverOneException("The provided omnivorousNutritionMultiplier is over one");
 
         }
 
@@ -560,6 +562,7 @@ namespace EvolutionSimulation
             if (parameters.thirstyThreshold <= 0) throw new UniverseParameterIsZeroException("The provided thirstyThreshold must be positive");
             if (parameters.veryThirstyThreshold <= 0) throw new UniverseParameterIsZeroException("The provided veryThirstyThreshold must be positive");
             if (parameters.actionPerceptionPercentage <= 0) throw new UniverseParameterIsZeroException("The provided actionPerceptionPercentage must be positive");
+            if (parameters.sleepingExpenseReduction <= 0) throw new UniverseParameterIsZeroException("The provided sleepingExpenseReduction must be positive");
             if (parameters.minPerception <= 0) throw new UniverseParameterIsZeroException("The provided minPerception must be positive");
             if (parameters.maxPerception <= 0) throw new UniverseParameterIsZeroException("The provided maxPerception must be positive");
             if (parameters.newbornStatMultiplier > 1) throw new PercentageOverOneException("The provided newbornStatMultiplier is over one");
@@ -571,6 +574,7 @@ namespace EvolutionSimulation
             if (parameters.thirstyThreshold > 1) throw new PercentageOverOneException("The provided thirstyThreshold is over one");
             if (parameters.veryThirstyThreshold > 1) throw new PercentageOverOneException("The provided veryThirstyThreshold is over one");
             if (parameters.actionPerceptionPercentage > 1) throw new PercentageOverOneException("The provided actionPerceptionPercentage is over one");
+            if (parameters.sleepingExpenseReduction > 1) throw new PercentageOverOneException("The provided sleepingExpenseReduction is over one");
         }
 
         static void ValidatePlants(UniverseParameters parameters)
@@ -593,7 +597,7 @@ namespace EvolutionSimulation
 
         static void ValidateMemory(UniverseParameters parameters)
         {
-            if (parameters.knowledgeTickMultiplier <= 0 || /*parameters.perceptionToRadiusMultiplier <= 0 || */parameters.aggressivenessToRadiusMultiplier <= 0 
+            if (parameters.knowledgeTickMultiplier <= 0 || parameters.aggressivenessToRadiusMultiplier <= 0 
                 || parameters.maxResourcesRemembered < 0 || parameters.maxPositionsRemembered < 0)
                 throw new UniverseParameterIsZeroException("The provided memory parameters must be positive");
         }
@@ -610,13 +614,13 @@ namespace EvolutionSimulation
 
         static void ValidateCreatureTransitions(UniverseParameters parameters)
         {
-            if (parameters.fleeingTransitionMultiplier <= 0 || parameters.hidingTransitionMultiplier <= 0 || parameters.stopEatingTransitionEnergyMultiplier <= 0 ||
+            if (parameters.fleeingTransitionMultiplier <= 0 || parameters.stopEatingTransitionEnergyMultiplier <= 0 || parameters.maxMenaceIntimidationMultiplierBasedOnMissingHealth <= 0 ||
                 parameters.combatTransitionHealthThresholdMultiplier <= 0 || parameters.safeTransitionAggressivenessThreshold <= 0 || parameters.experienceMaxAggresivenessMultiplier <= 0 || 
-                parameters.safePrefferedOverClosestResourceRatio <= 0)
+                parameters.safePrefferedOverClosestResourceRatio <= 0 || parameters.maxDistanceToStartFollowParent <= 0 || parameters.maxDistanceToStopFollowParent <= 0)
                 throw new UniverseParameterIsZeroException("The provided transition parameters must be positive");
-            // TODO: "combatTransitionAggressivenessThreshold": 0.5, hay que saber que era y que hacia y por que no estaba en los parameters
-            // TODO: "escapeTransitionAggressivenessThreshold": 0.5, hay que saber que era y que hacia y por que no estaba en los parameters
-            // TODO: "escapeTransitionHealthThresholdMultiplier": 50.0, hay que saber que era y que hacia y por que no estaba en los parameters
+            if (parameters.maxDistanceToStopFollowParent > parameters.maxDistanceToStartFollowParent)
+                throw new MinMaxValueSwappedException("The distance to stop following a parent is more than the distance to start following it");
+
         }
 
         static void ValidateCorpse(UniverseParameters parameters)
@@ -627,11 +631,6 @@ namespace EvolutionSimulation
 
         static void ValidateTaxonomy(UniverseParameters parameters)
         {
-            if (parameters.percentageOfSpeciesToExport <= 0)
-                throw new UniverseParameterIsZeroException("The provided taxonomy parameters species to export must be positive");
-            if (parameters.percentageOfSpeciesToExport > 1)
-                throw new PercentageOverOneException("The provided taxonomy parameters species to export cannot be over 1");
-
             if (parameters.percentageSimilaritySpecies < 0 || parameters.percentageSimilaritySpecies >= 1)
                 throw new SimilarityThesholdNotValid("The provided similarity species threshold must be a positive number smaller than one to allow reproduction");
         }

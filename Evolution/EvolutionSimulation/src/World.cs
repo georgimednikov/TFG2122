@@ -686,7 +686,7 @@ namespace EvolutionSimulation
             return results;
         }
 
-        static int entitiesID = 0;   // TODO: hacer un id unico para cada entidad con hash?
+        static int entitiesID = 0;   
         public Dictionary<int, Creature> Creatures { get; private set; }
         Comparer<Creature> metabolismComparer;
 
@@ -1040,16 +1040,6 @@ namespace EvolutionSimulation
             System.IO.File.WriteAllText($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/{UserInfo.WorldName}", word);
             string rMap = JsonConvert.SerializeObject(regionMap, Formatting.Indented);
             System.IO.File.WriteAllText($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/{UserInfo.RegionMapName}", rMap);
-        }
-
-        /// <summary>
-        /// Export just the especies information when an apocalyse occurs
-        /// </summary>
-        /// <param name="cont"></param>
-        public void ApocalypseExportContent(int cont)
-        {
-            taxonomy.RenderSpeciesTree(UserInfo.ExportDirectory + "/Apocalyse" + cont + UserInfo.TreeName, tick);
-            taxonomy.ExportSpecies(cont);
         }
 
         // Map with physical properties

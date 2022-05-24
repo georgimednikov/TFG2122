@@ -19,7 +19,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         { 
             creature = c;
             modifier = 1.1f - // TODO: Modificador que dependa bien, ahora mismo a mas agresividad mejor persigue
-                (c.stats.Aggressiveness / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * 0.4f);  // TODO: PASAR A UNIVERSAL
+                (c.stats.Aggressiveness / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.chaseCostMultiplier);
         }
 
         public override int GetCost()
@@ -39,7 +39,6 @@ namespace EvolutionSimulation.FSM.Creature.States
 
         public override void OnEntry()
         {
-            //base.OnEntry();
             creature.Enemy(out objectiveID, out objective);
             Entities.Creature objCreature = creature.world.GetCreature(objectiveID);
 
@@ -48,7 +47,7 @@ namespace EvolutionSimulation.FSM.Creature.States
 #endif
             Entities.Creature tmp = creature.world.GetCreature(objectiveID);
             objSpecies = tmp == null ? " " : creature.world.GetCreature(objectiveID).speciesName;
-            if (objective.x != creature.x && objective.y != creature.y && creature.CanReach((Entities.Creature.HeightLayer)objective.z)) // TODO: considerar alturas
+            if (objective.x != creature.x && objective.y != creature.y && creature.CanReach((Entities.Creature.HeightLayer)objective.z)) 
             {
                 creature.SetPath(objective);   // This MUST be set up for the cost of the action to work
             }
