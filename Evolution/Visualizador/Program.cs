@@ -40,38 +40,31 @@ namespace Visualizador
             int years, species, individuals;
 
             FolderBrowserDialog browser = new FolderBrowserDialog();
+
+            // Input data directory request
             browser.Description = "Choose the folder where the program will search for the data files. " +
                 "After this window a new one will open; if it does not show, minimize any other application open.";
             browser.SelectedPath = Path.GetFullPath("../../ProgramData");
             DialogResult result = browser.ShowDialog();
-            //UserInfo.DataDirectory = browser.SelectedPath + "\\";
-
             if (result == DialogResult.OK)
                 dataDir = browser.SelectedPath + "\\";
             else
                 return false;
 
+            // Output data directory request
             browser.Description = "Choose the folder where the program will save the program's resulting data.";
-            browser.SelectedPath = Path.GetFullPath("../../ResultingSpecies");
+            browser.SelectedPath = Path.GetFullPath("../../ResultingData");
             result = browser.ShowDialog();
-            //UserInfo.ExportDirectory = browser.SelectedPath + "\\";
-
             if (result == DialogResult.OK)
                 exportDir = browser.SelectedPath + "\\";
             else
                 return false;
-
             int userEntry;
-            do
-            {
-                if (!InstantiatePrompt("Input how many years of evolution are going to be\nsimulated:", out userEntry))
-                    return false;
-            } while (userEntry < 1);
-            years = userEntry;
 
+            // World information check and request if needed
+            // If a simulation world is not given, a new one has to be generated.
+            int minSize = UserInfo.MinWorldSize();
             WorldGenConfig config = null;
-
-            // If a simulation world is not given, a new one has to be created.
             if (!File.Exists(dataDir + UserInfo.WorldName) || !File.Exists(dataDir + UserInfo.RegionMapName))
             {
                 // If a height map is provided, it is not created from scratch.
@@ -84,43 +77,79 @@ namespace Visualizador
                         heightMap = heights,
                         mapSize = heights.GetLength(0)
                     };
-                    UserInfo.Size = config.mapSize;
                 }
-                else // if nothing is given, a size has to be asked of the user. 
+                else // If nothing is given, a size and a map type have to be requested from the user 
                 {
+                    // Map size request
+                    int mapSize;
                     do
                     {
                         if (!InstantiatePrompt("Input how big in squares the world is going to be.\nMust be a number larger than or equal to: " + UserInfo.MinWorldSize(), out userEntry))
                             return false;
                     } while (userEntry < UserInfo.MinWorldSize());
-                    UserInfo.Size = userEntry;
+                    mapSize = userEntry;
+
+                    // Map type request
+                    World.MapType[] mapTypes = (World.MapType[])Enum.GetValues(typeof(World.MapType));
+                    int lengthWithoutLast = mapTypes.Length - 1;    // last type is custom, and cannot be provided this way
+                    string label = "Input the number of the type of map that should be generated:\n";
+                    string separator;
+                    for (int i = 0; i < mapTypes.Length - 1; i++) 
+                    {
+                        separator = i % mapTypes.Length < lengthWithoutLast - 1 ? " | " : "";
+                        label += $"<{i}> {mapTypes[i]}{separator}";
+                    }
+                    label += "\n";
+                    do
+                    {
+                        if (!InstantiatePrompt(label, out userEntry, 360))
+                            return false;
+                    } while (userEntry < 0 || userEntry >= mapTypes.Length - 1);
+
+                    config = new WorldGenConfig(mapTypes[userEntry])
+                    {
+                        mapSize = mapSize
+                    };
                 }
             }
 
+            // Simulation duration request
+            do
+            {
+                if (!InstantiatePrompt("Input how many years of evolution are going to be\nsimulated:", out userEntry))
+                    return false;
+            } while (userEntry < 0);
+            years = userEntry;
+
+            // Original species request
+            int minSpecies = UserInfo.MinSpeciesAmount();
             do
             {
                 if (!InstantiatePrompt("Input how many species are going to be created\ninitially. Must be a number larger than or equal to: " + UserInfo.MinSpeciesAmount(), out userEntry))
                     return false;
-            } while (userEntry < UserInfo.MinSpeciesAmount());
+            } while (userEntry < minSpecies);
             species = userEntry;
 
+            // Initial individuals per species request
+            int minIndividuals = UserInfo.MinIndividualsAmount();
             do
             {
-                if (!InstantiatePrompt("Input how individuals per species are going to be\ncreated. Must be a number larger than or equal to: " + UserInfo.MinIndividualsAmount(), out userEntry))
+                if (!InstantiatePrompt("Input how many individuals per species are going to be\ncreated. Must be a number larger than or equal to: " + UserInfo.MinIndividualsAmount(), out userEntry))
                     return false;
-            } while (userEntry < UserInfo.MinIndividualsAmount());
+            } while (userEntry < minIndividuals);
             individuals = userEntry;
 
+            // Simulation initialization after all information has been provided
             s.Init(years, species, individuals, dataDir, exportDir, config);
             return true;
         }
 
-        static private bool InstantiatePrompt(string text, out int value)
+        static private bool InstantiatePrompt(string text, out int value, int width = 280, int height = 150)
         {
             Form prompt = new Form()
             {
-                Width = 280,
-                Height = 150,
+                Width = width,
+                Height = height,
                 FormBorderStyle = FormBorderStyle.FixedDialog,
                 Text = "Evolution Simulation",
                 StartPosition = FormStartPosition.CenterScreen

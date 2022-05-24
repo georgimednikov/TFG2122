@@ -13,7 +13,7 @@ namespace VisualizadorConsola
             EventSimulation s = new EventSimulation();
             s.OnSimulationBegin += (e) => { loadingBar = new ConsoleLoadingBar(); };
             s.OnSimulationStep += (e) => { loadingBar.Update(e); };
-#if true
+#if true // TODO: DEBUG
             s.Init(20, 30, 20, "../../ProgramData/", "../../ResultingData/", null);
 #else
             if (!AskInfoUsingConsole(s))
@@ -32,6 +32,7 @@ namespace VisualizadorConsola
             string dataDir, exportDir;
             int years, species, individuals;
 
+            // Input data directory request
             do
             {
                 Console.WriteLine("Input a valid directory containing the necessary data files for the program (chromosome.json, etc.):\n");
@@ -39,26 +40,17 @@ namespace VisualizadorConsola
                 Console.Clear();
             } while (!Directory.Exists(dataDir));
 
+            // Output data directory request
             Console.WriteLine("Input a valid directory in which the resulting data will be saved:\n");
             exportDir = Console.ReadLine() + "\\";
             Console.Clear();
             if (!Directory.Exists(exportDir))
                 exportDir = Directory.CreateDirectory(exportDir).FullName;
 
-            do
-            {
-                Console.WriteLine("Input how many years of evolution are going to be simulated:");
-                string input = Console.ReadLine();
-                years = -1;
-                if (input != "") years = int.Parse(input);
-                Console.Clear();
-            } while (years < 0);
-
+            // World information check and request if needed
+            // If a simulation world is not given, a new one has to be generated.
             int minSize = UserInfo.MinWorldSize();
-
             WorldGenConfig config = null;
-
-            // If a simulation world is not given, a new one has to be created.
             if (!File.Exists(dataDir + UserInfo.WorldName) || !File.Exists(dataDir + UserInfo.RegionMapName))
             {
                 // If a height map is provided, it is not created from scratch.
@@ -71,48 +63,65 @@ namespace VisualizadorConsola
                         heightMap = heights,
                         mapSize = heights.GetLength(0)
                     };
-                    UserInfo.Size = config.mapSize;
                 }
-                else // if nothing is given, a size and a map type has to be asked of the user. 
+                else // If nothing is given, a size and a map type have to be requested from the user 
                 {
+                    // Map size request
+                    int mapSize;
                     do
                     {
                         Console.WriteLine("Input how big in squares the world is going to be. Must be a number larger than or equal to: " + minSize + "\n");
                         string input = Console.ReadLine();
-                        UserInfo.Size = -1;
-                        if (input != "") UserInfo.Size = int.Parse(input);
+                        mapSize = -1;
+                        if (input != "")
+                            mapSize = int.Parse(input); // TODO: comprobar errores de parseo
                         Console.Clear();
-                    } while (UserInfo.Size < minSize);
+                    } while (mapSize < minSize);
 
+                    // Map type request
                     World.MapType[] mapTypes = (World.MapType[])Enum.GetValues(typeof(World.MapType));
                     int index = -1;
+                    int lengthWithoutLast = mapTypes.Length - 1;    // last type is custom, and cannot be provided this way
                     do
                     {
-                        Console.WriteLine($"Input the number of the type of map that should be generated:");
-                        for(int i = 0; i < mapTypes.Length; i++)
+                        Console.WriteLine("Input the number of the type of map that should be generated:");
+                        string separator;
+                        for (int i = 0; i < lengthWithoutLast; i++)
                         {
-                            Console.Write($"<{i}> {mapTypes[i]} | ");
+                            separator = i % mapTypes.Length < lengthWithoutLast - 1 ? " | " : "";
+                            Console.Write($"<{i}> {mapTypes[i]}{separator}");
                         }
                         Console.WriteLine();
 
                         string input = Console.ReadLine();
-                        try 
+                        try
                         {
                             index = int.Parse(input);
-                            if(index < 0 || index >= mapTypes.Length)
+                            if (index < 0 || index >= mapTypes.Length - 1)
                                 Console.WriteLine("Incorrect type number");
                         }
-                        catch (FormatException e){ Console.WriteLine("Incorrect format"); }
-                    } while (index < 0 || index >= mapTypes.Length);
+                        catch (FormatException e) { Console.WriteLine("Incorrect format"); }
+                    } while (index < 0 || index >= mapTypes.Length - 1);
                     Console.Clear();
 
                     config = new WorldGenConfig(mapTypes[index])
                     {
-                        mapSize = UserInfo.Size
+                        mapSize = mapSize
                     };
                 }
             }
 
+            // Simulation duration request
+            do
+            {
+                Console.WriteLine("Input how many years of evolution are going to be simulated:");
+                string input = Console.ReadLine();
+                years = -1;
+                if (input != "") years = int.Parse(input);
+                Console.Clear();
+            } while (years < 0);
+           
+            // Original species request
             int minSpecies = UserInfo.MinSpeciesAmount();
             do
             {
@@ -122,17 +131,19 @@ namespace VisualizadorConsola
                 if (input != "") species = int.Parse(input);
                 Console.Clear();
             } while (species < minSpecies);
-
+            
+            // Initial individuals per species request
             int minIndividuals = UserInfo.MinIndividualsAmount();
             do
             {
-                Console.WriteLine("Input how individuals per species are going to be created. Must be a number larger than or equal to: " + minIndividuals + "\n");
+                Console.WriteLine("Input how many individuals per species are going to be created. Must be a number larger than or equal to: " + minIndividuals + "\n");
                 string input = Console.ReadLine();
                 individuals = -1;
                 if (input != "") individuals = int.Parse(input);
                 Console.Clear();
             } while (individuals < minIndividuals);
 
+            // Simulation initialization after all information has been provided
             s.Init(years, species, individuals, dataDir, exportDir, config);
             return true;
         }

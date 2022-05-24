@@ -3,25 +3,30 @@ using System.IO;
 
 namespace EvolutionSimulation
 {
+    /// <summary>
+    /// Class to handle the information and files provided from the user.
+    /// </summary>
     static public class UserInfo
     {
-        static public int Size = 206;
-        static public int Years = 10;
-        static public int Species = 10;
-        static public int Individuals = 10;
+        // Simulation information that can be provided by the user
+        static public int Size { get; set; } = 512;
+        static public int Years { get; private set; } = 10;
+        static public int Species { get; private set; } = 10;
+        static public int Individuals { get; private set; } = 10;
+        static public string DataDirectory { get; private set; } = "./";
+        static public string ExportDirectory { get; private set; } = "./";
 
-        static public string DataDirectory = "./";
-        static public string ExportDirectory = "./";
+        // File names
+        static public string UniverseParametersName { get; set; } = "UniverseParameters.json";
+        static public string ChromosomeName { get; set; } = "Chromosome.json";
+        static public string AbilityUnlockName { get; set; } = "AbilityUnlock.json";
+        static public string GeneSimilarityName { get; set; } = "SimilarityGeneWeight.json";
+        static public string WorldConfigName { get; set; } = "WorldConfig.json";
+        static public string WorldName { get; set; } = "World.json";
+        static public string RegionMapName { get; set; } = "RegionMap.json";
+        static public string HeightMapName { get; set; } = "HeightMap.json";
+        static public string TreeName { get; set; } = "Tree.txt";
 
-        static public string UniverseParametersName = "UniverseParameters.json";
-        static public string ChromosomeName = "Chromosome.json";
-        static public string AbilityUnlockName = "AbilityUnlock.json";
-        static public string GeneSimilarityName = "SimilarityGeneWeight.json";
-        static public string WorldConfigName = "WorldConfig.json";
-        static public string WorldName = "World.json";
-        static public string RegionMapName = "RegionMap.json";
-        static public string HeightMapName = "HeightMap.json";
-        static public string TreeName = "Tree.txt";
 
         /// <summary>
         /// Returns the raw universe parameters file, if the file does not exist, returns null
@@ -65,7 +70,7 @@ namespace EvolutionSimulation
 
         /// <summary>
         /// Sets up the program with the file information provided by the user
-        /// If no directories are provided, data will be looked for in the directory where the .exe is located
+        /// If no directories are provided, data will be searched in the directory where the .exe is located
         /// </summary>
         /// <param name="years"> Years to simulate </param>
         /// <param name="species"> Initial number of original species </param>
@@ -80,11 +85,14 @@ namespace EvolutionSimulation
             if (_dataDir != null) DataDirectory = _dataDir;
             if (_exportDir != null) ExportDirectory = _exportDir;
 
+#if TRACKER_ENABLED
             Directory.CreateDirectory(ExportDirectory + "Output");
-
+#endif
         }
+        
+        static public void SetMapSize(int newSize) { Size = newSize; }
 
-        // TODO: Estos metodos en la simulacion
+        // TODO: Estos metodos en la simulacion ?
         static public int MinWorldSize() { return 100; }
         static public int MinSpeciesAmount() { return Size / 20; }
         static public int MinIndividualsAmount() { return 2; }

@@ -39,21 +39,20 @@ namespace EvolutionSimulation
             Genetics.GeneticTaxonomy.SetTaxonomy();
             // World
             world = new World();
-
-            // If the is no custom world configuration
+            // If there is no custom world configuration
             if (worldConfig == null)
             {
                 string worldData = UserInfo.WorldFile();
                 string regionData = UserInfo.RegionFile();
-                // If a simulation world is provided, that one is used.
+                // If a simulation world is provided, that one is used
                 if (worldData != null && regionData != null)
                 {
                     world.Init(worldData, regionData);
-                    UserInfo.Size = world.map.GetLength(0);
+                    UserInfo.SetMapSize(world.map.GetLength(0));
                 }
-                else // Else a new one has to be created from scratch with the given parameters, in this case only size.
+                else // A new one has to be created from scratch with the given size and default settings
                 {
-                    WorldGenConfig config = new WorldGenConfig(World.MapType.Atoll) // TODO: cambiar por default
+                    WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
                     {
                         mapSize = UserInfo.Size
                     };
@@ -61,11 +60,14 @@ namespace EvolutionSimulation
                     world.Init(config);
                 }
             }
-            else // There is a custom world configuration, which in this case means that a height map is provided.
+            else // There is a custom world configuration, which in this case means that a height map is provided
+            {
                 world.Init(worldConfig);
-
+                UserInfo.SetMapSize(worldConfig.mapSize);
+            }
         }
 
+        // TODO: poder pasar el config a este init
         /// <summary>
         /// Sets up the program with the information provided by the user
         /// </summary>
@@ -93,11 +95,13 @@ namespace EvolutionSimulation
             Genetics.GeneticTaxonomy.SetTaxonomy(sGeneWeightFile);
             // World
             world = new World();
+            // World data is provided
             if (worldFile != null && regionMap != null)
             {
                 world.Init(worldFile, regionMap);
-                UserInfo.Size = world.map.GetLength(0);
+                UserInfo.SetMapSize(world.map.GetLength(0));
             }
+            // World data is not provided, so the world is generated with default values
             else
             {
                 WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
@@ -107,7 +111,7 @@ namespace EvolutionSimulation
 
                 world.Init(config);
             }
-            UserInfo.Size = world.map.GetLength(0);
+            //UserInfo.Size = world.map.GetLength(0);
         }
 
         /// <summary>
