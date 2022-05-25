@@ -194,6 +194,7 @@ namespace EvolutionSimulation
             Animal a;
             int temperatureCont;
             int minDistanceCont;
+            int numTries = UserInfo.Size * UserInfo.Size;
             for (int i = 0; i < UserInfo.Species; i++)
             {
                 a = world.CreateCreature<Animal>(0, 0);
@@ -219,7 +220,7 @@ namespace EvolutionSimulation
                             }
                         }
                         minDistanceCont++;
-                    } while (!valid && minDistanceCont < UserInfo.Size);
+                    } while (!valid && minDistanceCont < numTries);
                     //The creatures cant start in a water position
                     if (world.map[x, y].isWater)
                     {
@@ -227,7 +228,7 @@ namespace EvolutionSimulation
                         continue;
                     }
                     //Try to be in a safe temperature position
-                    if (!a.CheckTemperature(x, y) && temperatureCont < UserInfo.Size)
+                    if (!a.CheckTemperature(x, y) && temperatureCont < numTries)
                     {
                         validPosition = false;
                         temperatureCont++;

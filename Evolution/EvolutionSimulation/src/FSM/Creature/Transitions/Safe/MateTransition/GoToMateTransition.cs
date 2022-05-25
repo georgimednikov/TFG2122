@@ -16,12 +16,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            // Do not go to a mate if the creature is a female
-            if (creature.stats.Gender == Genetics.Gender.Female)
+            // Do not go to a mate if the creature is a female or a new born
+            if (creature.stats.Gender == Genetics.Gender.Female || creature.stats.IsNewBorn())
                 return false;
 
-            return creature.Mate()                                                               
-                && !creature.stats.IsNewBorn();     // It has to be adult
+            return creature.Mate();
 
         }
 

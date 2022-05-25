@@ -15,18 +15,25 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
 
         public override bool Evaluate()
         {
-            if (!creature.CheckTemperature(creature.x, creature.y) && creature.SafeTemperaturePosition() == null) return false;
+            if (!creature.CheckTemperature(creature.x, creature.y))
+                if (creature.SafeTemperaturePosition() == null) return false;
+                else return true;
+
             if (creature.IsThirsty())
                 if (creature.WaterPosition() == null) return false;
                 else return true;
+
             if (creature.IsHungry())
                 if (!creature.HasEatingObjective()) return false;
                 else return true;
+
             if (creature.IsTired())
                 if (creature.SafePosition() == null)
                     return false;
                 else return true;
-            if (creature.wantMate && !creature.Mate()) return false;
+
+            if (creature.stats.Gender == Genetics.Gender.Female
+                || !creature.Mate()) return false;
             return true;
         }
 
