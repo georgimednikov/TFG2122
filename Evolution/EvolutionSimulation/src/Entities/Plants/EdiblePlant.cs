@@ -46,7 +46,7 @@ namespace EvolutionSimulation.Entities
             if(curHp <= 0) {
                 eaten = true;
 #if TRACKER_ENABLED
-                Telemetry.Tracker.Instance.Track(new Telemetry.Events.PlantEaten(world.tick, ID, x, y));
+                Telemetry.Tracker.Instance.Track(new Telemetry.Events.PlantEaten(world.CurrentTick, ID, x, y));
                 world.EatenPlants++;    // If it is eaten, add itself to the counter
 #endif
             }

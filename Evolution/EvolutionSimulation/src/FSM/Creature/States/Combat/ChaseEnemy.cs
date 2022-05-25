@@ -43,7 +43,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             Entities.Creature objCreature = creature.world.GetCreature(objectiveID);
 
 #if TRACKER_ENABLED
-            Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureStateEntryNotSafe(creature.world.tick, creature.ID, creature.speciesName, ToString(), objectiveID, creature.x, creature.y, objCreature == null ? " " : objCreature.speciesName));
+            Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureStateEntryNotSafe(creature.world.CurrentTick, creature.ID, creature.speciesName, ToString(), objectiveID, creature.x, creature.y, objCreature == null ? " " : objCreature.speciesName));
 #endif
             Entities.Creature tmp = creature.world.GetCreature(objectiveID);
             objSpecies = tmp == null ? " " : creature.world.GetCreature(objectiveID).speciesName;

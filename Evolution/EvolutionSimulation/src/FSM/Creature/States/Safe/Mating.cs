@@ -63,7 +63,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                     }
 
 #if TRACKER_ENABLED
-                    Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureMating(creature.world.tick, creature.ID, creature.speciesName, father.ID, father.speciesName, numberChilds, creature.x, creature.y));
+                    Telemetry.Tracker.Instance.Track(new Telemetry.Events.CreatureMating(creature.world.CurrentTick, creature.ID, creature.speciesName, father.ID, father.speciesName, numberChilds, creature.x, creature.y));
 #endif
                     creature.timeToBeInHeat = -1;
                     creature.mating = false;

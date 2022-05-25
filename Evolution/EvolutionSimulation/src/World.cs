@@ -115,7 +115,6 @@ namespace EvolutionSimulation
             public DeathCause cause;
         }
 
-        public int tick { get; private set; }
         /// <summary>
         /// Properties of each map tile
         /// </summary>
@@ -176,8 +175,9 @@ namespace EvolutionSimulation
             ticksHour = UniverseParametersManager.parameters.ticksPerHour;
             hoursDay = UniverseParametersManager.parameters.hoursPerDay;
             daysYear = UniverseParametersManager.parameters.daysPerYear;
-            morning = UniverseParametersManager.parameters.morningStart;
-            night = UniverseParametersManager.parameters.nightStart;
+            dawnHour = UniverseParametersManager.parameters.morningStart * ticksHour;
+            nightFallHour = UniverseParametersManager.parameters.nightStart * ticksHour;
+            CurrentTick = 1;
 
             mapSize = map.GetLength(0);
             entityMap = new List<IEntity>[mapSize, mapSize];
@@ -241,8 +241,9 @@ namespace EvolutionSimulation
             ticksHour = UniverseParametersManager.parameters.ticksPerHour;
             hoursDay = UniverseParametersManager.parameters.hoursPerDay;
             daysYear = UniverseParametersManager.parameters.daysPerYear;
-            morning = UniverseParametersManager.parameters.morningStart;
-            night = UniverseParametersManager.parameters.nightStart;
+            dawnHour = UniverseParametersManager.parameters.morningStart * ticksHour;
+            nightFallHour = UniverseParametersManager.parameters.nightStart * ticksHour;
+            CurrentTick = 1;
 
             if (config == null) throw new NullReferenceException("World generation config is null");
 
@@ -478,14 +479,15 @@ namespace EvolutionSimulation
         /// Performs a step of the simulation.
         /// </summary>
         /// <returns>True if ther are any remaining creatures</returns>
-        public bool Tick(int tick = 0)
+        public bool Tick()
         {
-            this.tick = tick;
+            //this.tick = tick;
             CycleDayNight();
-            return EntitiesTick();
+            bool entitiesLeft = EntitiesTick();
+            CurrentTick++;
+            return entitiesLeft;
         }
 
-        // TODO: que devuelva una criatura no soluciona el problema de la destrucción, a no ser que sea una copia u otro objeto
         public Creature GetCreature(int creatureID)
         {
             if (!Creatures.ContainsKey(creatureID)) return null;
@@ -583,13 +585,13 @@ namespace EvolutionSimulation
         /// </summary>
         private void CycleDayNight()
         {
-            bool prevState = day;
-            day = step % (ticksHour * hoursDay) >= (morning * ticksHour) && step % (ticksHour * hoursDay) <= (night * ticksHour);
+            bool prevState = IsDaytime;
+            int currDayTick = CurrentTick % (ticksHour * hoursDay);
+            IsDaytime = currDayTick >= dawnHour && currDayTick <= nightFallHour;
 
-            if (day != prevState)
+            if (IsDaytime != prevState)
                 foreach (Creature c in Creatures.Values)
                     c.CycleDayNight();
-            step++;
         }
 
         /// <summary>
@@ -1049,15 +1051,30 @@ namespace EvolutionSimulation
         public List<MapRegion> regionMap { get; private set; }
         int mapSize;
         public int chunkSize { get; private set; }
-        public bool day;
-        public uint step;
-        // 50 steps equals and hour, and 24 hours equal a day. 365 days equal a year
-        public static int ticksHour, hoursDay, daysYear;
-        // The day begins 6:30 and ends at 20:00.
-        float morning, night;
         // Perlin noise generator
         Perlin p;
 
+        // 50 steps equals and hour, and 24 hours equal a day. 365 days equal a year  
+        public static int ticksHour, hoursDay, daysYear; // TODO: esto deberia estar aqui o en la simulacion ?
+
+        /// <summary>
+        /// The current tick associated with the state of the world in the simulation
+        /// </summary>
+        public int CurrentTick { get; private set; }
+
+        /// <summary>
+        /// Boolean that tells if it its daytime (True) or nighttime (False)
+        /// </summary>
+        public bool IsDaytime { get; private set; }
+
+        /// <summary>
+        /// Variables to handle the night/day cycle
+        /// </summary>
+        float dawnHour, nightFallHour;
+
+        /// <summary>
+        /// Species taxonomy manager
+        /// </summary>
         GeneticTaxonomy taxonomy;
     }
 }

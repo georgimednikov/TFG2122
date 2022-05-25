@@ -137,7 +137,7 @@ namespace EvolutionSimulation.Entities
             }
 
             //Value that multiplies perception when it is being gotten
-            stats.CurrentVision = world.day ? 1 : stats.NightPerceptionPercentage;
+            stats.CurrentVision = world.IsDaytime ? 1 : stats.NightPerceptionPercentage;
             stats.ActionPerceptionPercentage = 1;
 
             int maxPerceptionGene = chromosome.GetFeatureMax(CreatureFeature.Perception);

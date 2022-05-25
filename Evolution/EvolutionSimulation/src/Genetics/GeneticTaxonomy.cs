@@ -142,7 +142,7 @@ namespace EvolutionSimulation.Genetics
             //Else a new species is created
             Species newSpecies = new Species(creature);
             existingSpecies.Add(newSpecies);
-            newSpecies.startTick = newSpecies.endTick = creature.world.tick;
+            newSpecies.startTick = newSpecies.endTick = creature.world.CurrentTick;
             //Now the new species is added to the record based on if it has a progenitor species or not
 
             //If the new species is made from scratch, it is simply added to the record
@@ -201,7 +201,7 @@ namespace EvolutionSimulation.Genetics
                     {
                         existingSpecies.Remove(sp);
                         int index = speciesRecord.FindIndex(x => x.name == sp.name);
-                        speciesRecord[index].endTick = creature.world.tick;
+                        speciesRecord[index].endTick = creature.world.CurrentTick;
                     }
                     return;
                 }
@@ -353,7 +353,7 @@ namespace EvolutionSimulation.Genetics
             //Export all the existing species
             for (int i = 0; i < existingSpecies.Count; i++)
             {
-                existingSpecies[i].endTick = existingSpecies[i].members[0].world.tick;
+                existingSpecies[i].endTick = existingSpecies[i].members[0].world.CurrentTick;
                 speciesRecord[speciesRecord.FindIndex(x => x == existingSpecies[i])].endTick = existingSpecies[i].endTick;
                 Species sp = existingSpecies[i];
                 SpeciesExport export = new SpeciesExport(sp.name, sp.original.stats);

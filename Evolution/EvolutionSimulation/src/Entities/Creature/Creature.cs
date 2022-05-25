@@ -175,7 +175,7 @@ namespace EvolutionSimulation.Entities
             stats.CurrHealth -= (float)damage;
 
 #if TRACKER_ENABLED
-            Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, -1, (float)damage, DamageType.Temperature, stats.CurrHealth, x, y));
+            Tracker.Instance.Track(new CreatureReceiveDamage(world.CurrentTick, ID, speciesName, -1, (float)damage, DamageType.Temperature, stats.CurrHealth, x, y));
 #endif
 
             if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
@@ -247,7 +247,7 @@ namespace EvolutionSimulation.Entities
             {
                 adultEvent = true;
 #if TRACKER_ENABLED
-                Tracker.Instance.Track(new CreatureAdult(world.tick, ID, speciesName, x, y));
+                Tracker.Instance.Track(new CreatureAdult(world.CurrentTick, ID, speciesName, x, y));
 #endif
             }
         }
@@ -274,7 +274,7 @@ namespace EvolutionSimulation.Entities
                     dtype = DamageType.Dehydration;
                 else if (stats.CurrRest <= 0)
                     dtype = DamageType.Exhaustion;
-                Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, -1, 1, dtype, stats.CurrHealth, x, y));
+                Tracker.Instance.Track(new CreatureReceiveDamage(world.CurrentTick, ID, speciesName, -1, 1, dtype, stats.CurrHealth, x, y));
 #endif
 
                 if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
@@ -633,7 +633,7 @@ namespace EvolutionSimulation.Entities
             stats.CurrHealth = Math.Max(Math.Min(stats.CurrHealth - damage, stats.MaxHealth), 0);
 
 #if TRACKER_ENABLED
-            Tracker.Instance.Track(new CreatureReceiveDamage(world.tick, ID, speciesName, interacter.ID, damage, DamageType.Attack, stats.CurrHealth, x, y));
+            Tracker.Instance.Track(new CreatureReceiveDamage(world.CurrentTick, ID, speciesName, interacter.ID, damage, DamageType.Attack, stats.CurrHealth, x, y));
 #endif
             if (causeOfDeath == CauseOfDeath.NONE && stats.CurrHealth <= 0)
             {
@@ -663,7 +663,7 @@ namespace EvolutionSimulation.Entities
         {
             interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
 #if TRACKER_ENABLED
-            Tracker.Instance.Track(new CreatureReceiveDamage(interacter.world.tick, interacter.ID, interacter.speciesName, ID, stats.Counter, DamageType.Retalliation, interacter.stats.CurrHealth, interacter.x, interacter.y));
+            Tracker.Instance.Track(new CreatureReceiveDamage(interacter.world.CurrentTick, interacter.ID, interacter.speciesName, ID, stats.Counter, DamageType.Retalliation, interacter.stats.CurrHealth, interacter.x, interacter.y));
 #endif
             if (interacter.causeOfDeath == CauseOfDeath.NONE && interacter.stats.CurrHealth <= 0)
             {
@@ -983,7 +983,7 @@ namespace EvolutionSimulation.Entities
             if (!world.IsTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
 #if TRACKER_ENABLED
-            Tracker.Instance.Track(new CreaturePositionSample(world.tick, ID, speciesName, x, y));
+            Tracker.Instance.Track(new CreaturePositionSample(world.CurrentTick, ID, speciesName, x, y));
 #endif
         }
 
@@ -1184,7 +1184,7 @@ namespace EvolutionSimulation.Entities
 #if TRACKER_ENABLED
         public void BirthEventTrack()
         {
-            CreatureBirth cbEvent = new CreatureBirth(world.tick, ID, speciesName, x, y);
+            CreatureBirth cbEvent = new CreatureBirth(world.CurrentTick, ID, speciesName, x, y);
             cbEvent.MaxHealth = stats.MaxHealth;
             cbEvent.HealthRegen = stats.HealthRegeneration;
             cbEvent.MaxEnergy = stats.MaxEnergy;

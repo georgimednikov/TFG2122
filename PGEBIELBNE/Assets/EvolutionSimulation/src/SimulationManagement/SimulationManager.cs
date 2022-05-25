@@ -85,7 +85,6 @@ namespace UnitySimulation
             string regionFileRaw = RegionMap == null ? null : RegionMap.text;
            
             simulation = new UnitySimulation();
-            simulation.InitTracker();
             simulation.GenerateWorld = worldGenerator;
             simulation.Init(
                 EvolutionYears, SpeciesNumber, IndividualsNumber,
@@ -131,11 +130,6 @@ namespace UnitySimulation
         public int GetTicksInDay()
         {
             return simulation.GetTicksInDay();
-        }
-
-        void OnDestroy()
-        {
-            simulation.EndTracker();
         }
     }
 }

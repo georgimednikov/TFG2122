@@ -5,9 +5,11 @@ using EvolutionSimulation.Utils;
 
 namespace UnitySimulation
 {
+    /// <summary>
+    /// Evolution simulation adapted to the unity environment. 
+    /// </summary>
     public class UnitySimulation : Simulation, ISubject<World> 
     {
-
         public override void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig config)
         {
             base.Init(years, species, individuals, dataDir, exportDir, config);
@@ -23,22 +25,25 @@ namespace UnitySimulation
         }
 
         /// <summary>
-        /// Performs a step of the simulation
+        /// Performs a step of the simulation and updates every listener with 
+        /// the state of the world after the step is performed.
         /// </summary>
         public void SimulateStep()
         {
-            world.Tick(currentTick);    //TODO: el current tick es otro si se ponen anios de evolucion al principio
-            currentTick++;
+            world.Tick();
 
             // Notify every listener after a step is simulated
             foreach (IListener<World> listener in world_listeners)
                 listener.OnNotify(world);
         }
 
-        // TODO: no exportar siempre?
+        /// <summary>
+        /// The unity simulation its just to show off the system,
+        /// no data needs to be exported at the end of the simulation.
+        /// So the End method is overrided to do nothing.
+        /// </summary>
         protected override void End()
         {
-            //EndTracker();
         }
 
         public bool Subscribe(IListener<World> listener)
@@ -62,9 +67,17 @@ namespace UnitySimulation
             return World.ticksHour * World.hoursDay;
         }
 
+        /// <summary>
+        /// World generation
+        /// </summary>
         public GenerateWorld GenerateWorld { private get; set; }
-        public World World { get => world; }
 
+
+        // Simulation evolutionSimulation; TODO: se podria hacer asi pero hay que revisar los listeners o la info que se quiere dar desde fuera
+
+        /// <summary>
+        /// Internal world information listeners
+        /// </summary>
         List<IListener<World>> world_listeners = new List<IListener<World>>();
     }
 }

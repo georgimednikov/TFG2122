@@ -134,7 +134,6 @@ namespace EvolutionSimulation
         {
             CreateCreatures();
             totalTicks = world.YearToTick(UserInfo.Years);
-            currentTick = 1;
 
 #if TRACKER_ENABLED
             SimulationStartTrack();
@@ -147,7 +146,7 @@ namespace EvolutionSimulation
         /// <returns> False if no creatures remain, true otherwise </returns>
         virtual protected bool Step()
         {
-            bool ret = world.Tick(currentTick); //TODO: NO DEJAR ESTO
+            bool ret = world.Tick();
 #if TRACKER_ENABLED
             HourTrack();
 #endif
@@ -159,8 +158,7 @@ namespace EvolutionSimulation
         /// </summary>
         protected void Simulate()
         {
-            while (Step() && currentTick <= totalTicks)
-                currentTick++;
+            while (Step() && currentTick <= totalTicks);
         }
 
         /// <summary>
@@ -687,47 +685,13 @@ namespace EvolutionSimulation
         {
             // To close creature json files
             foreach (Creature c in world.Creatures.Values)
-                Tracker.Instance.Track(new CreatureDeath(world.tick, c.ID, c.speciesName, DeathType.SimulationEnd, -1, 0, c.x, c.y));
+                Tracker.Instance.Track(new CreatureDeath(world.CurrentTick, c.ID, c.speciesName, DeathType.SimulationEnd, -1, 0, c.x, c.y));
             Tracker.Instance.Track(new SimulationEnd(currentTick - 1, world.Creatures.Count, world.GetSpeciesNumber()));
         }
 #endif
 
         protected World world;
         protected int totalTicks;
-        protected int currentTick;
-
-        //Method to test
-       /* virtual protected void CreateCreaturesTest()
-        {
-            Animal a = world.CreateCreature<Animal>(10, 10);
-            a.chromosome.ModifyGender(Genetics.Gender.Male);
-            Animal a2 = world.CreateCreature<Animal>(10, 10, a.chromosome, a.speciesName);
-            a2.chromosome.ModifyGender(Genetics.Gender.Female);
-
-            Genetics.CreatureChromosome bChrosomosome = Genetics.GeneticFunctions.UniformCrossover(a.chromosome, a2.chromosome);
-            Genetics.GeneticFunctions.UniformMutation(ref bChrosomosome, UniverseParametersManager.parameters.mutationChance);
-            bChrosomosome.ModifyGender(Genetics.Gender.Female);
-            Animal b = a2.world.CreateCreature<Animal>(10, 10, bChrosomosome, world.GiveName(bChrosomosome, a, a2), a.ID, a2.ID);
-           
-
-            Genetics.CreatureChromosome cChromosome = Genetics.GeneticFunctions.UniformCrossover(a.chromosome, a2.chromosome);
-            Genetics.GeneticFunctions.UniformMutation(ref cChromosome, UniverseParametersManager.parameters.mutationChance);
-            Animal c = a2.world.CreateCreature<Animal>(10, 10, cChromosome, world.GiveName(cChromosome, a, a2), a.ID, a2.ID);
-            
-
-            Genetics.CreatureChromosome childCC = Genetics.GeneticFunctions.UniformCrossover(a.chromosome, b.chromosome);
-            Genetics.GeneticFunctions.UniformMutation(ref childCC, UniverseParametersManager.parameters.mutationChance);
-            Animal ab = b.world.CreateCreature<Animal>(10, 10, childCC, world.GiveName(childCC, a, b), a.ID, b.ID);
-
-            Genetics.CreatureChromosome childCC2 = Genetics.GeneticFunctions.UniformCrossover(a.chromosome, b.chromosome);
-            Genetics.GeneticFunctions.UniformMutation(ref childCC2, UniverseParametersManager.parameters.mutationChance);
-            Animal ab2 = b.world.CreateCreature<Animal>(10, 10, childCC2, world.GiveName(childCC2, a, b), a.ID, b.ID);
-
-            Genetics.CreatureChromosome childCC3 = Genetics.GeneticFunctions.UniformCrossover(a.chromosome, b.chromosome);
-            Genetics.GeneticFunctions.UniformMutation(ref childCC3, UniverseParametersManager.parameters.mutationChance);
-            Animal ab3 = b.world.CreateCreature<Animal>(10, 10, childCC3, world.GiveName(childCC3, a, b), a.ID, b.ID);
-
-            world.ExportContent();
-        }*/
+        protected int currentTick { get => world.CurrentTick; } // TODO: esta variable es redundante pero esq estaba repetida en varios sitios
     }
 }

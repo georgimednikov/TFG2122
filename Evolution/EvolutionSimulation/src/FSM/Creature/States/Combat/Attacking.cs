@@ -29,7 +29,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             Entities.Creature objCreature = creature.world.GetCreature(enemyID);
 
 #if TRACKER_ENABLED
-            Tracker.Instance.Track(new CreatureStateEntryNotSafe(creature.world.tick, creature.ID, creature.speciesName, ToString(), enemyID, creature.x, creature.y, objCreature == null ? " " : objCreature.speciesName));
+            Tracker.Instance.Track(new CreatureStateEntryNotSafe(creature.world.CurrentTick, creature.ID, creature.speciesName, ToString(), enemyID, creature.x, creature.y, objCreature == null ? " " : objCreature.speciesName));
 #endif
         }
 
@@ -46,7 +46,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 if (poison)
                 {
 #if TRACKER_ENABLED
-                    Tracker.Instance.Track(new CreatureApplyPoison(creature.world.tick, creature.ID, creature.speciesName, 
+                    Tracker.Instance.Track(new CreatureApplyPoison(creature.world.CurrentTick, creature.ID, creature.speciesName, 
                         objCreature.ID, objCreature.speciesName, creature.stats.Venom * 0.25f, (int)creature.stats.Venom, creature.x, creature.y));
 #endif
                     objCreature.ReceiveInteraction(creature, Entities.Interactions.poison);
@@ -54,7 +54,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 objCreature.ReceiveInteraction(creature, Entities.Interactions.attack);
 
 #if TRACKER_ENABLED
-                Tracker.Instance.Track(new CreatureAttack(creature.world.tick, creature.ID, creature.speciesName, 
+                Tracker.Instance.Track(new CreatureAttack(creature.world.CurrentTick, creature.ID, creature.speciesName, 
                     objCreature.ID, objCreature.speciesName, creature.stats.Damage, creature.stats.Perforation, creature.x, creature.y));
 #endif
             }

@@ -30,7 +30,7 @@ namespace EvolutionSimulation.Entities.Status
             Console.WriteLine("POSION DEALT " + damage.ToString() + " DMG TO " + owner.speciesName + " " + owner.ID + " (" + owner.stats.CurrHealth + " HP LEFT)");
 #endif
 #if TRACKER_ENABLED
-            Tracker.Instance.Track(new CreatureReceiveDamage(owner.world.tick, owner.ID, owner.speciesName, giverID, damage, DamageType.Poison, owner.stats.CurrHealth, owner.x, owner.y));
+            Tracker.Instance.Track(new CreatureReceiveDamage(owner.world.CurrentTick, owner.ID, owner.speciesName, giverID, damage, DamageType.Poison, owner.stats.CurrHealth, owner.x, owner.y));
 #endif
             if (owner.causeOfDeath == CauseOfDeath.NONE && owner.stats.CurrHealth <= 0)
             {
