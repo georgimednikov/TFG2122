@@ -392,7 +392,7 @@ namespace EvolutionSimulation.Entities
                 safeFSM.AddTransition(wander, followParentTransition, followParent);
                 safeFSM.AddTransition(followParent, stopFollowParentTransition, wander);
             }
-
+            // Temperature
             ITransition goToSafeTempPlaceTransition = new GoToSafeTemperaturePlaceTransition(this);
             ITransition stopGoToSafeTempPlaceTransition = new StopGoToSafeTemperaturePlaceTransition(this);
             ITransition goToSafeTempPlaceExploreTransition = new GoToSafeTemperaturePlaceExploreTransition(this);
@@ -738,6 +738,15 @@ namespace EvolutionSimulation.Entities
         // Stats related information
         public bool IsCarnivorous() { return stats.Diet == Diet.Carnivore; }
         public bool IsHerbivorous() { return stats.Diet == Diet.Herbivore; }
+
+        /// <summary>
+        /// Check if the creature has some necesities
+        /// </summary>
+        /// <returns> True if the creature is hunger, thristy or tired </returns>
+        public bool HasNecesities()
+        {
+            return IsThirsty() || IsTired() || IsHungry();
+        }
 
         /// <summary>
         /// Check if the creature is hunger (need to eat)

@@ -22,8 +22,8 @@
             if (creature.IsExhausted())
                 return true;
 
-            // If the creature is really thirsty continue going to drinking objective
-            if (creature.IsVeryThirsty() || creature.IsThirsty())
+            // If the creature is thirsty continue going to drinking objective
+            if (creature.IsThirsty())
                 return false;
 
             // If the creature is really hunger stop going to drinking objective

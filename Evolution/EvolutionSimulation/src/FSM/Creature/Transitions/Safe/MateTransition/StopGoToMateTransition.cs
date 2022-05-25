@@ -14,7 +14,7 @@
 
         public override bool Evaluate()
         {
-            return !creature.Mate() || creature.IsHungry() || creature.IsThirsty() || creature.IsTired();
+            return !creature.Mate() || creature.HasNecesities();
         }
 
         public override string ToString()

@@ -13,7 +13,8 @@
 
         public override bool Evaluate()
         {
-            return creature.stats.Gender != Genetics.Gender.Female && creature.wantMate && !creature.Mate();
+            return creature.stats.Gender != Genetics.Gender.Female
+                && !creature.HasNecesities() && !creature.Mate();               
         }
 
         public override string ToString()
