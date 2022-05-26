@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using EvolutionSimulation;
 using EvolutionSimulation.Entities;
-using EvolutionSimulation.Utils;
 using UnityEngine;
 
 namespace UnitySimulation
@@ -18,13 +16,14 @@ namespace UnitySimulation
 
         Dictionary<int, GameObject> _creatures = new Dictionary<int, GameObject>();
         Terrain terrain;
-
+        public void Restart()
+        {
+            _creatures.Clear();
+        }
         private void Start()
         {
             terrain = GetComponent<Terrain>();
-            //AirHeight += terrain.terrainData.size.y;
         }
-
         public void OnNotify(World info)
         {
             List<int> l = new List<int>(info.Creatures.Keys);
@@ -78,26 +77,15 @@ namespace UnitySimulation
             cMG.InitalizeCreature(c);
             gO.name = c.speciesName + " " + c.ID;
             // Subscribes to the event launched when a creature receives an interaction
-            c.ReceiveInteractionEvent += ReceiveInteractionListener;
+            c.AddInteraction(Interactions.attack, (interacter) => { _creatures[c.ID].GetComponent<CreatureEffects>().Bite(); });
             c.AddInteraction(Interactions.attack,
-                             (c) =>
+                             (interacter) =>
                              {
                                  float percentage = c.stats.CurrHealth / c.stats.MaxHealth ;
                                  cMG.SetStatusBar(percentage);
                              }
                          );
             return gO;
-        }
-
-        /// <param name="receiver">Which creature received an interaction</param>
-        /// <param name="sender">Which creature sent an interaction</param>
-        /// <param name="type">Which interaction was sent</param>
-        void ReceiveInteractionListener(Creature receiver, Creature sender, Interactions type)
-        {
-            if (type == Interactions.attack)
-            {
-                _creatures[receiver.ID].GetComponent<CreatureEffects>().Bite();
-            }
         }
 
         void UpdateCreature(Creature c, GameObject gO)

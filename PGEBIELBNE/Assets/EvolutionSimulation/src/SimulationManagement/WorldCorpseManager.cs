@@ -10,7 +10,14 @@ namespace UnitySimulation
         public GameObject corpsePrefab;
 
         Dictionary<int, GameObject> _corpses = new Dictionary<int, GameObject>();
-
+        public void Restart()
+        {
+            foreach(GameObject corpse in _corpses.Values)
+            {
+                Destroy(corpse);
+            }
+            _corpses.Clear();
+        }
         public void OnNotify(World info)
         {
             List<int> currCorpses = new List<int>();
@@ -23,12 +30,8 @@ namespace UnitySimulation
 
             CheckCorpses(info, currCorpses);
         }
-
         void CheckCorpses(World w, List<int> corpses)
         {
-            //Debug.Log("ManagedCorpses: " + _corpses.Count);
-            //Debug.Log("WorldCorpses: " + corpses.Count);
-
             // Check if a corpse has despawned
             List<int> keys = new List<int>(_corpses.Keys);
 
@@ -52,7 +55,6 @@ namespace UnitySimulation
                 }
             }
         }
-
         GameObject SpawnCorpse(Corpse c)
         {
             Terrain terrain = GetComponent<Terrain>();

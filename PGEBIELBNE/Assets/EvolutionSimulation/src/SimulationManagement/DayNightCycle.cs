@@ -28,11 +28,11 @@ namespace UnitySimulation
             float blend = currentDayTicks / ticksInHalfDay;
             if (currentDayTicks > ticksInHalfDay)
             {
-                Debug.Log("SE METE " + blend);
+                //*Debug.Log("SE METE " + blend);
                 blend = 1 - (blend - 1);
             }
 
-            Debug.Log("CurrentTicks: " + currentTicks + " TicksInHalfDay: " + ticksInHalfDay + " Blend: " + blend);
+            //Debug.Log("CurrentTicks: " + currentTicks + " TicksInHalfDay: " + ticksInHalfDay + " Blend: " + blend);
 
             skyboxMaterial.SetFloat("_Blend", blend);
             lightSource.intensity = Lerp(blend);

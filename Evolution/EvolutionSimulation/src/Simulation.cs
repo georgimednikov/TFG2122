@@ -22,7 +22,7 @@ namespace EvolutionSimulation
         /// <param name="individuals"> Initial number of creatures per original specie </param>
         /// <param name="dataDir"> Directory where all the files with the simulation info are stored </param>
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends </param>
-        /// <param name="worldConfig"> World configuration to generate the world map. If it is provided, no other world files are considered </param>
+        /// <param name="worldConfig"> World configuration to generate the world map. If it is not null, no other world files are considered </param>
         virtual public void Init(int years, int species, int individuals, string dataDir, string exportDir, WorldGenConfig worldConfig)
         {
             UserInfo.SetUp(years, species, individuals, dataDir, exportDir);
@@ -74,12 +74,13 @@ namespace EvolutionSimulation
         /// <param name="years"> Years to simulate </param>
         /// <param name="species"> Initial number of original species </param>
         /// <param name="individuals"> Initial number of creatures per original specie </param>
+        /// <param name="worldConfig"> World configuration to generate the world map. If it is not null, no other world files are considered </param>
         /// <param name="uniParamsFile"> Raw file with the parameters of the simulation universe. If not provided, default information is setted </param>
         /// <param name="chromosomeFile"> Raw File with the chromosome information </param>
         /// <param name="sGeneWeightFile"> Raw file with each genes' weight for the chromosome </param>
         /// <param name="abilitiesFile"> Raw file with each ability unlock percentage. If not provided, default information is setted</param>
         /// <param name="exportDir"> Directory where the files will be stored when de simulation ends. If not provided, default export directory is setted</param>
-        virtual public void Init(int years, int species, int individuals, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMap = null, string exportDir = null)
+        virtual public void Init(int years, int species, int individuals, string exportDir, WorldGenConfig worldConfig, string uniParamsFile = null, string chromosomeFile = null, string abilitiesFile = null, string sGeneWeightFile = null, string worldFile = null, string regionMapFile = null)
         {
             UserInfo.SetUp(years, species, individuals, _exportDir: exportDir);
 
@@ -93,25 +94,33 @@ namespace EvolutionSimulation
             Genetics.CreatureChromosome.SetChromosome(chromosomeFile, abilitiesFile);
             // Similarity Gene Weight
             Genetics.GeneticTaxonomy.SetTaxonomy(sGeneWeightFile);
+
             // World
             world = new World();
-            // World data is provided
-            if (worldFile != null && regionMap != null)
+            // If there is no custom world configuration
+            if (worldConfig == null)
             {
-                world.Init(worldFile, regionMap);
-                UserInfo.SetMapSize(world.map.GetLength(0));
-            }
-            // World data is not provided, so the world is generated with default values
-            else
-            {
-                WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
+                // If a simulation world is provided, that one is used
+                if (worldFile != null && regionMapFile != null)
                 {
-                    mapSize = UserInfo.Size
-                };
+                    world.Init(worldFile, regionMapFile);
+                    UserInfo.SetMapSize(world.map.GetLength(0));
+                }
+                else // A new one has to be created from scratch with the given size and default settings
+                {
+                    WorldGenConfig config = new WorldGenConfig(World.MapType.Default)
+                    {
+                        mapSize = UserInfo.Size
+                    };
 
-                world.Init(config);
+                    world.Init(config);
+                }
             }
-            //UserInfo.Size = world.map.GetLength(0);
+            else // There is a custom world configuration, which in this case means that a height map is provided
+            {
+                world.Init(worldConfig);
+                UserInfo.SetMapSize(worldConfig.mapSize);
+            }
         }
 
         /// <summary>
