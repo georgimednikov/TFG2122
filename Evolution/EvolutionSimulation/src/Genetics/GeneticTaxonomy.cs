@@ -360,11 +360,13 @@ namespace EvolutionSimulation.Genetics
                 string species = JsonConvert.SerializeObject(export, Formatting.Indented);
                 File.WriteAllText($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Species_{i}.json", species);
             }
+
             speciesRecord.Sort(new TicksComparer());
             //Export at least the same number of species as the number of species that the simulation has begun
             int speciesToExport = UserInfo.Species - existingSpecies.Count;
             for (int i = 0; i < speciesRecord.Count && i < speciesToExport; i++)
             {
+                if (existingSpecies.Contains(speciesRecord[i])) continue;
                 Species sp = speciesRecord[i];
                 SpeciesExport export = new SpeciesExport(sp.name, sp.original.stats);
                 string species = JsonConvert.SerializeObject(export, Formatting.Indented);
@@ -398,13 +400,13 @@ namespace EvolutionSimulation.Genetics
             int indexP1 = speciesRecord.FindIndex(x => x.name == speciesRecord[index1].progenitor);
             int indexP2 = speciesRecord.FindIndex(x => x.name == speciesRecord[index2].progenitor);
             //it should not happend, but just in case
-            if (index1 == -1 || index2 == -1 )
+            if (index1 == -1 || index2 == -1)
                 return false;
 
-            if(speciesRecord[index1].name == speciesRecord[index2].progenitor ||    //parent-child
+            if (speciesRecord[index1].name == speciesRecord[index2].progenitor ||    //parent-child
                     speciesRecord[index2].name == speciesRecord[index1].progenitor ||   //parent-child
                     (speciesRecord[index1].progenitor == speciesRecord[index2].progenitor && speciesRecord[index2].progenitor != "None"))  //siblins
-                    return true;
+                return true;
 
             if (indexP1 != -1 && speciesRecord[index2].name == speciesRecord[indexP1].progenitor)//grandparent-grandchild
                 return true;
