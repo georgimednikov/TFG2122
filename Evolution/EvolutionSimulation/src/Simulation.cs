@@ -615,15 +615,17 @@ namespace EvolutionSimulation
                 SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Black, voronoiMap, scale);
             }
             /////TODO GORDO: Hacer lo mismo de debug en el resto!!!
-            treeMap.Save("treeTest.png");
-            floraMap.Save("flora.bmp");
-            floraMapMask.Save("floraMask.bmp");
-            heightMap.Save("height.bmp");
-            tempMap.Save("temp.bmp");
-            hMap.Save("humidity.bmp");
-            holdRidgeMap.Save("biome.bmp");
-            voronoiMap.Save("VoronoiDiagram.bmp");
-            debugMap.Save("Debug.bmp");
+            treeMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Flora.png");
+            floraMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/FloraProb.png");
+            floraMapMask.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/TerrainTexture.png");
+            heightMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Height.png");
+            tempMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Temp.png");
+            hMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Humidity.png");
+            holdRidgeMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/HoldridgeBiome.png");
+            voronoiMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/VoronoiRegions.png");
+#if DEBUG
+            debugMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Debug.png");
+#endif
             miniature.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Map.png");
 
         }
@@ -656,7 +658,7 @@ namespace EvolutionSimulation
                 }
             }
         }
-        #endregion
+#endregion
 
 #if TRACKER_ENABLED
         public void InitTracker()
