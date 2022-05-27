@@ -36,7 +36,6 @@ namespace UnitySimulation
             foreach (IListener<World> listener in world_listeners)
             {
                 listener.OnNotify(world);
-                Debug.Log(world.Creatures.Count);
             }
         }
 
