@@ -8,7 +8,6 @@ namespace UnitySimulation
         public GameObject creature;
         
         public CreatureSpawn[] creatureDistribution;
-
         void Start()
         {
             Terrain terrain = GetComponent<Terrain>();

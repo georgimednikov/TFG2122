@@ -24,33 +24,38 @@ namespace UnitySimulation
     }
 #endif
 
+    /// <summary>
+    /// Generates the terrain according with the simulation world information
+    /// </summary>
     [RequireComponent(typeof(Terrain))]
     public class WorldGenerator : MonoBehaviour
     {
+        [Tooltip("World json file showed when the 'Update' button is clicked")]
         public TextAsset worldJson;
-        World world;
+
+        [Tooltip("Object to represent the world water")]
         public GameObject waterPlane;
         GameObject waterPlaneInstance;
 
+        /// <summary>
+        /// Simulation World, it the World file in the SimulationManager script,
+        /// Not the one that is in this script.
+        /// </summary>
+        World world;
+
+        /// <summary>
+        /// Sets the world to be generated.
+        /// </summary>
         public void SetWorld(World world)
         {
             this.world = world;
-            //if (waterPlaneInstance != null)
-            //    MapGen();
         }
-        //public World Generate()
-        //{
-        //    world = new World();
 
-        //    if (worldJson != null)
-        //        world.Init(worldJson.text);
-        //    else
-        //        world.Init(worldSize);
-        //    if(waterPlaneInstance != null)
-        //        MapGen();
-        //    return world;
-        //}
-
+        /// <summary>
+        /// Generates the terrain with the current world setted
+        /// in this component. Used to check the map without needing
+        /// to simulate anything (using the 'Update' editor button) 
+        /// </summary>
         public void MapGenSkipEvolution()
         {
             World.MapData[,] map = JsonConvert.DeserializeObject<World.MapData[,]>(worldJson.ToString());
@@ -59,6 +64,9 @@ namespace UnitySimulation
             SetWaterPlane();
         }
 
+        /// <summary>
+        /// Generates the terrain corresponding to the setted evolution map of the simulation
+        /// </summary>
         public void MapGen()
         {
             UpdateMeshVertices(world.map);
@@ -67,6 +75,9 @@ namespace UnitySimulation
             Debug.Log("Map generation done");
         }
 
+        /// <summary>
+        /// Creates the water plane
+        /// </summary>
         private void SetWaterPlane()
         {
             if(waterPlaneInstance != null)
@@ -77,6 +88,9 @@ namespace UnitySimulation
             waterPlaneInstance.transform.localScale = new Vector3(terrain.size.x / 10, 1, terrain.size.z / 10);
         }
 
+        /// <summary>
+        /// Creates the flora on the terrain that corresponds with the simulation world flora
+        /// </summary>
         private void GenerateFlora(World.MapData[,] heightMap)
         {
             List<TreeInstance> trees = new List<TreeInstance>();
@@ -130,6 +144,9 @@ namespace UnitySimulation
             terrain.SetDetailLayer(0, 0, 0, newMap);
         }
 
+        /// <summary>
+        /// Updates the terrain mesh vertices to adapt to simulation world heights
+        /// </summary>
         private void UpdateMeshVertices(World.MapData[,] heightMap)
         {
             TerrainData terrain = GetComponent<Terrain>().terrainData;

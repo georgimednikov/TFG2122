@@ -2,6 +2,9 @@ using UnityEngine;
 
 namespace UnitySimulation
 {
+    /// <summary>
+    /// Updates the skybox shader with the simulation day-night cycle
+    /// </summary>
     public class DayNightCycle : MonoBehaviour
     {
         public float nightLight = 0.1f;
@@ -17,7 +20,6 @@ namespace UnitySimulation
             lightSource = GetComponent<Light>();
         }
 
-        // Update is called once per frame
         void Update()
         {
             float currentTicks = SimulationManager.Instance.GetCurrentTicks();

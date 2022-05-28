@@ -1,10 +1,15 @@
+using System;
 using System.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 
 namespace UnitySimulation
 {
+    /// <summary>
+    /// Singleton to manage the configuration, the simulation and the other managers 
+    /// </summary>
     public class SimulationManager : MonoBehaviour
     {
         // Singleton
@@ -41,11 +46,19 @@ namespace UnitySimulation
         [Tooltip("Region map file")]
         public TextAsset RegionMap;
 
+        // Managers
         public WorldCreaturesManager worldCreatureManager;
         public WorldCorpseManager worldCorpseManager;
         public WorldGenerator worldGenerator;
+
+        /// <summary>
+        /// UI Pannel to restart the simulation
+        /// </summary>
         public GameObject restartPannel;
 
+        /// <summary>
+        /// The simulation system adapted to Unity
+        /// </summary>
         UnitySimulation simulation;
 
         private void Awake()
@@ -83,44 +96,7 @@ namespace UnitySimulation
                 Debug.LogError("WorldCorpseManager is not assigned");
             
             simulation = new UnitySimulation();
-            simulation.GenerateWorld = worldGenerator;
-            simulation.Subscribe(worldCreatureManager);
-            simulation.Subscribe(worldCorpseManager);
             StartSimulation();
-        }
-
-        IEnumerator StepWorld()
-        {
-            Debug.Log(simulation.SimulationEnd);
-            while (!simulation.SimulationEnd)
-            {
-                simulation.SimulateStep();
-                yield return new WaitForSeconds(TimeBetweenSteps);                
-            }
-            restartPannel.SetActive(true);
-            yield return null;
-        }
-
-        void StartSimulation()
-        {
-            string universeFileRaw = UniverseParameters == null ? null : UniverseParameters.text;
-            string chromosomeFileRaw = Chromosome == null ? null : Chromosome.text;
-            string abilitiesFileRaw = AbilityUnlocks == null ? null : AbilityUnlocks.text;
-            string geneFileRaw = GeneSimilarity == null ? null : GeneSimilarity.text;
-            string worldFileRaw = WorldMap == null ? null : WorldMap.text;
-            string regionFileRaw = RegionMap == null ? null : RegionMap.text;
-
-            simulation.Init(
-                EvolutionYears, SpeciesNumber, IndividualsNumber, Application.dataPath + "/Export/" ,  // the data is not actually exported
-                null,
-                universeFileRaw,
-                chromosomeFileRaw, abilitiesFileRaw,
-                geneFileRaw,
-                worldFileRaw, regionFileRaw                
-                );
-
-            simulation.Run();
-            StartCoroutine(StepWorld());
         }
 
         public void RestartSimulation()
@@ -141,6 +117,55 @@ namespace UnitySimulation
         public int GetTicksInDay()
         {
             return simulation.GetTicksInDay();
+        }
+
+        /// <summary>
+        /// Coroutine where the simulation steps are performed,
+        /// and it is executed every 'TimeBetweenSteps'
+        /// </summary>
+        IEnumerator StepWorld()
+        {
+            //Debug.Log(simulation.SimulationEnd);
+            while (!simulation.SimulationEnd)
+            {
+                // Simulate an step
+                simulation.SimulateStep();
+                // Update every manager
+                worldCreatureManager.StepUpdate(simulation.World);
+                worldCorpseManager.StepUpdate(simulation.World);
+                yield return new WaitForSeconds(TimeBetweenSteps);
+            }
+            restartPannel.SetActive(true);
+            yield return null;
+        }
+
+        void StartSimulation()
+        {
+            string universeFileRaw = UniverseParameters == null ? null : UniverseParameters.text;
+            string chromosomeFileRaw = Chromosome == null ? null : Chromosome.text;
+            string abilitiesFileRaw = AbilityUnlocks == null ? null : AbilityUnlocks.text;
+            string geneFileRaw = GeneSimilarity == null ? null : GeneSimilarity.text;
+            string worldFileRaw = WorldMap == null ? null : WorldMap.text;
+            string regionFileRaw = RegionMap == null ? null : RegionMap.text;
+
+            simulation.Init(
+                EvolutionYears, SpeciesNumber, IndividualsNumber, Application.dataPath + "/Export/",  // the data is not actually exported
+                null,
+                universeFileRaw,
+                chromosomeFileRaw, abilitiesFileRaw,
+                geneFileRaw,
+                worldFileRaw, regionFileRaw
+                );
+            simulation.Run();
+
+            GenerateMap();
+            StartCoroutine(StepWorld());
+        }
+
+        void GenerateMap()
+        {
+            worldGenerator.SetWorld(simulation.World);
+            worldGenerator.MapGen();
         }
     }
 }

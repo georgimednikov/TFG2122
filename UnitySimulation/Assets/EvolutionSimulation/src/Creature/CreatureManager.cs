@@ -4,6 +4,11 @@ using UnityEngine;
 
 namespace UnitySimulation
 {
+    /// <summary>
+    /// Manages the object to represent the simulation creatures.
+    /// Each part is generated according to the data of the simulation 
+    /// or with the species exported data.
+    /// </summary>
     public class CreatureManager : MonoBehaviour
     {
         public GameObject body;
@@ -31,17 +36,22 @@ namespace UnitySimulation
         Transform bodyEmpty;
         AnimationActivation[] legAnimations; 
         AnimationActivation wingAnimation;
-        //public string state, stateLong;
 
         float sizeScale;
-
         float baseHeight;
 
+        /// <summary>
+        /// Creates the creature using the simulation creature data.
+        /// </summary>
         public void InitalizeCreature(Creature creature)
         {
             SpeciesExport species = new SpeciesExport(creature.speciesName, creature.stats);
             Init(species);
         }
+
+        /// <summary>
+        /// Creates the creature using the species json.
+        /// </summary>
         public void InitalizeCreature(TextAsset json)
         {
             SpeciesExport species = SpeciesExport.GetExportFromJSON(json.text);
