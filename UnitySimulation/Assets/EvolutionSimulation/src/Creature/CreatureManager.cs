@@ -138,15 +138,15 @@ namespace UnitySimulation
             legParent.transform.parent = transform;
             legParent.transform.localPosition = Vector3.up * (sizeScale + baseHeight);
             legParent.transform.localScale = Vector3.one * sizeScale;
-            float deltaAngle = 2 * Mathf.PI / creature.stats.Members;
-            legAnimations = new AnimationActivation[creature.stats.Members];
-            for (int i = 0; i < creature.stats.Members; i++)
+            float deltaAngle = 2 * Mathf.PI / creature.stats.Limbs;
+            legAnimations = new AnimationActivation[creature.stats.Limbs];
+            for (int i = 0; i < creature.stats.Limbs; i++)
             {
                 go = Instantiate(legs[legIndex], legParent.transform);
                 go.transform.rotation = Quaternion.Euler(-90, -i * deltaAngle / Mathf.PI * 180, -90);
                 legAnimations[i] = go.GetComponent<AnimationActivation>();
             }
-            if (creature.stats.Members % 2 == 1) legParent.transform.Rotate(new Vector3(0, -90, 0));
+            if (creature.stats.Limbs % 2 == 1) legParent.transform.Rotate(new Vector3(0, -90, 0));
         }
 
         private void InstantiateSpikes(SpeciesExport creature)

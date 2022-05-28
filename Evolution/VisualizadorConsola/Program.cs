@@ -13,7 +13,7 @@ namespace VisualizadorConsola
             EventSimulation s = new EventSimulation();
             s.OnSimulationBegin += (e) => { loadingBar = new ConsoleLoadingBar(); loadingBar.Begin(e); };
             s.OnSimulationStep += (e) => { loadingBar.Update(e); };
-#if true // TODO: DEBUG
+#if true 
             s.Init(20, 30, 20, "../../ProgramData/", "../../ResultingData/", null);
 #else
             if (!AskInfoUsingConsole(s))
@@ -74,9 +74,16 @@ namespace VisualizadorConsola
                         string input = Console.ReadLine();
                         mapSize = -1;
                         if (input != "")
-                            mapSize = int.Parse(input); // TODO: comprobar errores de parseo
-                        Console.Clear();
+                        {
+                            try
+                            {
+                                mapSize = int.Parse(input); 
+                                
+                            }
+                            catch {Console.WriteLine("You must introduce a number"); }
+                        }
                     } while (mapSize < minSize);
+                    Console.Clear();
 
                     // Map type request
                     World.MapType[] mapTypes = (World.MapType[])Enum.GetValues(typeof(World.MapType));
@@ -100,7 +107,7 @@ namespace VisualizadorConsola
                             if (index < 0 || index >= mapTypes.Length - 1)
                                 Console.WriteLine("Incorrect type number");
                         }
-                        catch (FormatException e) { Console.WriteLine("Incorrect format"); }
+                        catch { Console.WriteLine("You must introduce a number"); }
                     } while (index < 0 || index >= mapTypes.Length - 1);
                     Console.Clear();
 
@@ -117,9 +124,14 @@ namespace VisualizadorConsola
                 Console.WriteLine("Input how many years of evolution are going to be simulated:");
                 string input = Console.ReadLine();
                 years = -1;
-                if (input != "") years = int.Parse(input);
-                Console.Clear();
+                if (input != "")
+                try
+                {
+                    years = int.Parse(input);                   
+                }
+                catch { Console.WriteLine("You must introduce a number"); }
             } while (years < 0);
+            Console.Clear();
            
             // Original species request
             int minSpecies = UserInfo.MinSpeciesAmount();
@@ -128,9 +140,13 @@ namespace VisualizadorConsola
                 Console.WriteLine("Input how many species are going to be created initially. Must be a number larger than or equal to: " + minSpecies + "\n");
                 string input = Console.ReadLine();
                 species = -1;
-                if (input != "") species = int.Parse(input);
-                Console.Clear();
+                try
+                {
+                    species = int.Parse(input);
+                }
+                catch { Console.WriteLine("You must introduce a number"); }
             } while (species < minSpecies);
+             Console.Clear();
             
             // Initial individuals per species request
             int minIndividuals = UserInfo.MinIndividualsAmount();
@@ -139,9 +155,14 @@ namespace VisualizadorConsola
                 Console.WriteLine("Input how many individuals per species are going to be created. Must be a number larger than or equal to: " + minIndividuals + "\n");
                 string input = Console.ReadLine();
                 individuals = -1;
-                if (input != "") individuals = int.Parse(input);
-                Console.Clear();
+                if (input != "")
+                try
+                {
+                    individuals = int.Parse(input);
+                }
+                catch { Console.WriteLine("You must introduce a number"); }
             } while (individuals < minIndividuals);
+            Console.Clear();
 
             // Simulation initialization after all information has been provided
             s.Init(years, species, individuals, dataDir, exportDir, config);

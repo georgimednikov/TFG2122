@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace EvolutionSimulation.Entities
 {
-    //TODO: Podemos quitar el tipo T, y usar IEntity, pero habria que comparar los tipos
     /// <summary>
     /// Interface to represent an object that can be interacted with
     /// </summary>

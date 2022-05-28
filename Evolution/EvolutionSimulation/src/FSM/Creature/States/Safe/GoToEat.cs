@@ -25,7 +25,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (notAtDestiny)  // If it is already there, Eating transition must trigger the next tick
             {
                 Vector3 nextPos = creature.GetNextPosOnPath();
-                if (nextPos.X != -1 && nextPos.Y != -1) // TODO: esta comp no haria falta ahora con el notAtDestiny
+                if (nextPos.X != -1 && nextPos.Y != -1) 
                     creature.Place((int)nextPos.X, (int)nextPos.Y, (Entities.Creature.HeightLayer)nextPos.Z);
                 else SetPath();
             }

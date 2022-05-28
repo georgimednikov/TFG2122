@@ -45,7 +45,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                         return; 
                     }
                     // Create a random number of childs
-                    int numberChilds = RandomGenerator.Next(1, UniverseParametersManager.parameters.maxChildNumber + 1);//TODO: que el numero de hijos dependa de algo del cromosoma?
+                    int numberChilds = RandomGenerator.Next(1, UniverseParametersManager.parameters.maxChildNumber + 1);
                     for (int i = 0; i < numberChilds; ++i)
                     {
                         // Crossover with male and female chromosomes          

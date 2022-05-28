@@ -23,7 +23,6 @@ namespace EvolutionSimulation.FSM.Creature.States
             if (creature.stats.CurrHydration > creature.stats.MaxHydration)
             {
                 creature.stats.CurrHydration = creature.stats.MaxHydration;
-                //TODO: Mirar los valores cuando se llama a SafeWaterSpotFound SafePlantFound y CreateExperience
                 creature.SafeWaterSource();
             }
         }

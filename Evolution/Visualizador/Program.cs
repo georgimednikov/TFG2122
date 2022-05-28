@@ -166,9 +166,13 @@ namespace Visualizador
             DialogResult result = prompt.ShowDialog();
 
             if (result == DialogResult.OK && textBox.Text != "")
-            {
-                value = int.Parse(textBox.Text);
-                return true;
+            {                
+                try
+                {
+                    value = int.Parse(textBox.Text);
+                    return true;
+                }
+                catch { value = -1; return false; }                
             }
             else
             {

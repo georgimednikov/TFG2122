@@ -3,9 +3,10 @@ using System.Drawing;
 using System.Collections.Generic;
 using EvolutionSimulation.Entities;
 using System.Numerics;
+#if TRACKER_ENABLED
 using Telemetry;
 using Telemetry.Events;
-
+#endif
 namespace EvolutionSimulation
 {
     /// <summary>
@@ -67,7 +68,7 @@ namespace EvolutionSimulation
             }
         }
 
-        // TODO: poder pasar el config a este init
+
         /// <summary>
         /// Sets up the program with the information provided by the user
         /// </summary>
@@ -167,7 +168,7 @@ namespace EvolutionSimulation
         /// </summary>
         protected void Simulate()
         {
-            while (Step() && currentTick <= totalTicks);
+            while (Step() && currentTick <= totalTicks) ;
         }
 
         /// <summary>
@@ -259,7 +260,6 @@ namespace EvolutionSimulation
                 //The new position is added to the list of used.
                 spawnPositions.Add(new Tuple<int, int>(x, y));
             }
-            //SetUpInitialPopulation();
         }
 
         /// <summary>
@@ -318,7 +318,6 @@ namespace EvolutionSimulation
             Bitmap hMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap holdRidgeMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap voronoiMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-            Bitmap debugMap = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             Bitmap miniature = new Bitmap(world.map.GetLength(0) * scale, world.map.GetLength(0) * scale, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
             double val;
             for (int i = 0; i < world.map.GetLength(0) * scale; i += scale)
@@ -568,44 +567,6 @@ namespace EvolutionSimulation
                         SetPixel(j, i, Color.White, voronoiMap, scale / 2);
                     }
 
-                    if (world.map[j / scale, i / scale].isWater) SetPixel(j, i, Color.Blue, debugMap, scale);
-                    else SetPixel(j, i, Color.DarkGreen, debugMap, scale);
-                }
-            }
-            double max;
-            var posNum = ComputePathPos(out max);
-            foreach (var item in posNum)
-            {
-                Vector2 vector = item.Key;
-                int color = (int)(item.Value / max * 255);
-                SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.FromArgb(255, 255, 255 - color, 255 - color), debugMap, scale);
-            }
-
-            for (int i = 0; i < world.deathsPos.Count; i++)
-            {
-                Vector2 vector = world.deathsPos[i].pos;
-                switch (world.deathsPos[i].cause)
-                {
-                    case World.DeathCause.Temperature:
-                        SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Red, debugMap, scale);
-                        break;
-                    case World.DeathCause.Others:
-                        SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Yellow, debugMap, scale);
-                        break;
-                    case World.DeathCause.Retaliation:
-                        SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Orange, debugMap, scale);
-                        break;
-                    case World.DeathCause.Starvation:
-                        SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Pink, debugMap, scale);
-                        break;
-                    case World.DeathCause.Thirst:
-                        SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.BlueViolet, debugMap, scale);
-                        break;
-                    case World.DeathCause.Exhaustion:
-                        SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Fuchsia, debugMap, scale);
-                        break;
-                    default:
-                        break;
                 }
             }
 
@@ -614,38 +575,25 @@ namespace EvolutionSimulation
                 Vector2 vector = world.regionMap[t].spawnPoint;
                 SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Black, voronoiMap, scale);
             }
-            /////TODO GORDO: Hacer lo mismo de debug en el resto!!!
-            treeMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Flora.png");
-            floraMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/FloraProb.png");
-            floraMapMask.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/TerrainTexture.png");
-            heightMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Height.png");
-            tempMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Temp.png");
-            hMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Humidity.png");
-            holdRidgeMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/HoldridgeBiome.png");
-            voronoiMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/VoronoiRegions.png");
-#if DEBUG
-            debugMap.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Debug.png");
+            string path;
+#if TRACKER_ENABLED
+            path = $"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}";
+#else
+            path = $"{UserInfo.ExportDirectory}Output";
+
 #endif
-            miniature.Save($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Map.png");
+            floraMapMask.Save(path + "/TerrainTexture.png");
+            miniature.Save(path + "/Map.png");
+#if DEBUG
+            treeMap.Save(path + "/Flora.png");
+            floraMap.Save(path + "/FloraProb.png");
+            heightMap.Save(path + "/Height.png");
+            tempMap.Save(path + "/Temp.png");
+            hMap.Save(path + "/Humidity.png");
+            holdRidgeMap.Save(path + "/HoldridgeBiome.png");
+            voronoiMap.Save(path + "/VoronoiRegions.png");
+#endif
 
-        }
-
-        Dictionary<Vector2, int> ComputePathPos(out double max)
-        {
-            Dictionary<Vector2, int> posNum = new Dictionary<Vector2, int>();
-            List<Vector2> v = world.pathPos;
-            max = 1;
-            foreach (var pos in v)
-            {
-                if (posNum.ContainsKey(pos))
-                {
-                    int tMax = ++posNum[pos];
-                    if (tMax > max)
-                        max = tMax;
-                }
-                else posNum.Add(pos, 1);
-            }
-            return posNum;
         }
 
         void SetPixel(int x, int y, Color color, Bitmap bitmap, int scale = 2)
@@ -658,7 +606,7 @@ namespace EvolutionSimulation
                 }
             }
         }
-#endregion
+        #endregion
 
 #if TRACKER_ENABLED
         public void InitTracker()
@@ -704,6 +652,6 @@ namespace EvolutionSimulation
 
         protected World world;
         protected int totalTicks;
-        protected int currentTick { get => world.CurrentTick; } // TODO: esta variable es redundante pero esq estaba repetida en varios sitios
+        protected int currentTick { get => world.CurrentTick; }
     }
 }

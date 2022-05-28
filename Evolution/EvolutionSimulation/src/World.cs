@@ -89,10 +89,6 @@ namespace EvolutionSimulation
     /// </summary>
     public class World
     {
-        public int[] deaths;
-        public List<Death> deathsPos;
-        public List<Vector2> pathPos;
-
         public enum DeathCause
         {
             Temperature,
@@ -141,15 +137,6 @@ namespace EvolutionSimulation
             public Dictionary<int, List<Vector2>> links;
         }
 
-        // TODO: esta constructora se puede ir?
-        public void Init(int size)
-        {
-            WorldGenConfig c = new WorldGenConfig(MapType.Default);
-            c.mapSize = size;
-            Init(c);
-        }
-
-        // TODO: se va a poder inicializar asi o solo con un config?
         public void Init(string rawWorldData, string regionMap)
         {
             WorldGenConfig config = new WorldGenConfig(MapType.Custom);
@@ -194,9 +181,6 @@ namespace EvolutionSimulation
             StaticEntities = new Dictionary<int, StaticEntity>();
             entitiesToDelete = new List<int>();
             StaticEntitiesToUpdate = new List<StaticEntity>();
-            deathsPos = new List<Death>();
-            pathPos = new List<Vector2>();
-            deaths = new int[8];
             MapData mapData;
             // Create plant entities from the file
             for (int i = 0; i < mapSize; i++)
@@ -235,9 +219,6 @@ namespace EvolutionSimulation
         /// </summary>
         public void Init(WorldGenConfig config)
         {
-            deathsPos = new List<Death>();
-            pathPos = new List<Vector2>();
-            deaths = new int[8];
             ticksHour = UniverseParametersManager.parameters.ticksPerHour;
             hoursDay = UniverseParametersManager.parameters.hoursPerDay;
             daysYear = UniverseParametersManager.parameters.daysPerYear;
@@ -374,7 +355,7 @@ namespace EvolutionSimulation
         private void FillRegionMap()
         {
             int numReg = 0;
-            Queue<Vector2> regions = new Queue<Vector2>(); //TODO: Lista de nodos a encolar 
+            Queue<Vector2> regions = new Queue<Vector2>(); 
             for (int pass = 0; pass < numPasses; pass++)
             {
                 for (int i = 0; i < map.GetLength(0) / chunkSize; i++)
@@ -481,7 +462,6 @@ namespace EvolutionSimulation
         /// <returns>True if ther are any remaining creatures</returns>
         public bool Tick()
         {
-            //this.tick = tick;
             CycleDayNight();
             bool entitiesLeft = EntitiesTick();
             CurrentTick++;
@@ -524,7 +504,6 @@ namespace EvolutionSimulation
             Console.WriteLine("CREATURE HAS BORN AT " + x + ", " + y + " WITH ID: " + entitiesID);
 #endif
             entitiesID++;
-            // TODO: devolver el id, una copia o un wrap del objeto creado
             return ent;
         }
 
@@ -1054,8 +1033,7 @@ namespace EvolutionSimulation
         // Perlin noise generator
         Perlin p;
 
-        // 50 steps equals and hour, and 24 hours equal a day. 365 days equal a year  
-        public static int ticksHour, hoursDay, daysYear; // TODO: esto deberia estar aqui o en la simulacion ?
+        public static int ticksHour, hoursDay, daysYear;
 
         /// <summary>
         /// The current tick associated with the state of the world in the simulation

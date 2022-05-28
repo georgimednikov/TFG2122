@@ -73,13 +73,13 @@ namespace EvolutionSimulation
 
         // Memory
         public int knowledgeTickMultiplier = 500; // Amount of ticks that a creature can remember things like water positions. It depends also on its knowledge.
-        public float aggressivenessToRadiusMultiplier = 0.33f; // TODO: no se que es esto
+        public float aggressivenessToRadiusMultiplier = 0.33f; // Multiplier of the radius of perception that a creature can perceive as dangerous
         public int maxResourcesRemembered = 5; // Maximum number of resources that a creature can remeber
         public int maxPositionsRemembered = 10; // Maximum number of positions that a creature can remember
 
         // States
         public int baseActionCost = 1000; // Base cost of any action
-        public int venomCostMultiplier = 100; // Aditional cost of a venomous attack TODO: no es un multiplicador
+        public int venomCostMultiplier = 100; // Aditional cost of a venomous attack 
         public float chaseCostMultiplier = 0.4f;
         public float fleeingCostMultiplier = 0.75f; // Modifier of the cost of moving when one creature flees from another TODO: hay un numero mágico en flee
         public int drinkingCostMultiplier = 10; // Cost modifier of drinking
@@ -87,7 +87,7 @@ namespace EvolutionSimulation
         public int eatingCostMultiplier = 10; // Cost modifier of eating
         public int sleepingCostMultiplier = 10; // Cost modifier of sleeping
         public float mutationChance = 0.1f; // Chance of a mutation in new creatures 
-        public int adjacentLength = 1; // TODO: no se que es esto
+        public int adjacentLength = 1; // Tiles min that a creature will always perceive and will be able to interact 
         public float actionPerceptionPercentage = 0.75f; // Perception modification when a creature is performing an action
         public float sleepingExpenseReduction = 0.1f; // The reduction of every expense (energy, hydration, rest) when a creature is sleeping
 

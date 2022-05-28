@@ -486,7 +486,7 @@ namespace EvolutionSimulation
             ValidateTaxonomy(parameters);
         }
 
-        static void ValidateWorld(UniverseParameters parameters) // TODO: REVISAR QUE ESTAN TODOS
+        static void ValidateWorld(UniverseParameters parameters)
         {
             if (parameters.ticksPerHour <= 0 || parameters.hoursPerDay <= 0 || parameters.daysPerYear <= 0 || parameters.morningStart <= 0 || parameters.nightStart <= 0)
                 throw new UniverseParameterIsZeroException("The provided time parameters must be positive");
@@ -546,8 +546,6 @@ namespace EvolutionSimulation
 
         static void ValidateCreatureStats(UniverseParameters parameters)
         {
-            //TODO: Hay que ver que de Creature va aqui y viceversa, pues son metodos distintos
-
             if (parameters.newbornStatMultiplier <= 0) throw new UniverseParameterIsZeroException("The provided newbornStatMultiplier must be positive");
             if (parameters.adulthoodThreshold <= 0) throw new UniverseParameterIsZeroException("The provided adulthoodThreshold must be positive");
             if (parameters.tiredThreshold <= 0) throw new UniverseParameterIsZeroException("The provided tiredThreshold must be positive");

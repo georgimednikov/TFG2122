@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 0.3
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.21550927, g: 0.33363906, b: 0.38009503, a: 0.3}
+  m_IndirectSpecularColor: {r: 0.08919018, g: 0.20782372, b: 0.29776093, a: 0.3}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -450,12 +450,12 @@ MonoBehaviour:
   EvolutionYears: 0
   SpeciesNumber: 2
   IndividualsNumber: 3
-  UniverseParameters: {fileID: 4900000, guid: 28081e8ef8487cd40804789ee795ba64, type: 3}
-  Chromosome: {fileID: 4900000, guid: ff304230ee744c042bcd7708df05d0d2, type: 3}
-  AbilityUnlocks: {fileID: 4900000, guid: a72b0c7193b661a44a1826bf36cbbb1f, type: 3}
-  GeneSimilarity: {fileID: 4900000, guid: 720e5147ea417944ea92c6537381b5f7, type: 3}
-  WorldMap: {fileID: 4900000, guid: 8da52ab9936a2c64fa9ce818dec94ca7, type: 3}
-  RegionMap: {fileID: 4900000, guid: a97ba288782c446448196c158f33e089, type: 3}
+  UniverseParameters: {fileID: 4900000, guid: 68df4e6957b657347ac1137e77d0a994, type: 3}
+  Chromosome: {fileID: 4900000, guid: 7361984217cb5394b99df9711bbbc6dc, type: 3}
+  AbilityUnlocks: {fileID: 4900000, guid: a4d4ca45280434448bd11ac56cade37b, type: 3}
+  GeneSimilarity: {fileID: 4900000, guid: 3ad68cca89251a74fb3322126ce06096, type: 3}
+  WorldMap: {fileID: 4900000, guid: 76c473b9485fa554dbc5be2ee28c6cae, type: 3}
+  RegionMap: {fileID: 4900000, guid: d41ae392c49747e46a84e9ea10c949e6, type: 3}
   worldCreatureManager: {fileID: 848237403}
   worldCorpseManager: {fileID: 848237409}
   worldGenerator: {fileID: 848237407}
