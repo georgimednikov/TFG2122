@@ -129,7 +129,7 @@ namespace EvolutionSimulation.Entities
 
             maxResourcesRemembered = thisCreature.stats.Knowledge + UniverseParametersManager.parameters.maxResourcesRemembered;
             maxPositionsRemembered = thisCreature.stats.Knowledge + UniverseParametersManager.parameters.maxPositionsRemembered;
-            ticksToSavePosition = 10; //TODO: Esto bien en base a action points?
+            ticksToSavePosition = 10; 
             ticksElapsed = 0;
             maxExperienceTicks = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
             dangerRadius = (int)(thisCreature.stats.Aggressiveness * UniverseParametersManager.parameters.aggressivenessToRadiusMultiplier);

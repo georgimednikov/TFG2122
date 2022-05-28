@@ -148,6 +148,7 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
+
         /// Check if the creature is in a position where is confortable with the temperature
         /// Otherwise the creature will take damage
         /// </summary>
@@ -581,7 +582,7 @@ namespace EvolutionSimulation.Entities
         public bool AbleToFight()
         {
             // Health threshold above which the creature will fight
-            float threshold = 0.25f - (stats.Aggressiveness / UniverseParametersManager.parameters.combatTransitionHealthThresholdMultiplier); // TODO: A mayor agresividad mas se arriesga, revisar cifras
+            float threshold = 0.25f - (stats.Aggressiveness / UniverseParametersManager.parameters.combatTransitionHealthThresholdMultiplier); 
             return stats.CurrHealth >= stats.MaxHealth * threshold;
         }
 

@@ -605,7 +605,7 @@ namespace EvolutionSimulation
                 Vector2 vector = world.regionMap[t].spawnPoint;
                 SetPixel((int)vector.X * scale, (int)vector.Y * scale, Color.Black, voronoiMap, scale);
             }
-            /////TODO GORDO: Hacer lo mismo de debug en el resto!!!
+            //TODO GORDO: Hacer lo mismo de debug en el resto!!!
             treeMap.Save("treeTest.png");
             floraMap.Save("flora.bmp");
             floraMapMask.Save("floraMask.bmp");

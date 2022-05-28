@@ -10,9 +10,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
         public FleeTransition(Entities.Creature creature)
         {
             this.creature = creature;
+            // The more aggresive a creature is, the lesser its danger range
+
             danger = (int)((UniverseParametersManager.parameters.fleeingTransitionMultiplier + 1) - creature.stats.Aggressiveness /
-                (float)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.fleeingTransitionMultiplier);  // The more aggresive a creature is, the lesser its danger range
-        }                                                                                                                                                               // And therefore, the less it runs away
+                (float)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.fleeingTransitionMultiplier);  
+        }                                                                                                                                                               
 
         public override bool Evaluate()
         {

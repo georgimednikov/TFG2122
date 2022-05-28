@@ -12,8 +12,6 @@ namespace EvolutionSimulation.Entities
             int minHealth = UniverseParametersManager.parameters.minHealth;
             int healthValue = UniverseParametersManager.parameters.healthGainMultiplier;
             int maxLimbs = UniverseParametersManager.parameters.maxLimbs;
-            int minRestExpense = UniverseParametersManager.parameters.minRestExpense;
-            int maxRestExpense = UniverseParametersManager.parameters.maxRestExpense;
             //int minEnergy = 50;
             //int sizeToEnergyRatio = 2; //The creature gains 1 point of max energy for every sizeToEnergyRatio of Size
             int resourceAmount = UniverseParametersManager.parameters.resourceAmount; //Max amount of /*energy/*/sleep/hydration
