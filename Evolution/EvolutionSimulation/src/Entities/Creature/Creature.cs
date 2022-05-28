@@ -148,6 +148,7 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
+
         /// Check if the creature is in a position where is confortable with the temperature
         /// Otherwise the creature will take damage
         /// </summary>
@@ -264,7 +265,7 @@ namespace EvolutionSimulation.Entities
 
             if (stats.CurrEnergy <= 0 || stats.CurrRest <= 0 || stats.CurrHydration <= 0)
             {
-                stats.CurrHealth -= 1;  // TODO: Numero magico
+                stats.CurrHealth -= 1;  
 
 #if TRACKER_ENABLED
                 DamageType dtype = DamageType.Starvation;
@@ -576,7 +577,7 @@ namespace EvolutionSimulation.Entities
         public bool AbleToFight()
         {
             // Health threshold above which the creature will fight
-            float threshold = 0.25f - (stats.Aggressiveness / UniverseParametersManager.parameters.combatTransitionHealthThresholdMultiplier); // TODO: A mayor agresividad mas se arriesga, revisar cifras
+            float threshold = 0.25f - (stats.Aggressiveness / UniverseParametersManager.parameters.combatTransitionHealthThresholdMultiplier); 
             return stats.CurrHealth >= stats.MaxHealth * threshold;
         }
 
@@ -656,7 +657,7 @@ namespace EvolutionSimulation.Entities
         /// </summary>
         private void RetalliateDamage(Creature interacter)
         {
-            interacter.stats.CurrHealth -= stats.Counter;   // TODO: Ver si esto es danio bueno
+            interacter.stats.CurrHealth -= stats.Counter;
 #if TRACKER_ENABLED
             Tracker.Instance.Track(new CreatureReceiveDamage(interacter.world.CurrentTick, interacter.ID, interacter.speciesName, ID, stats.Counter, DamageType.Retalliation, interacter.stats.CurrHealth, interacter.x, interacter.y));
 #endif
@@ -677,7 +678,7 @@ namespace EvolutionSimulation.Entities
         private void Poison(Creature interacter)
         {
             if (interacter.stats.Perforation >= stats.Armor)    // Venoms stack, no refreshing
-                AddStatus(new Poison((int)(interacter.stats.Venom), interacter.stats.Venom * 0.25f, interacter.ID)); // TODO: Numero magico
+                AddStatus(new Poison((int)(interacter.stats.Venom), interacter.stats.Venom * 0.25f, interacter.ID)); 
         }
 
         /// <summary>
@@ -923,13 +924,8 @@ namespace EvolutionSimulation.Entities
         /// <returns> Null if the creature does not have or does not remember any safe temperature spot </returns>
         public Vector2Int SafeTemperaturePosition() { return mind.SafeTemperaturePosition(); }
         /// <summary>
-        /// Gets a new position that the creature has not explored yet or that it does not remember that 
-        /// it has explored it before
-        /// </summary>
-        public Vector2Int NewPosition() { return mind.NewPosition(); }
-
-        /// <summary>
-        /// 
+        /// Gets a new region that the creature has not explored yet or that it does not remember that
+        /// it has explored it before        
         /// </summary>
         public int NewExploreRegion() { return mind.NewExplorePosition(); }
 #endregion
@@ -964,7 +960,6 @@ namespace EvolutionSimulation.Entities
             world.entityMap[this.x, this.y].Add(this);
             Vector2 pos = new Vector2();
             pos.X = this.x; pos.Y = this.y;
-            world.pathPos.Add(pos);
             creatureLayer = z;
             if (!world.IsTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
@@ -982,7 +977,6 @@ namespace EvolutionSimulation.Entities
             world.entityMap[this.x, this.y].Add(this);
             Vector2 pos = new Vector2();
             pos.X = this.x; pos.Y = this.y;
-            world.pathPos.Add(pos);
             creatureLayer = z;
             if (!world.IsTree(x, y) && z == HeightLayer.Tree)
                 creatureLayer = HeightLayer.Ground;
@@ -1088,7 +1082,6 @@ namespace EvolutionSimulation.Entities
                 return -1;
             int speed;
             int layer = (int)path[pathIterator].Z;
-            //TODO: que es esto?
             switch ((int)path[pathIterator].Z)
             {
                 case 0:
@@ -1218,7 +1211,7 @@ namespace EvolutionSimulation.Entities
             cbEvent.Intimidation = stats.Intimidation;
             cbEvent.Size = stats.Size;
             cbEvent.LifeSpan = stats.LifeSpan;
-            cbEvent.Limbs = stats.Members;
+            cbEvent.Limbs = stats.Limbs;
             cbEvent.Metabolism = stats.Metabolism;
             cbEvent.Hair = stats.Hair;
             cbEvent.Knowledge = stats.Knowledge;

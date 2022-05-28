@@ -17,7 +17,7 @@
             int distPlant = creature.DistanceToObjective(plantPos),
                 distCorpse = creature.DistanceToObjective(corpsePos);
 
-            return creature.stats.CurrEnergy >= UniverseParametersManager.parameters.stopEatingTransitionEnergyMultiplier * creature.stats.MaxEnergy         // no hunger
+            return creature.stats.CurrEnergy >= UniverseParametersManager.parameters.stopEatingTransitionEnergyPercentage * creature.stats.MaxEnergy         // no hunger
                 || (distCorpse > UniverseParametersManager.parameters.adjacentLength && distPlant > UniverseParametersManager.parameters.adjacentLength)     // Both eating objective are far    
                 || (distPlant > UniverseParametersManager.parameters.adjacentLength && creature.stats.Diet == Genetics.Diet.Herbivore)    // hervibore and plant objective is far   
                 || (distCorpse > UniverseParametersManager.parameters.adjacentLength && creature.stats.Diet == Genetics.Diet.Carnivore)  // carnivore and corpse objective is far

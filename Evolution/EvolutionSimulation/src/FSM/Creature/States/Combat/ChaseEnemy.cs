@@ -18,7 +18,7 @@ namespace EvolutionSimulation.FSM.Creature.States
         public ChaseEnemy(Entities.Creature c) : base(c) 
         { 
             creature = c;
-            modifier = 1.1f - // TODO: Modificador que dependa bien, ahora mismo a mas agresividad mejor persigue
+            modifier = 1.1f -
                 (c.stats.Aggressiveness / c.chromosome.GetFeatureMax(Genetics.CreatureFeature.Aggressiveness) * UniverseParametersManager.parameters.chaseCostMultiplier);
         }
 
@@ -70,7 +70,7 @@ namespace EvolutionSimulation.FSM.Creature.States
             if(otherID == -1)   // Target has died! This entails looking for another ONLY if there is a menace, or none if there is not
             {                   // This will only take place when the creature still feels threatened and is cornered, because it won't be able to flee
                 creature.Menace(out otherID, out otherObj);  
-                if(Math.Abs(otherObj.x - creature.x) >= creature.stats.Perception / 2 || Math.Abs(otherObj.y - creature.y) >= creature.stats.Perception / 2)    // TODO: ajustar criterio de no cornered
+                if(Math.Abs(otherObj.x - creature.x) >= creature.stats.Perception / 2 || Math.Abs(otherObj.y - creature.y) >= creature.stats.Perception / 2)
                 {   // Creature is sufficiently far away to not pose immediate danger
                     creature.cornered = false;
                     await = false;

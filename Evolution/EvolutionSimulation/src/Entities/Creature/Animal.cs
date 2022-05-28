@@ -12,10 +12,7 @@ namespace EvolutionSimulation.Entities
             int minHealth = UniverseParametersManager.parameters.minHealth;
             int healthValue = UniverseParametersManager.parameters.healthGainMultiplier;
             int maxLimbs = UniverseParametersManager.parameters.maxLimbs;
-            int minRestExpense = UniverseParametersManager.parameters.minRestExpense;
-            int maxRestExpense = UniverseParametersManager.parameters.maxRestExpense;
-            //int minEnergy = 50;
-            //int sizeToEnergyRatio = 2; //The creature gains 1 point of max energy for every sizeToEnergyRatio of Size
+           
             int resourceAmount = UniverseParametersManager.parameters.resourceAmount; //Max amount of /*energy/*/sleep/hydration
             int minPerception = UniverseParametersManager.parameters.minPerception;
             int maxPerception = UniverseParametersManager.parameters.maxPerception;
@@ -29,7 +26,6 @@ namespace EvolutionSimulation.Entities
                                                                                           //An arboreal creature moves fast through trees, but arborealSpeed * mobilityPenalty on the ground
                                                                                           //An aerial creature moves fast in the air, but arborealSpeed = aerialSpeed * mobilityPenalty and groundSpeed = arborealSpeed * mobilityPenalty
 
-            //TODO: Poner esto en el cromosoma, tiempo de embarazo, tiempo entre celos, tiempo en celo
             float timeBetweenHeats = UniverseParametersManager.parameters.yearsBetweenHeats; //time in years between two heats or give birth and the next heat 
 
             stats.TimeBetweenHeats = world.YearToTick(timeBetweenHeats);
@@ -87,25 +83,24 @@ namespace EvolutionSimulation.Entities
             if (!chromosome.HasAbility(CreatureFeature.Thorns, CreatureChromosome.AbilityUnlock[CreatureFeature.Thorns])) stats.Counter = 0;
             else stats.Counter = chromosome.GetFeature(CreatureFeature.Thorns);
 
-            stats.Members = SetStatInRange(CreatureFeature.Members, maxLimbs + 1);//its not inclusive [0-11)
+            stats.Limbs = SetStatInRange(CreatureFeature.Limbs, maxLimbs + 1);//its not inclusive [0-11)
 
             stats.Metabolism = chromosome.GetFeature(CreatureFeature.Metabolism);
             
             stats.IdealTemperature = (chromosome.GetFeature(CreatureFeature.IdealTemperature) 
                 / (double)chromosome.GetFeatureMax(CreatureFeature.IdealTemperature));
             double tempInRange = (chromosome.GetFeature(CreatureFeature.TemperatureRange) 
-                / (double)chromosome.GetFeatureMax(CreatureFeature.TemperatureRange)) * 0.5f; // TODO: Numero magico
+                / (double)chromosome.GetFeatureMax(CreatureFeature.TemperatureRange)) * 0.5f; 
             stats.MinTemperature = stats.IdealTemperature - tempInRange;
             stats.MaxTemperature = stats.IdealTemperature + tempInRange;
 
             stats.MaxEnergy = resourceAmount;
             stats.CurrEnergy = stats.MaxEnergy;                                                                                     // The base cost of the action is expected of an average creature.
             stats.EnergyExpense = Math.Max(stats.MaxEnergy / (UniverseParametersManager.parameters.hoursTilStarvation * World.ticksHour) *   // An average creature is defined as one with half the maximum metabolism,
-            (chromosome.GetFeaturePercentage(CreatureFeature.Metabolism) * 2f) *                                                    // 4 members, and neither venom nor thorns. The base value of the expense
-            ((stats.Members / 4f) + // TODO: Numero magico                                                                          // is then multiplied to reflect the creature's lack or suprlus of features.
+            (chromosome.GetFeaturePercentage(CreatureFeature.Metabolism) * 2f) *                                                    // 4 limbs, and neither venom nor thorns. The base value of the expense
+            ((stats.Limbs / (maxLimbs / 2f)) +                                                                                      // is then multiplied to reflect the creature's lack or suprlus of features.
             (stats.Venom / (float)(chromosome.GetFeatureMax(CreatureFeature.Venomous) / 2f)) + (stats.Counter / (float)(chromosome.GetFeatureMax(CreatureFeature.Thorns) / 2f)))
             ,0.01f);
-            Console.WriteLine(stats.EnergyExpense);
             stats.MaxHydration = resourceAmount;
             stats.CurrHydration = stats.MaxHydration;
             stats.HydrationExpense = (stats.EnergyExpense * UniverseParametersManager.parameters.thirstToHungerRatio);
@@ -113,7 +108,7 @@ namespace EvolutionSimulation.Entities
             stats.MaxRest = resourceAmount;
             stats.CurrRest = stats.MaxRest;
             float re = stats.MaxRest / (UniverseParametersManager.parameters.hoursTilExhaustion * UniverseParametersManager.parameters.ticksPerHour);
-            stats.RestExpense = re / 2f +   // TODO: Numeros arcanos                            // A creature with average resistance will have the base expense
+            stats.RestExpense = re / 2f +                                                       // A creature with average resistance will have the base expense
                 (1 - chromosome.GetFeaturePercentage(CreatureFeature.Resistance)) * re;         // One with maximum or minimum will have either half or 1.5 times respectively
             stats.RestRecovery = stats.RestExpense * exhaustToSleepRatio;
 
@@ -190,7 +185,7 @@ namespace EvolutionSimulation.Entities
             }
 
             //Intimidation has to be calculed here because of modifyStatByAge
-            float intimidation = stats.Size / 2; //TODO:Hacer que escale con fuerza
+            float intimidation = stats.Size / 2;
 
             //Horns. Increase damage and intimidation
             if (chromosome.HasAbility(CreatureFeature.Horns, CreatureChromosome.AbilityUnlock[CreatureFeature.Horns]))

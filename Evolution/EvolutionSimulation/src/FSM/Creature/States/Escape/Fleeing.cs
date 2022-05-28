@@ -22,7 +22,7 @@ namespace EvolutionSimulation.FSM.Creature.States
                 UniverseParametersManager.parameters.fleeingCostMultiplier);
         }
 
-        public override int GetCost()   // TODO: con 0 de coste podria funcionar por el cornered
+        public override int GetCost()
         {
             int cost = creature.GetNextCostOnPath();
             if(cost <= 0) {
@@ -101,7 +101,6 @@ namespace EvolutionSimulation.FSM.Creature.States
             }
         }
 
-        // TODO: Esto deberia estar aqui?
         private void PositionAwayFromMe(ref int fX, ref int fY)
         {
             // If the creature is in a different tile, simpli get away from it

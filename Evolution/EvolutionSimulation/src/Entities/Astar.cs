@@ -84,10 +84,8 @@ namespace EvolutionSimulation.Entities
             Vector3 nStart = new Vector3(w.map[(int)start.X, (int)start.Y].regionId, 0, 0);
             Vector3 nEnd = new Vector3(w.map[(int)end.X, (int)end.Y].regionId, 0, 0);
 
-            if (nEnd.X != nStart.X) //TODO: Si es una isla y se quiere ir de ella andando, falta ese caso
+            if (nEnd.X != nStart.X) 
             {
-
-
                 List<GraphNode> list = new List<GraphNode>();
                 Utils.PriorityQueue<GraphNode> open = new Utils.PriorityQueue<GraphNode>();
                 List<GraphNode> closed = new List<GraphNode>();
@@ -262,7 +260,7 @@ namespace EvolutionSimulation.Entities
                         if (p is Tree) costSoFar += (2 - Tree.movementPenalty);
                         else if (p is EdibleTree) costSoFar += (2 - EdibleTree.movementPenalty);
                         else costSoFar += 1;
-                        neigh.Add(new GraphNode(newPos, n, costSoFar - c.PositionDanger((int)n.pos.X + i, (int)n.pos.Y + j))); //TODO: Danger aqui es problematico 
+                        neigh.Add(new GraphNode(newPos, n, costSoFar - c.PositionDanger((int)n.pos.X + i, (int)n.pos.Y + j)));
                     }
                 }
             return neigh;

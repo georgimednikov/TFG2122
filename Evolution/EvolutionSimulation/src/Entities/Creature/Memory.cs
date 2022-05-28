@@ -129,7 +129,7 @@ namespace EvolutionSimulation.Entities
 
             maxResourcesRemembered = thisCreature.stats.Knowledge + UniverseParametersManager.parameters.maxResourcesRemembered;
             maxPositionsRemembered = thisCreature.stats.Knowledge + UniverseParametersManager.parameters.maxPositionsRemembered;
-            ticksToSavePosition = 10; //TODO: Esto bien en base a action points?
+            ticksToSavePosition = 10; 
             ticksElapsed = 0;
             maxExperienceTicks = thisCreature.stats.Knowledge * UniverseParametersManager.parameters.knowledgeTickMultiplier;
             dangerRadius = (int)(thisCreature.stats.Aggressiveness * UniverseParametersManager.parameters.aggressivenessToRadiusMultiplier);
@@ -528,130 +528,6 @@ namespace EvolutionSimulation.Entities
             return goal;
         }
 
-        /// <summary>
-        /// To find a new unexplored position, the creature goes to
-        /// a position following the opposite direction of the average
-        /// of the most recent positions that the creature has visited.
-        /// It takes the furthest position that it can reach in that direction.
-        /// If the position is not reachable, a new position is calculated in a
-        /// circumference, with an angle and/or radius adjustment until 
-        /// a reachable position its achieved.
-        /// </summary>
-        public Vector2Int FindNewPosition()
-        {
-            int x = thisCreature.x;
-            int y = thisCreature.y;
-
-            if (!thisCreature.CheckTemperature(x, y) && SafeTemperaturePositions.Count == 0)
-                return BestTemperaturePosition();
-
-            Vector3 vector = Vector3.Zero;
-
-            // The average position of this creature's path so far is calculated and the used as a reference
-            // to get a direction vector that is used to guide the creature away from places already visited.
-            int averageX = x;
-            int averageY = y;
-
-            // The dangers encountered, whether good or bad, represent positions that the creature does not want
-            // to visit when exploring, either because it is dangerous or because it is a safe place it frequents.
-            foreach (Position p in dangersRemembered)
-            {
-                averageX += p.position.x;
-                averageY += p.position.y;
-            }
-            // These positions are used to further avoid positions previously visited, updated every so often
-            // and only when moving as to not stagnate when the creature is static.
-            foreach (Vector2Int p in explorePositionsRemembered)
-            {
-                averageX += p.x;
-                averageY += p.y;
-            }
-            averageX /= dangersRemembered.Count + explorePositionsRemembered.Count + 1;
-            averageY /= dangersRemembered.Count + explorePositionsRemembered.Count + 1;
-            vector = new Vector3(x - averageX, y - averageY, 0);
-            if (vector.X != 0 || vector.Y != 0)
-                vector = Vector3.Normalize(vector);
-
-            // If no positions are remebered or the resulting vector is zero, the creature chooses a random direction
-            if (vector.Length() == 0)
-                vector = RandomDir();
-
-            double radius = perceptionRadius;
-            double angleIncrement = Math.PI / 4.0;  // 45 degrees
-            double maxAngle = 3.0 * Math.PI / 2.0;
-            double angleDesist = 0.08727;   // 5 degrees to stop searching forward
-            Vector2Int finalPosition;
-
-            int cont = 0;
-            //Find a position to explore that is not water and is far of the vector calculated before
-            do
-            {
-                if (!GetPositionsAtRadius(out finalPosition, vector, radius, angleIncrement, maxAngle))
-                {
-                    if (++cont % 2 == 0)    // TODO: these numbers are magic
-                        angleIncrement /= 2.0;
-                    else
-                        radius *= 0.75f;
-                }
-                // If no viable position is found forward after several iterations, it goes back
-                if (angleIncrement < angleDesist || radius < 0.5)
-                {
-                    vector *= -1;
-                    radius = perceptionRadius;
-                    angleIncrement = Math.PI / 4.0;
-                    maxAngle = Math.PI / 2.0;   // 90 degrees, the area that the creature should have come from
-                }
-            }
-            while (!thisCreature.world.CanMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) // Repeat if it cannot move to the calculated destiny
-                || (finalPosition.x == thisCreature.x && finalPosition.y == thisCreature.y));                // or the destiny is the same position as the creature position
-
-            return finalPosition;
-        }
-
-
-        private Vector3 RandomDir()
-        {
-            int dirX, dirY;
-            do
-            {
-                dirX = RandomGenerator.Next(2);
-                dirY = RandomGenerator.Next(2);
-            }
-            while (dirX == 0 && dirY == 0);
-            return new Vector3(dirX, dirY, 0);
-        }
-        /// <summary>
-        /// Given an initial direction checks the tiles in a radius around the creature and returns
-        /// a position where the creature can go. Checks positions increasing and decreasing an angle
-        /// describing a circunference. If it does not find any position, it returns false and a smaller radius
-        /// or smaller angle increment must be provieded.
-        /// </summary>
-        /// <param name="finalPosition"> Position where the creature try to go</param>
-        /// <param name="dir"> Initial direction to start searching </param>
-        /// <param name="radius"> Radius of the circunference </param>
-        /// <param name="angleInc"> Angle increment to check positions in a circunference </param>
-        private bool GetPositionsAtRadius(out Vector2Int finalPosition, Vector3 dir, double radius, double angleInc, double maxAngle)
-        {
-            finalPosition = new Vector2Int();
-            double dot = Vector3.Dot(dir, Vector3.UnitX);
-            double acos = Math.Acos(dot);
-            double angleAcum = 0,
-                actualAngle = acos;
-            int inc = 1;
-            do
-            {
-                finalPosition.x = thisCreature.x + (int)Math.Round(Math.Cos(actualAngle) * radius, MidpointRounding.AwayFromZero);
-                finalPosition.y = thisCreature.y + (int)Math.Round(Math.Sin(actualAngle) * radius, MidpointRounding.AwayFromZero);
-
-                inc *= -1;
-                angleAcum += angleInc;
-                actualAngle += angleAcum * inc;
-            }
-            while (!thisCreature.world.CanMove(finalPosition.x, finalPosition.y, thisCreature.creatureLayer) && angleAcum <= maxAngle);
-
-            return angleAcum <= maxAngle
-                && (finalPosition.x != thisCreature.x || finalPosition.y != thisCreature.y);
-        }
         #endregion
 
         /// <summary>
@@ -803,7 +679,7 @@ namespace EvolutionSimulation.Entities
             if (list.Count > max)
                 list.RemoveRange(max, list.Count - max);
         }
-        // TODO: si tarda mucho hacer priority queue
+
         private void SortAndAdjustLists()
         {
             RemoveFakeInformation(Preys);
@@ -1009,7 +885,6 @@ namespace EvolutionSimulation.Entities
             else
                 l.Add(r);
         }
-        #endregion
 
         public void Shuffle<T>(IList<T> list)
         {
@@ -1023,6 +898,7 @@ namespace EvolutionSimulation.Entities
                 list[n] = value;
             }
         }
+        #endregion
 
         #region Comparators
         /// <summary>

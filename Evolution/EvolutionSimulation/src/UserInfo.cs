@@ -91,8 +91,6 @@ namespace EvolutionSimulation
         }
         
         static public void SetMapSize(int newSize) { Size = newSize; }
-
-        // TODO: Estos metodos en la simulacion ?
         static public int MinWorldSize() { return 100; }
         static public int MinSpeciesAmount() { return Size / 20; }
         static public int MinIndividualsAmount() { return 2; }

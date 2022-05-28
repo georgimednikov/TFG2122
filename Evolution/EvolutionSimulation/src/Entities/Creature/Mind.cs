@@ -244,7 +244,6 @@ namespace EvolutionSimulation.Entities
         public Vector2Int WaterPosition() { return worthyWaterPosition; }
         public Vector2Int SafePosition() { return mem.SafePositions.Count > 0 ? mem.SafePositions[0] : null; }
         public Vector2Int SafeTemperaturePosition() { return mem.SafeTemperaturePositions.Count > 0 ? mem.SafeTemperaturePositions[0] : null; }
-        public Vector2Int NewPosition() { return mem.FindNewPosition(); }
         public int NewExplorePosition() { return mem.NewExplorePosition(); }
 
         private bool AssignEntityInfo(EntityResource ent, out int id, out Vector3Int position)

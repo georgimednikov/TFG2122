@@ -486,7 +486,7 @@ namespace EvolutionSimulation
             ValidateTaxonomy(parameters);
         }
 
-        static void ValidateWorld(UniverseParameters parameters) // TODO: REVISAR QUE ESTAN TODOS
+        static void ValidateWorld(UniverseParameters parameters)
         {
             if (parameters.ticksPerHour <= 0 || parameters.hoursPerDay <= 0 || parameters.daysPerYear <= 0 || parameters.morningStart <= 0 || parameters.nightStart <= 0)
                 throw new UniverseParameterIsZeroException("The provided time parameters must be positive");
@@ -503,9 +503,6 @@ namespace EvolutionSimulation
             if (parameters.healthGainMultiplier <= 0) throw new UniverseParameterIsZeroException("The provided healthGainMultiplier must be positive");
             if (parameters.healthRegeneration <= 0) throw new UniverseParameterIsZeroException("The provided healthRegeneration must be positive");
             if (parameters.maxLimbs <= 0) throw new UniverseParameterIsZeroException("The provided maxLimbs must be positive");
-            if (parameters.minRestExpense <= 0) throw new UniverseParameterIsZeroException("The provided minRestExpense must be positive");
-            if (parameters.maxRestExpense <= 0) throw new UniverseParameterIsZeroException("The provided maxRestExpense must be positive");
-            if (parameters.maxRestExpense < parameters.minRestExpense) throw new MinMaxValueSwappedException("The maximum amount of rest expense is lower than the minimium");
             if (parameters.resourceAmount <= 0) throw new UniverseParameterIsZeroException("The provided resourceAmount must be positive");
             if (parameters.minLifeSpan <= 0) throw new UniverseParameterIsZeroException("The provided minLifeSpan must be positive");
             if (parameters.exhaustToSleepRatio <= 0) throw new UniverseParameterIsZeroException("The provided exhaustToSleepRatio must be positive");
@@ -526,7 +523,6 @@ namespace EvolutionSimulation
             if (parameters.regenerationRate <= 0) throw new UniverseParameterIsZeroException("The provided regenerationRate must be positive");
             if (parameters.hoursTilStarvation <= 0) throw new UniverseParameterIsZeroException("The provided hoursTilStarvation must be positive");
             if (parameters.thirstToHungerRatio <= 0) throw new UniverseParameterIsZeroException("The provided thirstToHungerRatio must be positive");
-            if (parameters.maxTemperatureAggressivenessPercentage <= 0) throw new UniverseParameterIsZeroException("The provided maxTemperatureAggressivenessPercentage must be positive");
             if (parameters.maxTemperatureDifference <= 0) throw new UniverseParameterIsZeroException("The provided maxTemperatureDifference must be positive");
             if (parameters.minHealthTemperatureDamage <= 0) throw new UniverseParameterIsZeroException("The provided minHealthTemperatureDamage must be positive");
             if (parameters.maxHealthTemperatureDamage <= 0) throw new UniverseParameterIsZeroException("The provided maxHealthTemperatureDamage must be positive");
@@ -541,7 +537,6 @@ namespace EvolutionSimulation
             if (parameters.restRegenerationThreshold > 1) throw new PercentageOverOneException("The provided restRegenerationThreshold is over one");
             if (parameters.energyRegenerationThreshold > 1) throw new PercentageOverOneException("The provided energyRegenerationThreshold is over one");
             if (parameters.hydrationRegenerationThreshold > 1) throw new PercentageOverOneException("The provided hydrationRegenerationThreshold is over one");
-            if (parameters.maxTemperatureAggressivenessPercentage > 1) throw new PercentageOverOneException("The provided maxTemperatureAggressivenessPercentage is over one");
             if (parameters.minHealthTemperatureDamage > 1) throw new PercentageOverOneException("The provided minHealthTemperatureDamage is over one");
             if (parameters.maxHealthTemperatureDamage > 1) throw new PercentageOverOneException("The provided maxHealthTemperatureDamage is over one");
             if (parameters.regenerationRate > 1) throw new PercentageOverOneException("The provided regenerationRate is over one");
@@ -551,8 +546,6 @@ namespace EvolutionSimulation
 
         static void ValidateCreatureStats(UniverseParameters parameters)
         {
-            //TODO: Hay que ver que de Creature va aqui y viceversa, pues son metodos distintos
-
             if (parameters.newbornStatMultiplier <= 0) throw new UniverseParameterIsZeroException("The provided newbornStatMultiplier must be positive");
             if (parameters.adulthoodThreshold <= 0) throw new UniverseParameterIsZeroException("The provided adulthoodThreshold must be positive");
             if (parameters.tiredThreshold <= 0) throw new UniverseParameterIsZeroException("The provided tiredThreshold must be positive");
@@ -614,12 +607,14 @@ namespace EvolutionSimulation
 
         static void ValidateCreatureTransitions(UniverseParameters parameters)
         {
-            if (parameters.fleeingTransitionMultiplier <= 0 || parameters.stopEatingTransitionEnergyMultiplier <= 0 || parameters.maxMenaceIntimidationMultiplierBasedOnMissingHealth <= 0 ||
-                parameters.combatTransitionHealthThresholdMultiplier <= 0 || parameters.safeTransitionAggressivenessThreshold <= 0 || parameters.experienceMaxAggresivenessMultiplier <= 0 || 
-                parameters.safePrefferedOverClosestResourceRatio <= 0 || parameters.maxDistanceToStartFollowParent <= 0 || parameters.maxDistanceToStopFollowParent <= 0)
+            if (parameters.fleeingTransitionMultiplier <= 0 || parameters.stopEatingTransitionEnergyPercentage <= 0 || parameters.maxMenaceIntimidationMultiplierBasedOnMissingHealth <= 0 ||
+                parameters.combatTransitionHealthThresholdMultiplier <= 0 || parameters.experienceMaxAggresivenessMultiplier <= 0 || 
+                 parameters.maxDistanceToStartFollowParent <= 0 || parameters.maxDistanceToStopFollowParent <= 0)
                 throw new UniverseParameterIsZeroException("The provided transition parameters must be positive");
             if (parameters.maxDistanceToStopFollowParent > parameters.maxDistanceToStartFollowParent)
                 throw new MinMaxValueSwappedException("The distance to stop following a parent is more than the distance to start following it");
+            if (parameters.stopEatingTransitionEnergyPercentage > 1)
+                throw new PercentageOverOneException("The provided stopEatingTransitionEnergyPercentage are over one");
 
         }
 

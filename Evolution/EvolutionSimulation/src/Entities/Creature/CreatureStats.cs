@@ -214,10 +214,10 @@ namespace EvolutionSimulation.Entities
             get { return baseStats.CurrAge; }
             set { float oldMaxH = MaxHealth; baseStats.CurrAge = value; CurrHealth += MaxHealth - oldMaxH; }
         }
-        public int Members //limbs
+        public int Limbs //limbs
         {
-            get { return baseStats.Members; }
-            set { baseStats.Members = value; }
+            get { return baseStats.Limbs; }
+            set { baseStats.Limbs = value; }
         }
         public int Metabolism
         {
@@ -287,7 +287,6 @@ namespace EvolutionSimulation.Entities
             set { baseStats.Upright = value; }
         }
 
-        // TODO: es redundante tener los baseStats publicos?
         public CreatureBaseStats GetBaseStats()
         {
             return baseStats;
@@ -398,7 +397,7 @@ namespace EvolutionSimulation.Entities
         public int LifeSpan;
 
         public int CurrAge;
-        public int Members; //limbs
+        public int Limbs; 
         public int Metabolism;
         public double MinTemperature;
         public double MaxTemperature;

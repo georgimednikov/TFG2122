@@ -25,7 +25,7 @@
         "relations":[]
     },
     {
-        "feature":"Members",
+        "feature":"Limbs",
         "maxValue":50,
         "relations":[]
     },
@@ -157,7 +157,7 @@
         "relations":
         [
             {
-                "feature":"Members",
+                "feature":"Limbs",
                 "percentage":0.1
             },
             {

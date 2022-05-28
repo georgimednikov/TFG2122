@@ -37,8 +37,8 @@ namespace EvolutionSimulation.Entities
         public void SetTraits(Creature creature)
         {
             // From an hour to two weeks of lifetime, depending on size
-            double minVal = World.ticksHour * World.hoursDay * (RandomGenerator.NextDouble() + 2);  // TODO: Numeros arcanos
-            double maxVal = World.ticksHour * World.hoursDay * (RandomGenerator.NextDouble() + 7);  // TODO: Numeros arcanos
+            double minVal = World.ticksHour * World.hoursDay * (RandomGenerator.NextDouble() + 2);
+            double maxVal = World.ticksHour * World.hoursDay * (RandomGenerator.NextDouble() + 7);
             lifeTime =  (int)(minVal + ((maxVal - minVal)  * (creature.stats.Size / (double)creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size)))); 
 
             // The less health, the faster the rot
@@ -57,8 +57,6 @@ namespace EvolutionSimulation.Entities
             maxNutritionPoints = UniverseParametersManager.parameters.corpseNutritionPointsMultiplier 
                                 * creature.stats.Size / creature.chromosome.GetFeatureMax(Genetics.CreatureFeature.Size);  
         }
-
-        //TODO, hacer un setTraits con parametros default que se saquen del UniverseParametersManager
 
         public void ReceiveInteraction(Creature other, Interactions type)
         {
