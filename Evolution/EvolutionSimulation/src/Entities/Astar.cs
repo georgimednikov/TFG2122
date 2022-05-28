@@ -250,12 +250,12 @@ namespace EvolutionSimulation.Entities
                 for (int j = -1; j <= 1; ++j)
                 {
                     Vector3 newPos;
-                    if (i == 0 && j == 0 && w.canMove(newPos = (new Vector3(n.pos.X + i, n.pos.Y + j, n.pos.Z == (int)Creature.HeightLayer.Tree ? (int)Creature.HeightLayer.Ground : (int)Creature.HeightLayer.Tree))))
+                    if (i == 0 && j == 0 && w.CanMove(newPos = (new Vector3(n.pos.X + i, n.pos.Y + j, n.pos.Z == (int)Creature.HeightLayer.Tree ? (int)Creature.HeightLayer.Ground : (int)Creature.HeightLayer.Tree))))
                         neigh.Add(new GraphNode(newPos, n, n.costSoFar + (treeBetter ? 0 : (int)Creature.HeightLayer.Tree) - c.PositionDanger((int)n.pos.X, (int)n.pos.Y)));
-                    else if (w.canMove(newPos = (n.pos + new Vector3(i, j, 0))) && (id == w.map[(int)n.pos.X + i, (int)n.pos.Y + j].regionId || otherId == w.map[(int)n.pos.X + i, (int)n.pos.Y + j].regionId))
+                    else if (w.CanMove(newPos = (n.pos + new Vector3(i, j, 0))) && (id == w.map[(int)n.pos.X + i, (int)n.pos.Y + j].regionId || otherId == w.map[(int)n.pos.X + i, (int)n.pos.Y + j].regionId))
                     {
                         double costSoFar = n.costSoFar;
-                        if (!w.canMove(newPos)) continue;
+                        if (!w.CanMove(newPos)) continue;
                         Plant p = w.map[(int)newPos.X, (int)newPos.Y].plant;
                         if (p is Tree) costSoFar += (2 - Tree.movementPenalty);
                         else if (p is EdibleTree) costSoFar += (2 - EdibleTree.movementPenalty);

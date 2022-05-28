@@ -1120,7 +1120,7 @@ namespace EvolutionSimulation.Entities
         }
 
         /// <summary>
-        /// Checks if the creature can access a given layer
+        /// Checks if the creature can reach a given layer
         /// Based on its current layer and stats
         /// </summary>
         public bool CanReach(HeightLayer layer)
@@ -1129,6 +1129,21 @@ namespace EvolutionSimulation.Entities
             {
                 if (layer == HeightLayer.Air) return stats.AirReach;
                 if (layer == HeightLayer.Tree) return stats.TreeReach;
+                return false;
+            }
+            else return true;
+        }
+
+        /// <summary>
+        /// Checks if the creature move to a given layer
+        /// Based on its current layer and stats
+        /// </summary>
+        public bool CanGoToLayer(HeightLayer layer)
+        {
+            if (creatureLayer < layer)
+            {
+                if (layer == HeightLayer.Air) return stats.AerialSpeed > 0;
+                if (layer == HeightLayer.Tree) return stats.ArborealSpeed > 0;
                 return false;
             }
             else return true;

@@ -429,6 +429,15 @@ namespace EvolutionSimulation
         /// <summary>
         /// Checks if target coordinates are within the map's boundaries
         /// </summary>
+        /// <returns>True if it is within bounds</returns>
+        public bool CanMove(Vector3 pos)
+        {
+            return CanMove((int)pos.X, (int)pos.Y, (Creature.HeightLayer)pos.Z);
+        }
+
+        /// <summary>
+        /// Checks if target coordinates are within the map's boundaries
+        /// </summary>
         /// <param name="x"></param>
         /// <param name="y"></param>
         /// <returns>True if it is within bounds</returns>
@@ -443,15 +452,6 @@ namespace EvolutionSimulation
                 return false;
             Plant p = map[x, y].plant;
             return (p is Tree || p is EdibleTree);
-        }
-
-        /// <summary>
-        /// Checks if target coordinates are within the map's boundaries
-        /// </summary>
-        /// <returns>True if it is within bounds</returns>
-        public bool canMove(Vector3 pos)
-        {
-            return CanMove((int)pos.X, (int)pos.Y, (Creature.HeightLayer)pos.Z);
         }
 
         #region EntitiesManagement

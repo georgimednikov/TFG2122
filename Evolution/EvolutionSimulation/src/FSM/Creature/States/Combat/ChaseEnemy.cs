@@ -47,9 +47,25 @@ namespace EvolutionSimulation.FSM.Creature.States
 #endif
             Entities.Creature tmp = creature.world.GetCreature(objectiveID);
             objSpecies = tmp == null ? " " : creature.world.GetCreature(objectiveID).speciesName;
-            if (objective.x != creature.x && objective.y != creature.y && creature.CanReach((Entities.Creature.HeightLayer)objective.z)) 
+            if (objective.x != creature.x && objective.y != creature.y)
             {
-                creature.SetPath(objective);   // This MUST be set up for the cost of the action to work
+                if (creature.CanReach((Entities.Creature.HeightLayer)objective.z))
+                {
+                    if (!creature.CanGoToLayer((Entities.Creature.HeightLayer)objective.z))
+                    {
+                        objective.z = (int)Entities.Creature.HeightLayer.Ground;
+                    }
+                    if (creature.world.CanMove(objective.x, objective.y, (Entities.Creature.HeightLayer)objective.z))
+                        creature.SetPath(objective);    // Set the path the creature must follow if he can reach it
+                    else await = true;
+                }
+                else
+                {
+                    objective.z = (int)Entities.Creature.HeightLayer.Ground;
+                    if (creature.world.CanMove(objective.x, objective.y, (Entities.Creature.HeightLayer)objective.z))
+                        creature.SetPath(objective);    // Set the path the creature must follow if he can reach it
+                    else await = true;
+                }
             }
             else
             {
@@ -91,8 +107,21 @@ namespace EvolutionSimulation.FSM.Creature.States
                 objective.x = otherObj.x;
                 objective.y = otherObj.y;
                 objective.z = otherObj.z;
-                if(creature.CanReach((Entities.Creature.HeightLayer)objective.z))
-                creature.SetPath(objective);    // Set the path the creature must follow if he can reach it
+                if (creature.CanReach((Entities.Creature.HeightLayer)objective.z))
+                {
+                    if (!creature.CanGoToLayer((Entities.Creature.HeightLayer)objective.z))
+                    {
+                        objective.z = (int)Entities.Creature.HeightLayer.Ground;
+                    }
+                    if(creature.world.CanMove(objective.x, objective.y, (Entities.Creature.HeightLayer)objective.z))
+                        creature.SetPath(objective);    // Set the path the creature must follow if he can reach it
+                }
+                else
+                {
+                    objective.z = (int)Entities.Creature.HeightLayer.Ground;
+                    if (creature.world.CanMove(objective.x, objective.y, (Entities.Creature.HeightLayer)objective.z))
+                        creature.SetPath(objective);    // Set the path the creature must follow if he can reach it
+                }
             }
 
             await = false;
