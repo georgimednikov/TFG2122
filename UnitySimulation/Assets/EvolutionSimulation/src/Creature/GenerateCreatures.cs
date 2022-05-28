@@ -6,8 +6,8 @@ namespace UnitySimulation
     public class GenerateCreatures : MonoBehaviour
     {
         public GameObject creature;
-        
         public CreatureSpawn[] creatureDistribution;
+
         void Start()
         {
             Terrain terrain = GetComponent<Terrain>();
