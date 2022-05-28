@@ -9,7 +9,7 @@ namespace VisualizadorConsola
         DateTime newT;
         double prevN;
 
-        public ConsoleLoadingBar()
+        public void Begin(EventSimulation e)
         {
             prevT = DateTime.Now;
             newT = DateTime.Now;
@@ -26,6 +26,8 @@ namespace VisualizadorConsola
             }
             Console.Clear();
             Console.WriteLine(s + "] " + prevN + "%");
+            Console.WriteLine("Ticks: {0}/{2} | Num Creatures: {1} | Births: {3} | Entities to Update: {4} | {5}",
+                0, e.World.Creatures.Count, e.TotalTicks, e.Births, e.World.StaticEntitiesToUpdate.Count, newT - prevT);
         }
 
         public void Update(EventSimulation e)

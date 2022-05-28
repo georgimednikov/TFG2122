@@ -508,10 +508,6 @@ namespace EvolutionSimulation.Entities
         // and values are the actions that the creature performs when something interacts with it.
         Dictionary<Interactions, List<Action<Creature>>> InteractionsDict;
 
-        // Handler for interaction events
-        public delegate void ReceiveInteractionHandler(Creature receiver, Creature sender, Interactions type);
-        public event ReceiveInteractionHandler ReceiveInteractionEvent; 
-
         /// <summary>
         /// Set the interactions that the creature has
         /// </summary>
@@ -545,7 +541,6 @@ namespace EvolutionSimulation.Entities
             {
                 foreach (Action<Creature> response in InteractionsDict[type])
                     response(interacter);
-                ReceiveInteractionEvent?.Invoke(this, interacter, type);
             }
         }
 
