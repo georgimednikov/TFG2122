@@ -16,7 +16,7 @@ namespace Visualizador
                 Width = 280,
                 Height = 150,
                 FormBorderStyle = FormBorderStyle.FixedDialog,
-                Text = "Loading Bar",
+                Text = "Evolution Simulation",
                 StartPosition = FormStartPosition.CenterScreen
             };
             progressBar = new ProgressBar()
@@ -31,7 +31,7 @@ namespace Visualizador
                 Step = 1,
             };
 
-            text = new Label() { Left = 0, Top = 25, Text = "Simulating..." };
+            text = new Label() { Left = 0, Top = 25, Text = "Simulating... This may take a long time" };
             text.AutoSize = true;
 
             prompt.Controls.Add(progressBar);
