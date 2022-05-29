@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using EvolutionSimulation.IO;
 
 namespace EvolutionSimulation.Genetics
 {
@@ -123,7 +123,7 @@ namespace EvolutionSimulation.Genetics
             if (chromosomeJson == null)
                 throw new Exception("Cannot find JSON with chromosome information");
 
-            List<Gene> genes = JsonReader.Deserialize<List<Gene>>(chromosomeJson);
+            List<Gene> genes = JsonLoader.Deserialize<List<Gene>>(chromosomeJson);
             Validator.Validate(genes);
             SetStructure(genes);
 
@@ -140,7 +140,7 @@ namespace EvolutionSimulation.Genetics
             // If it is provided, each ability is validated
             else
             {
-                Tuple<CreatureFeature, float>[] abUnlock = JsonReader.Deserialize<Tuple<CreatureFeature, float>[]> (abilitiesJson);
+                Tuple<CreatureFeature, float>[] abUnlock = JsonLoader.Deserialize<Tuple<CreatureFeature, float>[]> (abilitiesJson);
                 Validator.ValidateAbUnlock(abUnlock);
 
                 foreach (Tuple<CreatureFeature, float> ab in abUnlock)

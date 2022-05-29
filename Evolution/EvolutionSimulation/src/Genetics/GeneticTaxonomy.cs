@@ -1,9 +1,10 @@
-﻿using EvolutionSimulation.Entities;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
+using EvolutionSimulation.Entities;
+using EvolutionSimulation.IO;
 
 namespace EvolutionSimulation.Genetics
 {
@@ -45,7 +46,7 @@ namespace EvolutionSimulation.Genetics
 
         public static SpeciesExport GetExportFromJSON(string json)
         {
-            return JsonReader.Deserialize<SpeciesExport>(json);
+            return JsonLoader.Deserialize<SpeciesExport>(json);
         }
     }
 
@@ -94,7 +95,7 @@ namespace EvolutionSimulation.Genetics
 
             //In tuples to facilitate the modification of the file
             //(the feature name is written instead of a number)
-            Tuple<CreatureFeature, float>[] weights = JsonReader.Deserialize<Tuple<CreatureFeature, float>[]>(geneWeightsRaw);
+            Tuple<CreatureFeature, float>[] weights = JsonLoader.Deserialize<Tuple<CreatureFeature, float>[]>(geneWeightsRaw);
             Validator.Validate(weights);
             speciesGeneWeights = new float[weights.Length];
             foreach (var t in weights)

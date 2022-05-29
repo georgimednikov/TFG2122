@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using EvolutionSimulation;
 using Newtonsoft.Json;
+using EvolutionSimulation;
+using EvolutionSimulation.IO;
 
 namespace Visualizador
 {

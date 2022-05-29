@@ -66,3 +66,6 @@ crashlytics-build.properties
 /Output
 [Aa]ssets/Export
 [Aa]ssets/Export.meta
+
+# Blender meta files
+*.blend1
