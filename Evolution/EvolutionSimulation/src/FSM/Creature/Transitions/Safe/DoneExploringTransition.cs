@@ -32,9 +32,8 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
                 if (!creature.HasEatingObjective()) return false;
                 else return true;
 
-
-            if (creature.stats.Gender == Genetics.Gender.Female
-                || !creature.Mate()) return false;
+            if (creature.stats.Gender == Genetics.Gender.Male
+                && !creature.Mate()) return false;
             return true;
         }
 
