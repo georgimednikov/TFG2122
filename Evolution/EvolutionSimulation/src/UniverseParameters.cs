@@ -1,6 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Newtonsoft.Json;
+using EvolutionSimulation.IO;
 
 namespace EvolutionSimulation
 {
@@ -120,7 +120,7 @@ namespace EvolutionSimulation
         {
             if (uniParamsFile != null)
             {
-                parameters = JsonReader.Deserialize<UniverseParameters>(uniParamsFile);
+                parameters = JsonLoader.Deserialize<UniverseParameters>(uniParamsFile);
                 Validator.Validate(parameters);
             }
             else

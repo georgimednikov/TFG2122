@@ -69,7 +69,8 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\JsonReader.cs" />
+    <Compile Include="src\FSM\ITransition.cs" />
+    <Compile Include="src\IO\JsonLoader.cs" />
     <Compile Include="src\Entities\Creature\Animal.cs" />
     <Compile Include="src\Entities\Astar.cs" />
     <Compile Include="src\Entities\Creature\Memory.cs" />
@@ -141,7 +142,7 @@
     <Compile Include="src\FSM\Fsm.cs" />
     <Compile Include="src\Genetics\GeneticTaxonomy.cs" />
     <Compile Include="src\Entities\Plants\Grass.cs" />
-    <Compile Include="src\NameGenerator.cs" />
+    <Compile Include="src\Genetics\NameGenerator.cs" />
     <Compile Include="src\EventSimulation.cs" />
     <Compile Include="src\UniverseParameters.cs" />
     <Compile Include="src\Utils\PriorityQueue.cs" />
@@ -152,16 +153,16 @@
     <Compile Include="src\Genetics\GeneticFunctions.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\Eating.cs" />
     <Compile Include="src\FSM\Creature\States\Safe\Wander.cs" />
-    <Compile Include="src\FSM\Interfaces.cs" />
+    <Compile Include="src\FSM\IState.cs" />
     <Compile Include="src\Entities\IInteractable.cs" />
-    <Compile Include="src\Perlin.cs" />
+    <Compile Include="src\Utils\Perlin.cs" />
     <Compile Include="src\Entities\Creature\Creature.cs" />
     <Compile Include="src\ISimulation.cs" />
-    <Compile Include="src\Utils\SortByDistanceSEntities.cs" />
-    <Compile Include="src\Validator.cs" />
-    <Compile Include="src\Utils\SortByDistance.cs" />
-    <Compile Include="src\Utils\SortByMetabolism.cs" />
-    <Compile Include="src\UserInfo.cs" />
+    <Compile Include="src\Comparers\SortByDistanceSEntities.cs" />
+    <Compile Include="src\IO\Validator.cs" />
+    <Compile Include="src\Comparers\SortByDistance.cs" />
+    <Compile Include="src\Comparers\SortByMetabolism.cs" />
+    <Compile Include="src\IO\UserInfo.cs" />
     <Compile Include="src\Vector2Int.cs" />
     <Compile Include="src\World.cs" />
     <Compile Include="src\Simulation.cs" />
@@ -185,6 +186,7 @@
       <Name>Telemetry</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>

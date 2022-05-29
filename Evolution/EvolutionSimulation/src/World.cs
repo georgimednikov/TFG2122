@@ -1,9 +1,12 @@
-﻿using EvolutionSimulation.Entities;
-using EvolutionSimulation.Genetics;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Newtonsoft.Json;
 using System.Numerics;
+using Newtonsoft.Json;
+using EvolutionSimulation.Entities;
+using EvolutionSimulation.Genetics;
+using EvolutionSimulation.IO;
+using EvolutionSimulation.Utils;
+
 
 namespace EvolutionSimulation
 {
@@ -140,7 +143,7 @@ namespace EvolutionSimulation
         public void Init(string rawWorldData, string regionMap)
         {
             WorldGenConfig config = new WorldGenConfig(MapType.Custom);
-            map = JsonReader.Deserialize<MapData[,]>(rawWorldData);
+            map = JsonLoader.Deserialize<MapData[,]>(rawWorldData);
             int n = map.GetLength(0);
             float[,] heightMap = new float[n, n];
             float[,] temperatureMap = new float[n, n];
@@ -154,7 +157,7 @@ namespace EvolutionSimulation
             }
             config.heightMap = heightMap;
             config.temperatureMap = temperatureMap;
-            this.regionMap = JsonReader.Deserialize<List<MapRegion>>(regionMap);
+            this.regionMap = JsonLoader.Deserialize<List<MapRegion>>(regionMap);
             config.regionMap = this.regionMap;
             Validator.Validate(config);
             
@@ -177,7 +180,7 @@ namespace EvolutionSimulation
             }
             taxonomy = new GeneticTaxonomy();
             Creatures = new Dictionary<int, Creature>();
-            metabolismComparer = new Utils.SortByMetabolism();
+            metabolismComparer = new Comparers.SortByMetabolism();
             StaticEntities = new Dictionary<int, StaticEntity>();
             entitiesToDelete = new List<int>();
             StaticEntitiesToUpdate = new List<StaticEntity>();
@@ -273,7 +276,7 @@ namespace EvolutionSimulation
 
             taxonomy = new GeneticTaxonomy();
             Creatures = new Dictionary<int, Creature>();
-            metabolismComparer = new Utils.SortByMetabolism();
+            metabolismComparer = new Comparers.SortByMetabolism();
             StaticEntities = new Dictionary<int, StaticEntity>();
             entitiesToDelete = new List<int>();
             StaticEntitiesToUpdate = new List<StaticEntity>();
