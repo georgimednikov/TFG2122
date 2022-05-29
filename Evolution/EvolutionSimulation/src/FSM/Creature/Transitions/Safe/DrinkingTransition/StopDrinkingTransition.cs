@@ -13,8 +13,14 @@
 
         public override bool Evaluate()
         {
-            return creature.stats.CurrHydration >= creature.stats.MaxHydration
-                || (!creature.IsThirsty() && (creature.IsHungry() || creature.IsExhausted()));
+            // Stop drinking if the creature's currHydration is at max or is not thristy and 
+            // is very hungry or exhausted or hungry and doesn't have an eating objective
+            // or is tired and doesn't know where to sleep
+            return creature.stats.CurrHydration >= creature.stats.MaxHydration ||
+                 (!creature.IsThirsty() &&
+                (creature.IsVeryHungry() || creature.IsExhausted() ||
+                (creature.IsHungry() && !creature.HasEatingObjective()) ||
+                (creature.IsTired() && creature.SafePosition() == null)));
         }
 
         public override string ToString()

@@ -19,6 +19,11 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
                 if (creature.SafeTemperaturePosition() == null) return false;
                 else return true;
 
+            if (creature.IsTired())
+                if (creature.SafePosition() == null)
+                    return false;
+                else return true;
+
             if (creature.IsThirsty())
                 if (creature.WaterPosition() == null) return false;
                 else return true;
@@ -27,10 +32,6 @@ namespace EvolutionSimulation.FSM.Creature.Transitions
                 if (!creature.HasEatingObjective()) return false;
                 else return true;
 
-            if (creature.IsTired())
-                if (creature.SafePosition() == null)
-                    return false;
-                else return true;
 
             if (creature.stats.Gender == Genetics.Gender.Female
                 || !creature.Mate()) return false;

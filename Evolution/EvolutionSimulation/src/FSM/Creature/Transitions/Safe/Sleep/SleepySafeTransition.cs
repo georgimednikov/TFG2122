@@ -18,7 +18,9 @@
         /// </summary>
         public override bool Evaluate()
         {
-            return (creature.IsTired() && creature.DistanceToObjective(creature.SafePosition()) <= UniverseParametersManager.parameters.adjacentLength) || creature.IsExhausted();
+            return (creature.IsTired() && 
+                creature.DistanceToObjective(creature.SafePosition()) <= UniverseParametersManager.parameters.adjacentLength) 
+                || creature.IsExhausted();
         }
 
         public override string ToString()

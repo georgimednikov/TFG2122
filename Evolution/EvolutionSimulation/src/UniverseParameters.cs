@@ -60,13 +60,13 @@ namespace EvolutionSimulation
 
         // CreatureStats
         public float newbornStatMultiplier = 0.33f; //Starting multiplier of newborns
-        public float adulthoodThreshold = 0.25f; //After which percentage of lifespan the creature has his stats not dimished by age
-        public float tiredThreshold = 0.40f; //After which percentage of currRest the creature should sleep with low priority
-        public float exhaustThreshold = 0.15f; //After which percentage of currRest the creature should sleep with high priority and some stats are dimished
-        public float hungryThreshold = 0.60f; //After which percentage of currEnergy the creature should eat with low priority
-        public float veryHungryThreshold = 0.20f; //After which percentage of currEnergy the creature should eat with high priority
-        public float thirstyThreshold = 0.50f; //After which percentage of currHydration the creature should eat with low priority
-        public float veryThirstyThreshold = 0.15f; //After which percentage of currHydration the creature should eat with high priority
+        public float adulthoodThreshold = 0.20f; //After which percentage of lifespan the creature has his stats not dimished by age
+        public float tiredThreshold = 0.45f; //After which percentage of currRest the creature should sleep with low priority
+        public float exhaustThreshold = 0.12f; //After which percentage of currRest the creature should sleep with high priority and some stats are dimished
+        public float hungryThreshold = 0.55f; //After which percentage of currEnergy the creature should eat with low priority
+        public float veryHungryThreshold = 0.15f; //After which percentage of currEnergy the creature should eat with high priority
+        public float thirstyThreshold = 0.60f; //After which percentage of currHydration the creature should eat with low priority
+        public float veryThirstyThreshold = 0.20f; //After which percentage of currHydration the creature should eat with high priority
 
         // Trees
         public float treeMovementPenalty = 0.7f; // Mobility penalty applied to non-arborean creatures that move through trees

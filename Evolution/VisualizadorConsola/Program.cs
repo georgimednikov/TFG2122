@@ -13,7 +13,7 @@ namespace VisualizadorConsola
             EventSimulation s = new EventSimulation();
             s.OnSimulationBegin += (e) => { loadingBar = new ConsoleLoadingBar(); loadingBar.Begin(e); };
             s.OnSimulationStep += (e) => { loadingBar.Update(e); };
-#if true 
+#if true //TODO DEBUG
             s.Init(20, 30, 20, "../../ProgramData/", "../../ResultingData/", null);
 #else
             if (!AskInfoUsingConsole(s))

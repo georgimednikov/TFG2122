@@ -21,7 +21,10 @@
                 || (distCorpse > UniverseParametersManager.parameters.adjacentLength && distPlant > UniverseParametersManager.parameters.adjacentLength)     // Both eating objective are far    
                 || (distPlant > UniverseParametersManager.parameters.adjacentLength && creature.stats.Diet == Genetics.Diet.Herbivore)    // hervibore and plant objective is far   
                 || (distCorpse > UniverseParametersManager.parameters.adjacentLength && creature.stats.Diet == Genetics.Diet.Carnivore)  // carnivore and corpse objective is far
-                || (!creature.IsHungry() && (creature.IsThirsty() || creature.IsExhausted())); 
+                || (!creature.IsHungry() &&
+                (creature.IsVeryThirsty() || creature.IsExhausted() ||
+                (creature.IsThirsty() && creature.WaterPosition() == null) ||
+                (creature.IsTired() && creature.SafePosition() == null))); ; 
         }
 
         public override string ToString()
