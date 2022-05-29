@@ -14,7 +14,7 @@
         public override bool Evaluate()
         {
             return creature.stats.Gender != Genetics.Gender.Female
-                && creature.wantMate && !creature.Mate();               
+                && !creature.HasNecesities() && !creature.Mate();               
         }
 
         public override string ToString()
