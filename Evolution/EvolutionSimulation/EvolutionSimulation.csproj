@@ -193,9 +193,7 @@
     </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>if not exist assets\ mkdir assets\
-xcopy ..\assets assets\ /H /E /Y
-xcopy EvolutionSimulation.dll ..\..\..\UnitySimulation\Assets\Plugins /Y
+    <PostBuildEvent>xcopy EvolutionSimulation.dll ..\..\..\UnitySimulation\Assets\Plugins /Y
 xcopy ..\..\ProgramData\ ..\..\..\UnitySimulation\Assets\ProgramData\ /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>
