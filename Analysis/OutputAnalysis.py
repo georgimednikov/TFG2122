@@ -222,30 +222,33 @@ def ProcessData(path: str, mapScale: int):
 #endregion
 
 #region Data Visualization
-def PieChart(title, names, values):
-    fig = px.pie(names=names, values=values, title=title)
+def PieChart(title, names, values, width, height, fontSize):
+    fig = px.pie(names=names, values=values, title= title)
+    fig.update_layout(width = width, height = height, font = dict(size=fontSize))
     fig.show()
 
-def BarChart(title, axisNames, xNames, yValues):
+def BarChart(title, axisNames, xNames, yValues, width, height, titleFontSize, fontSize):
     fig = px.bar(x=xNames, y=yValues, title=title)
-    fig.update_xaxes(title=axisNames[0])
-    fig.update_yaxes(title=axisNames[1])
+    fig.update_xaxes(title= dict(text =axisNames[0], font = dict(size=titleFontSize)))
+    fig.update_yaxes(title= dict(text =axisNames[1], font = dict(size=titleFontSize)))
+    fig.update_layout(width = width, height = height, font = dict(size=fontSize))
     fig.show()
 
-def LineChart(title, axisNames, xNames, yValues):
+def LineChart(title, axisNames, xNames, yValues, width, height, titleFontSize, fontSize):
     fig = px.line(x=xNames, y=yValues, title=title)
-    fig.update_xaxes(title=axisNames[0])
-    fig.update_yaxes(title=axisNames[1])
+    fig.update_xaxes(title= dict(text =axisNames[0], font = dict(size=titleFontSize)))
+    fig.update_yaxes(title= dict(text =axisNames[1], font = dict(size=titleFontSize)))
+    fig.update_layout(width = width, height = height, font = dict(size=fontSize))
     fig.show()
 
-def ShowSpeciesCausesChart(title, axisNames, speciesDict: dict, cause:str):
+def ShowSpeciesCausesChart(title, axisNames, speciesDict: dict, cause:str, width, height, titleFontSize, fontSize):
     speciesNames = list(speciesDict.keys())
     speciesDeathCausePerc = list()
     for species in speciesNames:
         perc = speciesDict[species][0][cause] / max(1,speciesDict[species][1]) * 100
         speciesDeathCausePerc.append(perc)
 
-    BarChart(title, axisNames, speciesNames, speciesDeathCausePerc)  
+    BarChart(title, axisNames, speciesNames, speciesDeathCausePerc, width, height, titleFontSize, fontSize)  
 
 def ShowGlobalInfo(globalDeathInfo: dict, globalDamageInfo: dict):
     fig = make_subplots(rows=1, cols=2, specs=[[{"type": "pie"}, {"type": "pie"}]],subplot_titles=(
@@ -254,9 +257,10 @@ def ShowGlobalInfo(globalDeathInfo: dict, globalDamageInfo: dict):
 
     fig.add_trace(pgo.Pie(labels=list(globalDeathInfo.keys()), values=list(globalDeathInfo.values())), 1, 1)
     fig.add_trace(pgo.Pie(labels=list(globalDamageInfo.keys()), values=list(globalDamageInfo.values())), 1, 2)
+
     fig.show()
 
-def ShowDietInfo(dietInfo: dict):
+def ShowDietInfo(dietInfo: dict, width, height, titleFontSize, fontSize):
     keys = list(dietInfo.keys())
     values = list(dietInfo.values())
 
@@ -266,14 +270,14 @@ def ShowDietInfo(dietInfo: dict):
 
     fig = pgo.Figure(data=[pgo.Bar(name='Deaths caused',x=x, y=deaths), 
                            pgo.Bar(name='Damage dealt',x=x, y=damages)])
-    fig.update_layout(title_text='How starvation affects the survival of creatures depending on diet')
-    fig.update_xaxes(title='Diets')
-    fig.update_yaxes(title='Percentage')
+    fig.update_layout(title_text='How starvation affects the survival of creatures depending on diet', width = width, height = height, font = dict(size=fontSize))
+    fig.update_xaxes(title= dict(text ='Diets', font = dict(size=titleFontSize)))
+    fig.update_yaxes(title= dict(text ='Percentage', font = dict(size=titleFontSize)))
     fig.show()
 
 
 # Shows the birth and death line graphs throughout all the simulation years
-def ShowBirthsAndDeaths(name, yearTicks, totalTicks, birthList: list, deathList: list):
+def ShowBirthsAndDeaths(name, yearTicks, totalTicks, birthList: list, deathList: list, width, height, titleFontSize, fontSize):
     years = int(totalTicks / yearTicks)
     births = [0]*years
     deaths = [0]*years
@@ -288,18 +292,22 @@ def ShowBirthsAndDeaths(name, yearTicks, totalTicks, birthList: list, deathList:
 
     fig.add_trace(pgo.Scatter(x=list(range(1, years + 1)), y=births), 1, 1)
     fig.add_trace(pgo.Scatter(x=list(range(1, years + 1)), y=deaths), 1, 2)
-    fig.update_xaxes(title='Years')
-    fig.update_yaxes(title='Number of creatures')
+    fig.update_xaxes(title= dict(text ='Years', font = dict(size=titleFontSize)))
+    fig.update_yaxes(title= dict(text ='Number of creatures', font = dict(size=titleFontSize)))
+    fig.update_layout(width = width, height = height, font = dict(size=fontSize))
+
     fig.show()
 
 # Shows the natality data depending on the provided index
-def ShowAdulthood(globalBirthInfo:list , speciesBirthInfo: dict):
+def ShowAdulthood(globalBirthInfo:list , speciesBirthInfo: dict, width, height, titleFontSize, fontSize):
     aux = [x[0] * 100 for x in list(speciesBirthInfo.values())]
-    BarChart(f'Percentage of creatures that reach adulthood. Global: {globalBirthInfo[0] *100}%', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
+    BarChart(f'Percentage of creatures that reach adulthood. Global: {globalBirthInfo[0] *100}%', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux,
+     width, height, titleFontSize, fontSize)
 
-def ShowOffspring(globalBirthInfo:list , speciesBirthInfo: dict):
+def ShowOffspring(globalBirthInfo:list , speciesBirthInfo: dict, width, height, titleFontSize, fontSize):
     aux = [x[1] for x in list(speciesBirthInfo.values())]
-    BarChart(f'Average offspring per adult. Global: {globalBirthInfo[1]}', ['Species', 'Percentage'], list(speciesBirthInfo.keys()), aux)
+    BarChart(f'Average offspring per adult. Global: {globalBirthInfo[1]}', ['Species', 'Average'], list(speciesBirthInfo.keys()), aux,
+     width, height, titleFontSize, fontSize)
 
 
 # HeatMap of temperature damage
@@ -307,7 +315,7 @@ def ShowHeatMap(map, type):
     fig = px.imshow(map[type])
     fig.show()
 
-def ShowPlantConsumption(yearTicks, totalTicks, simulationSamples): 
+def ShowPlantConsumption(yearTicks, totalTicks, simulationSamples, width, height, titleFontSize, fontSize): 
     totalYears = int(totalTicks / yearTicks)
     yearlyConsumption = np.zeros((totalYears,2))
     eatenPlantRatios = [(x['EatenPlantsRatio'], x['Tick']) for x in simulationSamples]
@@ -316,6 +324,7 @@ def ShowPlantConsumption(yearTicks, totalTicks, simulationSamples):
         yearlyConsumption[year][0] += eatenPlantRatios[i][0]
         yearlyConsumption[year][1] += 1
     yearlyConsumption = [x[0]/max(1,x[1]) * 100 for x in yearlyConsumption]
-    LineChart('Average percentage of plants consumed through the years', ['Years', 'Percentage of plants consumed'], list(range(1,totalYears+1)), yearlyConsumption)
+    LineChart('Average percentage of plants consumed through the years', ['Years', 'Percentage of plants consumed'], list(range(1,totalYears+1)), yearlyConsumption, 
+     width, height, titleFontSize, fontSize)
   
 #endregion
