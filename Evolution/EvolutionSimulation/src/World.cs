@@ -1018,12 +1018,20 @@ namespace EvolutionSimulation
         /// </summary>
         public void ExportContent()
         {
-            taxonomy.ExportSpecies();
-            taxonomy.RenderSpeciesTree($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/{UserInfo.TreeName}");
+            string path;
+#if TRACKER_ENABLED
+            path = $"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}";
+#else
+            path = $"{UserInfo.ExportDirectory}Output";
+
+#endif
+            System.IO.Directory.CreateDirectory(path);
+            taxonomy.ExportSpecies(path);
+            taxonomy.RenderSpeciesTree($"{path}/{UserInfo.TreeName}");
             string word = JsonConvert.SerializeObject(map, Formatting.Indented);
-            System.IO.File.WriteAllText($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/{UserInfo.WorldName}", word);
+            System.IO.File.WriteAllText($"{path}/{UserInfo.WorldName}", word);
             string rMap = JsonConvert.SerializeObject(regionMap, Formatting.Indented);
-            System.IO.File.WriteAllText($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/{UserInfo.RegionMapName}", rMap);
+            System.IO.File.WriteAllText($"{path}/{UserInfo.RegionMapName}", rMap);
         }
 
         // Map with physical properties

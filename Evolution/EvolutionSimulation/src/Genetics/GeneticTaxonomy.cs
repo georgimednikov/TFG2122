@@ -349,7 +349,7 @@ namespace EvolutionSimulation.Genetics
         /// <summary>
         /// Exports the existing species as JSONs in the folder "ResultingSpecies" named "SpeciesN" being n the order of writing.
         /// </summary>
-        public void ExportSpecies()
+        public void ExportSpecies(string path)
         {
             //Export all the existing species
             for (int i = 0; i < existingSpecies.Count; i++)
@@ -359,7 +359,7 @@ namespace EvolutionSimulation.Genetics
                 Species sp = existingSpecies[i];
                 SpeciesExport export = new SpeciesExport(sp.name, sp.original.stats);
                 string species = JsonConvert.SerializeObject(export, Formatting.Indented);
-                File.WriteAllText($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Species_{i}.json", species);
+                File.WriteAllText($"{path}/Species_{i}.json", species);
             }
 
             speciesRecord.Sort(new TicksComparer());
@@ -371,7 +371,7 @@ namespace EvolutionSimulation.Genetics
                 Species sp = speciesRecord[i];
                 SpeciesExport export = new SpeciesExport(sp.name, sp.original.stats);
                 string species = JsonConvert.SerializeObject(export, Formatting.Indented);
-                File.WriteAllText($"{UserInfo.ExportDirectory}Output/{Telemetry.Tracker.Instance.SessionID}/Species_{i + existingSpecies.Count}.json", species);
+                File.WriteAllText($"{path}/Species_{i + existingSpecies.Count}.json", species);
             }
         }
 

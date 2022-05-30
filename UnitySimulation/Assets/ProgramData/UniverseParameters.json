@@ -28,7 +28,7 @@
   "minPerceptionWithNightVision": 0.7,
   "minMobilityMedium": 0.6,
   "mobilityPenalty": 0.7,
-  "yearsBetweenHeats": 0.1,
+  "yearsBetweenHeats": 0.05,
   "maxChildNumber": 5,
   "ticksToReproduce": 20,
   "maxSpeed": 1.5,
