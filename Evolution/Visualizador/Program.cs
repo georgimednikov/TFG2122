@@ -61,10 +61,9 @@ namespace Visualizador
             else
                 return false;
             int userEntry;
-
+            bool ret;
             // World information check and request if needed
             // If a simulation world is not given, a new one has to be generated.
-            int minSize = UserInfo.MinWorldSize();
             WorldGenConfig config = null;
             if (!File.Exists(dataDir + UserInfo.WorldName) || !File.Exists(dataDir + UserInfo.RegionMapName))
             {
@@ -82,12 +81,11 @@ namespace Visualizador
                 else // If nothing is given, a size and a map type have to be requested from the user 
                 {
                     // Map size request
-                    int mapSize;
+                    int mapSize;                   
                     do
                     {
-                        if (!InstantiatePrompt("Input how big in squares the world is going to be.\nMust be a number larger than or equal to: " + UserInfo.MinWorldSize(), out userEntry))
-                            return false;
-                    } while (userEntry < UserInfo.MinWorldSize());
+                        ret = InstantiatePrompt("Input how big in squares the world is going to be.\nMust be a number larger than or equal to: " + UserInfo.MinWorldSize(), out userEntry);
+                    } while (!ret || userEntry < UserInfo.MinWorldSize());
                     mapSize = userEntry;
 
                     // Map type request
@@ -103,9 +101,8 @@ namespace Visualizador
                     label += "\n";
                     do
                     {
-                        if (!InstantiatePrompt(label, out userEntry, 360))
-                            return false;
-                    } while (userEntry < 0 || userEntry >= mapTypes.Length - 1);
+                        ret = InstantiatePrompt(label, out userEntry, 360);                            
+                    } while (!ret || userEntry < 0 || userEntry >= mapTypes.Length - 1);
 
                     config = new WorldGenConfig(mapTypes[userEntry])
                     {
@@ -117,27 +114,24 @@ namespace Visualizador
             // Simulation duration request
             do
             {
-                if (!InstantiatePrompt("Input how many years of evolution are going to be\nsimulated:", out userEntry))
-                    return false;
-            } while (userEntry < 0);
+                ret = InstantiatePrompt("Input how many years of evolution are going to be\nsimulated:", out userEntry);
+            } while (!ret || userEntry < 0);
             years = userEntry;
 
             // Original species request
             int minSpecies = UserInfo.MinSpeciesAmount();
             do
             {
-                if (!InstantiatePrompt("Input how many species are going to be created\ninitially. Must be a number larger than or equal to: " + UserInfo.MinSpeciesAmount(), out userEntry))
-                    return false;
-            } while (userEntry < minSpecies);
+                ret = InstantiatePrompt("Input how many species are going to be created\ninitially. Must be a number larger than or equal to: " + UserInfo.MinSpeciesAmount(), out userEntry);
+            } while (!ret || userEntry < minSpecies);
             species = userEntry;
 
             // Initial individuals per species request
             int minIndividuals = UserInfo.MinIndividualsAmount();
             do
             {
-                if (!InstantiatePrompt("Input how many individuals per species are going to be\ncreated. Must be a number larger than or equal to: " + UserInfo.MinIndividualsAmount(), out userEntry))
-                    return false;
-            } while (userEntry < minIndividuals);
+                ret = InstantiatePrompt("Input how many individuals per species are going to be\ncreated. Must be a number larger than or equal to: " + UserInfo.MinIndividualsAmount(), out userEntry);
+            } while (!ret || userEntry < minIndividuals);
             individuals = userEntry;
 
             // Simulation initialization after all information has been provided
